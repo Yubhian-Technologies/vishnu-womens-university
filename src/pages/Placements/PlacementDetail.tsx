@@ -107,6 +107,13 @@ The Centre operates from the SVES Head Office, with designated Single Points of 
 Students can pursue advanced study at VWU or explore higher education opportunities at universities in India and abroad.`
 };
 
+// Hero subtitle fallback, shown only when the CMS's own Short Description
+// (`item.desc`) is empty — same idea as BODY_OVERRIDES above, just for the
+// hero instead of the body copy.
+const HERO_SUBTITLE_OVERRIDES: Record<string, string> = {
+  'placement-guidelines': 'A practical guide to placement requirements, career preparation and recruitment participation.',
+};
+
 // Higher-studies / competitive-exam training blurb for the Career Guidance
 // Cell page. Rendered unconditionally on that page (below the Overview
 // copy), because the BODY_OVERRIDES entry above only shows when the CMS
@@ -1524,12 +1531,12 @@ export default function PlacementDetail() {
                 </div>
               )}
               <h1 className="dept-hero-title">{item.slug === 'gsac' ? 'Graduate Study Abroad Center – GSAC' : item.title}</h1>
-              {(item.desc || item.slug === 'gsac' || item.slug === 'career-guidance-cell' || item.slug === 'higher-education') && (
+              {(item.desc || HERO_SUBTITLE_OVERRIDES[item.slug] || item.slug === 'gsac' || item.slug === 'career-guidance-cell' || item.slug === 'higher-education') && (
                 <p className="dept-hero-subtitle">
                   {item.slug === 'gsac' ? 'Guidance and support for students exploring postgraduate study opportunities around the world.' :
                    item.slug === 'career-guidance-cell' ? 'Helping students explore career pathways, higher studies and competitive examinations through structured guidance and preparation.' :
                    item.slug === 'higher-education' ? 'Pathways and academic support for students planning postgraduate study, research and advanced learning.' :
-                   item.desc}
+                   item.desc || HERO_SUBTITLE_OVERRIDES[item.slug]}
                 </p>
               )}
 

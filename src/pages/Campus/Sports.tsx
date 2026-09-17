@@ -306,7 +306,7 @@ export default function Sports() {
           <div className="container">
             <div className="sports-tournaments-header">
               <span className="sports-explore-eyebrow">
-                <Trophy size={14} /> CAMPUS SPORTS & COMPETITIONS
+                <Trophy size={14} /> Campus Sports & Competitions
               </span>
               <h2 className="sports-tournaments-title">
                 {settingsDoc?.tournaments?.title || 'Sports Events & Competitions'}
@@ -327,7 +327,7 @@ export default function Sports() {
           <div className="container">
             <div className="sports-achievements-header">
               <span className="sports-explore-eyebrow">
-                <Trophy size={14} /> STUDENT SPORTS ACHIEVEMENTS
+                <Trophy size={14} /> Student Sports Achievements
               </span>
               <h2 className="sports-achievements-title">
                 {settingsDoc?.achievements?.title || 'Hall of Champions'}

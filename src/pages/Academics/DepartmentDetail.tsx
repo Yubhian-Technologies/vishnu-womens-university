@@ -145,11 +145,25 @@ function VmExpandableCard({ title, content }: { title: string; content: string |
       <SmoothCollapse open={expanded}>
         <div style={{ paddingTop: '0.5rem' }}>
           {isArray ? (
-            <ul style={{ paddingLeft: '1.25rem', margin: 0, color: 'var(--color-text)', lineHeight: 1.6 }}>
-              {content.map((c, i) => <li key={i} style={{ marginBottom: '0.5rem' }}>{c}</li>)}
+            <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+              {content.map((c, i) => (
+                <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem' }}>
+                  <span style={{ width: 18, height: 18, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
+                    <svg width="9" height="9" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                  </span>
+                  <span style={{ color: 'var(--color-text)', lineHeight: 1.6 }}>{c}</span>
+                </li>
+              ))}
             </ul>
           ) : (
-            <p style={{ margin: 0, color: 'var(--color-text)', lineHeight: 1.6 }}>{content}</p>
+            <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+              <li style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem' }}>
+                <span style={{ width: 18, height: 18, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
+                  <svg width="9" height="9" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                </span>
+                <span style={{ color: 'var(--color-text)', lineHeight: 1.6 }}>{content}</span>
+              </li>
+            </ul>
           )}
         </div>
       </SmoothCollapse>

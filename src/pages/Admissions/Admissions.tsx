@@ -412,6 +412,7 @@ export default function Admissions() {
             subtitle="Explore VWU's academic environment, campus facilities, student life and career support before making your choice."
             columns={2}
             layout="side-text"
+            galleryLinkText="Explore Campus →"
           />
           <div style={{ textAlign: 'center', marginTop: 'var(--space-8)' }}>
             <Link to="/campus-visit" className="btn btn-primary btn-lg">Explore Campus →</Link>

@@ -207,9 +207,11 @@ export default function AdmissionProcedure() {
             Review your programme, confirm your eligibility and proceed with the applicable admission process
           </p>
           <div className="ap-cta__actions">
-            <Link to="/programmes-fee-structure" className="btn btn-accent">View Fee Structure</Link>
-            <Link to="/result-analysis" className="btn btn-secondary">View Results Analysis</Link>
-            <Link to="/admissions" className="btn btn-secondary">Back to Admissions</Link>
+            <Link to="/apply-now" className="btn btn-accent">Apply Now →</Link>
+          </div>
+          <div className="ap-cta__actions ap-cta__actions--secondary">
+            <Link to="/programmes-fee-structure" className="btn btn-secondary">View Fee Structure</Link>
+            <Link to="/admissions" className="btn btn-secondary">Return to Admissions</Link>
           </div>
         </div>
       </section>

@@ -39,6 +39,8 @@ export default function StateOfTheArtLabs() {
         page="campus-state-of-the-art-labs"
         defaultTitle={heroTitle}
         defaultSubtitle={heroSubtitle}
+        forceTitle={DEFAULT_HERO_TITLE}
+        forceSubtitle={DEFAULT_HERO_SUBTITLE}
         hideCta={true}
       />
 
@@ -103,16 +105,13 @@ export default function StateOfTheArtLabs() {
       {photos.length > 0 && photos[0].src !== PHOTO_NEEDED_PLACEHOLDER && (
         <section className="section bg-off-white">
           <div className="container">
-            <PhotoGrid 
-              images={photos} 
-              title="Inside Our Laboratories" 
+            <PhotoGrid
+              images={photos}
+              title="Inside Our Laboratories"
               subtitle="Explore the laboratory spaces where students experiment, build, test and apply what they learn."
-              columns={3} 
-              layout="default" 
+              columns={3}
+              layout="default"
             />
-            <div style={{ textAlign: 'center', marginTop: '3rem' }}>
-              <a href="#" className="btn btn-outline" onClick={(e) => e.preventDefault()}>View Full Gallery</a>
-            </div>
           </div>
         </section>
       )}

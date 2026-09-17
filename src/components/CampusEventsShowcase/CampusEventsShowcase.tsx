@@ -17,25 +17,41 @@ import './CampusEventsShowcase.css';
 const CULTURAL_CATEGORIES: { label: string; sub: string; Icon: typeof Sparkles }[] = [
   {
     label: 'Festival Celebrations',
-    sub: 'Celebrating every Indian festival with genuine enthusiasm and unity.',
+    sub: 'Campus celebrations bring students together to experience traditions, share cultures and strengthen the sense of community across the university.',
     Icon: PartyPopper,
   },
   {
     label: 'Artistic Development',
-    sub: 'Guidance and access to painting, photography, music, and craft facilities.',
+    sub: 'Students can develop their interests in painting, photography, music and crafts through opportunities for creative exploration and participation.',
     Icon: Palette,
   },
   {
     label: 'Performing Arts',
-    sub: 'Dance, drama, and music thrive through dedicated clubs and events.',
+    sub: 'Dance, drama and music activities provide students with platforms to perform, collaborate and develop confidence through shared creative experiences.',
     Icon: Drama,
   },
   {
     label: 'Photography & Film',
-    sub: 'Flash It Out Club and Vishnu TV Academy fuel creative storytelling.',
+    sub: 'Photography and film initiatives encourage students to document campus experiences, experiment with visual storytelling and develop their creative perspective.',
     Icon: Camera,
   },
 ];
+
+// Fallback sub-heading/paragraph for the "Cultural Initiatives" intro
+// section, shown only when an admin hasn't entered that section's own
+// Subtitle/Body text in Admin -> Campus Life -> Events -> Sections — so
+// filling those fields in there overrides this immediately.
+const CULTURAL_INTRO_SUBHEADING = 'Arts & Cultural Opportunities for Students';
+const CULTURAL_INTRO_PARAGRAPH = 'Students can explore diverse creative interests through cultural celebrations, performing arts, photography, music and other campus activities. These experiences complement academic learning while encouraging collaboration, self-expression and participation in university life.';
+
+// Same fallback idea as above, for the "Gallery" section's own heading/copy
+// — an admin's actual Section Label ("Gallery") still drives isGalleryLabel
+// detection and the light/polaroid layout below; only the DISPLAYED heading
+// and intro paragraph are overridden here, and only when the admin hasn't
+// entered a Subtitle/Body of their own for that section.
+const GALLERY_HEADING_OVERRIDE = 'Experience Life at VWU';
+const GALLERY_INTRO_PARAGRAPH = 'Explore moments from cultural programmes, student activities, celebrations and campus events that reflect the vibrant student experience at Vishnu Women’s University.';
+const GALLERY_CTA_LABEL = 'Explore the Campus Gallery';
 
 const ICON_BY_KEYWORD: { match: string; Icon: typeof Sparkles }[] = [
   { match: 'festival', Icon: PartyPopper },
@@ -324,25 +340,21 @@ export default function CampusEventsShowcase({ sourceItem }: { sourceItem: Campu
         )}
         <div className="container ces-hero-inner">
           <div className="ces-hero-copy">
-            <span className="ces-eyebrow">— Campus Life · Arts and Culture</span>
+            <span className="ces-eyebrow">— Campus Life · Arts & Culture</span>
             <h1 className="ces-hero-title">
-              Where <span>Campus</span><br />Comes Alive
+              Arts, Culture &amp; Campus Life at Vishnu Women&rsquo;s University
             </h1>
-            <p className="ces-hero-script">Where every event tells a story</p>
+            <p className="ces-hero-script">Learning, creativity and community beyond the classroom</p>
             <p className="ces-hero-desc">
-              From cultural festivals to annual celebrations, VWU's campus events bring students together
-              to create, perform, and celebrate as one community.
+              At Vishnu Women&rsquo;s University, campus life extends beyond academics. Cultural festivals, performing arts, student-led activities and annual celebrations give students opportunities to express their creativity, build confidence, connect with peers and become active members of the university community.
             </p>
             {visibleSections.length > 0 && (
               <div className="ces-hero-actions">
                 <button type="button" className="ces-btn ces-btn--solid" onClick={() => smoothScrollTo('#ces-sections')}>
-                  Explore Arts and Culture <ArrowRight size={16} strokeWidth={2.25} />
+                  Explore Arts &amp; Culture <ArrowRight size={16} strokeWidth={2.25} />
                 </button>
               </div>
             )}
-          </div>
-          <div className="ces-hero-tagline" aria-hidden="true">
-            Every Event.<br />One Community.
           </div>
         </div>
       </section>
@@ -473,26 +485,41 @@ export default function CampusEventsShowcase({ sourceItem }: { sourceItem: Campu
             const isFirstGeneric = genericIndex === 0;
             const isDark = !isFirstGeneric && genericIndex % 2 === 1;
             const isGalleryLabel = section.label.trim().toLowerCase() === 'gallery';
+            const hasOwnSectionCopy = !!section.subtitle || !!section.textContent?.trim();
 
             const copy = (
               <div>
-                <h2 className={`ces-section-title${isDark ? ' ces-section-title--light' : ''}`}>{section.label}</h2>
+                <h2 className={`ces-section-title${isDark ? ' ces-section-title--light' : ''}`}>
+                  {isGalleryLabel ? GALLERY_HEADING_OVERRIDE : section.label}
+                </h2>
                 {section.subtitle && <p className={isDark ? 'ces-events-sub' : 'ces-close-desc'}>{section.subtitle}</p>}
                 {section.textContent?.trim() && (
                   <p className={isDark ? 'ces-events-sub' : 'ces-close-desc'} style={{ whiteSpace: 'pre-line' }}>
                     {section.textContent}
                   </p>
                 )}
+                {isGalleryLabel && !hasOwnSectionCopy && (
+                  <p className="ces-close-desc">{GALLERY_INTRO_PARAGRAPH}</p>
+                )}
               </div>
             );
 
             if (isFirstGeneric) {
+              const hasOwnCopy = !!section.subtitle || !!section.textContent?.trim();
               return (
                 <section key={section.id} className="ces-section ces-section--light" style={colorVars}>
                   <div className="container">
                     <div className="ces-intro-grid">
                       <div>
                         {copy}
+                        {!hasOwnCopy && (
+                          <div style={{ margin: '0.5rem 0 1.5rem' }}>
+                            <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.35rem', fontWeight: 600, color: 'var(--color-primary)', margin: '0 0 0.75rem' }}>
+                              {CULTURAL_INTRO_SUBHEADING}
+                            </h3>
+                            <p className="ces-close-desc">{CULTURAL_INTRO_PARAGRAPH}</p>
+                          </div>
+                        )}
                         <div className="ces-category-row">
                           {CULTURAL_CATEGORIES.map(({ label, sub, Icon }) => (
                             <div key={label} className="ces-category">
@@ -549,7 +576,7 @@ export default function CampusEventsShowcase({ sourceItem }: { sourceItem: Campu
                     {copy}
                     {isGalleryLabel && (
                       <Link to="/news-awards/gallery" className="ces-btn ces-btn--dark" style={{ marginTop: 'var(--space-5)' }}>
-                        View Gallery <ArrowRight size={16} strokeWidth={2.25} />
+                        {GALLERY_CTA_LABEL} <ArrowRight size={16} strokeWidth={2.25} />
                       </Link>
                     )}
                   </div>

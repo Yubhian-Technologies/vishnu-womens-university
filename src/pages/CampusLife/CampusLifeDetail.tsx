@@ -40,6 +40,57 @@ const EVENTS_SHOWCASE_SLUGS = new Set(['event', 'events']);
 
 const NAV_OFFSET = 'calc(var(--topbar-height) + var(--header-height) + 1rem)';
 
+// Swimming Pool — hardcoded rather than the admin-entered CustomSections
+// content, which had every heading ("Pool at a Glance", "Facilities &
+// Support") typed as a plain line inside one flat List block, so each one
+// rendered as its own bullet item instead of a heading over its group. Fixed
+// here directly since restructuring the CMS record wasn't an option this
+// time; the tradeoff is this section is no longer editable from
+// Admin -> Campus Life for this page.
+const SWIMMING_POOL_FACILITIES: { title: string; desc: string }[] = [
+  { title: 'Six-Lane Swimming Pool', desc: 'The 80 ft × 40 ft pool provides dedicated lanes for structured practice, fitness swimming and recreational use.' },
+  { title: 'Professional Coaching', desc: 'Experienced coaching support helps students develop swimming techniques across the major strokes while building confidence, endurance and water skills.' },
+  { title: 'Water Quality & Maintenance', desc: 'Modern circulation and purification systems support regular water maintenance and help provide a clean swimming environment.' },
+  { title: 'Safety Facilities', desc: 'The pool area is equipped with essential lifesaving and poolside safety equipment to support safe aquatic activity.' },
+  { title: 'Poolside Amenities', desc: 'The surrounding poolside area provides space for students to prepare, relax and spend time between swimming sessions.' },
+  { title: 'Nearby Refreshments', desc: 'A refreshment facility located close to the pool offers students convenient access to food and beverages before or after their activities.' },
+];
+
+function SwimmingPoolContent() {
+  return (
+    <div>
+      <p style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-text-light)', margin: '0 0 var(--space-4)' }}>
+        Train. Stay Active. Recharge.
+      </p>
+      <p style={{ fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: 1.75, margin: '0 0 var(--space-8)' }}>
+        The swimming pool at Vishnu Women&rsquo;s University provides students with a dedicated space for aquatic training, fitness and recreation. Located near the Sports Complex, the facility supports both beginners and experienced swimmers while encouraging swimming as part of an active and balanced campus lifestyle.
+      </p>
+
+      <h3 style={{ fontSize: '1.5rem', color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>Pool at a Glance</h3>
+      <p style={{ fontSize: 'var(--text-base)', fontWeight: 600, color: 'var(--color-text)', marginBottom: 'var(--space-8)' }}>
+        80 ft × 40 ft swimming pool &nbsp;|&nbsp; Six lanes &nbsp;|&nbsp; Coaching support &nbsp;|&nbsp; Water circulation and purification systems
+      </p>
+
+      <h3 style={{ fontSize: '1.5rem', color: 'var(--color-primary)', marginBottom: 'var(--space-5)' }}>Facilities & Support</h3>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))', gap: 'var(--space-5)', marginBottom: 'var(--space-8)' }}>
+        {SWIMMING_POOL_FACILITIES.map((f) => (
+          <div key={f.title} style={{ padding: 'var(--space-5)', background: 'var(--color-off-white)', borderRadius: 'var(--radius-md)', borderLeft: '4px solid var(--color-primary)' }}>
+            <strong style={{ display: 'block', fontSize: 'var(--text-base)', marginBottom: 'var(--space-2)', color: 'var(--color-heading)' }}>{f.title}</strong>
+            <span style={{ color: 'var(--color-text-light)', lineHeight: 1.6, display: 'block' }}>{f.desc}</span>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ background: 'var(--color-off-white)', padding: 'var(--space-8)', borderRadius: 'var(--radius-lg)', textAlign: 'center', maxWidth: '900px', margin: '0 auto' }}>
+        <h3 style={{ fontSize: '1.5rem', color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>Supporting an Active Campus Lifestyle</h3>
+        <p style={{ fontSize: '1.05rem', color: 'var(--color-text)', lineHeight: 1.7, fontStyle: 'italic' }}>
+          The swimming pool forms part of the University&rsquo;s wider sports and wellness infrastructure, giving students another opportunity to stay active, develop new skills and make recreation part of everyday campus life.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 /**
  * One shared detail page for every admin-managed Campus Life page — the 16
  * facility pages under /campus/:slug (some as a single scrolling page of
@@ -127,7 +178,11 @@ export default function CampusLifeDetail({ slug: slugProp }: { slug?: string }) 
           <div className="container">
             <div>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>{title}</h2>
-              {visibleSections.length > 0 ? (
+              {slug === 'swimming-pool' ? (
+                <div style={{ marginTop: 'var(--space-5)' }}>
+                  <SwimmingPoolContent />
+                </div>
+              ) : visibleSections.length > 0 ? (
                 <div style={{ marginTop: 'var(--space-5)' }}>
                   <CustomSectionsPlain sections={visibleSections} />
                 </div>
@@ -147,7 +202,15 @@ export default function CampusLifeDetail({ slug: slugProp }: { slug?: string }) 
       {!isActivity && !EVENTS_SHOWCASE_SLUGS.has(slug) && !photosLoading && photos.length > 0 && (
         <section className="section bg-off-white">
           <div className="container">
-            <PhotoGrid images={photos} label="" title={title} subtitle={slug === 'campus-security' ? 'Campus Security in Action' : undefined} columns={3} layout="default" />
+            <PhotoGrid
+              images={photos}
+              label={slug === 'other-facilities' ? 'Campus Facilities Gallery' : ''}
+              title={slug === 'other-facilities' ? 'Explore the Spaces That Support Campus Life' : title}
+              subtitle={slug === 'other-facilities' ? 'Take a closer look at the infrastructure, services, learning spaces, and shared facilities across Vishnu Women’s University.' : undefined}
+              galleryLinkText={slug === 'other-facilities' ? 'View Full Gallery' : undefined}
+              columns={3}
+              layout="default"
+            />
           </div>
         </section>
       )}
@@ -158,8 +221,8 @@ export default function CampusLifeDetail({ slug: slugProp }: { slug?: string }) 
       {!EVENTS_SHOWCASE_SLUGS.has(slug) && (
         <section style={{ background: 'var(--color-primary)', padding: 'var(--space-14) 0' }}>
           <div className="container" style={{ textAlign: 'center' }}>
-            <h2 style={{ color: 'var(--color-white)', marginBottom: slug === 'campus-book-stores' || slug === 'campus-security' ? 'var(--space-2)' : 'var(--space-4)' }}>
-              {slug === 'campus-book-stores' ? 'Explore More Campus Facilities' : (slug === 'swimming-pool' ? 'Dive into More of Campus Life' : (isActivity ? 'Explore More Student Activities' : 'Explore More of Campus Life'))}
+            <h2 style={{ color: 'var(--color-white)', marginBottom: slug === 'campus-book-stores' ? 'var(--space-2)' : 'var(--space-4)' }}>
+              {slug === 'campus-book-stores' ? 'Explore More Campus Facilities' : slug === 'swimming-pool' ? 'Dive into More of Campus Life' : (isActivity ? 'Explore More Student Activities' : 'Explore More of Campus Life')}
             </h2>
             {slug === 'campus-book-stores' && (
               <p style={{ color: 'var(--color-white)', fontSize: '1.1rem', opacity: 0.9, maxWidth: '600px', margin: '0 auto var(--space-6)' }}>
@@ -181,8 +244,14 @@ export default function CampusLifeDetail({ slug: slugProp }: { slug?: string }) 
                 </>
               ) : (
                 <>
-                  <Link to="/campus" className="btn btn-accent">{slug === 'campus-book-stores' ? 'Explore Campus Facilities' : (slug === 'swimming-pool' ? 'Back to Campus Life →' : (slug === 'campus-security' ? 'Explore Campus Life →' : 'Back to Campus Life'))}</Link>
-                  <Link to={slug === 'swimming-pool' ? '/campus/sports' : '/student-life'} className="btn btn-secondary">{slug === 'campus-book-stores' ? 'Discover Student Life' : (slug === 'swimming-pool' ? 'Explore Fitness & Sports →' : (slug === 'campus-security' ? 'Discover Student Life →' : 'Student Life'))}</Link>
+                  <Link to="/campus" className="btn btn-accent">
+                    {slug === 'campus-book-stores' ? 'Explore Campus Facilities' : slug === 'swimming-pool' ? 'Back to Campus Life →' : 'Back to Campus Life'}
+                  </Link>
+                  {slug === 'swimming-pool' ? (
+                    <Link to="/campus/sports" className="btn btn-secondary">Explore Fitness & Sports →</Link>
+                  ) : (
+                    <Link to="/student-life" className="btn btn-secondary">{slug === 'campus-book-stores' ? 'Discover Student Life' : 'Student Life'}</Link>
+                  )}
                 </>
               )}
             </div>

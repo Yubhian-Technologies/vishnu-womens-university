@@ -86,7 +86,10 @@ export default function Temples() {
 
   // Dynamic titles and subtitles
   const title = adminItem?.title || facilityDefault?.title || 'Temples of God';
-  const subtitle = adminItem?.desc || facilityDefault?.heroSubtitle || 'A peaceful campus space for reflection, prayer, and inner calm.';
+  // Deliberately NOT reading adminItem?.desc here — this hero subtitle is
+  // meant to stay in sync with the current copy regardless of stale/older
+  // text that may still be saved on the campusLifeItems 'temples' doc.
+  const subtitle = facilityDefault?.heroSubtitle || 'A peaceful campus space for reflection, prayer, and inner calm.';
 
   // Dynamic admin custom sections
   const customSections = (adminItem?.customSections || [])
@@ -103,6 +106,7 @@ export default function Temples() {
         page="campus-temples"
         defaultTitle={title}
         defaultSubtitle={subtitle}
+        forceSubtitle={subtitle}
         hideCta={true}
       />
 
@@ -120,7 +124,6 @@ export default function Temples() {
                   title
                 )}
               </h1>
-              <p className="tmpl-hero-subtitle">{subtitle}</p>
 
               {/* Stat Badges */}
               <div className="tmpl-hero-stats">

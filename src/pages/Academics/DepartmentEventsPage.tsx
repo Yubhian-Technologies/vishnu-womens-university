@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
 import SEO from '../../components/SEO/SEO';
 import { useOrderedCollection } from '../../hooks/useCollection';
@@ -8,6 +8,13 @@ import { hasCustomSectionContent, type CustomSection } from '../../lib/customSec
 import type { NewsEventsCategory } from '../../components/NewsEventsTabs/NewsEventsTabs';
 import { ArrowLeft } from 'lucide-react';
 import '../detail-layout.css';
+
+// Shown per department/category before "Load More" reveals the rest —
+// applies to every department generically, since this page (unlike
+// HorizontalEventsShowcase's own department-agnostic "first 5 + View All"
+// carousel) is the one place all of a category's imageCards events land,
+// regardless of which department they belong to.
+const INITIAL_VISIBLE = 6;
 
 export default function DepartmentEventsPage() {
   const { slug, categorySlug } = useParams<{ slug: string; categorySlug: string }>();
@@ -23,6 +30,12 @@ export default function DepartmentEventsPage() {
       document.title = `Events | ${dept.title} | Vishnu Women's University`;
     }
   }, [dept]);
+
+  // React Router reuses this component instance across a slug/categorySlug
+  // param change (no remount), so without this a "Load More" click on one
+  // department/category would stay expanded after navigating to another.
+  const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE);
+  useEffect(() => { setVisibleCount(INITIAL_VISIBLE); }, [slug, categorySlug]);
 
   if (loading) return null;
   if (!group || !dept) return <Navigate to="/academics" replace />;
@@ -58,11 +71,13 @@ export default function DepartmentEventsPage() {
   }
 
   // Flatten all cards from all years in this category
-  const allCards = category.years.flatMap(y => 
-    y.section && y.section.contentType === 'imageCards' && y.section.imageCards 
-      ? y.section.imageCards.filter((c) => c.imageUrl || c.title.trim() || c.description.trim()) 
+  const allCards = category.years.flatMap(y =>
+    y.section && y.section.contentType === 'imageCards' && y.section.imageCards
+      ? y.section.imageCards.filter((c) => c.imageUrl || c.title.trim() || c.description.trim())
       : []
   );
+  const visibleCards = allCards.slice(0, visibleCount);
+  const hasMore = allCards.length > visibleCount;
 
   return (
     <main className="page-wrapper bg-off-white">
@@ -92,7 +107,7 @@ export default function DepartmentEventsPage() {
           <p style={{ color: 'var(--color-text-light)' }}>No events found.</p>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(280px, 100%), 1fr))', gap: 'var(--space-6)' }}>
-            {allCards.map((card, ci) => (
+            {visibleCards.map((card, ci) => (
               <div key={ci} style={{ border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-lg)', overflow: 'hidden', background: 'var(--color-white)', display: 'flex', flexDirection: 'column', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)' }}>
                 {card.imageUrl ? (
                   <img loading="lazy" src={card.imageUrl} alt={card.title} style={{ width: '100%', aspectRatio: '16 / 10', objectFit: 'cover', display: 'block' }} />
@@ -113,6 +128,18 @@ export default function DepartmentEventsPage() {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {hasMore && (
+          <div style={{ textAlign: 'center', marginTop: 'var(--space-10)' }}>
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => setVisibleCount(allCards.length)}
+            >
+              Load More
+            </button>
           </div>
         )}
       </div>
