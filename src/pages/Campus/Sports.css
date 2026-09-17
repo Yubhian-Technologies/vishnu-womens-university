@@ -748,6 +748,50 @@
   margin: 0;
 }
 
+/* Final CTA Band */
+.sports-cta-band {
+  position: relative;
+  background: var(--color-primary);
+  padding: var(--space-14) 0;
+  text-align: center;
+  border-top: 1px solid rgba(201, 168, 76, 0.25);
+}
+
+.sports-cta-band h2 {
+  font-family: var(--font-sans);
+  font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: var(--color-white);
+  margin: 0 0 var(--space-4) 0;
+  line-height: 1.15;
+}
+
+.sports-cta-band p {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.82);
+  max-width: 640px;
+  margin: 0 auto var(--space-8) auto;
+  line-height: 1.6;
+}
+
+.sports-cta-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+@media (max-width: 640px) {
+  .sports-cta-actions .btn {
+    white-space: normal;
+    width: 100%;
+    max-width: 340px;
+  }
+}
+
 /* Senior Responsive Architecture */
 @media (max-width: 1280px) {
   .sports-champions-gallery {

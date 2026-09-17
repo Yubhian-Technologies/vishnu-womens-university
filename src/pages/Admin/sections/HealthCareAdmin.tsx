@@ -8,10 +8,10 @@ import { CONTENT_ICON_NAMES } from '../../../lib/contentIcons';
 const PAGE = 'health-care';
 
 export const DEFAULT_HC_PILLS = [
-  { title: 'Better', desc: 'Health', icon: 'Heart' },
-  { title: 'Stronger', desc: 'Community', icon: 'Users' },
-  { title: 'Safe', desc: 'Campus', icon: 'ShieldCheck' },
-  { title: 'Quality', desc: 'Care', icon: 'Star' },
+  { title: 'Medical Support', desc: 'Access to consultation and essential healthcare services', icon: 'Heart' },
+  { title: 'First Aid & Emergency Support', desc: 'Assistance for immediate medical needs', icon: 'ShieldCheck' },
+  { title: 'On-Campus Facilities', desc: 'Healthcare services located within the University campus', icon: 'Users' },
+  { title: 'Student & Staff Care', desc: 'Support available to members of the University community', icon: 'Activity' },
 ];
 
 export const DEFAULT_HC_SERVICES = [
@@ -62,9 +62,9 @@ export const DEFAULT_HC_FACILITIES = [
 
 export const DEFAULT_HC_ABOUT = {
   badge: 'FACILITIES & SCHEDULE',
-  title: 'Quality Healthcare, Close to Campus',
+  title: 'Healthcare Support on Campus',
   subtitle:
-    'Vishnu Women’s University provides accessible and reliable healthcare support to students and staff through dedicated medical facilities across the campus. Services include medical consultation, first aid, basic diagnostics, inpatient care, specialist consultations, pharmacy and emergency support.',
+    'The University provides accessible healthcare services through dedicated medical facilities located across the campus. These facilities support routine consultations, first aid, basic diagnostics, short-term observation and other essential medical requirements.',
 };
 
 function useLoadedState<T>(loading: boolean, computeInitial: () => T) {

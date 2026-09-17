@@ -267,8 +267,8 @@
   border: 1px solid transparent !important;
   box-shadow: none !important;
   cursor: pointer;
-  padding: 2px 2px !important;
-  border-radius: 10px !important;
+  padding: 8px 16px !important; /* Significantly increased padding for 2x larger hover effect */
+  border-radius: 12px !important;
   font-family: var(--font-sans);
   font-size: 0.95rem; /* Force a smaller fixed font size */
   font-weight: 700;
@@ -278,36 +278,28 @@
   white-space: nowrap;
   position: relative;
   z-index: 1;
-  transition: color 180ms ease, opacity 180ms ease, background-color 180ms ease, transform 180ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+  transition: color 200ms ease, opacity 200ms ease, background-color 200ms ease, transform 200ms cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 
-/* No background-tint/scale hover effect on the tab itself — hovering a
-   tab expands its dropdown panel open instead (see onMouseEnter below),
-   and that IS the hover feedback. Focus-visible (keyboard nav) still gets
-   its own visible ring below, since keyboard users get no dropdown-open
-   feedback substitute the way mouse hover does. */
+/* Added rectangular curved gray hover effect (matching navbar pill layout) */
 .nav-tab-btn:hover,
-.nav-tab-btn:focus-visible {
-  background: transparent !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
+.nav-tab-btn:focus-visible,
+.nav-tab-item.is-active .nav-tab-btn {
+  background: rgba(255, 255, 255, 0.25) !important;
+  backdrop-filter: blur(32px) saturate(180%) contrast(100%) brightness(1.1) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(180%) contrast(100%) brightness(1.1) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 16px -4px rgba(0, 0, 0, 0.1) !important;
   color: var(--color-primary-dark) !important;
   opacity: 1 !important;
-  transform: none !important;
+  transform: translateY(-1px) !important;
 }
 
 .nav-tab-btn:focus-visible {
   outline: 2px solid var(--color-accent) !important;
   outline-offset: 2px;
-}
-
-.nav-tab-item.is-active .nav-tab-btn {
-  background: transparent !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
-  color: var(--color-primary-dark) !important;
-  font-weight: 800 !important;
 }
 
 .nav-tab-chevron {
@@ -355,7 +347,7 @@
   text-decoration: none;
   border: 1px solid color-mix(in srgb, var(--color-primary) 60%, transparent);
   box-shadow: 0 4px 12px color-mix(in srgb, var(--color-primary) 30%, transparent);
-  transition: all 220ms ease;
+  transition: all 300ms cubic-bezier(0.16, 1, 0.3, 1);
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -368,11 +360,11 @@
 }
 
 .navbar-cta-btn:hover {
-  background: var(--color-accent);
-  color: var(--color-primary-dark);
-  border-color: var(--color-accent);
-  box-shadow: 0 6px 20px color-mix(in srgb, var(--color-accent, #c9a84c) 35%, transparent);
-  transform: translateY(-1px);
+  background: color-mix(in srgb, var(--color-primary) 85%, black);
+  color: #ffffff;
+  border-color: color-mix(in srgb, var(--color-primary) 70%, black);
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--color-primary) 40%, transparent);
+  transform: translateY(-2px);
 }
 
 .navbar-cta-icon-wrap {
@@ -1030,7 +1022,8 @@
      "Contact" clipped past the visible edge next to the CTA button at most
      common desktop widths, not just a narrow "intermediate" band). */
   .nav-tab-btn {
-    padding: 2px 2px !important;
+    padding: 6px 10px !important; /* Increased padding for larger hover effect on desktop */
+    border-radius: 12px !important;
     font-size: 0.95rem; /* Force a smaller fixed font size */
     letter-spacing: 0;
   }

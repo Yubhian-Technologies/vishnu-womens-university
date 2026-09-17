@@ -235,7 +235,7 @@ function PhotoGridShowMore({
       </div>
       {hasMore && (
         <button type="button" className="ces-show-more" onClick={() => setExpanded((e) => !e)}>
-          {expanded ? 'Show Less' : `Show More (${photos.length - initial} more)`}
+          {expanded ? 'Show Less' : 'View More Photos'}
         </button>
       )}
       {lightbox !== null && (

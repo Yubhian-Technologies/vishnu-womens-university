@@ -8,15 +8,19 @@ import { CONTENT_ICON_NAMES } from '../../../lib/contentIcons';
 const PAGE = 'temples';
 
 export const DEFAULT_TEMPLES_HERO_STATS = [
-  { value: '25,000', label: 'Sq. Ft. Area', icon: 'Church' },
-  { value: 'All Faiths', label: 'Inclusive Reverence', icon: 'Compass' },
+  { value: '25,000 Sq. Ft.', label: 'Spiritual and reflection space', icon: 'Church' },
+  { value: 'Inclusive Space', label: 'Welcoming people of diverse faiths and traditions', icon: 'Compass' },
 ];
 
 export const DEFAULT_TEMPLES_ABOUT = {
-  badge: 'SACRED SPACES • REFLECTION & PEACE',
-  title: 'Reverence, Reflection & Inner Calm',
-  subtitle: 'A dedicated spiritual sanctuary on campus providing an atmosphere and attitude of reverence, joy, and peace.',
-  philosophyText: `Worship is putting the spotlight on God. This whole idea is to engage our Vishnu Women's University students in an atmosphere and attitude of reverence and joy. Vishnu Women's University engage students from varied faith and religious traditions as well as students without religious affiliation. So, Vishnu Women's University holds a place for temple of gods in the campus. The temple is built on a high foundation covering an area of 25,000 square feet.`,
+  badge: 'ABOUT THE TEMPLES OF GOD',
+  title: 'A Space for Reflection and Spiritual Wellbeing',
+  subtitle: 'The temple complex offers students, faculty, and staff a peaceful space for prayer, contemplation, and quiet reflection within the campus.',
+  philosophyText: `The Temples of God at Vishnu Women's University offer students, faculty, and staff a peaceful space for prayer, contemplation, and quiet reflection within the campus.
+
+Spread across approximately 25,000 sq. ft., the temple complex provides a serene setting where members of the university community can step away from their daily routines, spend time in reflection, and experience moments of calm.
+
+The space welcomes people from diverse faiths, traditions, and backgrounds while encouraging mutual respect and an inclusive campus environment.`,
 };
 
 export const DEFAULT_TEMPLES_PILLARS = [
