@@ -1495,53 +1495,122 @@ export default function PlacementDetail() {
       {/* Hero */}
       <section className="dept-hero-section">
         <div className="container">
-          <div className="dept-hero-card">
-            {heroVideo ? (
-              <video
-                src={heroVideo}
-                poster={heroImage || undefined}
-                className="dept-hero-bg-video"
-                autoPlay
-                muted
-                loop
-                playsInline
-              />
-            ) : heroImage && (
-              <img
-                src={heroImage}
-                alt={item.title}
-                className="dept-hero-bg-img"
-                loading="eager"
-                decoding="sync"
-                {...fetchPriorityAttr('high')}
-              />
-            )}
-            <div className="dept-hero-overlay" />
-            <div className="dept-hero-content">
-              <div className="breadcrumb animate-fade-in" style={{ marginBottom: '0.8rem' }}>
-                <Link to="/" className="breadcrumb-item">Home</Link>
-                <span className="breadcrumb-sep">›</span>
-                <Link to="/placements" className="breadcrumb-item">Placements</Link>
-                <span className="breadcrumb-sep">›</span>
-                <span className="breadcrumb-item active">{item.title}</span>
-              </div>
-              {item.slug !== 'tpo-team' && item.slug !== 'placement-guidelines' && item.slug !== 'employability-skills' && item.slug !== 'campus-recruitment-training' && (
-                <div className="animate-fade-in-up" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#C9973A', color: '#0B1E42', fontSize: 'var(--text-xs)', fontWeight: 800, padding: '0.35rem 0.9rem', borderRadius: '9999px', marginBottom: '0.8rem', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-                  <Icon size={14} /> Placements & Careers
-                </div>
+          {item.slug === 'placement-details' ? (
+            <div className="placement-details-hero-card">
+              {heroVideo ? (
+                <video
+                  src={heroVideo}
+                  poster={heroImage || '/images/placements/placement-hero-bg.jpg'}
+                  className="placement-details-hero-bg-media"
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                />
+              ) : (
+                <img
+                  src={heroImage || '/images/placements/placement-hero-bg.jpg'}
+                  alt={item.title}
+                  className="placement-details-hero-bg-media"
+                  loading="eager"
+                  decoding="sync"
+                  {...fetchPriorityAttr('high')}
+                />
               )}
-              <h1 className="dept-hero-title">{item.slug === 'gsac' ? 'Graduate Study Abroad Center – GSAC' : item.title}</h1>
-              {(item.desc || HERO_SUBTITLE_OVERRIDES[item.slug] || item.slug === 'gsac' || item.slug === 'career-guidance-cell' || item.slug === 'higher-education') && (
-                <p className="dept-hero-subtitle">
-                  {item.slug === 'gsac' ? 'Guidance and support for students exploring postgraduate study opportunities around the world.' :
-                   item.slug === 'career-guidance-cell' ? 'Helping students explore career pathways, higher studies and competitive examinations through structured guidance and preparation.' :
-                   item.slug === 'higher-education' ? 'Pathways and academic support for students planning postgraduate study, research and advanced learning.' :
-                   item.desc || HERO_SUBTITLE_OVERRIDES[item.slug]}
-                </p>
-              )}
+              <div className="placement-details-hero-overlay" />
 
+              <div className="placement-details-hero-content-wrap">
+                <div className="breadcrumb animate-fade-in placement-hero-breadcrumb">
+                  <Link to="/" className="breadcrumb-item">Home</Link>
+                  <span className="breadcrumb-sep">›</span>
+                  <Link to="/placements" className="breadcrumb-item">Placements</Link>
+                  <span className="breadcrumb-sep">›</span>
+                  <span className="breadcrumb-item active">{item.title}</span>
+                </div>
+
+                <div className="placement-details-glass-box animate-fade-in-up">
+                  <div className="placement-details-hero-tag">
+                    VISHNU WOMEN'S UNIVERSITY • BHIMAVARAM
+                  </div>
+
+                  <h1 className="placement-details-hero-headline">
+                    <span className="placement-details-hero-headline-main">Where Your Engineering Degree</span>
+                    <span className="placement-details-hero-headline-highlight">Becomes Your Career.</span>
+                  </h1>
+
+                  <p className="placement-details-hero-desc">
+                    Empowering women engineers since 2001, we nurture talent through quality education, skill development, and strong industry connect that opens real opportunities.
+                  </p>
+
+                  <div className="placement-details-hero-stats">
+                    <div className="placement-details-stat-item">
+                      <div className="placement-details-stat-val">59.29 LPA</div>
+                      <div className="placement-details-stat-lbl">Highest Package</div>
+                    </div>
+                    <div className="placement-details-stat-divider" />
+                    <div className="placement-details-stat-item">
+                      <div className="placement-details-stat-val">1100+</div>
+                      <div className="placement-details-stat-lbl">Total Offers</div>
+                    </div>
+                    <div className="placement-details-stat-divider" />
+                    <div className="placement-details-stat-item">
+                      <div className="placement-details-stat-val">100+</div>
+                      <div className="placement-details-stat-lbl">Companies (in progress)</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="placement-details-hero-bottom-accent" />
             </div>
-          </div>
+          ) : (
+            <div className="dept-hero-card">
+              {heroVideo ? (
+                <video
+                  src={heroVideo}
+                  poster={heroImage || undefined}
+                  className="dept-hero-bg-video"
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                />
+              ) : heroImage && (
+                <img
+                  src={heroImage}
+                  alt={item.title}
+                  className="dept-hero-bg-img"
+                  loading="eager"
+                  decoding="sync"
+                  {...fetchPriorityAttr('high')}
+                />
+              )}
+              <div className="dept-hero-overlay" />
+              <div className="dept-hero-content">
+                <div className="breadcrumb animate-fade-in" style={{ marginBottom: '0.8rem' }}>
+                  <Link to="/" className="breadcrumb-item">Home</Link>
+                  <span className="breadcrumb-sep">›</span>
+                  <Link to="/placements" className="breadcrumb-item">Placements</Link>
+                  <span className="breadcrumb-sep">›</span>
+                  <span className="breadcrumb-item active">{item.title}</span>
+                </div>
+                {item.slug !== 'tpo-team' && item.slug !== 'placement-guidelines' && item.slug !== 'employability-skills' && item.slug !== 'campus-recruitment-training' && (
+                  <div className="animate-fade-in-up" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#C9973A', color: '#0B1E42', fontSize: 'var(--text-xs)', fontWeight: 800, padding: '0.35rem 0.9rem', borderRadius: '9999px', marginBottom: '0.8rem', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                    <Icon size={14} /> Placements & Careers
+                  </div>
+                )}
+                <h1 className="dept-hero-title">{item.slug === 'gsac' ? 'Graduate Study Abroad Center – GSAC' : item.title}</h1>
+                {(item.desc || HERO_SUBTITLE_OVERRIDES[item.slug] || item.slug === 'gsac' || item.slug === 'career-guidance-cell' || item.slug === 'higher-education') && (
+                  <p className="dept-hero-subtitle">
+                    {item.slug === 'gsac' ? 'Guidance and support for students exploring postgraduate study opportunities around the world.' :
+                     item.slug === 'career-guidance-cell' ? 'Helping students explore career pathways, higher studies and competitive examinations through structured guidance and preparation.' :
+                     item.slug === 'higher-education' ? 'Pathways and academic support for students planning postgraduate study, research and advanced learning.' :
+                     item.desc || HERO_SUBTITLE_OVERRIDES[item.slug]}
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
