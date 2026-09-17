@@ -20,7 +20,7 @@ import '../Campus/tabbed-section.css';
 // title/subtitle exactly the same way it does for every other page.
 const ACTIVITY_DEFAULTS: Record<string, { title: string; subtitle: string }> = {
   'vishnu-tv-academy': { title: 'Vishnu TV Academy', subtitle: 'Student-run and student-driven — the only dedicated campus TV Academy in Andhra Pradesh.' },
-  'arts-culture': { title: 'Arts & Culture', subtitle: 'Nurturing creativity, preserving heritage, and building a sense of belonging — developing responsible and culturally grounded leaders.' },
+  'arts-culture': { title: 'Arts, Culture & Campus Life at Vishnu Women’s University', subtitle: 'Learning, creativity and community beyond the classroom' },
   'sports-games': { title: 'Sports & Games', subtitle: 'Building Strength, Skill, Teamwork, and Sporting Spirit.' },
   'social-services': { title: 'Social Services', subtitle: 'The National Service Scheme at VWU shapes engineers who are equally committed to their craft and to the communities they serve.' },
   'campus-magazines': { title: 'Campus Magazines', subtitle: 'Three publications that document academic achievements, student creativity, and the story of campus life at VWU and across SVES.' },
@@ -147,7 +147,7 @@ export default function CampusLifeDetail({ slug: slugProp }: { slug?: string }) 
       {!isActivity && !EVENTS_SHOWCASE_SLUGS.has(slug) && !photosLoading && photos.length > 0 && (
         <section className="section bg-off-white">
           <div className="container">
-            <PhotoGrid images={photos} label="" title={title} columns={3} layout="default" />
+            <PhotoGrid images={photos} label="" title={title} subtitle={slug === 'campus-security' ? 'Campus Security in Action' : undefined} columns={3} layout="default" />
           </div>
         </section>
       )}
@@ -158,12 +158,17 @@ export default function CampusLifeDetail({ slug: slugProp }: { slug?: string }) 
       {!EVENTS_SHOWCASE_SLUGS.has(slug) && (
         <section style={{ background: 'var(--color-primary)', padding: 'var(--space-14) 0' }}>
           <div className="container" style={{ textAlign: 'center' }}>
-            <h2 style={{ color: 'var(--color-white)', marginBottom: slug === 'campus-book-stores' ? 'var(--space-2)' : 'var(--space-4)' }}>
-              {slug === 'campus-book-stores' ? 'Explore More Campus Facilities' : (isActivity ? 'Explore More Student Activities' : 'Explore More of Campus Life')}
+            <h2 style={{ color: 'var(--color-white)', marginBottom: slug === 'campus-book-stores' || slug === 'campus-security' ? 'var(--space-2)' : 'var(--space-4)' }}>
+              {slug === 'campus-book-stores' ? 'Explore More Campus Facilities' : (slug === 'swimming-pool' ? 'Dive into More of Campus Life' : (isActivity ? 'Explore More Student Activities' : 'Explore More of Campus Life'))}
             </h2>
             {slug === 'campus-book-stores' && (
               <p style={{ color: 'var(--color-white)', fontSize: '1.1rem', opacity: 0.9, maxWidth: '600px', margin: '0 auto var(--space-6)' }}>
                 Discover the spaces and services that support learning and everyday student life at Vishnu Women's University.
+              </p>
+            )}
+            {slug === 'campus-security' && (
+              <p style={{ color: 'var(--color-white)', fontSize: '1.1rem', opacity: 0.9, maxWidth: '600px', margin: '0 auto var(--space-6)' }}>
+                Discover the facilities, experiences, and support systems that make student life at Vishnu Women's University enriching and engaging.
               </p>
             )}
             <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -176,8 +181,8 @@ export default function CampusLifeDetail({ slug: slugProp }: { slug?: string }) 
                 </>
               ) : (
                 <>
-                  <Link to="/campus" className="btn btn-accent">{slug === 'campus-book-stores' ? 'Explore Campus Facilities' : 'Back to Campus Life'}</Link>
-                  <Link to="/student-life" className="btn btn-secondary">{slug === 'campus-book-stores' ? 'Discover Student Life' : 'Student Life'}</Link>
+                  <Link to="/campus" className="btn btn-accent">{slug === 'campus-book-stores' ? 'Explore Campus Facilities' : (slug === 'swimming-pool' ? 'Back to Campus Life →' : (slug === 'campus-security' ? 'Explore Campus Life →' : 'Back to Campus Life'))}</Link>
+                  <Link to={slug === 'swimming-pool' ? '/campus/sports' : '/student-life'} className="btn btn-secondary">{slug === 'campus-book-stores' ? 'Discover Student Life' : (slug === 'swimming-pool' ? 'Explore Fitness & Sports →' : (slug === 'campus-security' ? 'Discover Student Life →' : 'Student Life'))}</Link>
                 </>
               )}
             </div>

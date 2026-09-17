@@ -306,11 +306,14 @@ export default function Sports() {
           <div className="container">
             <div className="sports-tournaments-header">
               <span className="sports-explore-eyebrow">
-                <Trophy size={14} /> Campus Competitions
+                <Trophy size={14} /> CAMPUS SPORTS & COMPETITIONS
               </span>
               <h2 className="sports-tournaments-title">
-                {settingsDoc?.tournaments?.title || 'COLLEGEWISE TOURNAMENTS'}
+                {settingsDoc?.tournaments?.title || 'Sports Events & Competitions'}
               </h2>
+              <p className="sports-tournaments-subtitle">
+                {settingsDoc?.tournaments?.subtitle || 'Explore highlights from campus sports events, team competitions and opportunities that encourage students to participate, compete and grow through sport.'}
+              </p>
             </div>
           </div>
 
@@ -324,13 +327,13 @@ export default function Sports() {
           <div className="container">
             <div className="sports-achievements-header">
               <span className="sports-explore-eyebrow">
-                <Trophy size={14} /> Athletic Excellence
+                <Trophy size={14} /> STUDENT SPORTS ACHIEVEMENTS
               </span>
               <h2 className="sports-achievements-title">
-                {settingsDoc?.achievements?.title || 'HALL OF CHAMPIONS'}
+                {settingsDoc?.achievements?.title || 'Hall of Champions'}
               </h2>
               <p className="sports-achievements-subtitle">
-                CELEBRATING OUR ATHLETIC LEGACY
+                {settingsDoc?.achievements?.subtitle || 'Celebrating the achievements of students and teams who demonstrate skill, commitment and sporting excellence across competitive events.'}
               </p>
             </div>
 
@@ -371,13 +374,13 @@ export default function Sports() {
           <div className="container">
             <div className="sports-infra-header">
               <span className="sports-explore-eyebrow">
-                <Activity size={14} /> World-Class Venues
+                <Activity size={14} /> SPORTS INFRASTRUCTURE
               </span>
               <h2 className="sports-infra-title">
-                {settingsDoc?.infrastructure?.title || 'Infrastructure & Facilities'}
+                {settingsDoc?.infrastructure?.title || 'Sports Facilities & Training Spaces'}
               </h2>
               <p className="sports-infra-subtitle">
-                {settingsDoc?.infrastructure?.subtitle || 'Explore our world-class, state-of-the-art sporting amenities designed for athletes and students.'}
+                {settingsDoc?.infrastructure?.subtitle || 'Vishnu Women’s University provides indoor and outdoor facilities that support regular practice, physical fitness, recreation and competitive sports training.'}
               </p>
             </div>
 
@@ -426,6 +429,18 @@ export default function Sports() {
           </div>
         </section>
       </Section>
+
+      {/* CTA Band — always visible */}
+      <section className="sports-cta-band">
+        <div className="container">
+          <h2>Be Part of an Active Campus Community</h2>
+          <p>From recreational participation to competitive sport, students have opportunities to stay active, build teamwork and pursue their sporting interests alongside academics.</p>
+          <div className="sports-cta-actions">
+            <Link to="/campus" className="btn btn-accent">Explore Campus Life</Link>
+            <Link to="/apply-now" className="btn btn-secondary">Apply to Vishnu Women’s University</Link>
+          </div>
+        </div>
+      </section>
     </main>
   );
 }

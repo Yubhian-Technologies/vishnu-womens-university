@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Heart, Users, ShieldCheck, Star, Activity } from 'lucide-react';
 import PageHero from '../../components/PageHero/PageHero';
 import CustomSectionsRenderer from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
@@ -53,7 +54,7 @@ export default function HealthCare() {
 
   // Dynamic page title & desc overrides from Firestore if present
   const title = adminItem?.title || 'Health Care';
-  const desc = adminItem?.desc || 'Your health, our priority. Campus Life Healthcare is dedicated to keeping our students healthy, safe and supported — because a healthier campus builds a brighter future.';
+  const desc = adminItem?.desc || 'Accessible healthcare services and medical support for students, faculty and staff on campus.';
 
   const customSections = (adminItem?.customSections || []).filter(hasCustomSectionContent);
 
@@ -76,9 +77,14 @@ export default function HealthCare() {
           <div className="hc-hero-grid">
             <div className="hc-hero-content">
               <h1 className="hc-hero-title">
-                Campus Life <span className="hc-hero-title-accent">Healthcare</span>
+                Campus <span className="hc-hero-title-accent">Healthcare Services</span>
               </h1>
-              <p className="hc-hero-subtitle">{desc}</p>
+              <p className="hc-hero-subtitle">
+                Vishnu Women’s University provides healthcare support within the campus to address routine medical needs, first aid and other essential health requirements of students, faculty and staff.
+              </p>
+              <p className="hc-hero-subtitle">
+                Campus medical facilities provide access to consultation, basic diagnostic services, first aid, pharmacy support and other healthcare services when required.
+              </p>
 
               {/* 4 Feature Pills */}
               <div className="hc-pills-row">
@@ -126,10 +132,10 @@ export default function HealthCare() {
         <div className="hc-container">
           <div className="hc-section-header">
             <h2 className="hc-section-title">
-              Gallery <span>Campus Healthcare</span>
+              Campus <span>Healthcare Gallery</span>
             </h2>
             <p className="hc-section-subtitle">
-              A glimpse into our healthcare services, facilities and the care we provide for our campus community.
+              A glimpse of the medical facilities, healthcare services and support available to students and staff across the University campus.
             </p>
           </div>
 
@@ -153,6 +159,12 @@ export default function HealthCare() {
                 </div>
               ))}
             </div>
+          </div>
+
+          <div style={{ textAlign: 'center', marginTop: 'var(--space-6)' }}>
+            <Link to="/news-awards/gallery" className="btn btn-outline">
+              View Full Gallery →
+            </Link>
           </div>
         </div>
       </section>

@@ -86,7 +86,7 @@ export default function Temples() {
 
   // Dynamic titles and subtitles
   const title = adminItem?.title || facilityDefault?.title || 'Temples of God';
-  const subtitle = adminItem?.desc || facilityDefault?.heroSubtitle || 'A Space for Reflection, Reverence, and Inner Peace.';
+  const subtitle = adminItem?.desc || facilityDefault?.heroSubtitle || 'A peaceful campus space for reflection, prayer, and inner calm.';
 
   // Dynamic admin custom sections
   const customSections = (adminItem?.customSections || [])
@@ -182,7 +182,7 @@ export default function Temples() {
             images={photos}
             title="Temple Gallery"
             label="GALLERY SHOWCASE"
-            subtitle="Visual glimpses of the campus temple sanctuary, architecture, and festival celebrations."
+            subtitle="Explore glimpses of the temple complex, its architecture, interiors, and peaceful campus surroundings."
           />
         </div>
       </section>
@@ -195,7 +195,7 @@ export default function Temples() {
               Sanctuary <span>Highlights</span>
             </h2>
             <p className="tmpl-section-subtitle">
-              Designed to foster reflection, peace, and spiritual harmony for the entire campus community.
+              The temple complex offers dedicated spaces and surroundings that support reflection, inclusion and wellbeing within the University community.
             </p>
           </div>
 
@@ -232,76 +232,76 @@ export default function Temples() {
         <div className="tmpl-container">
           <div className="tmpl-section-header">
             <h2 className="tmpl-section-title">
-              A Space for Reverence, <span>Reflection & Inner Peace</span>
+              Supporting Wellbeing and <span>Campus Community</span>
             </h2>
             <p className="tmpl-section-subtitle">
-              Fostering spiritual wellbeing, mutual respect, and quiet contemplation across the campus community.
+              The temple complex contributes to the campus environment by supporting personal reflection, inclusivity and a sense of wellbeing among members of the University community.
             </p>
           </div>
 
           <div className="tmpl-reflection-cards">
-            {/* Paragraph 1 Card: Holistic Wellbeing */}
+            {/* Paragraph 1 Card: Personal Wellbeing */}
             <div className="tmpl-reflection-card">
-              <div className="tmpl-reflection-tag">HOLISTIC WELLBEING</div>
+              <div className="tmpl-reflection-tag">PERSONAL WELLBEING</div>
               <div className="tmpl-reflection-icon-box">
                 <Heart size={28} />
               </div>
-              <h3 className="tmpl-reflection-card-title">Holistic Development & Wellbeing</h3>
+              <h3 className="tmpl-reflection-card-title">Space for Reflection and Wellbeing</h3>
               <p className="tmpl-reflection-card-body">
-                Vishnu Women’s University recognises that spirituality, reflection, and inner wellbeing can be meaningful aspects of a student’s holistic development. The campus provides a serene space for prayer, contemplation, and quiet reflection, fostering an atmosphere of reverence, peace, and joy.
+                The temple complex provides students, faculty and staff with a quiet setting for prayer, contemplation and personal reflection. It offers an opportunity to pause and spend time away from academic and professional routines.
               </p>
               <ul className="tmpl-highlights-list">
                 <li className="tmpl-highlight-item">
                   <CheckCircle2 size={16} className="tmpl-highlight-icon" />
-                  <span>Prayer & Contemplation Spaces</span>
+                  <span>Spaces for Prayer and Contemplation</span>
                 </li>
                 <li className="tmpl-highlight-item">
                   <CheckCircle2 size={16} className="tmpl-highlight-icon" />
-                  <span>Atmosphere of Reverence, Peace & Joy</span>
+                  <span>Quiet Setting for Personal Reflection</span>
                 </li>
               </ul>
             </div>
 
-            {/* Paragraph 2 Card: Inclusive Spiritual Harmony */}
+            {/* Paragraph 2 Card: Inclusion and Respect */}
             <div className="tmpl-reflection-card">
-              <div className="tmpl-reflection-tag">INCLUSIVITY & HARMONY</div>
+              <div className="tmpl-reflection-tag">INCLUSION AND RESPECT</div>
               <div className="tmpl-reflection-icon-box">
                 <Users size={28} />
               </div>
-              <h3 className="tmpl-reflection-card-title">Inclusive Spiritual Harmony</h3>
+              <h3 className="tmpl-reflection-card-title">Respect for Diverse Faiths and Traditions</h3>
               <p className="tmpl-reflection-card-body">
-                The University welcomes students from diverse faiths, religious traditions, and backgrounds, as well as those without religious affiliation, and respects their individual beliefs and perspectives. The temple on campus forms part of the University’s distinctive environment, offering those who wish to worship a peaceful place for spiritual practice and reflection.
+                The University welcomes people from diverse faiths, traditions and backgrounds. The temple complex provides a shared space that encourages respectful engagement and consideration for individual beliefs and practices.
               </p>
               <ul className="tmpl-highlights-list">
                 <li className="tmpl-highlight-item">
                   <CheckCircle2 size={16} className="tmpl-highlight-icon" />
-                  <span>All Faiths & Backgrounds Welcomed</span>
+                  <span>Welcoming Diverse Faiths and Backgrounds</span>
                 </li>
                 <li className="tmpl-highlight-item">
                   <CheckCircle2 size={16} className="tmpl-highlight-icon" />
-                  <span>Respect for Individual Beliefs</span>
+                  <span>Encouraging Mutual Respect</span>
                 </li>
               </ul>
             </div>
 
-            {/* Paragraph 3 Card: Architectural Landmark */}
+            {/* Paragraph 3 Card: Campus Environment */}
             <div className="tmpl-reflection-card">
-              <div className="tmpl-reflection-tag">CAMPUS LANDMARK</div>
+              <div className="tmpl-reflection-tag">CAMPUS ENVIRONMENT</div>
               <div className="tmpl-reflection-icon-box">
                 <Landmark size={28} />
               </div>
-              <h3 className="tmpl-reflection-card-title">25,000 Sq. Ft. Spiritual Landmark</h3>
+              <h3 className="tmpl-reflection-card-title">A Distinctive Campus Space</h3>
               <p className="tmpl-reflection-card-body">
-                Built on an elevated foundation and spread across approximately 25,000 sq. ft., the temple complex is an important architectural and spiritual landmark of the campus. Its tranquil surroundings provide an opportunity for students and members of the University community to pause, reflect, and find a sense of peace amidst their academic journey.
+                Located within the University campus, the temple complex complements the academic, residential and student-life environment by providing a dedicated space for spiritual reflection and quiet contemplation.
               </p>
               <ul className="tmpl-highlights-list">
                 <li className="tmpl-highlight-item">
                   <CheckCircle2 size={16} className="tmpl-highlight-icon" />
-                  <span>25,000 Sq. Ft. Elevated Foundation</span>
+                  <span>Part of the University Campus Environment</span>
                 </li>
                 <li className="tmpl-highlight-item">
                   <CheckCircle2 size={16} className="tmpl-highlight-icon" />
-                  <span>Tranquil Surroundings for Inner Peace</span>
+                  <span>Dedicated Space for Reflection and Wellbeing</span>
                 </li>
               </ul>
             </div>
@@ -313,9 +313,9 @@ export default function Temples() {
               <Sparkles size={34} />
             </div>
             <div>
-              <div className="tmpl-callout-title">Architectural & Spiritual Campus Landmark</div>
+              <div className="tmpl-callout-title">A Distinctive Part of Campus Life</div>
               <div className="tmpl-callout-desc">
-                Spread across 25,000 sq. ft. on an elevated foundation — offering students a serene environment to pause, reflect, and cultivate inner peace throughout their academic journey.
+                The temple complex forms an integral part of the University campus, providing students, faculty and staff with a dedicated space for prayer, reflection and quiet contemplation within a peaceful setting.
               </div>
             </div>
           </div>

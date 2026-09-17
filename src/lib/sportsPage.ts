@@ -227,7 +227,7 @@ export function resolveSectionOpacity(
 // Hero fallback only — same role as the `defaultTitle`/`defaultSubtitle`
 // every other page passes into <PageHero>. Not used for any other field.
 export const SPORTS_HERO_DEFAULTS = {
-  heroTitle: 'Play with Passion, Compete with Pride',
+  heroTitle: 'SPORTS, FITNESS & WELLNESS',
   heroSubtitle: 'Sports build stronger bodies, sharper minds, and a united campus.',
 };
 
@@ -236,9 +236,9 @@ export const SPORTS_HERO_DEFAULTS = {
 // actually types (or accepts) it.
 export const SPORTS_TEXT_SUGGESTIONS: Record<'explore' | 'tournaments' | 'achievements' | 'infrastructure', SportsSectionText> = {
   explore: { label: 'Our Sports', title: 'Explore Our Sports', subtitle: '' },
-  tournaments: { label: 'Competitions', title: 'Collegewise Tournaments', subtitle: '' },
-  achievements: { label: 'Our Achievements', title: 'Medals & Achievements', subtitle: '' },
-  infrastructure: { label: 'Infrastructure', title: 'Infrastructure & Our Sports', subtitle: '' },
+  tournaments: { label: 'Sports Events & Competitions', title: 'Campus Sports & Competitions', subtitle: 'Explore highlights from campus sports events, team competitions and opportunities that encourage students to participate, compete and grow through sport.' },
+  achievements: { label: 'Student Sports Achievements', title: 'Hall of Champions', subtitle: 'Celebrating the achievements of students and teams who demonstrate skill, commitment and sporting excellence across competitive events.' },
+  infrastructure: { label: 'Sports Infrastructure', title: 'Sports Facilities & Training Spaces', subtitle: 'Vishnu Women’s University provides indoor and outdoor facilities that support regular practice, physical fitness, recreation and competitive sports training.' },
 };
 
 export const SPORTS_CLOSING_SUGGESTION: SportsClosingText = {
