@@ -19,6 +19,7 @@ import { resolveRndYears } from '../../../components/RndSection/RndSection';
 import { downloadPlacementsTemplate } from '../../../lib/placementsImport';
 import { downloadInternshipsTemplate } from '../../../lib/internshipsImport';
 import CustomSectionEditor from './CustomSectionEditor';
+import EventCardsEditor from './EventCardsEditor';
 import { replaceAtPath, getAtPath, RESERVED_SECTION_IDS, type CustomSection } from '../../../lib/customSections';
 import { slugify } from '../../../lib/slugify';
 import { FRESHMAN_DEPARTMENT_SEEDS } from '../../Academics/freshmanDepartmentSeeds';
@@ -2030,29 +2031,15 @@ export default function DepartmentsAdmin() {
           <div className="admin-field admin-field--full">
             <p className="admin-field__hint" style={{ marginTop: '0.25rem' }}>
               Always shown on the public page under the fixed heading "News &amp; Events" — that heading itself
-              can't be renamed or removed. What's inside it is fully up to you: add any number of sections (e.g.
-              "Student Awards", "Others", or anything else), each with its own name and a choice of plain text, a
-              table, a checklist, a list of links, uploaded files, a photo gallery, or images with their own caption.
-              Applies to every department, grouped or standalone.
-              {(form.newsEventsYears?.length || form.studentAwardsYears?.length || form.othersYears?.length) ? (
-                <> This department's old fixed News &amp; Events / Student Awards / Others were converted into
-                  starter sections below the first time this page was opened after that switchover — edit them here
-                  now.</>
-              ) : null}
+              can't be renamed or removed. Add one event per item: a title, a description, and a photo — they show
+              on the public page as a single scrollable carousel with arrows on both sides. Applies to every
+              department, grouped or standalone.
             </p>
           </div>
           <div className="admin-field admin-field--full">
-            <CustomSectionEditor
+            <EventCardsEditor
               sections={form.newsEventsSections || []}
               onChange={(next) => set('newsEventsSections', next)}
-              rootSections={form.newsEventsSections || []}
-              parentPath={[]}
-              onFileUploaded={newsEventsSectionHandlers.onFileUploaded}
-              onFileRemoved={newsEventsSectionHandlers.onFileRemoved}
-              onPhotoUploaded={newsEventsSectionHandlers.onPhotoUploaded}
-              onPhotoRemoved={newsEventsSectionHandlers.onPhotoRemoved}
-              onGalleryPhotoUploaded={newsEventsSectionHandlers.onGalleryPhotoUploaded}
-              onGalleryPhotoRemoved={newsEventsSectionHandlers.onGalleryPhotoRemoved}
               onImageCardPhotoUploaded={newsEventsSectionHandlers.onImageCardPhotoUploaded}
               onImageCardPhotoRemoved={newsEventsSectionHandlers.onImageCardPhotoRemoved}
             />

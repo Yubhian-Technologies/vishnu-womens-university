@@ -185,6 +185,68 @@ export function hasCustomSectionContent(section: CustomSection): boolean {
   return (section.subSections || []).some(hasCustomSectionContent);
 }
 
+// Collapses an arbitrary Custom Section tree (any content type, any number
+// of sections/sub-sections) down to a single flat list of image cards — used
+// by EventCardsEditor.tsx (the simplified "Department Page — News & Events"
+// admin editor, which always writes back exactly one 'imageCards' section)
+// so that whatever shape a department's existing data happens to be in
+// (already 'imageCards', or the older table/text/mixed shape auto-migrated
+// from the old fixed News & Events/Student Awards/Others fields), opening
+// this editor never silently loses it. Content that fits the card shape
+// (image + title + description) natively carries over as-is; content that
+// doesn't (a table, a checklist, contacts, ...) becomes a text-only card
+// (title = section label, description = a readable rendering of its
+// content) an admin can then add a real photo to, or edit further — nothing
+// simply disappears.
+export function flattenSectionsToEventCards(sections: CustomSection[]): CustomSectionImageCard[] {
+  const out: CustomSectionImageCard[] = [];
+  const walk = (list: CustomSection[]) => {
+    list.forEach((s) => {
+      switch (s.contentType) {
+        case 'imageCards':
+          (s.imageCards || []).forEach((c) => {
+            if (c.imageUrl || c.title.trim() || c.description.trim()) out.push(c);
+          });
+          break;
+        case 'text':
+        case 'person':
+          if (s.textContent?.trim()) out.push({ imageUrl: '', storagePath: '', title: s.label, description: s.textContent.trim() });
+          break;
+        case 'list':
+          if (s.listText?.trim()) out.push({ imageUrl: '', storagePath: '', title: s.label, description: s.listText.trim() });
+          break;
+        case 'table':
+          if (s.tableText?.trim()) out.push({ imageUrl: '', storagePath: '', title: s.label, description: s.tableText.trim() });
+          break;
+        case 'links':
+          if (s.linksText?.trim()) out.push({ imageUrl: '', storagePath: '', title: s.label, description: s.linksText.trim() });
+          break;
+        case 'files':
+          if ((s.files || []).some((f) => f.fileUrl)) {
+            out.push({ imageUrl: '', storagePath: '', title: s.label, description: (s.files || []).map((f) => f.label).filter(Boolean).join(', ') });
+          }
+          break;
+        case 'contacts':
+          if ((s.contacts || []).some((c) => c.name.trim())) {
+            out.push({
+              imageUrl: '', storagePath: '', title: s.label,
+              description: (s.contacts || []).map((c) => [c.role, c.name, c.phone, c.email].filter(Boolean).join(' — ')).filter(Boolean).join('\n'),
+            });
+          }
+          break;
+        case 'gallery':
+          (s.galleryPhotos || []).forEach((p) => {
+            if (p.imageUrl) out.push({ imageUrl: p.imageUrl, storagePath: p.storagePath, title: s.label, description: p.caption || '' });
+          });
+          break;
+      }
+      if (s.subSections?.length) walk(s.subSections);
+    });
+  };
+  walk(sections);
+  return out;
+}
+
 // Immutable update at an arbitrary depth in the section tree, addressed by a
 // path of indices (e.g. [2] = top-level section 2, [2, 0] = its first
 // sub-section). Used specifically for file upload/remove handlers: several

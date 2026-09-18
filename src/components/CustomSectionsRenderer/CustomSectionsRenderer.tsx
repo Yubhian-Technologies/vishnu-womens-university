@@ -685,13 +685,7 @@ function CustomSectionBodyContent({ section, departmentSlug, categorySlug }: { s
     if (cards.length === 0) return null;
     
     if (departmentSlug && categorySlug) {
-      return (
-        <HorizontalEventsShowcase 
-          cards={cards} 
-          departmentSlug={departmentSlug} 
-          categorySlug={categorySlug} 
-        />
-      );
+      return <HorizontalEventsShowcase cards={cards} />;
     }
     
     return (
