@@ -1,21 +1,22 @@
 import { useCallback, useEffect, useState } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
-import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { CustomSectionImageCard } from '../../lib/customSections';
-import { Link } from 'react-router-dom';
 import './HorizontalEventsShowcase.css';
 
 interface Props {
   cards: CustomSectionImageCard[];
-  departmentSlug: string;
-  categorySlug: string;
 }
 
-export default function HorizontalEventsShowcase({ cards, departmentSlug, categorySlug }: Props) {
-  const topCards = cards.slice(0, 5);
-  const hasMore = cards.length > 5;
-
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, align: 'start' });
+// Every event card scrolls here — no 5-card cap/"View All" page, since the
+// arrows already let a viewer reach every card directly (see NewsEventsTabs,
+// the only caller: department "Events & Happenings"). `loop: true` plus the
+// auto-advance effect below make it behave like a real carousel (cycles on
+// its own, and Next from the last card continues into the first) rather than
+// a scroll strip that dead-ends — same rhythm as the department "Pioneers of
+// Research & Innovation" slider (ResearchSection in DepartmentDetail.tsx).
+export default function HorizontalEventsShowcase({ cards }: Props) {
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: 'start' });
   const [prevBtnEnabled, setPrevBtnEnabled] = useState(false);
   const [nextBtnEnabled, setNextBtnEnabled] = useState(false);
 
@@ -35,13 +36,21 @@ export default function HorizontalEventsShowcase({ cards, departmentSlug, catego
     emblaApi.on('reInit', onSelect);
   }, [emblaApi, onSelect]);
 
+  // Auto-advance every 4.5s, same interval as the Research & Innovation
+  // slider — nothing to cycle through with 0 or 1 card.
+  useEffect(() => {
+    if (!emblaApi || cards.length <= 1) return;
+    const t = setInterval(() => emblaApi.scrollNext(), 4500);
+    return () => clearInterval(t);
+  }, [emblaApi, cards.length]);
+
   if (cards.length === 0) return null;
 
   return (
     <div className="horizontal-events-showcase">
       <div className="horizontal-events-carousel" ref={emblaRef}>
         <div className="horizontal-events-container">
-          {topCards.map((card, i) => (
+          {cards.map((card, i) => (
              // @ts-ignore
              // Embla sets opacity and transform inline; we add a class to let CSS do transitions if needed
             <div className="horizontal-events-slide" key={i}>
@@ -62,35 +71,28 @@ export default function HorizontalEventsShowcase({ cards, departmentSlug, catego
           ))}
         </div>
       </div>
-      
-      <div className="events-showcase-footer">
-        <div className="events-showcase-controls">
-          <button 
-            type="button" 
-            className="events-showcase-nav" 
-            onClick={scrollPrev} 
-            disabled={!prevBtnEnabled}
-            aria-label="Previous event"
-          >
-            <ChevronLeft size={20} strokeWidth={2.5} />
-          </button>
-          <button 
-            type="button" 
-            className="events-showcase-nav" 
-            onClick={scrollNext} 
-            disabled={!nextBtnEnabled}
-            aria-label="Next event"
-          >
-            <ChevronRight size={20} strokeWidth={2.5} />
-          </button>
-        </div>
-        {hasMore && (
-          <Link to={`/academics/departments/${departmentSlug}/events/${categorySlug}`} className="events-showcase-view-all">
-            <span>View All Events</span>
-            <ArrowRight size={16} strokeWidth={2.5} />
-          </Link>
-        )}
-      </div>
+
+      {/* Arrows sit on the card's own left/right edges (not below it) —
+          same "circle over the photo" convention as every other photo
+          carousel on this site. */}
+      <button
+        type="button"
+        className="events-showcase-nav events-showcase-nav--prev"
+        onClick={scrollPrev}
+        disabled={!prevBtnEnabled}
+        aria-label="Previous event"
+      >
+        <ChevronLeft size={20} strokeWidth={2.5} />
+      </button>
+      <button
+        type="button"
+        className="events-showcase-nav events-showcase-nav--next"
+        onClick={scrollNext}
+        disabled={!nextBtnEnabled}
+        aria-label="Next event"
+      >
+        <ChevronRight size={20} strokeWidth={2.5} />
+      </button>
     </div>
   );
 }

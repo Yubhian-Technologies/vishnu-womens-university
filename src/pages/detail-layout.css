@@ -1516,8 +1516,8 @@ td.pb-activities-num {
 
 .dept-recruiters-grid--circular .dept-recruiter-tile--named img,
 .dept-recruiters-grid--circular .dept-recruiter-tile--fallback {
-  width: 100px;
-  height: 100px;
+  width: 118px;
+  height: 118px;
   border-radius: 50%;
   background: var(--color-white);
   border: 1.5px solid var(--color-light-gray);
@@ -1561,8 +1561,8 @@ td.pb-activities-num {
 
   .dept-recruiters-grid--circular .dept-recruiter-tile--named img,
   .dept-recruiters-grid--circular .dept-recruiter-tile--fallback {
-    width: 80px;
-    height: 80px;
+    width: 92px;
+    height: 92px;
   }
 }
 
