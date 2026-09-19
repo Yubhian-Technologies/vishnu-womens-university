@@ -54,6 +54,18 @@ export function truncate(text: string, max: number) {
   return text.length > max ? `${text.slice(0, max).trimEnd()}…` : text;
 }
 
+export function resolveProgramIntake(program: { name?: string; slug?: string; category?: string; intake?: number | string }): number | string {
+  const name = (program.name || '').toUpperCase();
+  const slug = (program.slug || '').toLowerCase();
+  if (/VLSI|VSLI/.test(name) || slug.includes('vlsi')) {
+    return 18;
+  }
+  if ((name.includes('COMPUTER SCIENCE') || slug.includes('cse')) && (program.category === 'mtech' || name.includes('M.TECH') || slug.startsWith('mtech'))) {
+    return 27;
+  }
+  return program.intake ?? 0;
+}
+
 // Loose comparison key so "AI&ML", "AI & ML", "ai and ml" all collapse to the
 // same thing when matching a department card to a program.
 const matchKey = (s: string) =>
@@ -258,7 +270,7 @@ export default function Academics() {
                   <p>{truncate(program.about, 140)}</p>
                   <div className="program-card-badges">
                     <span className="program-badge-seats">
-                      {program.intake} Seats
+                      {resolveProgramIntake(program)} Seats
                     </span>
                     {program.accreditation && program.accreditation !== '—' && (
                       <span className="program-badge-accreditation">

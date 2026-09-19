@@ -35,7 +35,7 @@ const VISWPU_BTECH_PROGRAMS: ProgramRow[] = [
 ];
 
 const MTECH_PROGRAMS: ProgramRow[] = [
-  { name: 'M.Tech – Computer Science & Engineering', code: 'M.Tech CSE', intake: 18, fee: MTECH_FEE },
+  { name: 'M.Tech – Computer Science & Engineering', code: 'M.Tech CSE', intake: 27, fee: MTECH_FEE },
   { name: 'M.Tech – VLSI Design', code: 'M.Tech VLSI', intake: 18, fee: MTECH_FEE },
   { name: 'M.Tech – Power Electronics', code: 'M.Tech Power Electronics', intake: 9, fee: MTECH_FEE },
   { name: 'M.Tech – Software Engineering', code: 'M.Tech Software Engg.', intake: 9, fee: MTECH_FEE },

@@ -1396,7 +1396,20 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
           : validAcc.map((p) => ({ id: p.id, label: p.shortName || p.name, value: clean(p.accreditation), image: p.accreditationImage || '' }));
 
         const deptIntakeList = dept?.programmeIntakeList || [];
-        const intakeItems: ProfileListItem[] = deptIntakeList.map((pi, i) => ({ id: `dept-pi-${i}`, label: pi.program, value: pi.intake }));
+        const intakeItems: ProfileListItem[] = deptIntakeList.map((pi, i) => {
+          const pName = (pi.program || '').toUpperCase();
+          let intakeVal = pi.intake;
+          if (/VLSI|VSLI/.test(pName)) {
+            intakeVal = '18';
+          } else if ((pName.includes('COMPUTER SCIENCE') || pName.includes('CSE')) && (pName.includes('M.TECH') || pName.includes('MTECH') || String(pi.intake).trim() === '18')) {
+            intakeVal = '27';
+          }
+          return {
+            id: `dept-pi-${i}`,
+            label: pi.program,
+            value: intakeVal,
+          };
+        });
 
         const hasJourneyRow = establishmentItems.length > 0 || intakeItems.length > 0;
         // AP EAPCET Code panel below always renders, so this row is never empty.

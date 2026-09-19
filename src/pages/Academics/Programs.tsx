@@ -4,7 +4,7 @@ import PageHero from '../../components/PageHero/PageHero';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { resolveProgramIcon } from '../../lib/programIcons';
 import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
-import { TABS, truncate } from './Academics';
+import { TABS, truncate, resolveProgramIntake } from './Academics';
 import './Academics.css';
 import '../detail-layout.css';
 
@@ -103,7 +103,7 @@ export default function Programs() {
                       )}
                       <div className="program-spec">
                         <span className="program-spec-label">Intake</span>
-                        <span className="program-spec-value">{program.intake} Seats</span>
+                        <span className="program-spec-value">{resolveProgramIntake(program)} Seats</span>
                       </div>
                       {program.accreditation && program.accreditation !== '—' && (
                         <div className="program-spec">

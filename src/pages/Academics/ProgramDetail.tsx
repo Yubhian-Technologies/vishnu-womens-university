@@ -79,6 +79,7 @@ import { useEapcetCode } from '../../hooks/useContentBlocks';
 import { smoothScrollTo } from '../../lib/smoothScroll';
 import { fetchPriorityAttr } from '../../lib/domAttrs';
 import { normalizeLab, normalizeMindMapImages, type ProgramDoc, type NewsEventsYear } from '../Admin/sections/ProgramsAdmin';
+import { resolveProgramIntake } from './Academics';
 import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import type { FacultyDoc } from './Faculty';
 import RndSection, { resolveRndYears, rndYearsHaveContent } from '../../components/RndSection/RndSection';
@@ -613,7 +614,7 @@ function SingleProgramDetail() {
                       <div className="dept-fact-static-list">
                         <div className="dept-fact-chip-entry">
                           <span className="dept-fact-chip-sub">Approved Seats</span>
-                          <span className="dept-fact-chip-val">{program.intake} Seats</span>
+                          <span className="dept-fact-chip-val">{resolveProgramIntake(program)} Seats</span>
                         </div>
                       </div>
                     </div>
