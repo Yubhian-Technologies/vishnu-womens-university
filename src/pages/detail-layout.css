@@ -1566,7 +1566,7 @@ td.pb-activities-num {
   }
 }
 
-/* ===== Department Profile — editorial "at a glance" section (replaces
+/* ===== Department Information — editorial "at a glance" section (replaces
    the earlier five-equal-cards Rankings grid). Establishments,
    Accreditations and Programme Intake are unbounded per-programme arrays
    (see DepartmentDetail.tsx), so nothing here assumes a fixed count:

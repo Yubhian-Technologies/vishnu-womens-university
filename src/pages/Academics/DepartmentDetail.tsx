@@ -852,7 +852,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     hasAbout && { id: 'about', label: 'Overview' },
     hasCoreValues && { id: 'vision-mission', label: 'Core Values' },
     (hasPlacements || hasInternships) && { id: 'placements', label: placementsLinkLabel },
-    { id: 'rankings', label: 'Department Profile' },
+    { id: 'rankings', label: 'Department Information' },
     hasLabs && { id: 'labs', label: 'Facilities' },
     shared.tieUpsMous.length > 0 && { id: 'tieups-mous', label: "Tie-Ups & MoU's" },
     subPrograms.length > 0 && { id: 'program-toggle', label: 'Programmes' },
@@ -1406,7 +1406,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
           <section id="rankings" className="dept-profile-section" style={{ scrollMarginTop: NAV_OFFSET }}>
             <div className="container">
               <div className="dept-profile-header">
-                <span className="dept-profile-eyebrow">Department Profile</span>
+                <span className="dept-profile-eyebrow">Department Information</span>
                 <h2 className="section-title">{deptName} at a Glance</h2>
               </div>
 

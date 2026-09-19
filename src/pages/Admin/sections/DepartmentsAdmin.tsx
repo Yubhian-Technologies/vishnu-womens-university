@@ -1231,11 +1231,11 @@ export default function DepartmentsAdmin() {
         </details>
 
         <details className="admin-accordion">
-          <summary className="admin-accordion__summary">Department Profile — At a Glance</summary>
+          <summary className="admin-accordion__summary">Department Information — At a Glance</summary>
           <div className="admin-form-grid">
           <div className="admin-field admin-field--full">
             <p className="admin-field__hint" style={{ marginTop: '0.25rem' }}>
-              Controls the <strong>Department Profile</strong> section on the public page (Academic Journey, Programmes & Intake, Accreditation).
+              Controls the <strong>Department Information</strong> section on the public page (Academic Journey, Programmes & Intake, Accreditation).
               The Academic Journey and Programmes & Intake lists are completely manual and must be populated here to appear on the public page.
             </p>
           </div>
