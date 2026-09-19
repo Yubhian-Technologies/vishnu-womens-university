@@ -223,16 +223,9 @@ function ResearchSection({
         {/* ── Header row ── */}
         <div className="dept-research-header-row">
           <h2 className="section-title dept-research-heading" id="research-heading">
-            <span className="dept-research-heading-light">Pioneers of<br /></span>
+            <span className="dept-research-heading-light">Departmental<br /></span>
             <span className="dept-research-heading-bold">Research &amp; Innovation</span>
           </h2>
-          <a
-            href="/research"
-            className="dept-research-circle-btn"
-            aria-label="Go to research page"
-          >
-            <span>Research</span>
-          </a>
         </div>
 
         {/* ── Body: stats left + slider right ── */}
