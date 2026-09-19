@@ -113,7 +113,7 @@ export default function SettingsAdmin() {
         <div style={{ padding: '1rem' }}>
           <p className="admin-field__hint" style={{ marginTop: '0.25rem', marginBottom: '1rem' }}>
             Manage reusable admission code panels for department pages. Departments can select a preset
-            to display in their "Department Profile" section, or choose "Hide Panel" to remove it entirely.
+            to display in their "Department Information" section, or choose "Hide Panel" to remove it entirely.
           </p>
 
           {!showForm && (
