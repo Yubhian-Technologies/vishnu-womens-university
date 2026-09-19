@@ -70,23 +70,9 @@ function buildStaticSlides(btechCount: string): Slide[] {
   ];
 }
 
-interface HeroTitle {
-  lead: string;
-  italic: string;
-}
-
-const HERO_TITLES: HeroTitle[] = [
-  { lead: 'Leading by Design.\nBeyond Every Expectation.\nRewriting Who Builds the World.', italic: '' },
-  { lead: 'Where Ambition Meets', italic: 'Excellence.' },
-  { lead: 'Engineering the', italic: 'Future of Tech.' },
-  { lead: 'Inspiring Brilliance,', italic: 'Leading Change.' },
-];
-
 const SLIDE_DURATION = 6000;
 
 export default function HeroSlider() {
-  const [titleIndex, setTitleIndex] = useState(0);
-  const [isFadingTitle, setIsFadingTitle] = useState(false);
   const [current, setCurrent] = useState(0);
   const [progressWidth, setProgressWidth] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -167,17 +153,6 @@ export default function HeroSlider() {
     return () => clearInterval(interval);
   }, [next]);
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setIsFadingTitle(true);
-      setTimeout(() => {
-        setTitleIndex((prev) => (prev + 1) % HERO_TITLES.length);
-        setIsFadingTitle(false);
-      }, 450);
-    }, 4200);
-    return () => clearInterval(timer);
-  }, []);
-
   const toggleMute = () => {
     if (videoRef.current) {
       videoRef.current.muted = !isMuted;
@@ -187,6 +162,7 @@ export default function HeroSlider() {
 
   return (
     <section className="hero-slider" aria-label="Featured content">
+      <h1 className="sr-only">Vishnu Women&apos;s University — Leading by Design</h1>
 
       {/* Background video — rendered immediately with a highly-optimized poster image */}
       <video
@@ -201,23 +177,6 @@ export default function HeroSlider() {
         playsInline
         aria-hidden="true"
       />
-
-      {/* Center Tagline & Clean Sleek Search */}
-      <div className="hero-center-panel">
-        <h1 className={`hero-center-tagline ${isFadingTitle ? 'title-exit' : 'title-enter'}`}>
-          <span className="hero-title-lead">{HERO_TITLES[titleIndex].lead}</span>
-          {' '}
-          <span className="hero-title-italic">{HERO_TITLES[titleIndex].italic}</span>
-        </h1>
-
-        {/* <div className="hero-tag-words" aria-label="Values">
-          <span>Think</span>
-          <span className="hero-tag-dot">•</span>
-          <span>Build</span>
-          <span className="hero-tag-dot">•</span>
-          <span>Lead</span>
-        </div> */}
-      </div>
 
       {/* Slide layer — carries only the optional admin-uploaded Hero Banner
           photo now; the title/description card has been removed. */}
