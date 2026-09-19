@@ -226,7 +226,7 @@
 /* Photo Marquee Strip */
 .activity-strip {
   overflow: hidden;
-  height: clamp(140px, 22vh, 240px);
+  height: clamp(210px, 30vh, 300px);
   border-top: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 10%, transparent);
   border-bottom: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 10%, transparent);
   margin: 0;
@@ -263,12 +263,12 @@
 
 .activity-track {
   display: flex;
-  gap: 14px;
+  gap: 18px;
   width: max-content;
   height: 100%;
-  animation: activity-scroll 32s linear infinite;
+  animation: activity-scroll 38s linear infinite;
   will-change: transform;
-  padding: 10px 0;
+  padding: 12px 0;
 }
 
 .activity-track:hover,
@@ -285,11 +285,13 @@
 
 .activity-card {
   position: relative;
+  display: block;
   flex-shrink: 0;
-  width: 300px;
+  width: clamp(330px, 26vw, 420px);
   height: 100%;
   overflow: hidden;
-  cursor: default;
+  cursor: pointer;
+  text-decoration: none;
   border-radius: var(--radius-lg, 16px);
   background: var(--color-primary-dark);
   box-shadow: var(--shadow-sm);
@@ -346,10 +348,10 @@
 .activity-card-label {
   position: absolute;
   bottom: 0; left: 0; right: 0;
-  background: linear-gradient(to top, rgba(8,20,14,0.94) 0%, rgba(8,20,14,0.55) 55%, transparent 100%);
-  padding: calc(var(--space-5) + 0.5rem) var(--space-4) var(--space-4);
+  background: linear-gradient(to top, rgba(8,20,14,0.94) 0%, rgba(8,20,14,0.6) 55%, transparent 100%);
+  padding: calc(var(--space-6) + 0.5rem) var(--space-5) var(--space-4);
   font-family: var(--font-sans);
-  font-size: var(--text-xs);
+  font-size: var(--text-sm);
   font-weight: 700;
   color: var(--color-white);
   letter-spacing: 0.02em;

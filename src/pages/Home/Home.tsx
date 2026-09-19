@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Laptop, Search } from 'lucide-react';
 import HeroSlider from '../../components/HeroSlider/HeroSlider';
@@ -12,7 +12,7 @@ import AccreditationsStrip from '../../components/AccreditationsStrip/Accreditat
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { fetchPriorityAttr } from '../../lib/domAttrs';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
-import { useSitePhotos, useSitePhotosLoading } from '../../hooks/useSitePhotos';
+import { useSitePhotos } from '../../hooks/useSitePhotos';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import type { HappeningDoc } from '../Admin/sections/NewsAwardsDataAdmin';
@@ -51,7 +51,7 @@ const defaultStudyCardPhotos = [
 // index-matched, non-admin-editable array (matches by position). CSS var()
 // references (not literal hex) so these follow the admin Color Theme like
 // everywhere else, instead of being frozen to the original brand greens.
-const STUDY_CARD_COLORS = ['var(--color-primary)', 'var(--color-primary-light)', 'var(--color-secondary)'];
+const STUDY_CARD_COLORS = ['var(--color-primary)', 'var(--color-primary-light)', 'var(--color-primary)'];
 
 const defaultCtaBannerPhoto = [
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'VWU campus', caption: '' },
@@ -151,27 +151,48 @@ export default function Home() {
     navigate(searchQuery.trim() ? `/academics/programs?search=${encodeURIComponent(searchQuery.trim())}` : '/academics/programs');
   };
 
-  // "Upcoming at VWU" is driven by the Happenings collection the admin's
-  // "Happenings & Awards" → Happenings editor writes to (see
-  // NewsAwardsDataAdmin.tsx) — marking something Upcoming there is what
-  // shows it below.
-  const { docs: happenings } = useOrderedCollection<HappeningDoc>('happenings', 'order');
+  // "Upcoming at VWU" and "Recent Campus Activities" are driven by the
+  // Happenings collection (see NewsAwardsDataAdmin.tsx / Happenings.tsx).
+  const { docs: happenings, loading: happeningsLoading } = useOrderedCollection<HappeningDoc>('happenings', 'order');
   const upcomingHappenings = happenings.filter(h => h.type === 'upcoming');
+  const recentHappenings = happenings.filter(h => h.type === 'recent');
 
   const liveTestimonials = useContentBlocks('home', 'testimonials');
   const testimonials = liveTestimonials.length > 0 ? liveTestimonials : defaultTestimonials;
   const liveStudyCards = useContentBlocks('home', 'studyCards');
   const studyCards = liveStudyCards.length > 0 ? liveStudyCards : defaultStudyCards;
   const activityPhotos = useSitePhotos('home', 'activities', defaultActivityPhotos);
-  // Gates the strip's first paint: until Firestore actually responds, we
-  // don't yet know whether real activity photos exist, so a skeleton shows
-  // instead of the generic stock defaults — avoids ever rendering a photo
-  // that's about to be replaced by a different one a moment later. Shares
-  // useSitePhotos' subscription (not its own useOrderedCollection call) so
-  // this always resolves at the exact same moment as activityPhotos itself.
-  const activitiesLoading = useSitePhotosLoading();
   const studyCardPhotos = useSitePhotos('home', 'study-cards', defaultStudyCardPhotos);
   const ctaBannerPhoto = useSitePhotos('home', 'cta-banner', defaultCtaBannerPhoto)[0];
+
+  // Derive Recent Campus Activities directly from Happenings (#recent-events)
+  const activityItems = useMemo(() => {
+    if (recentHappenings.length > 0) {
+      return recentHappenings.map(item => ({
+        id: item.id,
+        title: item.title,
+        src: item.imageUrl || PHOTO_NEEDED_PLACEHOLDER,
+        alt: item.title,
+        link: `/news-awards/happenings/${item.id}`,
+      }));
+    }
+    return activityPhotos.map((item, idx) => ({
+      id: `default-${idx}`,
+      title: item.caption || item.alt,
+      src: item.src,
+      alt: item.alt,
+      link: '/news-awards/happenings#recent-events',
+    }));
+  }, [recentHappenings, activityPhotos]);
+
+  const loopItems = useMemo(() => {
+    if (activityItems.length === 0) return [];
+    let base = activityItems;
+    while (base.length < 6) {
+      base = [...base, ...activityItems];
+    }
+    return [...base, ...base];
+  }, [activityItems]);
 
   useEffect(() => {
     document.title = 'VWU | Leading by Design — Women in Engineering';
@@ -269,28 +290,33 @@ export default function Home() {
                 A rolling glimpse of the events, celebrations, and everyday moments that shape life at VWU.
               </p>
             </div>
-            <Link to="/news-awards/gallery" className="btn btn-outline reveal-right">View Gallery →</Link>
+            <Link to="/news-awards/happenings#recent-events" className="btn btn-outline reveal-right">View All Events →</Link>
           </div>
         </div>
 
         <div className="activity-strip">
           <div className="activity-track-wrap">
             <div className="activity-track">
-              {activitiesLoading ? (
+              {happeningsLoading ? (
                 Array.from({ length: 6 }).map((_, i) => (
                   <div key={i} className="activity-card activity-card--skeleton" aria-hidden="true" />
                 ))
               ) : (
-                [...activityPhotos, ...activityPhotos].map((item, i) => (
-                  <div key={i} className="activity-card">
+                loopItems.map((item, i) => (
+                  <Link
+                    key={`${item.id}-${i}`}
+                    to={item.link}
+                    className="activity-card"
+                    title={item.title}
+                  >
                     <SmoothImage
                       src={item.src}
                       alt={item.alt}
                       className="activity-card-img"
                       {...(i < 3 ? fetchPriorityAttr('high') : { loading: 'lazy', decoding: 'async' })}
                     />
-                    <div className="activity-card-label">{item.caption || item.alt}</div>
-                  </div>
+                    <div className="activity-card-label">{item.title}</div>
+                  </Link>
                 ))
               )}
             </div>
