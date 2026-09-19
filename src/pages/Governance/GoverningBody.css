@@ -2,7 +2,10 @@
   --gb-primary: #0b1e42;
   --gb-primary-soft: rgba(11, 30, 66, 0.85);
   --gb-secondary: #f8fafc;
-  --gb-accent: #C9A84C;
+  /* Gold is shared with the main site theme (unlike the navy tokens above,
+     which are this page's own deliberate design) — ties this page's accent
+     to Admin -> Theme -> Accent instead of a second, disconnected copy. */
+  --gb-accent: var(--color-accent, #C9A84C);
 }
 
 /* ---- Hero ---- */

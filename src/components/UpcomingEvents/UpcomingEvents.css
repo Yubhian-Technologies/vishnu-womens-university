@@ -724,7 +724,7 @@
 }
 
 .m3-dialog-close-btn:hover {
-  background: #cde8d9;
+  background: var(--color-light-gray, #cde8d9);
   transform: rotate(90deg);
 }
 

@@ -47,7 +47,7 @@
 
 /* Subtle green accent — restrained, no gradient */
 .we-title-accent {
-  color: #1B4332;
+  color: var(--color-primary, #1B4332);
 }
 
 .we-lead {
