@@ -62,10 +62,16 @@ const defaultCtaBannerPhoto = [
 // <section>). Shown until an admin adds real entries there — same fallback
 // pattern used throughout this codebase (e.g. defaultExecutives in About.tsx).
 const defaultStudyCards: ContentBlockDoc[] = [
-  { id: 'default-1', page: 'home', section: 'studyCards', value: 'Explore Programs', title: 'B.Tech Programs', desc: 'Ten specialisations across Computer Science, Electronics, Electrical, Civil and Mechanical Engineering — including AI & Machine Learning, AI & Data Science, and Cyber Security.', icon: 'Laptop', slug: '/academics', order: 0 },
-  { id: 'default-2', page: 'home', section: 'studyCards', value: 'M.Tech & MBA Programs', title: 'M.Tech & MBA', desc: 'Five postgraduate programmes: M.Tech in Computer Science, VLSI Design, Power Electronics and Software Engineering, and a two-year MBA.', icon: 'GraduationCap', slug: '/academics', order: 1 },
-  { id: 'default-3', page: 'home', section: 'studyCards', value: 'Ph.D. Programs', title: 'Research & Ph.D.', desc: 'Doctoral research in Computer Science, Electronics and Electrical Engineering, supported by 2,500+ publications, 150+ patents and dedicated research facilities.', icon: 'FlaskConical', slug: '/academics', order: 2 },
+  { id: 'default-1', page: 'home', section: 'studyCards', value: 'Explore Programs', title: 'UG Programs', desc: 'Ten specialisations across Computer Science, Electronics, Electrical, Civil and Mechanical Engineering — including AI & Machine Learning, AI & Data Science, and Cyber Security.', icon: 'Laptop', slug: '/academics', order: 0 },
+  { id: 'default-2', page: 'home', section: 'studyCards', value: 'PG Programs', title: 'PG Programs', desc: 'Five postgraduate programmes: M.Tech in Computer Science, VLSI Design, Power Electronics and Software Engineering, and a two-year MBA.', icon: 'GraduationCap', slug: '/academics', order: 1 },
+  { id: 'default-3', page: 'home', section: 'studyCards', value: 'Research Programs', title: 'Ph.D. Programs', desc: 'Doctoral research in Computer Science, Electronics and Electrical Engineering, supported by 2,500+ publications, 150+ patents and dedicated research facilities.', icon: 'FlaskConical', slug: '/academics', order: 2 },
 ];
+
+function normalizeStudyCardTitle(title: string): string {
+  if (title === 'B.Tech Programs' || title === 'B.Tech') return 'UG Programs';
+  if (title === 'M.Tech & MBA Programs' || title === 'M.Tech & MBA' || title === 'M.Tech Programs') return 'PG Programs';
+  return title;
+}
 
 // Each study card's slug is admin-editable in Firestore and currently just
 // points at the plain "/academics" page, which always lands on its default
@@ -75,12 +81,18 @@ const defaultStudyCards: ContentBlockDoc[] = [
 // external link) isn't overridden.
 const STUDY_CARD_TABS: Record<string, string> = {
   'B.Tech Programs': 'btech',
+  'UG Programs': 'btech',
   'M.Tech & MBA Programs': 'mtech',
+  'M.Tech & MBA': 'mtech',
+  'PG Programs': 'mtech',
   'Ph.D. Programs': 'phd',
+  'Ph.D Programs': 'phd',
+  'Research & Ph.D.': 'phd',
+  'Research Programs': 'phd',
 };
 
 function studyCardHref(card: ContentBlockDoc): string {
-  const tab = STUDY_CARD_TABS[card.value];
+  const tab = STUDY_CARD_TABS[card.title] || STUDY_CARD_TABS[card.value] || STUDY_CARD_TABS[normalizeStudyCardTitle(card.title)];
   if (tab && (card.slug === '/academics' || !card.slug)) {
     return `/academics?tab=${tab}`;
   }
@@ -115,6 +127,7 @@ function useTilt(strength = 12) {
 function StudyCardItem({ card, photo, color }: { card: ContentBlockDoc; photo?: { src: string; alt: string; caption?: string }; color: string }) {
   const Icon = resolveContentIcon(card.icon) || Laptop;
   const tilt = useTilt(10);
+  const displayTitle = normalizeStudyCardTitle(card.title);
   
   return (
     <div
@@ -129,7 +142,7 @@ function StudyCardItem({ card, photo, color }: { card: ContentBlockDoc; photo?: 
         <div className="study-card-shine" />
       </div>
       <div className="study-card-body">
-        <h3 className="study-card-title">{card.title}</h3>
+        <h3 className="study-card-title">{displayTitle}</h3>
         <p className="study-card-desc">{card.desc}</p>
         <Link to={studyCardHref(card)} className="study-card-link">
           {card.value}

@@ -91,12 +91,12 @@ const DEFAULT_SECTIONS: Record<string, Record<string, SectionDef>> = {
         { imageUrl: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=600&q=80', alt: 'Space Application Center', caption: 'Space Application Center' },
       ],
     },
-    // The 3 "Study at VWU" cards (B.Tech / M.Tech & MBA / Research & Ph.D.).
+    // The 3 "Study at VWU" cards (UG / PG / Research & Ph.D.).
     'study-cards': {
       label: 'Study at VWU Card Photos',
       slots: [
-        { imageUrl: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=800&q=80', alt: 'Students in engineering classroom', caption: '', label: 'B.Tech Programs card' },
-        { imageUrl: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80', alt: 'Postgraduate students', caption: '', label: 'M.Tech & MBA card' },
+        { imageUrl: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=800&q=80', alt: 'Students in engineering classroom', caption: '', label: 'UG Programs card' },
+        { imageUrl: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80', alt: 'Postgraduate students', caption: '', label: 'PG Programs card' },
         { imageUrl: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&q=80', alt: 'Research laboratory', caption: '', label: 'Research & Ph.D. card' },
       ],
     },
