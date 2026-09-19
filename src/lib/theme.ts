@@ -21,11 +21,11 @@ export interface ColorVarDef {
 // colors can't just reuse the main palette directly. --footer-accent still
 // inherits from the main theme until an admin explicitly sets one, so
 // changing Accent above still re-colors the footer's highlights. --footer-bg
-// deliberately does NOT inherit Primary Dark — reference university footers
-// (LPU, VIT, Amrita) all use a near-black neutral background independent of
-// the brand color, not a tinted brand-dark tone, so that's the default here.
+// deliberately does NOT inherit Primary Dark — the footer ships its own deep
+// navy design (Footer.css), independent of the brand color, so that's the
+// default here rather than a tinted brand-dark tone.
 export const FOOTER_COLOR_VARS: ColorVarDef[] = [
-  { key: '--footer-bg', label: 'Footer Background', hint: 'Near-black neutral by default, independent of the brand color.', default: '#0a0a0a' },
+  { key: '--footer-bg', label: 'Footer Background', hint: 'Deep navy by default, independent of the brand color.', default: '#0b1e42' },
   { key: '--footer-text', label: 'Footer Text', hint: 'Body text and muted details in the footer.', default: '#e2e8f0' },
   { key: '--footer-heading', label: 'Footer Heading', hint: 'Headings, brand name, and brightest text in the footer.', default: '#ffffff' },
   { key: '--footer-accent', label: 'Footer Accent', hint: 'Blank inherits Accent from the theme above.', default: '#c9a84c', inheritsFrom: '--color-accent' },
@@ -71,3 +71,7 @@ export const COLOR_VARS: ColorVarDef[] = [
 ];
 
 export const THEME_DOC = { collection: 'siteSettings', id: 'theme' } as const;
+
+// Named, saved color palettes an admin can switch the live theme (THEME_DOC)
+// to later — see ThemeAdmin.tsx's "Saved Color Themes" card.
+export const THEME_PRESETS_COLLECTION = 'themePresets';
