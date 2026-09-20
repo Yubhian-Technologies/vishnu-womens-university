@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Laptop, Search } from 'lucide-react';
+import { useEffect, useMemo, useRef } from 'react';
+import { Link } from 'react-router-dom';
+import { Laptop } from 'lucide-react';
 import HeroSlider from '../../components/HeroSlider/HeroSlider';
+import SiteSearch from '../../components/SiteSearch/SiteSearch';
 import CounterSection from '../../components/CounterSection/CounterSection';
 import ScrollTopButton from '../../components/ScrollTopButton/ScrollTopButton';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
@@ -157,13 +158,6 @@ function StudyCardItem({ card, photo, color }: { card: ContentBlockDoc; photo?: 
 
 /* ── Component ────────────────────────────────────────────── */
 export default function Home() {
-  const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState('');
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    navigate(searchQuery.trim() ? `/academics/programs?search=${encodeURIComponent(searchQuery.trim())}` : '/academics/programs');
-  };
-
   // "Upcoming at VWU" and "Recent Campus Activities" are driven by the
   // Happenings collection (see NewsAwardsDataAdmin.tsx / Happenings.tsx).
   const { docs: happenings, loading: happeningsLoading } = useOrderedCollection<HappeningDoc>('happenings', 'order');
@@ -244,21 +238,8 @@ export default function Home() {
       {/* Straddles the hero/Accreditations seam — half the pill overlaps
           the hero's bottom edge, half sits in the strip below, via the
           negative margin-top in Home.css (no visible section of its own). */}
-      <section className="home-search-float" aria-label="Search Programs">
-        <form className="home-search-form" onSubmit={handleSearch} role="search">
-          <div className="home-search-box">
-            <Search className="home-search-icon" size={19} strokeWidth={2} />
-            <input
-              type="text"
-              className="home-search-input"
-              placeholder="Explore courses"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              aria-label="Explore courses"
-            />
-            <button type="submit" className="home-search-submit">Search</button>
-          </div>
-        </form>
+      <section className="home-search-float" aria-label="Search courses, programs and schools">
+        <SiteSearch />
       </section>
 
       <AccreditationsStrip />
