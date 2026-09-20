@@ -37,6 +37,9 @@ interface PageHeroProps {
       control of both text and image together. */
   forceTitle?: string;
   forceSubtitle?: string;
+  className?: string;
+  bottomSlot?: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 const INTERVAL = 5000;
@@ -53,6 +56,9 @@ export default function PageHero({
   layout = 'default',
   forceTitle,
   forceSubtitle,
+  className,
+  bottomSlot,
+  children,
 }: PageHeroProps) {
   const { slides, loading } = usePageBanners(page);
   const [rawCurrent, setCurrent] = useState(0);
@@ -201,6 +207,12 @@ export default function PageHero({
               )}
             </div>
           )}
+
+          {children && (
+            <div className="page-hero__extra animate-fade-in-up" style={{ marginTop: '1.5rem', width: '100%' }}>
+              {children}
+            </div>
+          )}
         </>
       )}
     </>
@@ -231,7 +243,7 @@ export default function PageHero({
   );
 
   return (
-    <section className={`page-hero page-hero--${size}`}>
+    <section className={`page-hero page-hero--${size} ${className || ''}`}>
       <div className="container">
         <div
           className={`page-hero-card${layout === 'split' ? ' page-hero-card--split' : ''}`}
@@ -244,6 +256,7 @@ export default function PageHero({
               <div className="page-hero-split-image-scrim" />
               <div className="page-hero-split-glow" />
               <div className="page-hero-split-text">{textMarkup}</div>
+              {bottomSlot && <div className="page-hero-bottom-slot">{bottomSlot}</div>}
               {navMarkup}
             </>
           ) : (
@@ -251,6 +264,7 @@ export default function PageHero({
               {slidesMarkup}
               <div className="page-hero-overlay" />
               <div className="page-hero-content">{textMarkup}</div>
+              {bottomSlot && <div className="page-hero-bottom-slot">{bottomSlot}</div>}
               {navMarkup}
             </>
           )}

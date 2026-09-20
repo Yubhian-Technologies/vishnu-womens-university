@@ -484,3 +484,9 @@
   .page-hero { min-height: clamp(320px, 56dvh, 420px); }
 }
 
+.page-hero-bottom-slot {
+  position: relative;
+  z-index: 4;
+  width: 100%;
+}
+

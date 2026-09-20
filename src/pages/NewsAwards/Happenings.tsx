@@ -8,6 +8,8 @@ import { useHashScroll } from '../../hooks/useHashScroll';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { happeningToArticle } from '../../lib/happenings';
 import type { HappeningDoc } from '../Admin/sections/NewsAwardsDataAdmin';
+import ScrollingAchievements from './ScrollingAchievements';
+import './Happenings.css';
 
 export default function Happenings() {
   useHashScroll();
@@ -36,15 +38,18 @@ export default function Happenings() {
   const upcoming = happenings.filter(h => h.type === 'upcoming');
 
   return (
-    <main className="page-wrapper">
+    <main className="page-wrapper happenings-page">
       {/* Hero */}
       <PageHero
         page="news-awards-happenings"
+        className="page-hero--happenings"
         defaultTitle="Happenings at VWU"
-  defaultSubtitle="Workshops, MoUs, competitions, achievements, and institutional milestones — a running record of life at VWU."
+        defaultSubtitle="Workshops, MoUs, competitions, achievements, and institutional milestones — a running record of life at VWU."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'News & Awards', to: '/news-awards' }, { label: 'Happenings' }]}
         scrollCtaTargetId={upcoming.length > 0 ? 'upcoming-events' : 'recent-events'}
-      />
+      >
+        <ScrollingAchievements />
+      </PageHero>
 
       {/* Upcoming Events */}
       {upcoming.length > 0 && (
