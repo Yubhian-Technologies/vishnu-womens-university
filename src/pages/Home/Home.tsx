@@ -277,7 +277,15 @@ export default function Home() {
         <div className="container">
           <div className="study-intro reveal">
             <h2 className="section-title gradient-text">Study at VWU</h2>
-            <p className="section-desc"><strong>Courses for Women</strong><br />At VWU, education goes beyond the classroom. Experience personalized, industry-focused learning that builds technical expertise, leadership confidence, creativity, and the skills to shape your future. Every course here is taught to women, in working laboratories, by faculty who bring industry into the classroom from the first year. All programmes are approved by AICTE and recognised by the UGC.</p>
+            <p className="section-desc">
+              <strong>Courses for Women</strong>
+              <br /><br />
+              At VWU, learning extends far beyond the traditional classroom. Students gain personalized, industry-oriented education designed to develop technical expertise, leadership skills, creativity, and the confidence to shape their future.
+              <br /><br />
+              Every programme is designed exclusively for women and emphasizes hands-on learning through modern laboratories and practical experiences. Our faculty bring valuable industry exposure into the classroom from the very first year, helping students connect academic knowledge with real-world applications.
+              <br /><br />
+              All programmes are approved by AICTE and recognized by the UGC.
+            </p>
           </div>
           <div className="study-grid">
             {studyCards.map((card, i) => {
