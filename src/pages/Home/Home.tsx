@@ -337,13 +337,7 @@ export default function Home() {
       <AlumniConnect />
 
       {/* ── Chapter 6: Student Voices & Testimonials ── */}
-      <div className="student-voices-header reveal">
-        <div className="container">
-          <p className="section-eyebrow">Student Voices</p>
-          <h2 className="section-title gradient-text">What Our Students Say</h2>
-        </div>
-      </div>
-      <TestimonialSlider testimonials={testimonials} title="" />
+      <TestimonialSlider testimonials={testimonials} title="What Our Students Say" />
 
       <UpcomingEvents happenings={upcomingHappenings} />
 

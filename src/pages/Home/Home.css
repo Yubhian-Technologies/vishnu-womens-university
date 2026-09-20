@@ -52,43 +52,6 @@
   color: var(--color-accent, #C9A84C);
 }
 
-/* ===== Student Voices Section =====
-   The header sits above TestimonialSlider without an explicit section
-   wrapper — the .student-voices-header provides the navy background
-   and the testimonial cards render below with their own background. */
-
-.student-voices-header {
-  background: #0B1E42;
-  padding: var(--space-20) 0;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.student-voices-header::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 12%;
-  right: 12%;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(201, 151, 58, 0.7), transparent);
-}
-
-.student-voices-header .section-eyebrow {
-  margin: 0 0 0.4rem 0;
-  font-family: var(--font-sans);
-  font-size: 0.78rem;
-  font-weight: 800;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--color-accent, #C9A84C);
-}
-
-.student-voices-header .section-title {
-  margin-bottom: 0;
-}
-
 /* ===== Utilities ===== */
 
 .home-page { overflow-x: hidden; }
