@@ -1,48 +1,67 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { usePageBanners } from '../../hooks/usePageBanners';
+import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
+import { useOrderedCollection } from '../../hooks/useCollection';
+import type { HappeningsShowcaseDoc } from '../Admin/sections/NewsAwardsDataAdmin';
 import './HappeningsPosterSlider.css';
 
-interface PosterSlide {
+interface ShowcaseSlide {
   id: string;
+  title: string;
+  caption?: string;
+  description?: string;
   imageUrl: string;
-  caption: string;
   linkUrl?: string;
+  badge?: string;
 }
 
-const DEFAULT_POSTER_SLIDES: PosterSlide[] = [
+const DEFAULT_SHOWCASE_SLIDES: ShowcaseSlide[] = [
   {
     id: 'amazon-selects-2026',
+    title: 'Amazon 2026 Selects',
+    caption: '16 Students Placed with ₹46.38 Lakhs per annum',
+    description: 'Congratulations to our 16 students on securing Full-Time roles at Amazon with ₹46.38 LPA package. Shri Vishnu Engineering College for Women continues its tradition of exceptional career placements and engineering excellence.',
     imageUrl: '/images/placements/1.png',
-    caption: 'Amazon 2026 Selects — 16 Students Placed with ₹46.38 Lakhs per annum',
+    badge: 'Placement Record',
+    linkUrl: '/placements',
   },
   {
     id: 'campus-placements-2026',
+    title: 'Campus Recruitment Star Achievers',
+    caption: 'Elite Career Milestones Across Global Technology Leaders',
+    description: 'VWU engineers consistently secure premier roles in software engineering, AI/ML, VLSI, and cloud computing across Fortune 500 enterprises and global tech giants.',
     imageUrl: '/images/placements/2.png',
-    caption: 'Campus Placements 2026 — Elite Career Milestones at Premier Tech Leaders',
+    badge: 'Campus Selections',
+    linkUrl: '/placements',
   },
   {
     id: 'student-achievements-vwu',
+    title: 'Student Innovations & Engineering Excellence',
+    caption: 'National Hackathon Champions & Technical Milestones',
+    description: 'Celebrating groundbreaking projects, national championship victories, and technical research developed by VWU student innovators.',
     imageUrl: '/images/placements/3.png',
-    caption: 'Student Achievements & Innovations — Engineering Excellence at VWU',
+    badge: 'Student Achievements',
+    linkUrl: '/news-awards/gallery',
   },
 ];
 
 export default function HappeningsPosterSlider() {
-  const { slides: firestoreSlides } = usePageBanners('news-awards-happenings');
+  const { docs: dbShowcase } = useOrderedCollection<HappeningsShowcaseDoc>('happeningsShowcase', 'order');
 
-  // Convert Firestore slides if any exist with images
-  const slides: PosterSlide[] = firestoreSlides.length > 0 && firestoreSlides.some(s => s.imageUrl)
-    ? firestoreSlides
-        .filter(s => !!s.imageUrl)
-        .map(s => ({
+  // If Super Admin added showcase posters in Admin -> News & Awards, use them dynamically!
+  const slides: ShowcaseSlide[] = dbShowcase.length > 0 && dbShowcase.some((s) => !!s.imageUrl)
+    ? dbShowcase
+        .filter((s) => !!s.imageUrl)
+        .map((s) => ({
           id: s.id,
+          title: s.title,
+          caption: s.caption || s.title,
+          description: s.description || '',
           imageUrl: s.imageUrl,
-          caption: s.title || s.subtitle || 'VWU Happenings & Achievements',
-          linkUrl: s.ctaLink || undefined,
+          linkUrl: s.linkUrl || undefined,
+          badge: s.badge || undefined,
         }))
-    : DEFAULT_POSTER_SLIDES;
+    : DEFAULT_SHOWCASE_SLIDES;
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
@@ -56,10 +75,10 @@ export default function HappeningsPosterSlider() {
     setCurrentIndex((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
   }, [slides.length]);
 
-  // Auto-slide every 5.5 seconds unless user is hovering
+  // Auto-slide every 6 seconds unless user is hovering
   useEffect(() => {
     if (isHovered || slides.length <= 1) return;
-    const interval = setInterval(nextSlide, 5500);
+    const interval = setInterval(nextSlide, 6000);
     return () => clearInterval(interval);
   }, [isHovered, nextSlide, slides.length]);
 
@@ -108,7 +127,7 @@ export default function HappeningsPosterSlider() {
               const content = (
                 <img
                   src={slide.imageUrl}
-                  alt={slide.caption}
+                  alt={slide.caption || slide.title}
                   className="happenings-poster-img"
                   loading={idx === 0 ? 'eager' : 'lazy'}
                 />
@@ -159,11 +178,37 @@ export default function HappeningsPosterSlider() {
             )}
           </div>
 
-          {/* Footer: Caption & Dot Indicators */}
+          {/* Footer: Details, Description, Link & Dot Indicators */}
           <div className="happenings-poster-footer">
-            <p className="happenings-poster-caption">
-              {currentSlide.caption}
-            </p>
+            <div className="happenings-poster-info">
+              {currentSlide.badge && (
+                <span className="happenings-poster-badge">{currentSlide.badge}</span>
+              )}
+              <h2 className="happenings-poster-title">
+                {currentSlide.caption || currentSlide.title}
+              </h2>
+              {currentSlide.description && (
+                <p className="happenings-poster-desc">{currentSlide.description}</p>
+              )}
+              {currentSlide.linkUrl && (
+                <div className="happenings-poster-action">
+                  {currentSlide.linkUrl.startsWith('http') ? (
+                    <a
+                      href={currentSlide.linkUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="happenings-poster-link-btn"
+                    >
+                      View Details <ArrowRight size={15} />
+                    </a>
+                  ) : (
+                    <Link to={currentSlide.linkUrl} className="happenings-poster-link-btn">
+                      View Details <ArrowRight size={15} />
+                    </Link>
+                  )}
+                </div>
+              )}
+            </div>
 
             {slides.length > 1 && (
               <div className="happenings-poster-dots" role="tablist">

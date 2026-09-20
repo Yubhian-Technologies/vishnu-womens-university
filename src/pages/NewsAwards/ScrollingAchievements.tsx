@@ -1,8 +1,18 @@
 import { useRef, useState, useEffect } from 'react';
 import { Trophy, Award, Sparkles, Star, Zap, ChevronLeft, ChevronRight, GraduationCap } from 'lucide-react';
 import { useOrderedCollection } from '../../hooks/useCollection';
-import type { StudentAchievementDoc } from '../Admin/sections/NewsAwardsDataAdmin';
 import './ScrollingAchievements.css';
+
+export interface StudentAchievementDoc {
+  id: string;
+  studentName?: string;
+  achievementTitle?: string;
+  department?: string;
+  category?: string;
+  badge?: string;
+  year?: string;
+  imageUrl?: string;
+}
 
 export interface StudentAchievementItem {
   id: string;
@@ -42,17 +52,21 @@ export default function ScrollingAchievements() {
   // Purely dynamic: only display items that admin has added
   const items: StudentAchievementItem[] = (liveStudentAchievements || []).map((a) => ({
     id: a.id,
-    studentName: a.studentName,
-    achievementTitle: a.achievementTitle,
+    studentName: a.studentName || '',
+    achievementTitle: a.achievementTitle || '',
     department: a.department || '',
     category: a.category || '',
     badge: a.badge || a.year || '',
     year: a.year || '',
     image: a.imageUrl || '',
-    icon: /hackathon|prize|cup|winner/i.test(a.achievementTitle)
+    icon: /hackathon|prize|cup|winner/i.test(a.achievementTitle || '')
       ? 'trophy'
-      : /patent|research/i.test(a.achievementTitle)
+      : /patent|research/i.test(a.achievementTitle || '')
       ? 'grad'
+      : /gold|medal|first/i.test(a.achievementTitle || '')
+      ? 'star'
+      : /star|top|elite/i.test(a.achievementTitle || '')
+      ? 'sparkles'
       : 'award',
   }));
 
