@@ -6,7 +6,7 @@ import NewsCard, { type NewsArticle } from '../../components/NewsCard/NewsCard';
 import NewsArticleDialog from '../../components/NewsCard/NewsArticleDialog';
 import { useHashScroll } from '../../hooks/useHashScroll';
 import { useOrderedCollection } from '../../hooks/useCollection';
-import { happeningToArticle } from '../../lib/happenings';
+import { happeningToArticle, isUpcomingHappening } from '../../lib/happenings';
 import type { HappeningDoc } from '../Admin/sections/NewsAwardsDataAdmin';
 
 export default function Happenings() {
@@ -33,7 +33,9 @@ export default function Happenings() {
   }, []);
 
   const recent = happenings.filter(h => h.type === 'recent');
-  const upcoming = happenings.filter(h => h.type === 'upcoming');
+  // Admins don't always flip type back once an event's date passes, so
+  // drop anything already past regardless of type (see isUpcomingHappening).
+  const upcoming = happenings.filter(h => h.type === 'upcoming' && isUpcomingHappening(h));
 
   return (
     <main className="page-wrapper">
