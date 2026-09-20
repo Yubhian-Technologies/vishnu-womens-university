@@ -140,7 +140,7 @@ export default function Footer() {
             <div className="vwu-footer-brand-header">
               <Link to="/" className="vwu-footer-logo-link" aria-label="Vishnu Women's University Home">
                 <img
-                  src="/images/footer-logo.png"
+                  src="/images/square-logo.png"
                   alt="Vishnu Women's University"
                   className="vwu-footer-logo"
                   loading="lazy"
