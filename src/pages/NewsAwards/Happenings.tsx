@@ -1,14 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CalendarDays } from 'lucide-react';
-import PageHero from '../../components/PageHero/PageHero';
 import NewsCard, { type NewsArticle } from '../../components/NewsCard/NewsCard';
 import NewsArticleDialog from '../../components/NewsCard/NewsArticleDialog';
 import { useHashScroll } from '../../hooks/useHashScroll';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { happeningToArticle, isUpcomingHappening } from '../../lib/happenings';
 import type { HappeningDoc } from '../Admin/sections/NewsAwardsDataAdmin';
-import ScrollingAchievements from './ScrollingAchievements';
+import HappeningsPosterSlider from './HappeningsPosterSlider';
 import './Happenings.css';
 
 export default function Happenings() {
@@ -41,17 +40,8 @@ export default function Happenings() {
 
   return (
     <main className="page-wrapper happenings-page">
-      {/* Hero */}
-      <PageHero
-        page="news-awards-happenings"
-        className="page-hero--happenings"
-        defaultTitle="Happenings at VWU"
-        defaultSubtitle="Workshops, MoUs, competitions, achievements, and institutional milestones — a running record of life at VWU."
-        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'News & Awards', to: '/news-awards' }, { label: 'Happenings' }]}
-        scrollCtaTargetId={upcoming.length > 0 ? 'upcoming-events' : 'recent-events'}
-      >
-        <ScrollingAchievements />
-      </PageHero>
+      {/* Event & Achievement Poster Showcase Banner (SVECW Style) */}
+      <HappeningsPosterSlider />
 
       {/* Upcoming Events */}
       {upcoming.length > 0 && (

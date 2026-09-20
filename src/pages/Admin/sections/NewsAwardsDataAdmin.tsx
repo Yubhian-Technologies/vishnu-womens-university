@@ -27,44 +27,42 @@ export interface AwardDoc {
   order: number;
 }
 
-export interface StudentAchievementDoc {
+export interface HappeningsShowcaseDoc {
   id: string;
-  studentName: string;
-  achievementTitle: string;
-  department: string;
-  category: string;
-  badge?: string;
-  year?: string;
-  imageUrl?: string;
-  storagePath?: string;
+  title: string;
+  caption?: string;
   description?: string;
+  imageUrl: string;
+  storagePath?: string;
+  linkUrl?: string;
+  badge?: string;
   order: number;
 }
 
+export type StudentAchievementDoc = HappeningsShowcaseDoc;
+
 const EMPTY_HAPPENING: Omit<HappeningDoc, 'id'> = { title: '', date: '', type: 'recent', dept: '', order: 0, imageUrl: '', storagePath: '', description: '' };
 const EMPTY_AWARD: Omit<AwardDoc, 'id'> = { name: '', issuedBy: '', year: '', details: '', category: 'ranking', order: 0 };
-const EMPTY_STUDENT_ACHIEVEMENT: Omit<StudentAchievementDoc, 'id'> = {
-  studentName: '',
-  achievementTitle: '',
-  department: '',
-  category: 'Hackathon',
-  badge: '',
-  year: '2026',
+const EMPTY_SHOWCASE: Omit<HappeningsShowcaseDoc, 'id'> = {
+  title: '',
+  caption: '',
+  description: '',
   imageUrl: '',
   storagePath: '',
-  description: '',
+  linkUrl: '',
+  badge: '',
   order: 0,
 };
 
 export default function NewsAwardsDataAdmin() {
-  const [tab, setTab] = useState<'happenings' | 'awards' | 'student-achievements'>('student-achievements');
+  const [tab, setTab] = useState<'happenings' | 'awards' | 'showcase'>('showcase');
 
   return (
     <div className="admin-section">
       <div className="admin-card">
         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
-          <button className={`admin-btn ${tab === 'student-achievements' ? 'admin-btn--primary' : 'admin-btn--ghost'}`} onClick={() => setTab('student-achievements')}>
-            🎓 Student Achievements (Hero Ticker)
+          <button className={`admin-btn ${tab === 'showcase' ? 'admin-btn--primary' : 'admin-btn--ghost'}`} onClick={() => setTab('showcase')}>
+            🏆 Event & Achievement Posters (Hero Showcase)
           </button>
           <button className={`admin-btn ${tab === 'happenings' ? 'admin-btn--primary' : 'admin-btn--ghost'}`} onClick={() => setTab('happenings')}>
             Happenings
@@ -74,14 +72,14 @@ export default function NewsAwardsDataAdmin() {
           </button>
         </div>
       </div>
-      {tab === 'student-achievements' ? <StudentAchievementsPanel /> : tab === 'happenings' ? <HappeningsPanel /> : <AwardsPanel />}
+      {tab === 'showcase' ? <HappeningsShowcasePanel /> : tab === 'happenings' ? <HappeningsPanel /> : <AwardsPanel />}
     </div>
   );
 }
 
-function StudentAchievementsPanel() {
-  const { docs: items, loading } = useOrderedCollection<StudentAchievementDoc>('studentAchievements', 'order');
-  const [form, setForm] = useState<Omit<StudentAchievementDoc, 'id'>>(EMPTY_STUDENT_ACHIEVEMENT);
+function HappeningsShowcasePanel() {
+  const { docs: items, loading } = useOrderedCollection<HappeningsShowcaseDoc>('happeningsShowcase', 'order');
+  const [form, setForm] = useState<Omit<HappeningsShowcaseDoc, 'id'>>(EMPTY_SHOWCASE);
   const [editing, setEditing] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -89,21 +87,24 @@ function StudentAchievementsPanel() {
   const handleImage = (r: UploadResult) => setForm((p) => ({ ...p, imageUrl: r.url, storagePath: r.path }));
 
   const save = async () => {
-    if (!form.studentName || !form.achievementTitle) {
-      return alert('Student Name / Team Name and Achievement Title are required.');
+    if (!form.title) {
+      return alert('Title / Event Name is required.');
+    }
+    if (!form.imageUrl) {
+      return alert('Please upload the Event / Achievement Poster Image.');
     }
     setSaving(true);
     try {
       if (editing) {
-        await updateDoc(doc(db, 'studentAchievements', editing), { ...form });
+        await updateDoc(doc(db, 'happeningsShowcase', editing), { ...form });
       } else {
-        await addDoc(collection(db, 'studentAchievements'), {
+        await addDoc(collection(db, 'happeningsShowcase'), {
           ...form,
           order: form.order || items.length + 1,
           createdAt: serverTimestamp(),
         });
       }
-      setForm(EMPTY_STUDENT_ACHIEVEMENT);
+      setForm(EMPTY_SHOWCASE);
       setEditing(null);
     } catch (e) {
       alert(`Couldn't save: ${(e as Error).message}`);
@@ -112,26 +113,24 @@ function StudentAchievementsPanel() {
     }
   };
 
-  const startEdit = (it: StudentAchievementDoc) => {
+  const startEdit = (it: HappeningsShowcaseDoc) => {
     setEditing(it.id);
     setForm({
-      studentName: it.studentName,
-      achievementTitle: it.achievementTitle,
-      department: it.department || '',
-      category: it.category || 'Hackathon',
-      badge: it.badge || '',
-      year: it.year || '',
+      title: it.title,
+      caption: it.caption || '',
+      description: it.description || '',
       imageUrl: it.imageUrl || '',
       storagePath: it.storagePath || '',
-      description: it.description || '',
+      linkUrl: it.linkUrl || '',
+      badge: it.badge || '',
       order: it.order || 0,
     });
   };
 
   const remove = async (id: string) => {
-    if (!confirm('Delete this student achievement?')) return;
+    if (!confirm('Delete this showcase poster item?')) return;
     try {
-      await deleteDoc(doc(db, 'studentAchievements', id));
+      await deleteDoc(doc(db, 'happeningsShowcase', id));
     } catch (e) {
       alert(`Couldn't delete: ${(e as Error).message}`);
     }
@@ -140,69 +139,51 @@ function StudentAchievementsPanel() {
   return (
     <>
       <div className="admin-card">
-        <h2 className="admin-card__title">{editing ? 'Edit Student Achievement' : 'Add Student Achievement'}</h2>
+        <h2 className="admin-card__title">{editing ? 'Edit Event / Achievement Poster' : 'Add Event / Achievement Poster'}</h2>
         <p style={{ fontSize: '0.85rem', color: '#6b7280', marginBottom: '1.25rem' }}>
-          Manage dynamic student achievements displayed in the Happenings page Hero scrolling ticker.
+          Manage dynamic event & achievement posters displayed in the Happenings page top Hero carousel showcase.
         </p>
         <div className="admin-form-grid">
           <div className="admin-field">
-            <label htmlFor="st-name">Student Name / Team Name *</label>
+            <label htmlFor="sh-title">Title / Headline *</label>
             <input
-              id="st-name"
-              value={form.studentName}
-              onChange={(e) => set('studentName', e.target.value)}
-              placeholder="e.g. P. Sai Deepika & Team, K. Charitha"
+              id="sh-title"
+              value={form.title}
+              onChange={(e) => set('title', e.target.value)}
+              placeholder="e.g. Amazon 2026 Selects, Smart India Hackathon Winners"
             />
           </div>
           <div className="admin-field">
-            <label htmlFor="st-dept">Department / Program</label>
+            <label htmlFor="sh-caption">Subtitle / Caption (displayed below poster)</label>
             <input
-              id="st-dept"
-              value={form.department}
-              onChange={(e) => set('department', e.target.value)}
-              placeholder="e.g. Computer Science & Engineering"
-            />
-          </div>
-          <div className="admin-field admin-field--full">
-            <label htmlFor="st-title">Achievement Title / Event *</label>
-            <input
-              id="st-title"
-              value={form.achievementTitle}
-              onChange={(e) => set('achievementTitle', e.target.value)}
-              placeholder="e.g. 1st Prize @ Smart India Hackathon (National Level)"
+              id="sh-caption"
+              value={form.caption}
+              onChange={(e) => set('caption', e.target.value)}
+              placeholder="e.g. Amazon 2026 Selects — 16 Students Placed with ₹46.38 Lakhs per annum"
             />
           </div>
           <div className="admin-field">
-            <label htmlFor="st-category">Category</label>
+            <label htmlFor="sh-badge">Badge / Category Tag (optional)</label>
             <input
-              id="st-category"
-              value={form.category}
-              onChange={(e) => set('category', e.target.value)}
-              placeholder="e.g. National Hackathon, Motorsports, Placements"
-            />
-          </div>
-          <div className="admin-field">
-            <label htmlFor="st-badge">Badge / Prize Pill</label>
-            <input
-              id="st-badge"
+              id="sh-badge"
               value={form.badge}
               onChange={(e) => set('badge', e.target.value)}
-              placeholder="e.g. 1st Prize, Gold Medal, ₹44 LPA"
+              placeholder="e.g. Placements, Hackathon Champions, Sports, MoU"
             />
           </div>
           <div className="admin-field">
-            <label htmlFor="st-year">Year</label>
+            <label htmlFor="sh-link">Target Link URL (optional)</label>
             <input
-              id="st-year"
-              value={form.year}
-              onChange={(e) => set('year', e.target.value)}
-              placeholder="e.g. 2026"
+              id="sh-link"
+              value={form.linkUrl}
+              onChange={(e) => set('linkUrl', e.target.value)}
+              placeholder="e.g. /placements or https://..."
             />
           </div>
           <div className="admin-field">
-            <label htmlFor="st-order">Display Order</label>
+            <label htmlFor="sh-order">Display Order</label>
             <input
-              id="st-order"
+              id="sh-order"
               type="number"
               value={form.order}
               onChange={(e) => set('order', +e.target.value)}
@@ -210,23 +191,23 @@ function StudentAchievementsPanel() {
             />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Student Photo / Certificate / Trophy Photo</label>
+            <label>Poster / Banner Image *</label>
             <ImageUploader
-              folder="vwu/student-achievements"
+              folder="vwu/happenings-showcase"
               currentUrl={form.imageUrl}
               onUploaded={handleImage}
-              label="Upload Student / Trophy Photo"
-              aspect={1}
+              label="Upload Event / Achievement Poster"
+              aspect={16 / 7.5}
             />
           </div>
           <div className="admin-field admin-field--full">
-            <label htmlFor="st-desc">Short Description / Details (optional)</label>
+            <label htmlFor="sh-desc">Description of Particular Achievement / Event</label>
             <textarea
-              id="st-desc"
-              rows={2}
+              id="sh-desc"
+              rows={3}
               value={form.description}
               onChange={(e) => set('description', e.target.value)}
-              placeholder="Brief details about the project or competition."
+              placeholder="Describe this particular achievement or event in detail (e.g. Congratulations to our 16 students on securing Full-Time roles at Amazon...)."
             />
           </div>
         </div>
@@ -236,20 +217,20 @@ function StudentAchievementsPanel() {
               className="admin-btn admin-btn--ghost"
               onClick={() => {
                 setEditing(null);
-                setForm(EMPTY_STUDENT_ACHIEVEMENT);
+                setForm(EMPTY_SHOWCASE);
               }}
             >
               Cancel
             </button>
           )}
           <button className="admin-btn admin-btn--primary" onClick={save} disabled={saving}>
-            {saving ? 'Saving…' : editing ? 'Update Achievement' : 'Add Achievement'}
+            {saving ? 'Saving…' : editing ? 'Update Poster' : 'Add Poster'}
           </button>
         </div>
       </div>
 
       <div className="admin-card">
-        <h2 className="admin-card__title">Student Achievements ({items.length})</h2>
+        <h2 className="admin-card__title">All Showcase Posters ({items.length})</h2>
         {loading ? (
           <p className="admin-loading">Loading…</p>
         ) : (
@@ -258,11 +239,10 @@ function StudentAchievementsPanel() {
               <thead>
                 <tr>
                   <th>Order</th>
-                  <th>Photo</th>
-                  <th>Student / Team</th>
-                  <th>Achievement</th>
-                  <th>Category</th>
-                  <th>Badge</th>
+                  <th>Poster</th>
+                  <th>Title & Caption</th>
+                  <th>Description</th>
+                  <th>Badge & Link</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -274,22 +254,34 @@ function StudentAchievementsPanel() {
                       {it.imageUrl ? (
                         <img
                           src={it.imageUrl}
-                          alt={it.studentName}
-                          style={{ width: 44, height: 44, borderRadius: 6, objectFit: 'cover' }}
+                          alt={it.title}
+                          style={{ width: 80, height: 44, borderRadius: 6, objectFit: 'cover' }}
                         />
                       ) : (
-                        <span style={{ color: '#9ca3af', fontSize: '0.8rem' }}>No photo</span>
+                        <span style={{ color: '#9ca3af', fontSize: '0.8rem' }}>No image</span>
                       )}
                     </td>
                     <td>
-                      <strong>{it.studentName}</strong>
-                      {it.department && (
-                        <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>{it.department}</div>
+                      <strong>{it.title}</strong>
+                      {it.caption && (
+                        <div style={{ fontSize: '0.78rem', color: '#6b7280', fontStyle: 'italic' }}>{it.caption}</div>
                       )}
                     </td>
-                    <td>{it.achievementTitle}</td>
-                    <td>{it.category}</td>
-                    <td>{it.badge || '-'}</td>
+                    <td style={{ maxWidth: 280 }}>
+                      <div style={{ fontSize: '0.8rem', color: '#4b5563', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                        {it.description || <span style={{ color: '#9ca3af' }}>No description</span>}
+                      </div>
+                    </td>
+                    <td>
+                      {it.badge && (
+                        <span style={{ display: 'inline-block', fontSize: '0.75rem', background: '#f3f4f6', padding: '2px 6px', borderRadius: 4, marginBottom: 2 }}>
+                          {it.badge}
+                        </span>
+                      )}
+                      {it.linkUrl && (
+                        <div style={{ fontSize: '0.75rem', color: '#2563eb' }}>{it.linkUrl}</div>
+                      )}
+                    </td>
                     <td>
                       <button className="admin-btn admin-btn--sm" onClick={() => startEdit(it)}>
                         Edit
@@ -305,8 +297,8 @@ function StudentAchievementsPanel() {
                 ))}
                 {items.length === 0 && (
                   <tr>
-                    <td colSpan={7} className="admin-empty">
-                      No custom student achievements added yet (default curated achievements will display).
+                    <td colSpan={6} className="admin-empty">
+                      No custom showcase posters added yet (curated default posters with descriptions are displayed on the site).
                     </td>
                   </tr>
                 )}
