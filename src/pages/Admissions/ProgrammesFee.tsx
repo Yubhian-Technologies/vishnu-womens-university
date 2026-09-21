@@ -6,7 +6,7 @@ import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
 import { dotTech } from '../../lib/academicDegreeNames';
 
 const BTECH_FEE = '₹ 1,05,000';
-const VISWPU_BTECH_FEE = '₹ 45,000';
+const VISWPU_BTECH_FEE = '₹ 47,000';
 const MTECH_FEE = '₹ 55,800';
 const MBA_FEE = '₹ 55,000';
 
