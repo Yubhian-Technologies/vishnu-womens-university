@@ -1,91 +1,195 @@
-// Rich hardcoded content for the Microchip Embedded System differentiator
-// page (slug: microchip-embedded) — overrides that item's generic
-// Firestore intro/about text in DifferentiatorDetail.tsx.
-export interface TeamMember {
-  name: string;
-  designation?: string;
-  email?: string;
-  mobile?: string;
-  callSign?: string;
-  interests?: string;
-  profileLink?: string;
+// Structured content for the Microchip Embedded Systems Centre differentiator
+// page (slug: microchip-embedded).
+
+export interface MicrochipEmbeddedData {
+  hero: {
+    category: string;
+    title: string;
+    subtitle: string;
+  };
+  about: {
+    title: string;
+    paragraphs: string[];
+  };
+  vision: {
+    title: string;
+    statement: string;
+  };
+  mission: {
+    title: string;
+    intro: string;
+    points: string[];
+  };
+  learningAreas: {
+    number: string;
+    title: string;
+    description: string;
+  }[];
+  trainingAndActivities: {
+    title: string;
+    programmeName: string;
+    description: string;
+  };
+  programmeOutcome: {
+    title: string;
+    description: string;
+  };
+  technicalHighlights: {
+    title: string;
+    items: string[];
+  };
+  facilities: {
+    title: string;
+    intro: string;
+    items: string[];
+  };
+  learningPartners: {
+    title: string;
+    partners: {
+      name: string;
+      description: string;
+    }[];
+  };
+  gallery: {
+    title: string;
+    caption: string;
+  };
+  cta: {
+    title: string;
+    subtitle: string;
+    links: {
+      label: string;
+      url: string;
+      primary?: boolean;
+    }[];
+  };
 }
 
-export const microchipEmbedded = {
-  paragraphs: [
-    'The centre enables students to work with 8-bit, 16-bit, and 32-bit PIC microcontrollers across applications including IoT, automation, and sensor-based systems. Faculty mentorship and online certification programmes through Eduskills enhance student employability and technical competencies. Key objectives include advancing research in microchip design and testing, developing skilled talent through hands-on training, and promoting sustainable, energy-efficient microchip solutions.',
-  ],
-  vision: [
-    'Through collaborative research initiatives and partnerships with industry and academia, the COE fosters a culture of leadership in microchip innovation, positioning itself as a nationally and internationally recognized hub of excellence.',
-    'By addressing pressing societal challenges through the development of cutting-edge microchip technologies, the COE drives meaningful technological advancements that benefit communities and industries alike.',
-    "The COE's commitment to global collaboration and forward-thinking research contributes to the evolution of the microchip industry, reinforcing its role in shaping the future of technology on a worldwide scale.",
-  ],
-  mission: [
-    'The COE is dedicated to advancing microchip research, development, and innovation through interdisciplinary collaboration, cutting-edge technology, and academic excellence. We aim to empower students, researchers, and industry partners to create high-impact solutions that address real-world challenges, foster sustainable development, and contribute to the growth of a resilient and globally competitive microchip ecosystem.',
-  ],
-  objectives: [
-    'Advance Research and Innovation: Promote cutting-edge research in microchip design, fabrication, and testing, fostering breakthroughs that address emerging technological and societal needs.',
-    'Develop Skilled Talent: Provide high-quality education, hands-on training, and mentorship to cultivate a new generation of engineers and researchers with expertise in microchip technologies.',
-    'Strengthen Industry-Academia Collaboration: Establish strong partnerships with industry, academia, and government to facilitate knowledge exchange, joint projects, and the commercialization of microchip solutions.',
-    'Promote Sustainable and Inclusive Technologies: Design and develop microchip solutions that are energy-efficient, cost-effective, and accessible, contributing to sustainable development and inclusive technological growth.',
-  ],
-  team: {
-    heading: 'Team (Microchip Embedded System)',
-    inCharge: {
-      name: 'E. R. Praveen Kumar',
-      designation: 'Assistant Professor',
-      email: 'emani3815@svecw.edu.in',
-      mobile: '9700963994',
-      interests: 'Signal Processing, Embedded & IOT',
-      profileLink: 'https://svecw.irins.org/profile/145727',
-    } as TeamMember,
-    facultyMembers: [
-      {
-        name: 'Dr. M. V. Ganeswara Rao',
-        designation: 'Associate Professor',
-        email: 'mgr_ganesh@svecw.edu.in',
-        mobile: '9497123439',
-        interests: 'VLSI, Image Processing, Embedded & IOT, ML & DL',
-        profileLink: 'https://svecw.irins.org/profile/196149',
-      },
-      {
-        name: 'Ms. M. Hemalatha',
-        designation: 'Assistant Professor',
-        email: 'mhemalathaece@svecw.edu.in',
-        mobile: '6302016121',
-        interests: 'Image Processing, Embedded & IOT, ML & DL',
-        profileLink: 'https://vidwan.inflibnet.ac.in/profile/513272',
-      },
-      {
-        name: 'Ms. T. Pavani Varma',
-        designation: 'Assistant Professor',
-        email: 'pavaniece@svecw.edu.in',
-        mobile: '7780442623',
-        interests: 'Image Processing, Embedded & IOT, ML & DL',
-        profileLink: 'https://svecw.irins.org/profile/149729',
-      },
-      {
-        name: 'Mr. D. Murali Krishna',
-        designation: 'Assistant Professor',
-        email: 'ece_krishnad@svecw.edu.in',
-        mobile: '9490145567',
-        interests: 'Image Processing, Embedded & IOT, ML & DL',
-        profileLink: 'https://svecw.irins.org/profile/196149',
-      },
-      {
-        name: 'D. Ramesh Varma',
-        designation: 'Assistant Professor',
-        email: 'varmaramesh422@svecw.edu.in',
-        mobile: '9963630435',
-        callSign: 'VU2AZU',
-        interests: 'RF & Microwave',
-      },
-    ] as TeamMember[],
+export const microchipEmbedded: MicrochipEmbeddedData = {
+  hero: {
+    category: 'INDUSTRY CENTRES OF EXCELLENCE',
+    title: 'Microchip Embedded Systems Centre',
+    subtitle:
+      'Developing practical competencies in PIC microcontrollers, embedded systems, IoT, automation and sensor-based applications through hands-on learning and structured technical training.',
   },
-  activities: [
-    'AICTE ATAL – EduSkills Microchip Embedded Systems Developer',
+  about: {
+    title: 'About the Centre',
+    paragraphs: [
+      'The Microchip Embedded Systems Centre provides students with practical exposure to 8-bit, 16-bit and 32-bit PIC microcontrollers and their application in embedded systems.',
+      'Learning activities focus on areas such as microcontroller programming, IoT, automation and sensor-based systems, supported by faculty mentoring, development tools and structured technical programmes.',
+      'The Centre enables students to connect concepts studied in electronics and computing with hands-on embedded-system development and application-oriented problem solving.',
+    ],
+  },
+  vision: {
+    title: 'Our Vision',
+    statement:
+      'To develop a strong academic environment for embedded systems learning, experimentation and innovation, enabling students and faculty to build competencies in microcontroller-based technologies and their real-world applications.',
+  },
+  mission: {
+    title: 'Our Mission',
+    intro: 'The Centre aims to:',
+    points: [
+      'provide hands-on learning in microcontrollers and embedded-system development;',
+      'strengthen student competencies in IoT, automation and sensor-based applications;',
+      'support faculty and student development through structured training and certification programmes;',
+      'encourage practical projects and interdisciplinary applications of embedded technologies; and',
+      'connect academic learning with contemporary tools and practices in embedded-system development.',
+    ],
+  },
+  learningAreas: [
+    {
+      number: '01',
+      title: 'Microcontroller Systems',
+      description:
+        'Develop practical familiarity with 8-bit, 16-bit and 32-bit PIC microcontrollers, including programming, interfacing and application development.',
+    },
+    {
+      number: '02',
+      title: 'Embedded Systems Development',
+      description:
+        'Apply hardware and software concepts to the design and implementation of embedded-system solutions.',
+    },
+    {
+      number: '03',
+      title: 'IoT, Automation & Sensors',
+      description:
+        'Explore applications involving connected devices, automation, data acquisition and sensor-based systems.',
+    },
+    {
+      number: '04',
+      title: 'Practical Technical Development',
+      description:
+        'Strengthen problem-solving and implementation skills through hands-on training, guided projects and structured technical programmes.',
+    },
   ],
-  outcomes: [
-    'Conducted an AICTE ATAL – EduSkills Microchip Embedded Systems Developer Faculty Development Program.',
-  ],
+  trainingAndActivities: {
+    title: 'Training & Activities',
+    programmeName:
+      'AICTE ATAL – EduSkills Microchip Embedded Systems Developer Programme',
+    description:
+      'The Centre has supported participation in the AICTE ATAL – EduSkills Microchip Embedded Systems Developer initiative, providing structured exposure to embedded-system technologies and related technical practices.',
+  },
+  programmeOutcome: {
+    title: 'Programme Outcome',
+    description:
+      'The Centre conducted an AICTE ATAL – EduSkills Microchip Embedded Systems Developer Faculty Development Programme, supporting faculty exposure to contemporary embedded-system technologies and learning practices.',
+  },
+  technicalHighlights: {
+    title: 'Technical Highlights',
+    items: [
+      'exposure to 8-bit, 16-bit and 32-bit PIC microcontrollers',
+      'applications in IoT, automation and sensor-based systems',
+      'hands-on embedded-system learning',
+      'development and debugging tools',
+      'faculty-guided technical learning',
+      'access to structured EduSkills learning initiatives',
+    ],
+  },
+  facilities: {
+    title: 'Facilities & Development Resources',
+    intro: 'The Centre supports practical learning through resources such as:',
+    items: [
+      'PIC microcontroller development platforms',
+      'embedded-system development tools',
+      'hardware programming and debugging resources',
+      'project-development environments',
+      'access to EduSkills online learning and certification resources',
+    ],
+  },
+  learningPartners: {
+    title: 'External Programmes & Learning Partners',
+    partners: [
+      {
+        name: 'EduSkills',
+        description:
+          'Supports structured technical learning and certification opportunities related to embedded systems.',
+      },
+      {
+        name: 'AICTE ATAL Academy',
+        description:
+          'Associated with the Faculty Development Programme conducted through the Centre.',
+      },
+    ],
+  },
+  gallery: {
+    title: 'Gallery',
+    caption: 'Faculty-led Embedded Systems Workshop',
+  },
+  cta: {
+    title: 'Explore More Differentiators',
+    subtitle:
+      'Discover the laboratories, centres and initiatives that strengthen experiential learning, industry engagement and innovation at VWU.',
+    links: [
+      {
+        label: 'Explore All Differentiators →',
+        url: '/differentiators',
+        primary: true,
+      },
+      {
+        label: 'Explore Academics →',
+        url: '/academics',
+        primary: false,
+      },
+    ],
+  },
 };

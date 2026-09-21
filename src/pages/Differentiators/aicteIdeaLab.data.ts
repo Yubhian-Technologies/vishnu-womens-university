@@ -1,35 +1,141 @@
-// Rich hardcoded content for the AICTE IDEA Lab differentiator page
-// (slug: aicte-idea-lab), sourced from the site owner's AICTE AQIS
-// application document — overrides that item's generic Firestore
-// intro/about text in DifferentiatorDetail.tsx.
-export interface InfoField {
-  label: string;
-  value: string[];
+// Structured copy for the AICTE IDEA Lab differentiator page (slug: aicte-idea-lab)
+
+export interface IdeaLabProcessStep {
+  number: string;
+  title: string;
+  description: string;
+}
+
+export interface IdeaLabPillar {
+  number: string;
+  title: string;
+  description: string;
+}
+
+export interface IdeaLabEquipmentItem {
+  id: string;
+  title: string;
+  category: string;
 }
 
 export const aicteIdeaLab = {
-  tagline: 'AICTE-Idea Development, Evaluation & Application (IDEA) Lab',
-  paragraphs: [
-    'The purpose of IDEA Lab is to provide all facilities under one roof, for conversion of an idea into a prototype. With these facilities in the campus, more students and faculty will be encouraged to take up creative work and in the process, get training on creative thinking, problem solving, collaboration etc. which conventional labs are not able to. The focus will be on training students so that they become imaginative and creative and stay so at the workplaces they join. The whole idea is to transform engineering education with such a Lab in all colleges and for this they must proactively expose all students to the IDEA Lab, organize training sessions for interested students as well as support projects and by providing online learning materials.',
-    'Teachers must also get trained in these Labs to know their scope and opportunities in teaching learning processes as well as research and development projects. They should encourage the students to take up and themselves get involved in activities, projects, internships which involve utilization of such Labs. They must strive for creating problems/ projects/ internships in their own subjects/disciplines and mentor the students.',
+  hero: {
+    category: 'INNOVATION & ENTREPRENEURSHIP',
+    title: 'AICTE IDEA Lab',
+    tagline: 'Turn ideas into working prototypes through hands-on experimentation, design, fabrication and collaborative problem-solving.',
+    ctaPrimary: 'Explore the IDEA Lab →',
+    ctaSecondary: 'View Facilities →',
+  },
+  telemetry: [
+    { value: 'IDEA202000128', label: 'AQIS Application ID' },
+    { value: 'AICTE IDEA Lab', label: 'Approved Innovation Facility' },
+    { value: 'Prototype & Fabrication', label: 'Learn Through Making' },
+    { value: 'Green Innovation', label: 'Sustainable Engineering Practices' },
   ],
-  fields: [
-    { label: 'AQIS Application ID', value: ['IDEA202000128'] },
-    { label: 'Name of Institute, City and State', value: ['Shri Vishnu Engineering College for Women,', 'Bhimavaram, West Godavari District, Andhra Pradesh.'] },
-    { label: 'Head of the Institution', value: ['Dr. G. Srinivasa Rao (Ph.D. from Faculty of Mechanical Engg.)'] },
-    { label: 'Faculty Coordinator', value: ['Dr. P. Srinivasa Raju (Ph.D. from Faculty of Mechanical Engg.)'] },
-    { label: 'Faculty Coordinator', value: ['Dr. S. Hanumanth Rao (Ph.D. from Faculty of ECE.)'] },
-    { label: 'Guru', value: ['Dr. T. Sudheer Kumar'] },
-    { label: 'Guru', value: ['Dr. M. Prem Kumar'] },
-    { label: 'Guru', value: ['Dr. B. Satya Krishna'] },
-    { label: 'Guru', value: ['Mr. N. Kalyana Chakravarthy'] },
-  ] as InfoField[],
-  vision: [
-    'To Provide Agile Platform for Students to make their idea to work and engage well in their education program',
-    'To build effective network between institutes and inculcate cooperative and project based learning culture to students',
-    'To provide echo system for faculty to experiment / practice the "Learn while make" teaching philosophy.',
-    'To provide platform for faculty to interact with other Idea labs and network with them for disseminating knowledge to students.',
-    'To try and get insights in to their research activities by preparing proof of concept in faculty research journey',
-    'To practice GREEN initiatives in all the activities of proposed IDEA Lab',
-  ],
+  overview: {
+    title: 'From Idea to Prototype',
+    paragraphs: [
+      "The AICTE Idea Development, Evaluation & Application (IDEA) Lab at Vishnu Women's University provides a common space where students and faculty can develop concepts into functional prototypes.",
+      'The lab complements classroom learning with practical experimentation, design thinking, fabrication and collaborative problem-solving. Students can explore ideas, test solutions and gain experience in approaching engineering challenges through making and iteration.',
+      'Faculty members can also use the lab to support project-based learning, research exploration and interdisciplinary academic activities.',
+    ],
+  },
+  process: {
+    title: 'Learn. Build. Test. Improve.',
+    intro: 'The IDEA Lab encourages students to move beyond theoretical understanding and engage with the complete process of developing a solution.',
+    steps: [
+      {
+        number: '01',
+        title: 'Explore an Idea',
+        description: 'Identify problems, question assumptions and develop possible approaches.',
+      },
+      {
+        number: '02',
+        title: 'Design a Solution',
+        description: 'Translate ideas into workable designs through discussion, planning and experimentation.',
+      },
+      {
+        number: '03',
+        title: 'Build & Prototype',
+        description: 'Use available lab resources to create models, proof-of-concept solutions and prototypes.',
+      },
+      {
+        number: '04',
+        title: 'Test & Refine',
+        description: 'Evaluate results, identify improvements and strengthen the proposed solution through iteration.',
+      },
+    ] as IdeaLabProcessStep[],
+  },
+  pillars: [
+    {
+      number: '01',
+      title: 'Student Innovation',
+      description: 'Provide students with an agile environment to develop ideas, experiment and engage meaningfully with project-based learning.',
+    },
+    {
+      number: '02',
+      title: 'Collaborative Learning',
+      description: 'Encourage cooperation across disciplines and institutions through shared projects and knowledge exchange.',
+    },
+    {
+      number: '03',
+      title: 'Learn While Making',
+      description: 'Create opportunities for students and faculty to understand concepts through practical experimentation and hands-on development.',
+    },
+    {
+      number: '04',
+      title: 'Faculty Engagement',
+      description: 'Support faculty interaction with IDEA Labs, interdisciplinary networks and emerging approaches to experiential teaching.',
+    },
+    {
+      number: '05',
+      title: 'Research & Proof of Concept',
+      description: 'Enable faculty and students to explore research ideas and develop early-stage proofs of concept.',
+    },
+    {
+      number: '06',
+      title: 'Sustainable Innovation',
+      description: 'Encourage responsible use of resources and integrate environmentally conscious practices into lab activities.',
+    },
+  ] as IdeaLabPillar[],
+  team: {
+    title: 'People Behind the IDEA Lab',
+    intro: 'The IDEA Lab is supported by academic leadership, faculty coordinators and technical mentors who guide its academic and prototyping activities.',
+    contactNotice: 'For inquiries or collaborative lab activities, reach out to the official IDEA Lab coordinator desk.',
+  },
+  ambassadors: {
+    title: 'Student Ambassadors',
+    intro: 'Student Ambassadors help strengthen student participation in IDEA Lab activities by supporting peer engagement, communication and awareness of opportunities available through the lab.',
+    contactNotice: 'For student ambassador inquiries or to connect with lab representatives, please contact the official IDEA Lab desk at idealab@svecw.edu.in.',
+  },
+  facilities: {
+    title: 'Facilities for Making & Prototyping',
+    paragraphs: [
+      'The IDEA Lab brings together equipment and tools for prototyping, fabrication, measurement, testing and hands-on engineering practice.',
+      'Students can use the facility to experiment with concepts, develop project components, create proof-of-concept models and refine prototypes as part of academic and innovation activities.',
+    ],
+    defaultEquipment: [
+      { id: 'eq-1', title: '3D Printers & Additive Manufacturing', category: 'Digital Fabrication' },
+      { id: 'eq-2', title: 'Laser Cutting & Engraving Unit', category: 'Precision Cutting' },
+      { id: 'eq-3', title: 'CNC Router & Machining Station', category: 'Subtractive Fabrication' },
+      { id: 'eq-4', title: 'PCB Design & Prototyping Station', category: 'Electronics Prototyping' },
+      { id: 'eq-5', title: 'Embedded Systems & IoT Testbed', category: 'Measurement & Testing' },
+      { id: 'eq-6', title: 'Soldering, Assembly & Inspection Bench', category: 'Hardware Assembly' },
+    ] as IdeaLabEquipmentItem[],
+  },
+  officialInfo: {
+    title: 'Official IDEA Lab Information',
+    aqisId: 'IDEA202000128',
+    institution: 'Shri Vishnu Engineering College for Women, Bhimavaram, West Godavari District, Andhra Pradesh',
+    headOfInstitution: 'Dr. G. Srinivasa Rao',
+    facultyCoordinators: ['Dr. P. Srinivasa Raju', 'Dr. S. Hanumantha Rao'],
+    email: 'idealab@svecw.edu.in',
+  },
+  cta: {
+    title: 'Explore Innovation at VWU',
+    description: 'Discover the labs, centres and initiatives that extend learning beyond the classroom and support innovation, research and experiential education.',
+    primaryBtn: 'Explore All Differentiators →',
+    secondaryBtn: 'Explore Academics →',
+  },
 };
+
