@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link, useNavigate, useLocation, Navigate } from 'react-router-dom';
-import { Check, Microscope, Sparkles, FileText, BookOpen, GraduationCap, Award, Calendar, Users, ChevronDown, ArrowRight } from 'lucide-react';
+import { Check, Microscope, Sparkles, FileText, BookOpen, GraduationCap, Award, Calendar, Users, ChevronDown, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import SmoothCollapse from '../../components/SmoothCollapse/SmoothCollapse';
 import RouteFallback from '../../components/RouteFallback/RouteFallback';
@@ -674,7 +674,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     description: s.description,
     photoUrl: s.photoUrl,
   }));
-  const testimonialCount = Math.min(testimonialItems.length, 6);
+  const testimonialCount = testimonialItems.length;
   testimonialCountRef.current = testimonialCount;
   // Institution-wide "Placements" module figures for this department (see
   // departmentPlacementBridge.ts) — an independent, separately-maintained
@@ -2082,19 +2082,21 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
               </p>
             </div>
             <div className="dept-testimonial-single">
-              <div className="dept-testimonial-single-dots" role="tablist" aria-label="Testimonials">
-                {testimonialItems.slice(0, testimonialCount).map((story, i) => (
-                  <button
-                    key={story.id || i}
-                    type="button"
-                    role="tab"
-                    aria-selected={activeTestimonial === i}
-                    aria-label={`Show testimonial from ${story.name}`}
-                    className={`dept-testimonial-dot${activeTestimonial === i ? ' active' : ''}`}
-                    onClick={() => setActiveTestimonial(i)}
-                  />
-                ))}
-              </div>
+              {testimonialItems.length > 1 && (
+                <div className="dept-testimonial-single-dots" role="tablist" aria-label="Testimonials">
+                  {testimonialItems.map((story, i) => (
+                    <button
+                      key={story.id || i}
+                      type="button"
+                      role="tab"
+                      aria-selected={activeTestimonial === i}
+                      aria-label={`Show testimonial from ${story.name} (${i + 1} of ${testimonialItems.length})`}
+                      className={`dept-testimonial-dot${activeTestimonial === i ? ' active' : ''}`}
+                      onClick={() => setActiveTestimonial(i)}
+                    />
+                  ))}
+                </div>
+              )}
 
               {testimonialItems[activeTestimonial] && (
                 <div key={activeTestimonial} className="dept-testimonial-single-card">
@@ -2124,10 +2126,35 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                     {testimonialItems[activeTestimonial].description && (
                       <p className="dept-testimonial-single-quote">{testimonialItems[activeTestimonial].description}</p>
                     )}
-                    <div>
-                      <span className="dept-testimonial-single-name">{testimonialItems[activeTestimonial].name}</span>
-                      {testimonialItems[activeTestimonial].programme && (
-                        <span className="dept-testimonial-single-role">{testimonialItems[activeTestimonial].programme}</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '1rem' }}>
+                      <div>
+                        <span className="dept-testimonial-single-name">{testimonialItems[activeTestimonial].name}</span>
+                        {testimonialItems[activeTestimonial].programme && (
+                          <span className="dept-testimonial-single-role">{testimonialItems[activeTestimonial].programme}</span>
+                        )}
+                      </div>
+                      {testimonialItems.length > 1 && (
+                        <div className="dept-testimonial-nav-arrows">
+                          <button
+                            type="button"
+                            className="dept-testimonial-arrow-btn"
+                            onClick={() => setActiveTestimonial((i) => (i === 0 ? testimonialItems.length - 1 : i - 1))}
+                            aria-label="Previous testimonial"
+                          >
+                            <ChevronLeft size={18} />
+                          </button>
+                          <span className="dept-testimonial-count-badge">
+                            {activeTestimonial + 1} / {testimonialItems.length}
+                          </span>
+                          <button
+                            type="button"
+                            className="dept-testimonial-arrow-btn"
+                            onClick={() => setActiveTestimonial((i) => (i === testimonialItems.length - 1 ? 0 : i + 1))}
+                            aria-label="Next testimonial"
+                          >
+                            <ChevronRight size={18} />
+                          </button>
+                        </div>
                       )}
                     </div>
                   </div>

@@ -91,26 +91,21 @@
 }
 
 .idealab-telemetry-val {
-  font-size: 1.1rem;
+  font-size: 1.02rem;
   font-weight: 800;
   color: #FFFFFF;
   letter-spacing: -0.01em;
-  line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.25;
 }
 
 .idealab-telemetry-lbl {
-  font-size: 0.7rem;
-  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.75);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   font-weight: 600;
   margin-top: 3px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.3;
 }
 
 /* --------------------------------------------------------------------------
@@ -212,57 +207,105 @@
 }
 
 /* --------------------------------------------------------------------------
-   3. AQIS Roster Box
+   3. Process Workflow Cards (Learn. Build. Test. Improve.)
    -------------------------------------------------------------------------- */
-.idealab-aqis-card {
-  margin-top: 1.25rem;
-  border-left: 4px solid #C9973A;
-  background: linear-gradient(135deg, #FFFDF8 0%, #FFFFFF 100%);
+.idealab-process-section {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #E2E8F0;
 }
 
-.idealab-subcard-title {
-  font-size: 1.1rem;
-  font-weight: 800;
-  color: #0B1E42;
-  margin-bottom: 1rem;
-  line-height: 1.3;
-}
-
-.idealab-aqis-grid {
+.idealab-process-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 0.85rem;
+  gap: 0.9rem;
+  margin-top: 1.1rem;
 }
 
-@media (min-width: 480px) {
-  .idealab-aqis-grid {
+@media (min-width: 640px) {
+  .idealab-process-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
-@media (min-width: 900px) {
-  .idealab-aqis-grid {
-    grid-template-columns: repeat(3, 1fr);
+.idealab-process-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 1.15rem;
+  background: #F8FAFC;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 12px;
+  position: relative;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.idealab-process-card:hover {
+  background: #FFFFFF;
+  border-color: #0B1E42;
+  box-shadow: 0 6px 18px rgba(11, 30, 66, 0.08);
+  transform: translateY(-2px);
+}
+
+.idealab-process-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.2rem;
+}
+
+.idealab-process-num {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #C9973A;
+  background: rgba(201, 151, 58, 0.12);
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  letter-spacing: 0.04em;
+}
+
+.idealab-process-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #0B1E42;
+  margin: 0;
+}
+
+.idealab-process-desc {
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: #475569;
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   4. Official Information Registry Box
+   -------------------------------------------------------------------------- */
+.idealab-official-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .idealab-official-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
-.idealab-aqis-field-box {
+.idealab-official-box {
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
-  padding: 0.9rem 1rem;
+  gap: 0.4rem;
+  padding: 1.15rem 1.25rem;
   background: #F8FAFC;
   border: 1px solid #E2E8F0;
-  border-radius: 10px;
-  transition: all 0.2s ease;
+  border-radius: 12px;
+  border-left: 3px solid #C9973A;
 }
 
-.idealab-aqis-field-box:hover {
-  background: #FFFFFF;
-  border-color: rgba(201, 151, 58, 0.35);
-}
-
-.idealab-aqis-field-label {
+.idealab-official-label {
   font-size: 0.72rem;
   font-weight: 800;
   text-transform: uppercase;
@@ -270,21 +313,41 @@
   color: #C9973A;
 }
 
-.idealab-aqis-field-values {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-}
-
-.idealab-aqis-field-val {
-  font-size: 0.9rem;
+.idealab-official-val {
+  font-size: 0.96rem;
   font-weight: 700;
   color: #0B1E42;
-  line-height: 1.4;
+  line-height: 1.45;
+}
+
+.idealab-official-val-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+/* Notice banner */
+.idealab-notice-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.9rem 1.15rem;
+  background: rgba(11, 30, 66, 0.04);
+  border: 1px dashed rgba(11, 30, 66, 0.2);
+  border-radius: 10px;
+  margin-top: 1.25rem;
+  font-size: 0.86rem;
+  color: #334155;
+}
+
+.idealab-notice-card a {
+  color: #0B1E42;
+  font-weight: 700;
+  text-decoration: underline;
 }
 
 /* --------------------------------------------------------------------------
-   4. Vision Pillar Cards
+   5. Vision Pillar Cards
    -------------------------------------------------------------------------- */
 .idealab-vision-grid {
   display: grid;
@@ -307,9 +370,9 @@
 
 .idealab-vision-pillar-card {
   display: flex;
-  align-items: flex-start;
-  gap: 0.85rem;
-  padding: 1.1rem;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.25rem;
   background: #F8FAFC;
   border: 1px solid #E2E8F0;
   border-radius: 12px;
@@ -323,24 +386,26 @@
   transform: translateY(-2px);
 }
 
+.idealab-pillar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .idealab-pillar-num {
-  font-size: 1.3rem;
+  font-size: 0.85rem;
   font-weight: 900;
   color: #C9973A;
-  line-height: 1;
-  flex-shrink: 0;
+  background: rgba(201, 151, 58, 0.14);
+  padding: 0.15rem 0.5rem;
+  border-radius: 6px;
 }
 
-.idealab-pillar-body {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.5rem;
-}
-
-.idealab-pillar-check {
+.idealab-pillar-title {
+  font-size: 1.05rem;
+  font-weight: 800;
   color: #0B1E42;
-  flex-shrink: 0;
-  margin-top: 2px;
+  margin: 0;
 }
 
 .idealab-pillar-text {
@@ -351,7 +416,7 @@
 }
 
 /* --------------------------------------------------------------------------
-   5. Styled Tables — Fully Responsive
+   6. Styled Tables — Fully Responsive
    -------------------------------------------------------------------------- */
 .idealab-table-responsive {
   overflow-x: auto;
@@ -450,44 +515,86 @@
 }
 
 /* --------------------------------------------------------------------------
-   6. Facilities Masonry Grid
+   7. Facilities Masonry Grid with Confirmed Labels
    -------------------------------------------------------------------------- */
-.idealab-facilities-masonry {
-  columns: 1;
-  column-gap: 0.85rem;
-  margin-top: 1rem;
+.idealab-facilities-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.15rem;
+  margin-top: 1.25rem;
 }
 
-@media (min-width: 480px) {
-  .idealab-facilities-masonry {
-    columns: 2;
+@media (min-width: 540px) {
+  .idealab-facilities-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
-@media (min-width: 768px) {
-  .idealab-facilities-masonry {
-    columns: 3;
+@media (min-width: 860px) {
+  .idealab-facilities-grid {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
-.idealab-facility-item {
-  break-inside: avoid;
-  margin-bottom: 0.85rem;
+.idealab-facility-card {
+  display: flex;
+  flex-direction: column;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
   border-radius: 12px;
   overflow: hidden;
-  border: 1px solid #E2E8F0;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+  transition: all 0.25s ease;
 }
 
-.idealab-facility-item img {
+.idealab-facility-card:hover {
+  border-color: #0B1E42;
+  box-shadow: 0 8px 24px rgba(11, 30, 66, 0.1);
+  transform: translateY(-3px);
+}
+
+.idealab-facility-img-wrap {
   width: 100%;
-  height: auto;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: #0B1E42;
+  position: relative;
+}
+
+.idealab-facility-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   display: block;
   transition: transform 0.3s ease;
 }
 
-.idealab-facility-item:hover img {
-  transform: scale(1.04);
+.idealab-facility-card:hover .idealab-facility-img-wrap img {
+  transform: scale(1.05);
+}
+
+.idealab-facility-info {
+  padding: 0.85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  background: #FFFFFF;
+}
+
+.idealab-facility-title {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #0B1E42;
+  margin: 0;
+  line-height: 1.35;
+}
+
+.idealab-facility-category {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #C9973A;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 /* --------------------------------------------------------------------------

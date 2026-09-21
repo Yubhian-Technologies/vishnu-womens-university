@@ -16,6 +16,8 @@ import type { DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdm
 import type { FacultyDoc } from '../Academics/Faculty';
 import { talentSprintWise } from './talentSprintWise.data';
 import { foreignLanguages } from './foreignLanguages.data';
+import { medaPlmCoe } from './medaPlmCoe.data';
+import { microchipEmbedded } from './microchipEmbedded.data';
 import MicrochipPage from './MicrochipPage';
 import TiDspPage from './TiDspPage';
 import UltraTechPage from './UltraTechPage';
@@ -834,8 +836,36 @@ export default function DifferentiatorDetail() {
                 {/* Its own "Hero Subtitle" admin field — deliberately not the
                     same as the Short Description (hub-card blurb) or the
                     Description block further down the page. */}
-                {item.summary && (
-                  <p className="dept-hero-subtitle">{item.summary}</p>
+                {(item.summary || (item.slug === 'meda-plm-coe' ? medaPlmCoe.hero.subtitle : item.slug === 'microchip-embedded' ? microchipEmbedded.hero.subtitle : null)) && (
+                  <p className="dept-hero-subtitle">{item.summary || (item.slug === 'meda-plm-coe' ? medaPlmCoe.hero.subtitle : item.slug === 'microchip-embedded' ? microchipEmbedded.hero.subtitle : '')}</p>
+                )}
+                {item.slug === 'aicte-idea-lab' && (
+                  <div className="dept-hero-cta animate-fade-in-up">
+                    <a
+                      href="#overview"
+                      className="btn-hero-gold"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        window.location.hash = 'overview';
+                        window.dispatchEvent(new HashChangeEvent('hashchange'));
+                        document.getElementById('idealab-main')?.scrollIntoView({ behavior: 'smooth' });
+                      }}
+                    >
+                      Explore the IDEA Lab →
+                    </a>
+                    <a
+                      href="#facilities"
+                      className="btn-hero-outline"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        window.location.hash = 'facilities';
+                        window.dispatchEvent(new HashChangeEvent('hashchange'));
+                        document.getElementById('idealab-main')?.scrollIntoView({ behavior: 'smooth' });
+                      }}
+                    >
+                      View Facilities →
+                    </a>
+                  </div>
                 )}
               </div>
             </div>
@@ -1025,19 +1055,29 @@ export default function DifferentiatorDetail() {
       {isForeignLanguages ? (
         <ForeignLanguagesFooter />
       ) : (
-        <section style={{ background: 'var(--color-primary)', padding: (item.slug === 'meda-plm-coe' || item.slug === 'vsac' || item.slug === 'vehicle-design-lab' || item.slug === 'dream-house-lab' || item.slug === 'hpc-lab' || item.slug === 'aicte-idea-lab' || item.slug === 'institution-innovation-cell') ? 'var(--space-6) 0' : 'var(--space-14) 0' }}>
+        <section style={{ background: 'var(--color-primary)', padding: (item.slug === 'meda-plm-coe' || item.slug === 'microchip-embedded' || item.slug === 'vsac' || item.slug === 'vehicle-design-lab' || item.slug === 'dream-house-lab' || item.slug === 'hpc-lab' || item.slug === 'aicte-idea-lab' || item.slug === 'institution-innovation-cell') ? 'var(--space-6) 0' : 'var(--space-14) 0' }}>
           <div className="container" style={{ textAlign: 'center' }}>
             <div>
               <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>
-                Explore More Differentiators
+                {item.slug === 'aicte-idea-lab' ? 'Explore Innovation at VWU' : 'Explore More Differentiators'}
               </h2>
-              <p style={{ color: 'rgba(255,255,255,0.75)', maxWidth: 520, margin: '0 auto var(--space-6)' }}>
-                Discover all the unique initiatives, labs, and centres that make VWU an extraordinary place to learn and grow.
+              <p style={{ color: 'rgba(255,255,255,0.75)', maxWidth: 620, margin: '0 auto var(--space-6)' }}>
+                {item.slug === 'aicte-idea-lab'
+                  ? 'Discover the labs, centres and initiatives that extend learning beyond the classroom and support innovation, research and experiential education.'
+                  : (item.slug === 'meda-plm-coe' || item.slug === 'microchip-embedded')
+                  ? 'Discover the laboratories, centres and initiatives that strengthen experiential learning, industry engagement and innovation at VWU.'
+                  : 'Discover all the unique initiatives, labs, and centres that make VWU an extraordinary place to learn and grow.'}
               </p>
               <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
-                <Link to="/differentiators" className="btn btn-accent">All Differentiators</Link>
-                <Link to="/apply-now" className="btn btn-secondary">Apply Now</Link>
-                <Link to="/academics" className="btn btn-secondary">Academics</Link>
+                <Link to="/differentiators" className="btn btn-accent">
+                  {(item.slug === 'aicte-idea-lab' || item.slug === 'meda-plm-coe' || item.slug === 'microchip-embedded') ? 'Explore All Differentiators →' : 'All Differentiators'}
+                </Link>
+                <Link to="/academics" className="btn btn-secondary">
+                  {(item.slug === 'aicte-idea-lab' || item.slug === 'meda-plm-coe' || item.slug === 'microchip-embedded') ? 'Explore Academics →' : 'Academics'}
+                </Link>
+                {item.slug !== 'aicte-idea-lab' && item.slug !== 'meda-plm-coe' && item.slug !== 'microchip-embedded' && (
+                  <Link to="/apply-now" className="btn btn-secondary">Apply Now</Link>
+                )}
               </div>
             </div>
           </div>

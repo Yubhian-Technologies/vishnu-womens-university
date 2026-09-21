@@ -271,3 +271,30 @@
   border-radius: 6px;
   background: var(--color-accent, #C9973A);
 }
+
+/* Skeleton Loading State */
+.happenings-poster-skeleton {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.happenings-skeleton-shimmer {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    #f1f5f9 0%,
+    #e2e8f0 50%,
+    #f1f5f9 100%
+  );
+  background-size: 200% 100%;
+  animation: happeningsShimmer 1.6s ease-in-out infinite;
+}
+
+@keyframes happeningsShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}

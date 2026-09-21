@@ -1,17 +1,22 @@
 import { useState } from 'react';
-import type { CustomSection } from '../../lib/customSections';
-import { CustomSectionsGalleries, CustomSectionsAccordion } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
-import SmoothCollapse from '../../components/SmoothCollapse/SmoothCollapse';
-import { microchipEmbedded } from './microchipEmbedded.data';
 import {
-  Target,
   Compass,
-  Mail,
-  ExternalLink,
-  BookOpen,
-  Radio,
-  ChevronDown
+  Target,
+  Cpu,
+  Zap,
+  CheckCircle2,
+  Award,
+  Sparkles,
+  Wrench,
+  GraduationCap,
+  Building2,
+  Handshake,
+  Maximize2,
+  X,
 } from 'lucide-react';
+import { microchipEmbedded } from './microchipEmbedded.data';
+import type { CustomSection } from '../../lib/customSections';
+import { CustomSectionsAccordion } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import './MicrochipPage.css';
 
 interface MicrochipPageProps {
@@ -19,21 +24,64 @@ interface MicrochipPageProps {
 }
 
 export default function MicrochipPage({ customSections = [] }: MicrochipPageProps) {
-  const { paragraphs, vision, mission, objectives, team } = microchipEmbedded;
-  const [isTeamOpen, setIsTeamOpen] = useState(true);
+  const [lightboxImg, setLightboxImg] = useState<string | null>(null);
+  const data = microchipEmbedded;
 
+  // Extract gallery photos from admin custom sections
+  const gallerySection = customSections.find(
+    (s) => s.id === 'gallery' || s.label?.toLowerCase() === 'gallery' || s.contentType === 'gallery'
+  );
+  const galleryItems: { url: string; label: string }[] = [];
+
+  if (gallerySection) {
+    if (gallerySection.galleryPhotos) {
+      gallerySection.galleryPhotos.forEach((p, idx) => {
+        if (p.imageUrl) galleryItems.push({ url: p.imageUrl, label: p.caption || `Microchip Workshop Photo ${idx + 1}` });
+      });
+    } else if (gallerySection.files) {
+      gallerySection.files.forEach((f, idx) => {
+        if (f.fileUrl) galleryItems.push({ url: f.fileUrl, label: f.label || `Microchip Workshop Photo ${idx + 1}` });
+      });
+    } else if (gallerySection.imageCards) {
+      gallerySection.imageCards.forEach((c, idx) => {
+        if (c.imageUrl) galleryItems.push({ url: c.imageUrl, label: c.title || `Microchip Workshop Photo ${idx + 1}` });
+      });
+    }
+  }
+
+  // Filter out any custom sections handled specifically
   const accordionSections = customSections.filter(
-    (s) => s.id !== 'team' && !s.label.toLowerCase().includes('team')
+    (s) => s.id !== 'gallery' && s.contentType !== 'gallery'
   );
 
   return (
     <div className="mc-page-container">
-      {/* 1. OVERVIEW & LAB CAPABILITIES */}
-      <section className="mc-overview-section">
-        <div className="mc-overview-paragraphs">
-          {paragraphs.map((p, idx) => (
-            <p key={idx}>{p}</p>
-          ))}
+      {/* 1. ABOUT THE CENTRE */}
+      <section className="mc-about-section">
+        <div className="mc-about-card">
+          <div className="mc-about-header">
+            <span className="mc-section-badge">
+              <Cpu size={14} /> Centre Overview
+            </span>
+            <h2 className="mc-about-title">{data.about.title}</h2>
+          </div>
+          <div className="mc-about-body">
+            {data.about.paragraphs.map((para, idx) => (
+              <p key={idx} className="mc-about-text">{para}</p>
+            ))}
+          </div>
+
+          <div className="mc-key-tags">
+            <span className="mc-key-tag">
+              <Cpu size={14} /> 8, 16 & 32-Bit PIC Microcontrollers
+            </span>
+            <span className="mc-key-tag">
+              <Zap size={14} /> IoT & Sensor-Based Applications
+            </span>
+            <span className="mc-key-tag">
+              <Handshake size={14} /> EduSkills & AICTE ATAL Integration
+            </span>
+          </div>
         </div>
       </section>
 
@@ -41,165 +89,200 @@ export default function MicrochipPage({ customSections = [] }: MicrochipPageProp
       <section className="mc-vm-section">
         <div className="mc-vm-grid">
           {/* Vision */}
-          <div className="mc-vm-card">
+          <div className="mc-vm-card mc-vision-card">
             <span className="mc-vm-badge">
               <Compass size={14} /> Strategic Vision
             </span>
-            <h3 className="mc-vm-title">Our Vision</h3>
-            <ul className="mc-vision-bullets">
-              {vision.map((v, idx) => (
-                <li key={idx} className="mc-vision-bullet">
-                  <span className="mc-bullet-disc" />
-                  <span>{v}</span>
+            <h3 className="mc-vm-title">{data.vision.title}</h3>
+            <div className="mc-vision-content">
+              <p>{data.vision.statement}</p>
+            </div>
+          </div>
+
+          {/* Mission */}
+          <div className="mc-vm-card mc-mission-card">
+            <span className="mc-vm-badge">
+              <Target size={14} /> Institutional Mission
+            </span>
+            <h3 className="mc-vm-title">{data.mission.title}</h3>
+            <p className="mc-mission-intro">{data.mission.intro}</p>
+            <ul className="mc-mission-list">
+              {data.mission.points.map((point, idx) => (
+                <li key={idx} className="mc-mission-item">
+                  <CheckCircle2 size={16} className="mc-mission-check" />
+                  <span>{point}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* 3. CORE LEARNING AREAS */}
+      <section className="mc-learning-section">
+        <div className="mc-section-header">
+          <span className="mc-section-label">Competency Framework</span>
+          <h2 className="mc-section-title">Core Learning Areas</h2>
+        </div>
+
+        <div className="mc-learning-grid">
+          {data.learningAreas.map((area) => (
+            <div key={area.number} className="mc-learning-card">
+              <div className="mc-learning-num">{area.number}</div>
+              <div className="mc-learning-content">
+                <h4 className="mc-learning-card-title">{area.title}</h4>
+                <p className="mc-learning-card-desc">{area.description}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 4. TRAINING & ACTIVITIES & PROGRAMME OUTCOME */}
+      <section className="mc-training-outcome-section">
+        <div className="mc-training-grid">
+          {/* Training & Activities */}
+          <div className="mc-training-card">
+            <div className="mc-feature-badge">
+              <Award size={14} /> {data.trainingAndActivities.title}
+            </div>
+            <h3 className="mc-training-title">{data.trainingAndActivities.programmeName}</h3>
+            <p className="mc-training-desc">{data.trainingAndActivities.description}</p>
+          </div>
+
+          {/* Programme Outcome */}
+          <div className="mc-outcome-card">
+            <div className="mc-feature-badge mc-badge-outcome">
+              <Sparkles size={14} /> {data.programmeOutcome.title}
+            </div>
+            <h3 className="mc-outcome-title">Faculty Development & Impact</h3>
+            <p className="mc-outcome-desc">{data.programmeOutcome.description}</p>
+          </div>
+        </div>
+      </section>
+
+      {/* 5. TECHNICAL HIGHLIGHTS & FACILITIES */}
+      <section className="mc-details-section">
+        <div className="mc-details-grid">
+          {/* Technical Highlights */}
+          <div className="mc-details-card">
+            <div className="mc-details-header">
+              <Zap size={20} className="mc-details-icon" />
+              <h3 className="mc-details-title">{data.technicalHighlights.title}</h3>
+            </div>
+            <ul className="mc-highlights-list">
+              {data.technicalHighlights.items.map((item, idx) => (
+                <li key={idx} className="mc-highlight-item">
+                  <div className="mc-highlight-bullet" />
+                  <span>{item}</span>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Mission */}
-          <div className="mc-vm-card">
-            <span className="mc-vm-badge">
-              <Target size={14} /> Institutional Mission
-            </span>
-            <h3 className="mc-vm-title">Our Mission</h3>
-            <div className="mc-mission-box">
-              "{mission[0]}"
+          {/* Facilities & Development Resources */}
+          <div className="mc-details-card">
+            <div className="mc-details-header">
+              <Wrench size={20} className="mc-details-icon" />
+              <h3 className="mc-details-title">{data.facilities.title}</h3>
             </div>
+            <p className="mc-facilities-intro">{data.facilities.intro}</p>
+            <ul className="mc-facilities-list">
+              {data.facilities.items.map((item, idx) => (
+                <li key={idx} className="mc-facility-item">
+                  <CheckCircle2 size={16} className="mc-facility-icon" />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </section>
 
-      {/* 3. CORE OBJECTIVES */}
-      <section className="mc-objectives-section">
+      {/* 6. EXTERNAL PROGRAMMES & LEARNING PARTNERS */}
+      <section className="mc-partners-section">
         <div className="mc-section-header">
-          <span className="mc-section-label">Pillars of Excellence</span>
-          <h2 className="mc-section-title">Core Objectives</h2>
+          <span className="mc-section-label">Collaborative Ecosystem</span>
+          <h2 className="mc-section-title">{data.learningPartners.title}</h2>
         </div>
 
-        <div className="mc-objectives-grid">
-          {objectives.map((objStr, idx) => {
-            const [title, ...descParts] = objStr.split(':');
-            const desc = descParts.join(':').trim();
-            return (
-              <div key={idx} className="mc-obj-card">
-                <div className="mc-obj-num">0{idx + 1}</div>
-                <div className="mc-obj-content">
-                  <h4>{title}</h4>
-                  <p>{desc || objStr}</p>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* 5. TEAM & FACULTY (COLLAPSIBLE ACCORDION ITEM 01) */}
-      <section className="mc-team-accordion-wrapper" style={{ marginTop: '2.5rem', marginBottom: '0.75rem' }}>
-        <div className={`cs-accordion-item${isTeamOpen ? ' is-open' : ''}`}>
-          <button
-            type="button"
-            className="cs-accordion-trigger"
-            onClick={() => setIsTeamOpen(!isTeamOpen)}
-            aria-expanded={isTeamOpen}
-          >
-            <span className="cs-accordion-num" aria-hidden="true">01</span>
-            <span className="cs-accordion-title">{team.heading}</span>
-            <ChevronDown size={18} strokeWidth={2.25} className="cs-accordion-chevron" aria-hidden="true" />
-          </button>
-          
-          <SmoothCollapse open={isTeamOpen}>
-            <div className="cs-accordion-body" style={{ padding: '2rem 1.5rem', background: '#f8fafc', borderTop: '1px solid #e2e8f0' }}>
-              {/* Faculty In-Charge */}
-              <div className="mc-incharge-card">
-                <div className="mc-incharge-avatar">
-                  {team.inCharge.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+        <div className="mc-partners-grid">
+          {data.learningPartners.partners.map((partner, idx) => (
+            <div key={idx} className="mc-partner-card">
+              <div className="mc-partner-header">
+                <div className="mc-partner-avatar">
+                  <Building2 size={24} />
                 </div>
                 <div>
-                  <span className="mc-incharge-badge">Faculty In-Charge</span>
-                  <h3 className="mc-incharge-name">{team.inCharge.name}</h3>
-                  <div className="mc-incharge-desig">{team.inCharge.designation}</div>
-
-                  <div className="mc-contact-meta">
-                    {team.inCharge.email && (
-                      <div className="mc-contact-item">
-                        <Mail size={15} color="#c9973a" />
-                        <a href={`mailto:${team.inCharge.email}`}>{team.inCharge.email}</a>
-                      </div>
-                    )}
-                    {team.inCharge.interests && (
-                      <div className="mc-contact-item">
-                        <BookOpen size={15} color="#c9973a" />
-                        <span><strong>Interests:</strong> {team.inCharge.interests}</span>
-                      </div>
-                    )}
-                    {team.inCharge.profileLink && (
-                      <div className="mc-contact-item">
-                        <ExternalLink size={15} color="#c9973a" />
-                        <a href={team.inCharge.profileLink} target="_blank" rel="noopener noreferrer">IRINS Profile</a>
-                      </div>
-                    )}
-                  </div>
+                  <h4 className="mc-partner-name">{partner.name}</h4>
+                  <span className="mc-partner-badge">Official Learning Partner</span>
                 </div>
               </div>
-
-              {/* Faculty Members Grid */}
-              <div className="mc-faculty-grid">
-                {team.facultyMembers.map((member, idx) => (
-                  <div key={idx} className="mc-faculty-card">
-                    <div className="mc-faculty-header">
-                      <div className="mc-faculty-avatar">
-                        {member.name.replace(/^(Dr\.|Ms\.|Mr\.)\s*/, '').split(' ').map(n => n[0]).join('').slice(0, 2)}
-                      </div>
-                      <div>
-                        <h4 className="mc-faculty-name">{member.name}</h4>
-                        <div className="mc-faculty-desig">{member.designation}</div>
-                      </div>
-                    </div>
-
-                    <div className="mc-faculty-details">
-                      {member.callSign && (
-                        <div className="mc-callsign-badge">
-                          <Radio size={12} style={{ display: 'inline', marginRight: 4 }} />
-                          Call Sign: {member.callSign}
-                        </div>
-                      )}
-                      {member.interests && (
-                        <div><strong>Interests:</strong> {member.interests}</div>
-                      )}
-                      {member.email && (
-                        <div style={{ wordBreak: 'break-all' }}>
-                          <Mail size={13} style={{ display: 'inline', marginRight: 4 }} />
-                          <a href={`mailto:${member.email}`} style={{ color: '#0b1e42' }}>{member.email}</a>
-                        </div>
-                      )}
-                      {member.profileLink && (
-                        <div style={{ marginTop: '0.25rem' }}>
-                          <a href={member.profileLink} target="_blank" rel="noopener noreferrer" style={{ color: '#c9973a', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 3 }}>
-                            Profile Link <ExternalLink size={12} />
-                          </a>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <p className="mc-partner-desc">{partner.description}</p>
             </div>
-          </SmoothCollapse>
+          ))}
         </div>
       </section>
 
-      {/* 6. DYNAMIC CUSTOM SECTIONS ACCORDION (Starting at 02) */}
+      {/* 7. GALLERY SECTION */}
+      <section className="mc-gallery-section">
+        <div className="mc-section-header">
+          <span className="mc-section-label">Visual Documentation</span>
+          <h2 className="mc-section-title">{data.gallery.title}</h2>
+          <p className="mc-gallery-caption-subtitle">{data.gallery.caption}</p>
+        </div>
+
+        {galleryItems.length > 0 ? (
+          <div className="mc-gallery-grid">
+            {galleryItems.map((photo, idx) => (
+              <div
+                key={idx}
+                className="mc-gallery-item"
+                onClick={() => setLightboxImg(photo.url)}
+              >
+                <img loading="lazy" src={photo.url} alt={photo.label} className="mc-gallery-img" />
+                <div className="mc-gallery-overlay">
+                  <span>{photo.label}</span>
+                  <Maximize2 size={16} />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="mc-gallery-showcase">
+            <div className="mc-showcase-card">
+              <div className="mc-showcase-icon">
+                <GraduationCap size={32} />
+              </div>
+              <h4 className="mc-showcase-title">{data.gallery.caption}</h4>
+              <p className="mc-showcase-desc">
+                Interactive practical workshops and faculty development sessions covering PIC microcontrollers, embedded programming, and IoT interfacing.
+              </p>
+            </div>
+          </div>
+        )}
+      </section>
+
+      {/* 8. DYNAMIC CUSTOM SECTIONS ACCORDION (If added via Admin) */}
       {accordionSections.length > 0 && (
-        <section className="mc-custom-sections">
-          <CustomSectionsAccordion sections={accordionSections} startIndex={2} />
+        <section className="mc-custom-sections" style={{ marginTop: '3rem' }}>
+          <CustomSectionsAccordion sections={accordionSections} />
         </section>
       )}
 
-      {/* 7. PHOTO GALLERIES (AT THE VERY BOTTOM OF THE PAGE) */}
-      {customSections.length > 0 && (
-        <section className="mc-custom-galleries" style={{ marginTop: '3.5rem' }}>
-          <CustomSectionsGalleries sections={customSections} />
-        </section>
+      {/* LIGHTBOX MODAL */}
+      {lightboxImg && (
+        <div className="meda-lightbox-overlay" onClick={() => setLightboxImg(null)}>
+          <button
+            type="button"
+            className="meda-lightbox-close"
+            onClick={() => setLightboxImg(null)}
+            aria-label="Close"
+          >
+            <X size={24} />
+          </button>
+          <img src={lightboxImg} alt="Gallery Preview" className="meda-lightbox-img" onClick={(e) => e.stopPropagation()} />
+        </div>
       )}
     </div>
   );

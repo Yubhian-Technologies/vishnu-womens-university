@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
 import { useOrderedCollection } from '../../hooks/useCollection';
-import type { HappeningsShowcaseDoc } from '../Admin/sections/NewsAwardsDataAdmin';
+import type { HappeningsShowcaseDoc, HappeningDoc } from '../Admin/sections/NewsAwardsDataAdmin';
 import './HappeningsPosterSlider.css';
 
 interface ShowcaseSlide {
@@ -15,72 +15,68 @@ interface ShowcaseSlide {
   badge?: string;
 }
 
-const DEFAULT_SHOWCASE_SLIDES: ShowcaseSlide[] = [
-  {
-    id: 'amazon-selects-2026',
-    title: 'Amazon 2026 Selects',
-    caption: '16 Students Placed with ₹46.38 Lakhs per annum',
-    description: 'Congratulations to our 16 students on securing Full-Time roles at Amazon with ₹46.38 LPA package. Shri Vishnu Engineering College for Women continues its tradition of exceptional career placements and engineering excellence.',
-    imageUrl: '/images/placements/1.png',
-    badge: 'Placement Record',
-    linkUrl: '/placements',
-  },
-  {
-    id: 'campus-placements-2026',
-    title: 'Campus Recruitment Star Achievers',
-    caption: 'Elite Career Milestones Across Global Technology Leaders',
-    description: 'VWU engineers consistently secure premier roles in software engineering, AI/ML, VLSI, and cloud computing across Fortune 500 enterprises and global tech giants.',
-    imageUrl: '/images/placements/2.png',
-    badge: 'Campus Selections',
-    linkUrl: '/placements',
-  },
-  {
-    id: 'student-achievements-vwu',
-    title: 'Student Innovations & Engineering Excellence',
-    caption: 'National Hackathon Champions & Technical Milestones',
-    description: 'Celebrating groundbreaking projects, national championship victories, and technical research developed by VWU student innovators.',
-    imageUrl: '/images/placements/3.png',
-    badge: 'Student Achievements',
-    linkUrl: '/news-awards/gallery',
-  },
-];
-
 export default function HappeningsPosterSlider() {
-  const { docs: dbShowcase } = useOrderedCollection<HappeningsShowcaseDoc>('happeningsShowcase', 'order');
+  const { docs: dbShowcase, loading: loadingShowcase } = useOrderedCollection<HappeningsShowcaseDoc>('happeningsShowcase', 'order');
+  const { docs: dbHappenings, loading: loadingHappenings } = useOrderedCollection<HappeningDoc>('happenings', 'order');
 
-  // If Super Admin added showcase posters in Admin -> News & Awards, use them dynamically!
-  const slides: ShowcaseSlide[] = dbShowcase.length > 0 && dbShowcase.some((s) => !!s.imageUrl)
-    ? dbShowcase
-        .filter((s) => !!s.imageUrl)
-        .map((s) => ({
-          id: s.id,
-          title: s.title,
-          caption: s.caption || s.title,
-          description: s.description || '',
-          imageUrl: s.imageUrl,
-          linkUrl: s.linkUrl || undefined,
-          badge: s.badge || undefined,
-        }))
-    : DEFAULT_SHOWCASE_SLIDES;
+  const isLoading = loadingShowcase || loadingHappenings;
+
+  // Filter strictly ONLY uploaded items with valid non-empty imageUrls
+  const showcaseSlides: ShowcaseSlide[] = dbShowcase
+    .filter((s) => !!s.imageUrl && typeof s.imageUrl === 'string' && s.imageUrl.trim() !== '')
+    .map((s) => ({
+      id: s.id,
+      title: s.title,
+      caption: s.caption || s.title,
+      description: s.description || '',
+      imageUrl: s.imageUrl,
+      linkUrl: s.linkUrl || undefined,
+      badge: s.badge || undefined,
+    }));
+
+  const happeningSlides: ShowcaseSlide[] = dbHappenings
+    .filter((h) => !!h.imageUrl && typeof h.imageUrl === 'string' && h.imageUrl.trim() !== '')
+    .map((h) => ({
+      id: h.id,
+      title: h.title,
+      caption: h.title,
+      description: h.description || '',
+      imageUrl: h.imageUrl!,
+      badge: h.type === 'upcoming' ? 'Upcoming Event' : 'Recent Event',
+    }));
+
+  // Use admin showcase slides first; fallback to uploaded happenings with images
+  const slides: ShowcaseSlide[] = showcaseSlides.length > 0 ? showcaseSlides : happeningSlides;
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
+  const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
   const touchStartX = useRef<number | null>(null);
 
+  // Filter out any image that failed to load
+  const validSlides = slides.filter((s) => !failedImages.has(s.id));
+
+  // Reset index if bounds change
+  useEffect(() => {
+    if (currentIndex >= validSlides.length && validSlides.length > 0) {
+      setCurrentIndex(0);
+    }
+  }, [currentIndex, validSlides.length]);
+
   const prevSlide = useCallback(() => {
-    setCurrentIndex((prev) => (prev === 0 ? slides.length - 1 : prev - 1));
-  }, [slides.length]);
+    setCurrentIndex((prev) => (prev === 0 ? validSlides.length - 1 : prev - 1));
+  }, [validSlides.length]);
 
   const nextSlide = useCallback(() => {
-    setCurrentIndex((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
-  }, [slides.length]);
+    setCurrentIndex((prev) => (prev === validSlides.length - 1 ? 0 : prev + 1));
+  }, [validSlides.length]);
 
   // Auto-slide every 6 seconds unless user is hovering
   useEffect(() => {
-    if (isHovered || slides.length <= 1) return;
+    if (isHovered || validSlides.length <= 1) return;
     const interval = setInterval(nextSlide, 6000);
     return () => clearInterval(interval);
-  }, [isHovered, nextSlide, slides.length]);
+  }, [isHovered, nextSlide, validSlides.length]);
 
   // Touch swipe support for mobile
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -98,7 +94,48 @@ export default function HappeningsPosterSlider() {
     touchStartX.current = null;
   };
 
-  const currentSlide = slides[currentIndex] || slides[0];
+  const handleImageError = (id: string) => {
+    setFailedImages((prev) => new Set(prev).add(id));
+  };
+
+  // While fetching from Firestore, show a clean skeleton (NO hardcoded placeholder images)
+  if (isLoading) {
+    return (
+      <section className="happenings-showcase-section">
+        <div className="happenings-showcase-container">
+          <nav className="happenings-breadcrumb" aria-label="Breadcrumb">
+            <Link to="/">Home</Link>
+            <span className="happenings-breadcrumb__sep">/</span>
+            <Link to="/news-awards">News & Awards</Link>
+            <span className="happenings-breadcrumb__sep">/</span>
+            <span className="happenings-breadcrumb__current">Happenings</span>
+          </nav>
+          <div className="happenings-poster-card happenings-poster-skeleton">
+            <div className="happenings-poster-viewport">
+              <div className="happenings-skeleton-shimmer" />
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // If no uploaded posters/events exist in Firestore, do not render dummy slides
+  if (validSlides.length === 0) {
+    return (
+      <div className="happenings-showcase-container" style={{ paddingTop: '1.25rem' }}>
+        <nav className="happenings-breadcrumb" aria-label="Breadcrumb">
+          <Link to="/">Home</Link>
+          <span className="happenings-breadcrumb__sep">/</span>
+          <Link to="/news-awards">News & Awards</Link>
+          <span className="happenings-breadcrumb__sep">/</span>
+          <span className="happenings-breadcrumb__current">Happenings</span>
+        </nav>
+      </div>
+    );
+  }
+
+  const currentSlide = validSlides[currentIndex] || validSlides[0];
 
   return (
     <section className="happenings-showcase-section">
@@ -122,7 +159,7 @@ export default function HappeningsPosterSlider() {
         >
           {/* Main Poster Viewport */}
           <div className="happenings-poster-viewport">
-            {slides.map((slide, idx) => {
+            {validSlides.map((slide, idx) => {
               const isActive = idx === currentIndex;
               const content = (
                 <img
@@ -130,6 +167,7 @@ export default function HappeningsPosterSlider() {
                   alt={slide.caption || slide.title}
                   className="happenings-poster-img"
                   loading={idx === 0 ? 'eager' : 'lazy'}
+                  onError={() => handleImageError(slide.id)}
                 />
               );
 
@@ -156,7 +194,7 @@ export default function HappeningsPosterSlider() {
             })}
 
             {/* Navigation Arrows */}
-            {slides.length > 1 && (
+            {validSlides.length > 1 && (
               <>
                 <button
                   type="button"
@@ -210,9 +248,9 @@ export default function HappeningsPosterSlider() {
               )}
             </div>
 
-            {slides.length > 1 && (
+            {validSlides.length > 1 && (
               <div className="happenings-poster-dots" role="tablist">
-                {slides.map((s, idx) => (
+                {validSlides.map((s, idx) => (
                   <button
                     key={s.id}
                     type="button"

@@ -8,26 +8,25 @@ export interface AicteIdeaLabAmbassadorDoc extends WithId {
   name: string;
   year: string;
   branch: string;
-  whatsapp: string;
   email: string;
   order: number;
 }
 
-const EMPTY = { regNumber: '', name: '', year: '', branch: '', whatsapp: '', email: '', order: 0 };
+const EMPTY = { regNumber: '', name: '', year: '', branch: '', email: '', order: 0 };
 
 // The original "Student Ambassadors" table, used as the one-click starting
 // point when this collection is still empty — see seedAmbassadors below.
 const DEFAULT_AMBASSADORS: Omit<AicteIdeaLabAmbassadorDoc, 'id'>[] = [
-  { regNumber: '21B01A54A6', name: 'T. Hanuma Priya', year: 'II', branch: 'AIDS', whatsapp: '6301886833', email: '21B01A54A6@svecw.edu.in', order: 1 },
-  { regNumber: '21B01A6110', name: 'B. Haritha Priya Lakshmi Bala', year: 'II', branch: 'AIML', whatsapp: '9398973387', email: '21B01A6110@svecw.edu.in', order: 2 },
-  { regNumber: '21B01A0125', name: 'K. Renu Priyanka', year: 'II', branch: 'CIVIL', whatsapp: '9182403993', email: '21B01A0125@svecw.edu.in', order: 3 },
-  { regNumber: '21B01A0525', name: 'B. Naga Sai Eswari Sathvika', year: 'II', branch: 'CSE', whatsapp: '8686850509', email: '21B01A0525@svecw.edu.in', order: 4 },
-  { regNumber: '21B01A0437', name: 'J. Tejaswini Sai Sindhu', year: 'II', branch: 'ECE', whatsapp: '9133337333', email: '21B01A0437@svecw.edu.in', order: 5 },
-  { regNumber: '21B01A0488', name: 'R. Jahnavi', year: 'II', branch: 'ECE', whatsapp: '8985455489', email: '21B01A04A1@svecw.edu.in', order: 6 },
-  { regNumber: '21B01A0211', name: 'G. T. S. Padmavathi', year: 'II', branch: 'EEE', whatsapp: '9014368722', email: '21B01A0211@svecw.edu.in', order: 7 },
-  { regNumber: '21B01A0221', name: 'K. Pujitha', year: 'II', branch: 'EEE', whatsapp: '9390151619', email: '21B01A0221@svecw.edu.in', order: 8 },
-  { regNumber: '21B01A0313', name: 'D. Yasaswini Naga Sai Sirisha', year: 'II', branch: 'ME', whatsapp: '7013625483', email: '21B01A0313@svecw.edu.in', order: 9 },
-  { regNumber: '21B01A0314', name: 'D. H Pravallika Devi', year: 'II', branch: 'ME', whatsapp: '6281434959', email: '21B01A0314@svecw.edu.in', order: 10 },
+  { regNumber: '21B01A54A6', name: 'T. Hanuma Priya', year: 'II', branch: 'AIDS', email: '21B01A54A6@svecw.edu.in', order: 1 },
+  { regNumber: '21B01A6110', name: 'B. Haritha Priya Lakshmi Bala', year: 'II', branch: 'AIML', email: '21B01A6110@svecw.edu.in', order: 2 },
+  { regNumber: '21B01A0125', name: 'K. Renu Priyanka', year: 'II', branch: 'CIVIL', email: '21B01A0125@svecw.edu.in', order: 3 },
+  { regNumber: '21B01A0525', name: 'B. Naga Sai Eswari Sathvika', year: 'II', branch: 'CSE', email: '21B01A0525@svecw.edu.in', order: 4 },
+  { regNumber: '21B01A0437', name: 'J. Tejaswini Sai Sindhu', year: 'II', branch: 'ECE', email: '21B01A0437@svecw.edu.in', order: 5 },
+  { regNumber: '21B01A0488', name: 'R. Jahnavi', year: 'II', branch: 'ECE', email: '21B01A04A1@svecw.edu.in', order: 6 },
+  { regNumber: '21B01A0211', name: 'G. T. S. Padmavathi', year: 'II', branch: 'EEE', email: '21B01A0211@svecw.edu.in', order: 7 },
+  { regNumber: '21B01A0221', name: 'K. Pujitha', year: 'II', branch: 'EEE', email: '21B01A0221@svecw.edu.in', order: 8 },
+  { regNumber: '21B01A0313', name: 'D. Yasaswini Naga Sai Sirisha', year: 'II', branch: 'ME', email: '21B01A0313@svecw.edu.in', order: 9 },
+  { regNumber: '21B01A0314', name: 'D. H Pravallika Devi', year: 'II', branch: 'ME', email: '21B01A0314@svecw.edu.in', order: 10 },
 ];
 
 export default function AicteIdeaLabAmbassadorsAdmin() {
@@ -58,7 +57,7 @@ export default function AicteIdeaLabAmbassadorsAdmin() {
 
   const startEdit = (a: AicteIdeaLabAmbassadorDoc) => {
     setEditing(a.id);
-    setForm({ regNumber: a.regNumber, name: a.name, year: a.year, branch: a.branch, whatsapp: a.whatsapp, email: a.email, order: a.order });
+    setForm({ regNumber: a.regNumber, name: a.name, year: a.year, branch: a.branch, email: a.email, order: a.order });
   };
 
   const remove = async (id: string) => {
@@ -104,10 +103,6 @@ export default function AicteIdeaLabAmbassadorsAdmin() {
             <input id="field-branch" value={form.branch} onChange={(e) => set('branch', e.target.value.toUpperCase())} placeholder="AIDS" />
           </div>
           <div className="admin-field">
-            <label htmlFor="field-whatsapp-number">WhatsApp Number</label>
-            <input id="field-whatsapp-number" value={form.whatsapp} onChange={(e) => set('whatsapp', e.target.value)} placeholder="6301886833" />
-          </div>
-          <div className="admin-field">
             <label htmlFor="field-e-mail-id">E Mail Id</label>
             <input id="field-e-mail-id" value={form.email} onChange={(e) => set('email', e.target.value)} placeholder="21B01A54A6@svecw.edu.in" />
           </div>
@@ -127,7 +122,7 @@ export default function AicteIdeaLabAmbassadorsAdmin() {
         {loading ? <p className="admin-loading">Loading…</p> : (
           <div className="admin-table-wrap">
             <table className="admin-table">
-              <thead><tr><th>Order</th><th>Reg. Number</th><th>Name</th><th>Year</th><th>Branch</th><th>WhatsApp</th><th>Email</th><th>Actions</th></tr></thead>
+              <thead><tr><th>Order</th><th>Reg. Number</th><th>Name</th><th>Year</th><th>Branch</th><th>Email</th><th>Actions</th></tr></thead>
               <tbody>
                 {ambassadors.map((a) => (
                   <tr key={a.id}>
@@ -136,7 +131,6 @@ export default function AicteIdeaLabAmbassadorsAdmin() {
                     <td>{a.name}</td>
                     <td>{a.year}</td>
                     <td>{a.branch}</td>
-                    <td>{a.whatsapp}</td>
                     <td>{a.email}</td>
                     <td>
                       <button className="admin-btn admin-btn--sm" onClick={() => startEdit(a)}>Edit</button>
@@ -146,7 +140,7 @@ export default function AicteIdeaLabAmbassadorsAdmin() {
                 ))}
                 {ambassadors.length === 0 && (
                   <tr>
-                    <td colSpan={8} className="admin-empty">
+                    <td colSpan={7} className="admin-empty">
                       No student ambassadors yet.{' '}
                       <button className="admin-btn admin-btn--sm" onClick={seedAmbassadors}>Add starter ambassadors</button>
                     </td>

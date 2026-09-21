@@ -7,15 +7,14 @@ import {
   Cpu,
   Database,
   Settings,
-  ShieldCheck,
   Sparkles,
   Workflow,
   Wrench,
-  Users,
-  Briefcase,
   Building2,
   X,
   Maximize2,
+  Layers,
+  Handshake,
 } from 'lucide-react';
 import { medaPlmCoe } from './medaPlmCoe.data';
 import type { DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
@@ -30,7 +29,7 @@ interface MedaPlmCoePageProps {
 export default function MedaPlmCoePage({ sections }: MedaPlmCoePageProps) {
   const [lightboxImg, setLightboxImg] = useState<string | null>(null);
 
-  // Extract existing photos from custom sections safely (100% exact retention, no photos added or removed)
+  // Extract existing photos from custom sections safely
   const gallerySection = sections.find(
     (s) => s.id === 'gallery' || s.label?.toLowerCase() === 'gallery' || s.contentType === 'gallery'
   );
@@ -88,16 +87,67 @@ export default function MedaPlmCoePage({ sections }: MedaPlmCoePageProps) {
   };
 
   const hasPhotos = galleryItems.length > 0;
+  const data = medaPlmCoe;
 
   return (
     <div className="meda-plm-container">
-      {/* MoU Executive Hero Banner (Paired with Photo 0) */}
+      {/* Centre at a Glance Strip */}
+      <section className="meda-glance-strip">
+        <div className="meda-glance-grid">
+          <div className="meda-glance-card">
+            <div className="meda-glance-icon-box">
+              <Cpu className="meda-glance-icon" size={20} />
+            </div>
+            <div className="meda-glance-info">
+              <span className="meda-glance-title">{data.glance[0].title}</span>
+              <span className="meda-glance-subtitle">{data.glance[0].subtitle}</span>
+            </div>
+          </div>
+
+          <div className="meda-glance-card">
+            <div className="meda-glance-icon-box">
+              <Layers className="meda-glance-icon" size={20} />
+            </div>
+            <div className="meda-glance-info">
+              <span className="meda-glance-title">{data.glance[1].title}</span>
+              <span className="meda-glance-subtitle">{data.glance[1].subtitle}</span>
+            </div>
+          </div>
+
+          <div className="meda-glance-card">
+            <div className="meda-glance-icon-box">
+              <Handshake className="meda-glance-icon" size={20} />
+            </div>
+            <div className="meda-glance-info">
+              <span className="meda-glance-title">{data.glance[2].title}</span>
+              <span className="meda-glance-subtitle">{data.glance[2].subtitle}</span>
+            </div>
+          </div>
+
+          <div className="meda-glance-card">
+            <div className="meda-glance-icon-box">
+              <Boxes className="meda-glance-icon" size={20} />
+            </div>
+            <div className="meda-glance-info">
+              <span className="meda-glance-title">{data.glance[3].title}</span>
+              <span className="meda-glance-subtitle">{data.glance[3].subtitle}</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Hero MoU Banner Section: Industry Collaboration with Capgemini */}
       <section className={`meda-hero-banner ${hasPhotos ? 'has-photo' : 'no-photo'}`}>
         <div>
           <div className="meda-hero-badge">
             <Sparkles size={14} /> Capgemini Collaboration MoU
           </div>
-          <p className="meda-hero-text">{medaPlmCoe.intro}</p>
+          <h2 className="meda-hero-title">{data.collaboration.title}</h2>
+          <div className="meda-hero-paragraphs">
+            {data.collaboration.paragraphs.map((p, idx) => (
+              <p key={idx} className="meda-hero-text">{p}</p>
+            ))}
+          </div>
         </div>
         {hasPhotos && <RenderPhotoFrame index={0} />}
       </section>
@@ -107,7 +157,7 @@ export default function MedaPlmCoePage({ sections }: MedaPlmCoePageProps) {
         <div className="meda-section-banner">
           <div className="meda-section-banner-title">
             <span className="meda-section-num">01</span>
-            <h2 className="meda-section-name">{medaPlmCoe.meda.heading}</h2>
+            <h2 className="meda-section-name">{data.meda.heading}</h2>
           </div>
         </div>
 
@@ -115,46 +165,35 @@ export default function MedaPlmCoePage({ sections }: MedaPlmCoePageProps) {
           <div className={`meda-glass-split ${hasPhotos ? 'has-photo' : 'no-photo'}`}>
             <div>
               <p className="meda-closing-note" style={{ marginTop: 0, paddingTop: 0, borderTop: 'none', fontStyle: 'normal', color: '#475569', fontSize: '0.975rem' }}>
-                {medaPlmCoe.meda.intro}
+                {data.meda.intro}
               </p>
 
-              {/* Software Tools List */}
+              {/* Software Platforms */}
+              <div style={{ margin: '0.75rem 0 0.5rem 0', fontWeight: 800, fontSize: '0.85rem', color: '#0B1E42', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                {data.meda.softwarePlatformsHeading}
+              </div>
               <div className="meda-tools-container">
-                <div className="meda-tool-pill-card">
-                  <div className="meda-tool-icon-wrap">
-                    <Cpu size={18} />
+                {data.meda.softwarePlatforms.map((tool, idx) => (
+                  <div key={idx} className="meda-tool-pill-card">
+                    <div className="meda-tool-icon-wrap">
+                      {idx === 0 && <Cpu size={18} />}
+                      {idx === 1 && <Boxes size={18} />}
+                      {idx === 2 && <Wrench size={18} />}
+                    </div>
+                    <div className="meda-tool-desc">
+                      <span className="meda-tool-title">{tool.name}</span> – {tool.description}
+                    </div>
                   </div>
-                  <div className="meda-tool-desc">
-                    <span className="meda-tool-title">CATIA</span> – for 3D modeling, assembly design, and drafting.
-                  </div>
-                </div>
-
-                <div className="meda-tool-pill-card">
-                  <div className="meda-tool-icon-wrap">
-                    <Boxes size={18} />
-                  </div>
-                  <div className="meda-tool-desc">
-                    <span className="meda-tool-title">Siemens NX CAD</span> – for advanced parametric modeling, sheet metal design, and surface modeling.
-                  </div>
-                </div>
-
-                <div className="meda-tool-pill-card">
-                  <div className="meda-tool-icon-wrap">
-                    <Wrench size={18} />
-                  </div>
-                  <div className="meda-tool-desc">
-                    <span className="meda-tool-title">ANSYS</span> – for finite element analysis (FEA), structural, thermal, and dynamic simulation.
-                  </div>
-                </div>
+                ))}
               </div>
 
-              {/* Technical Concepts */}
+              {/* Key Areas of Learning */}
               <div className="meda-concepts-panel">
                 <div className="meda-concepts-header">
-                  <BookOpen size={16} /> {medaPlmCoe.meda.conceptsIntro}
+                  <BookOpen size={16} /> {data.meda.learningAreasHeading}
                 </div>
                 <ul className="meda-concepts-grid">
-                  {medaPlmCoe.meda.concepts.map((concept, idx) => (
+                  {data.meda.learningAreas.map((concept, idx) => (
                     <li key={idx} className="meda-concept-row">
                       <span className="meda-concept-check">✓</span>
                       <span>{concept}</span>
@@ -163,7 +202,7 @@ export default function MedaPlmCoePage({ sections }: MedaPlmCoePageProps) {
                 </ul>
               </div>
 
-              <p className="meda-closing-note">{medaPlmCoe.meda.closing}</p>
+              <p className="meda-closing-note">{data.meda.closing}</p>
             </div>
 
             {/* Section 01 Photo Frame */}
@@ -172,12 +211,12 @@ export default function MedaPlmCoePage({ sections }: MedaPlmCoePageProps) {
         </div>
       </div>
 
-      {/* Section 02: Product Life Cycle Management (PLM) */}
+      {/* Section 02: Product Lifecycle Management (PLM) */}
       <div className="meda-section-block">
         <div className="meda-section-banner">
           <div className="meda-section-banner-title">
             <span className="meda-section-num">02</span>
-            <h2 className="meda-section-name">{medaPlmCoe.plm.heading}</h2>
+            <h2 className="meda-section-name">{data.plm.heading}</h2>
           </div>
         </div>
 
@@ -188,65 +227,75 @@ export default function MedaPlmCoePage({ sections }: MedaPlmCoePageProps) {
 
             <div>
               <p className="meda-closing-note" style={{ marginTop: 0, paddingTop: 0, borderTop: 'none', fontStyle: 'normal', color: '#475569', fontSize: '0.975rem' }}>
-                {medaPlmCoe.plm.intro}
+                {data.plm.intro}
               </p>
 
               {/* Training Modules */}
-              <div className="meda-tools-container">
-                {medaPlmCoe.plm.training.map((train, idx) => (
-                  <div key={idx} className="meda-tool-pill-card" style={{ borderLeftColor: '#0B1E42' }}>
-                    <div className="meda-tool-icon-wrap" style={{ background: 'rgba(11, 30, 66, 0.08)', color: '#0B1E42' }}>
-                      <Workflow size={18} />
-                    </div>
-                    <div className="meda-tool-desc">{train}</div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Siemens Teamcenter Capabilities */}
-              <div className="meda-concepts-panel" style={{ background: '#F8FAFC' }}>
+              <div className="meda-concepts-panel" style={{ background: '#F8FAFC', marginBottom: '0.75rem' }}>
                 <div className="meda-concepts-header">
-                  <Database size={16} /> {medaPlmCoe.plm.teamcenterIntro}
+                  <Workflow size={16} /> {data.plm.trainingHeading}
                 </div>
                 <ul className="meda-concepts-grid">
-                  {medaPlmCoe.plm.teamcenter.map((tc, idx) => (
+                  {data.plm.trainingItems.map((train, idx) => (
                     <li key={idx} className="meda-concept-row">
-                      <span className="meda-concept-check" style={{ background: '#C9973A', color: '#0B1E42' }}>✓</span>
-                      <span>{tc}</span>
+                      <span className="meda-concept-check" style={{ background: '#0070AD', color: '#FFFFFF' }}>✓</span>
+                      <span>{train}</span>
                     </li>
                   ))}
                 </ul>
+              </div>
+
+              {/* Siemens Teamcenter Box */}
+              <div className="meda-tool-pill-card" style={{ borderLeftColor: '#C9973A', background: '#FFFDF7' }}>
+                <div className="meda-tool-icon-wrap" style={{ background: 'rgba(201, 151, 58, 0.15)', color: '#C9973A' }}>
+                  <Database size={18} />
+                </div>
+                <div className="meda-tool-desc">
+                  <span className="meda-tool-title">{data.plm.teamcenter.heading}</span>
+                  <p style={{ margin: '0.2rem 0 0 0', color: '#475569', fontSize: '0.85rem' }}>
+                    {data.plm.teamcenter.description}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Section 03: Outcome and Benefits */}
+      {/* Section 03: Learning Outcomes & Opportunities */}
       <div className="meda-section-block">
         <div className="meda-section-banner" style={{ background: 'linear-gradient(90deg, #132A58 0%, #0B1E42 100%)' }}>
           <div className="meda-section-banner-title">
             <span className="meda-section-num" style={{ background: '#F8DA8D' }}>03</span>
             <h2 className="meda-section-name" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Award size={20} style={{ color: '#F8DA8D' }} /> {medaPlmCoe.outcomeHeading}
+              <Award size={20} style={{ color: '#F8DA8D' }} /> {data.outcomes.heading}
             </h2>
           </div>
         </div>
 
         <div className="meda-glass-card">
           <div className={`meda-glass-split ${hasPhotos ? 'has-photo' : 'no-photo'}`}>
-            <div className="meda-outcomes-wrapper">
-              {medaPlmCoe.outcomes.map((outcome, idx) => (
-                <div key={idx} className="meda-outcome-box">
-                  <div className="meda-outcome-icon-wrap">
-                    {idx === 0 && <Users size={18} />}
-                    {idx === 1 && <ShieldCheck size={18} />}
-                    {idx === 2 && <Briefcase size={18} />}
-                    {idx === 3 && <CheckCircle2 size={18} />}
+            <div>
+              <p className="meda-closing-note" style={{ marginTop: 0, paddingTop: 0, borderTop: 'none', fontStyle: 'normal', color: '#475569', fontSize: '0.975rem' }}>
+                {data.outcomes.intro}
+              </p>
+
+              <div style={{ margin: '0.75rem 0 0.5rem 0', fontWeight: 800, fontSize: '0.85rem', color: '#0B1E42', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                {data.outcomes.opportunitiesHeading}
+              </div>
+
+              <div className="meda-outcomes-wrapper">
+                {data.outcomes.opportunities.map((opp, idx) => (
+                  <div key={idx} className="meda-outcome-box">
+                    <div className="meda-outcome-icon-wrap">
+                      <CheckCircle2 size={16} color="#0B1E42" />
+                    </div>
+                    <p className="meda-outcome-desc">{opp}</p>
                   </div>
-                  <p className="meda-outcome-desc">{outcome}</p>
-                </div>
-              ))}
+                ))}
+              </div>
+
+              <p className="meda-closing-note">{data.outcomes.closing}</p>
             </div>
 
             {/* Section 03 Photo Frame */}
@@ -255,85 +304,85 @@ export default function MedaPlmCoePage({ sections }: MedaPlmCoePageProps) {
         </div>
       </div>
 
-      {/* Sections 04 & 06 Tall Cards with Photos Row */}
-      <div className="meda-matrix-wrapper">
-        {/* 04 Key Highlights */}
-        {highlights.length > 0 && (
-          <div className="meda-matrix-card">
-            <div className="meda-matrix-head">
-              <span className="meda-section-num" style={{ padding: '0.2rem 0.5rem', fontSize: '0.75rem' }}>04</span>
-              <Sparkles size={16} style={{ color: '#C9973A' }} /> Key Highlights
+      {/* Dynamic Admin Custom Sections: Key Highlights / Facilities / Partners (if added in Admin) */}
+      {(highlights.length > 0 || outcomes.length > 0) && (
+        <div className="meda-matrix-wrapper">
+          {/* Key Highlights */}
+          {highlights.length > 0 && (
+            <div className="meda-matrix-card">
+              <div className="meda-matrix-head">
+                <Sparkles size={16} style={{ color: '#C9973A' }} /> Key Highlights
+              </div>
+              <ul className="meda-matrix-items">
+                {highlights.map((h, i) => (
+                  <li key={i} className="meda-matrix-row">
+                    <CheckCircle2 size={14} style={{ color: '#0070AD', flexShrink: 0, marginTop: 2 }} />
+                    <span>{h}</span>
+                  </li>
+                ))}
+              </ul>
+              {hasPhotos && <RenderPhotoFrame index={4} />}
             </div>
-            <ul className="meda-matrix-items">
-              {highlights.map((h, i) => (
-                <li key={i} className="meda-matrix-row">
-                  <CheckCircle2 size={14} style={{ color: '#0070AD', flexShrink: 0, marginTop: 2 }} />
-                  <span>{h}</span>
-                </li>
-              ))}
-            </ul>
-            {hasPhotos && <RenderPhotoFrame index={4} />}
-          </div>
-        )}
+          )}
 
-        {/* 06 Outcomes & Achievements */}
-        {outcomes.length > 0 && (
-          <div className="meda-matrix-card">
-            <div className="meda-matrix-head">
-              <span className="meda-section-num" style={{ padding: '0.2rem 0.5rem', fontSize: '0.75rem' }}>06</span>
-              <Award size={16} style={{ color: '#C9973A' }} /> Outcomes & Achievements
+          {/* Outcomes & Achievements */}
+          {outcomes.length > 0 && (
+            <div className="meda-matrix-card">
+              <div className="meda-matrix-head">
+                <Award size={16} style={{ color: '#C9973A' }} /> Additional Achievements
+              </div>
+              <ul className="meda-matrix-items">
+                {outcomes.map((o, i) => (
+                  <li key={i} className="meda-matrix-row">
+                    <Award size={14} style={{ color: '#C9973A', flexShrink: 0, marginTop: 2 }} />
+                    <span>{o}</span>
+                  </li>
+                ))}
+              </ul>
+              {hasPhotos && <RenderPhotoFrame index={5} />}
             </div>
-            <ul className="meda-matrix-items">
-              {outcomes.map((o, i) => (
-                <li key={i} className="meda-matrix-row">
-                  <Award size={14} style={{ color: '#C9973A', flexShrink: 0, marginTop: 2 }} />
-                  <span>{o}</span>
-                </li>
-              ))}
-            </ul>
-            {hasPhotos && <RenderPhotoFrame index={5} />}
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
 
-      {/* Side-by-Side Row: 05 Facilities & Equipment AND 07 Partners Horizontal Cards */}
-      <div className="meda-matrix-wrapper">
-        {/* 05 Facilities & Equipment */}
-        {facilities.length > 0 && (
-          <div className="meda-matrix-card">
-            <div className="meda-matrix-head">
-              <span className="meda-section-num" style={{ padding: '0.2rem 0.5rem', fontSize: '0.75rem' }}>05</span>
-              <Settings size={16} style={{ color: '#0070AD' }} /> Facilities & Equipment
+      {/* Side-by-Side Row: Facilities & Equipment AND Partners (if added in Admin) */}
+      {(facilities.length > 0 || partners.length > 0) && (
+        <div className="meda-matrix-wrapper">
+          {/* Facilities & Equipment */}
+          {facilities.length > 0 && (
+            <div className="meda-matrix-card">
+              <div className="meda-matrix-head">
+                <Settings size={16} style={{ color: '#0070AD' }} /> Facilities & Equipment
+              </div>
+              <ul className="meda-matrix-items">
+                {facilities.map((f, i) => (
+                  <li key={i} className="meda-matrix-row">
+                    <Cpu size={14} style={{ color: '#0B1E42', flexShrink: 0, marginTop: 2 }} />
+                    <span style={{ fontWeight: 700 }}>{f}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
-            <ul className="meda-matrix-items">
-              {facilities.map((f, i) => (
-                <li key={i} className="meda-matrix-row">
-                  <Cpu size={14} style={{ color: '#0B1E42', flexShrink: 0, marginTop: 2 }} />
-                  <span style={{ fontWeight: 700 }}>{f}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+          )}
 
-        {/* 07 Partners */}
-        {partners.length > 0 && (
-          <div className="meda-matrix-card">
-            <div className="meda-matrix-head">
-              <span className="meda-section-num" style={{ padding: '0.2rem 0.5rem', fontSize: '0.75rem' }}>07</span>
-              <Building2 size={16} style={{ color: '#0B1E42' }} /> Partners
+          {/* Partners */}
+          {partners.length > 0 && (
+            <div className="meda-matrix-card">
+              <div className="meda-matrix-head">
+                <Building2 size={16} style={{ color: '#0B1E42' }} /> Industry Partners
+              </div>
+              <ul className="meda-matrix-items">
+                {partners.map((p, i) => (
+                  <li key={i} className="meda-matrix-row" style={{ background: '#FFFDF5', borderColor: 'rgba(201, 151, 58, 0.3)' }}>
+                    <Building2 size={14} style={{ color: '#C9973A', flexShrink: 0, marginTop: 2 }} />
+                    <span style={{ fontWeight: 800, color: '#0B1E42', fontSize: '0.95rem' }}>{p}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
-            <ul className="meda-matrix-items">
-              {partners.map((p, i) => (
-                <li key={i} className="meda-matrix-row" style={{ background: '#FFFDF5', borderColor: 'rgba(201, 151, 58, 0.3)' }}>
-                  <Building2 size={14} style={{ color: '#C9973A', flexShrink: 0, marginTop: 2 }} />
-                  <span style={{ fontWeight: 800, color: '#0B1E42', fontSize: '0.95rem' }}>{p}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
 
       {/* Lightbox for Photos */}
       {lightboxImg && (
