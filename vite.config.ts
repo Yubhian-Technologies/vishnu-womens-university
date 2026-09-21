@@ -16,9 +16,9 @@ export default defineConfig({
         // slow-changing dependencies shared by every public route — splitting
         // them into their own chunk lets browsers cache them independently of
         // app code, instead of re-downloading everything on each deploy.
-        // firebase/auth and firebase/storage are deliberately NOT listed here:
-        // only /admin (login + uploads, see firebaseAdmin.ts) touches them,
-        // and they're loaded there via dynamic import() rather than a static
+        // firebase/auth is deliberately NOT listed here: only /admin (login,
+        // see firebaseAdmin.ts) and the admissions OTP form touch it, and
+        // it's loaded there via dynamic import() rather than a static
         // import specifically so Rollup treats them as a genuine on-demand
         // chunk. Adding them to manualChunks previously caused Rollup to
         // statically link that chunk into every page's bundle (since manual
