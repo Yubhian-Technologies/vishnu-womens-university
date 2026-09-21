@@ -5,7 +5,7 @@ import NewsCard, { type NewsArticle } from '../../components/NewsCard/NewsCard';
 import NewsArticleDialog from '../../components/NewsCard/NewsArticleDialog';
 import { useHashScroll } from '../../hooks/useHashScroll';
 import { useOrderedCollection } from '../../hooks/useCollection';
-import { happeningToArticle } from '../../lib/happenings';
+import { happeningToArticle, isUpcomingHappening } from '../../lib/happenings';
 import type { HappeningDoc } from '../Admin/sections/NewsAwardsDataAdmin';
 import HappeningsPosterSlider from './HappeningsPosterSlider';
 import './Happenings.css';
@@ -34,7 +34,9 @@ export default function Happenings() {
   }, []);
 
   const recent = happenings.filter(h => h.type === 'recent');
-  const upcoming = happenings.filter(h => h.type === 'upcoming');
+  // Admins don't always flip type back once an event's date passes, so
+  // drop anything already past regardless of type (see isUpcomingHappening).
+  const upcoming = happenings.filter(h => h.type === 'upcoming' && isUpcomingHappening(h));
 
   return (
     <main className="page-wrapper happenings-page">
@@ -50,8 +52,9 @@ export default function Happenings() {
             </div>
             <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 'var(--space-5)' }}>
               {upcoming.map((ev) => (
-                <div key={ev.id}
-                  style={{ background: 'var(--color-primary)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
+                <Link key={ev.id}
+                  to={`/news-awards/happenings/${ev.id}`}
+                  style={{ background: 'var(--color-primary)', borderRadius: 'var(--radius-md)', overflow: 'hidden', display: 'block', textDecoration: 'none', color: 'inherit' }}>
                   {ev.imageUrl && (
                     <img loading="lazy" src={ev.imageUrl} alt={ev.title} style={{ width: '100%', height: 160, objectFit: 'cover', display: 'block' }} />
                   )}
@@ -72,7 +75,7 @@ export default function Happenings() {
                       )}
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </div>

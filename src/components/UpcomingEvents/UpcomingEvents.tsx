@@ -1,65 +1,14 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { 
-  CalendarDays, 
-  MapPin, 
-  Sparkles, 
-  ArrowRight, 
-  X, 
-  Clock, 
-  Check, 
-  Share2, 
-  Building2,
+import { useNavigate, Link } from 'react-router-dom';
+import {
+  CalendarDays,
+  MapPin,
+  ArrowRight,
+  Clock,
   CalendarPlus
 } from 'lucide-react';
 import type { HappeningDoc } from '../../pages/Admin/sections/NewsAwardsDataAdmin';
+import { parseHappeningDate, isUpcomingHappening } from '../../lib/happenings';
 import './UpcomingEvents.css';
-
-interface FormattedDate {
-  month: string;
-  day: string;
-  year?: string;
-  weekday?: string;
-  fullDateStr: string;
-}
-
-function parseEventDate(dateStr: string): FormattedDate {
-  if (!dateStr) {
-    return { month: 'VWU', day: '—', fullDateStr: '' };
-  }
-  const clean = dateStr.trim();
-  
-  // Matches "Month DD, YYYY" or "Month DD" (e.g. "March 28, 2026", "April 15")
-  const match = clean.match(/^([A-Za-z]+)\s+(\d{1,2})(?:,?\s*(\d{4}))?/);
-  if (match) {
-    const month = match[1].slice(0, 3).toUpperCase();
-    const day = match[2].padStart(2, '0');
-    const year = match[3] || new Date().getFullYear().toString();
-    
-    let weekday: string | undefined;
-    try {
-      const d = new Date(`${match[1]} ${match[2]}, ${year}`);
-      if (!isNaN(d.getTime())) {
-        weekday = d.toLocaleDateString('en-US', { weekday: 'short' });
-      }
-    } catch {
-      // Ignore fallback
-    }
-    
-    return { month, day, year, weekday, fullDateStr: clean };
-  }
-
-  // Matches "DD Month YYYY" (e.g. "28 March 2026")
-  const match2 = clean.match(/^(\d{1,2})\s+([A-Za-z]+)(?:,?\s*(\d{4}))?/);
-  if (match2) {
-    const day = match2[1].padStart(2, '0');
-    const month = match2[2].slice(0, 3).toUpperCase();
-    const year = match2[3] || new Date().getFullYear().toString();
-    return { month, day, year, fullDateStr: clean };
-  }
-
-  return { month: 'EVENT', day: clean.slice(0, 5), fullDateStr: clean };
-}
 
 function getGoogleCalendarUrl(event: { title: string; date: string; description?: string; dept?: string }): string {
   const title = encodeURIComponent(`${event.title} | Vishnu Women's University`);
@@ -85,11 +34,22 @@ function getGoogleCalendarUrl(event: { title: string; date: string; description?
   return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&details=${details}&location=${location}${datesParam}`;
 }
 
+// Shown only until an admin adds real "Upcoming" happenings (see
+// NewsAwardsDataAdmin.tsx). Dates are computed relative to today rather
+// than hardcoded so this placeholder content never drifts into the past —
+// a fixed date string here would otherwise start displaying as a stale
+// "upcoming" event the moment it elapsed.
+function daysFromNow(n: number): string {
+  const d = new Date();
+  d.setDate(d.getDate() + n);
+  return d.toLocaleDateString('en-US', { month: 'long', day: '2-digit', year: 'numeric' });
+}
+
 const DEFAULT_UPCOMING_EVENTS: HappeningDoc[] = [
   {
     id: 'up-1',
     title: 'TECHNOVA 2026: National Women in Tech Symposium & Hackathon',
-    date: 'March 28, 2026',
+    date: daysFromNow(14),
     type: 'upcoming',
     dept: 'Dept. of CSE & AI',
     order: 0,
@@ -98,7 +58,7 @@ const DEFAULT_UPCOMING_EVENTS: HappeningDoc[] = [
   {
     id: 'up-2',
     title: 'International Conference on Sustainable VLSI & Embedded Systems (ICSVES)',
-    date: 'April 15, 2026',
+    date: daysFromNow(30),
     type: 'upcoming',
     dept: 'Dept. of ECE',
     order: 1,
@@ -107,7 +67,7 @@ const DEFAULT_UPCOMING_EVENTS: HappeningDoc[] = [
   {
     id: 'up-3',
     title: 'Annual Placement & Corporate Leadership Masterclass Series',
-    date: 'May 04, 2026',
+    date: daysFromNow(45),
     type: 'upcoming',
     dept: 'Career Guidance & Placements',
     order: 2,
@@ -116,7 +76,7 @@ const DEFAULT_UPCOMING_EVENTS: HappeningDoc[] = [
   {
     id: 'up-4',
     title: 'VWU Innovation Expo & Startup Incubation Pitchfest',
-    date: 'May 20, 2026',
+    date: daysFromNow(60),
     type: 'upcoming',
     dept: 'Centre for Innovation (CIED)',
     order: 3,
@@ -129,41 +89,22 @@ interface Props {
 }
 
 export default function UpcomingEvents({ happenings = [] }: Props) {
-  const items = happenings.length > 0 ? happenings : DEFAULT_UPCOMING_EVENTS;
-  const [selectedEvent, setSelectedEvent] = useState<HappeningDoc | null>(null);
-  const [copied, setCopied] = useState(false);
+  const navigate = useNavigate();
+  const candidates = happenings.length > 0 ? happenings : DEFAULT_UPCOMING_EVENTS;
+  // Admins set type: 'upcoming' manually and don't always remember to flip
+  // it back once the date passes — drop anything whose parsed date is
+  // already before today so a stale entry can't linger indefinitely.
+  const items = candidates.filter(isUpcomingHappening);
 
   // Featured first event + subsequent schedule list
   const featuredEvent = items[0];
   const otherEvents = items.slice(1);
+  const featuredDate = featuredEvent ? parseHappeningDate(featuredEvent.date) : null;
 
-  useEffect(() => {
-    if (!selectedEvent) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setSelectedEvent(null); };
-    window.addEventListener('keydown', onKey);
-    document.body.style.overflow = 'hidden';
-    return () => {
-      window.removeEventListener('keydown', onKey);
-      document.body.style.overflow = '';
-    };
-  }, [selectedEvent]);
-
-  const handleShare = (e: React.MouseEvent, ev: HappeningDoc) => {
-    e.stopPropagation();
-    if (navigator.share) {
-      navigator.share({
-        title: ev.title,
-        text: `${ev.title} at Vishnu Women's University on ${ev.date}`,
-        url: window.location.href,
-      }).catch(() => {});
-    } else {
-      navigator.clipboard.writeText(`${ev.title} - ${ev.date} | Vishnu Women's University\n${window.location.origin}/news-awards/happenings`);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  };
-
-  const featuredDate = featuredEvent ? parseEventDate(featuredEvent.date) : null;
+  // Cards link to the existing per-happening detail page
+  // (HappeningDetail.tsx, routed at /news-awards/happenings/:id) instead
+  // of opening an in-place dialog.
+  const goToEvent = (item: HappeningDoc) => navigate(`/news-awards/happenings/${item.id}`);
 
   return (
     <section className="m3-upcoming-section" id="upcoming-events" aria-label="Upcoming Events at VWU">
@@ -189,16 +130,20 @@ export default function UpcomingEvents({ happenings = [] }: Props) {
           </div>
         </div>
 
+        {items.length === 0 && (
+          <p className="m3-upcoming-empty reveal">No upcoming events right now — check back soon.</p>
+        )}
+
         {/* Events Layout: Spotlight Grid */}
         <div className="m3-upcoming-grid">
           {/* Hero Spotlight Card (Featured Next Event) */}
           {featuredEvent && featuredDate && (
-            <div 
+            <div
               className="m3-card m3-card--featured reveal-left"
-              onClick={() => setSelectedEvent(featuredEvent)}
+              onClick={() => goToEvent(featuredEvent)}
               role="button"
               tabIndex={0}
-              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setSelectedEvent(featuredEvent); }}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') goToEvent(featuredEvent); }}
             >
               <div className="m3-featured-top">
                 <span className="m3-badge-next">Next Event</span>
@@ -251,12 +196,12 @@ export default function UpcomingEvents({ happenings = [] }: Props) {
                   <span>Add to Calendar</span>
                 </a>
 
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   className="m3-btn-subtle"
-                  onClick={() => setSelectedEvent(featuredEvent)}
+                  onClick={() => goToEvent(featuredEvent)}
                 >
-                  <span>Quick Details →</span>
+                  <span>View Details →</span>
                 </button>
               </div>
             </div>
@@ -265,15 +210,15 @@ export default function UpcomingEvents({ happenings = [] }: Props) {
           {/* Schedule Column (Compact Remaining Events) */}
           <div className="m3-schedule-list reveal-right">
             {otherEvents.map((item, idx) => {
-              const dt = parseEventDate(item.date);
+              const dt = parseHappeningDate(item.date);
               return (
-                <div 
-                  key={item.id || idx} 
+                <div
+                  key={item.id || idx}
                   className="m3-card m3-card--row"
-                  onClick={() => setSelectedEvent(item)}
+                  onClick={() => goToEvent(item)}
                   role="button"
                   tabIndex={0}
-                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setSelectedEvent(item); }}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') goToEvent(item); }}
                 >
                   {/* Calendar Date Tile */}
                   <div className="m3-cal-tile">
@@ -323,106 +268,6 @@ export default function UpcomingEvents({ happenings = [] }: Props) {
           </Link>
         </div>
       </div>
-
-      {/* Google M3 Event Detail Dialog Modal */}
-      {selectedEvent && (
-        <div className="m3-dialog-overlay" onClick={() => setSelectedEvent(null)}>
-          <div 
-            className="m3-dialog" 
-            role="dialog" 
-            aria-modal="true" 
-            aria-label={selectedEvent.title}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button 
-              className="m3-dialog-close-btn" 
-              onClick={() => setSelectedEvent(null)}
-              aria-label="Close dialog"
-            >
-              <X size={20} />
-            </button>
-
-            <div className="m3-dialog-header">
-              <div className="m3-dialog-eyebrow">
-                <span className="m3-chip m3-chip--primary">
-                  <Sparkles size={12} />
-                  <span>Upcoming Event</span>
-                </span>
-                {selectedEvent.dept && (
-                  <span className="m3-dept-pill">{selectedEvent.dept}</span>
-                )}
-              </div>
-              <h3 className="m3-dialog-title">{selectedEvent.title}</h3>
-            </div>
-
-            <div className="m3-dialog-body">
-              {/* Event Meta Cards */}
-              <div className="m3-dialog-meta-grid">
-                <div className="m3-dialog-meta-card">
-                  <CalendarDays size={18} className="m3-meta-icon" />
-                  <div>
-                    <span className="m3-meta-label">Date</span>
-                    <span className="m3-meta-val">{selectedEvent.date}</span>
-                  </div>
-                </div>
-
-                <div className="m3-dialog-meta-card">
-                  <MapPin size={18} className="m3-meta-icon" />
-                  <div>
-                    <span className="m3-meta-label">Location</span>
-                    <span className="m3-meta-val">VWU Campus, Bhimavaram</span>
-                  </div>
-                </div>
-
-                <div className="m3-dialog-meta-card">
-                  <Building2 size={18} className="m3-meta-icon" />
-                  <div>
-                    <span className="m3-meta-label">Department</span>
-                    <span className="m3-meta-val">{selectedEvent.dept || 'Vishnu Women\'s University'}</span>
-                  </div>
-                </div>
-              </div>
-
-              {selectedEvent.description && (
-                <div className="m3-dialog-desc-box">
-                  <h4 className="m3-desc-heading">About This Event</h4>
-                  <p className="m3-desc-text">{selectedEvent.description}</p>
-                </div>
-              )}
-            </div>
-
-            <div className="m3-dialog-footer">
-              <a 
-                href={getGoogleCalendarUrl(selectedEvent)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="m3-btn m3-btn--primary"
-              >
-                <CalendarPlus size={16} />
-                <span>Add to Google Calendar</span>
-              </a>
-
-              <button 
-                type="button" 
-                className="m3-btn m3-btn--tonal"
-                onClick={(e) => handleShare(e, selectedEvent)}
-              >
-                {copied ? <Check size={16} color="green" /> : <Share2 size={16} />}
-                <span>{copied ? 'Link Copied!' : 'Share Event'}</span>
-              </button>
-
-              <Link 
-                to="/news-awards/happenings" 
-                className="m3-btn m3-btn--outlined"
-                onClick={() => setSelectedEvent(null)}
-              >
-                <span>All Happenings</span>
-                <ArrowRight size={15} />
-              </Link>
-            </div>
-          </div>
-        </div>
-      )}
     </section>
   );
 }

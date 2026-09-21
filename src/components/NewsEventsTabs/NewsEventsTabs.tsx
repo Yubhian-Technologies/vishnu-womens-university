@@ -40,7 +40,6 @@ export default function NewsEventsTabs({ categories, navOffset, embedded, depart
   const withContent = categories.filter((c) => c.years.length > 0);
   const [activeKey, setActiveKey] = useState<string | null>(null);
   const [expandedYearIndex, setExpandedYearIndex] = useState<number | null>(0);
-  const [sectionExpanded, setSectionExpanded] = useState(false);
 
   if (withContent.length === 0) return null;
   const active = categories.find((c) => c.key === activeKey) ?? withContent[0];
@@ -289,28 +288,12 @@ export default function NewsEventsTabs({ categories, navOffset, embedded, depart
   return (
     <section id="news-events" className="section bg-white" style={{ scrollMarginTop: navOffset }}>
       <div className="container">
-        <button
-          type="button"
-          className="dept-outcomes-toggle"
-          onClick={() => setSectionExpanded((v) => !v)}
-          aria-expanded={sectionExpanded}
-          aria-controls="news-events-panel-wrap"
-        >
-          <div>
-            <h2 className="section-title" style={{ marginBottom: 0 }}>Events &amp; Happenings</h2>
-          </div>
-          <ChevronDown
-            size={22}
-            strokeWidth={2.2}
-            className={`dept-outcomes-toggle-chevron${sectionExpanded ? ' is-open' : ''}`}
-            aria-hidden="true"
-          />
-        </button>
-        <SmoothCollapse open={sectionExpanded}>
-          <div id="news-events-panel-wrap" style={{ paddingTop: 'var(--space-6)' }}>
-            {body}
-          </div>
-        </SmoothCollapse>
+        <div style={{ marginBottom: 'var(--space-4)' }}>
+          <h2 className="section-title" style={{ marginBottom: 0 }}>Events &amp; Happenings</h2>
+        </div>
+        <div id="news-events-panel-wrap">
+          {body}
+        </div>
       </div>
     </section>
   );

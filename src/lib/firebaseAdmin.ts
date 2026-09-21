@@ -1,10 +1,8 @@
 import type { Auth, ConfirmationResult } from 'firebase/auth';
-import type { FirebaseStorage } from 'firebase/storage';
 import { app } from './firebase';
 
-// firebase/auth and firebase/storage used to be needed only by /admin (login
-// gate + image/PDF uploads); AdmissionApplyForm's mobile-OTP verification
-// (the public "Curious to Know More?" form) now uses the auth half too.
+// firebase/auth used to be needed only by /admin (login gate); AdmissionApplyForm's
+// mobile-OTP verification (the public "Curious to Know More?" form) now uses it too.
 // Loading it via a genuine dynamic import() — rather than a static top-level
 // import — is what keeps it out of every OTHER public page's bundle: a
 // static import gets pulled into whatever manualChunks bucket Rollup assigns
@@ -52,14 +50,6 @@ export async function sendPhoneOtp(phoneE164: string, containerId: string): Prom
 export async function logoutFirebaseAuth(): Promise<void> {
   const [{ signOut }, auth] = await Promise.all([import('firebase/auth'), getFirebaseAuth()]);
   return signOut(auth);
-}
-
-let storagePromise: Promise<FirebaseStorage> | null = null;
-export function getFirebaseStorage(): Promise<FirebaseStorage> {
-  if (!storagePromise) {
-    storagePromise = import('firebase/storage').then(({ getStorage }) => getStorage(app));
-  }
-  return storagePromise;
 }
 
 // A second, independently-named Firebase App (same project config, via

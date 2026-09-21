@@ -8,15 +8,15 @@ import { useOrderedCollection } from '../../hooks/useCollection';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { HERO_VIDEO_SRC } from '../../lib/heroVideo';
 import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
-import { Users, User, Video, GraduationCap } from 'lucide-react';
+import { Users, Target, Globe, School } from 'lucide-react';
 
 type VisitType = 'group' | 'individual' | 'virtual' | 'openday';
 
-const VISIT_TYPES: { key: VisitType; title: string; desc: string; icon: typeof Users }[] = [
-  { key: 'group', title: 'Group Campus Tour', desc: 'For schools, colleges, or any group of prospective students visiting together.', icon: Users },
-  { key: 'individual', title: 'Individual Visit Day', desc: 'A personalised campus visit for a single prospective student and family.', icon: User },
-  { key: 'virtual', title: 'Virtual Campus Tour', desc: 'Explore VWU from anywhere — watch our virtual campus tour video.', icon: Video },
-  { key: 'openday', title: 'Open Day for Admitted Students', desc: 'A full-day department interaction day for students who have already been admitted.', icon: GraduationCap },
+const VISIT_TYPES: { key: VisitType; title: string; desc: string; icon: typeof Users; buttonText: string }[] = [
+  { key: 'group', title: 'Group Campus Tour', desc: 'Join a guided walkthrough of the VWU campus — see the labs, smart classrooms, hostels, and student facilities in Bhimavaram.', icon: Users, buttonText: 'Book a Group Tour' },
+  { key: 'individual', title: 'Individual Visit Day', desc: 'Arrange a one-on-one visit with our admissions team, sit in on a demo class, and meet faculty from your preferred department.', icon: Target, buttonText: 'Schedule a Visit' },
+  { key: 'virtual', title: 'Virtual Campus Tour', desc: 'Unable to travel to Bhimavaram? Take an online tour of the campus and speak with our admissions team via video call.', icon: Globe, buttonText: 'Take the Virtual Tour' },
+  { key: 'openday', title: 'Open Day for Admitted Students', desc: 'Spend a full day at VWU after confirming your admission — meet your future classmates, faculty, and student activity groups.', icon: School, buttonText: 'Register for Open Day' },
 ];
 
 const PERSON_COUNTS = ['2-5', '6-10', '11-20', '20+'];
@@ -157,6 +157,7 @@ export default function CampusVisit() {
                   <div className="cv-type-icon"><Icon size={32} strokeWidth={1.75} /></div>
                   <h3>{t.title}</h3>
                   <p>{t.desc}</p>
+                  <div className="cv-type-card-btn">{t.buttonText}</div>
                 </button>
               );
             })}
