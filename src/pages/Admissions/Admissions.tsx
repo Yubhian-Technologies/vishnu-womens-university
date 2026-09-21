@@ -1,4 +1,4 @@
-import { useEffect, useState, type CSSProperties } from 'react';
+import { useEffect, useState, useMemo, type CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
 import './Admissions.css';
 import PageHero from '../../components/PageHero/PageHero';
@@ -89,13 +89,40 @@ const DEFAULT_ADMISSIONS_FAQS: FaqDoc[] = [
   },
 ];
 
+const DEFAULT_TUITION_DATA = [
+  { id: 'tuition-visw', title: 'B.Tech. (VISW)', value: '₹ 1,05,000', order: 1 },
+  { id: 'tuition-viswpu', title: 'B.Tech. (VISWPU)', value: '₹ 45,000', order: 2 },
+  { id: 'tuition-mtech', title: 'M.Tech. (per year)', value: '₹ 55,800', order: 3 },
+  { id: 'tuition-mba', title: 'MBA (per year)', value: '₹ 55,000', order: 4 },
+  { id: 'tuition-pmv', title: 'PM Vidyalaxmi Scheme', value: 'Available', order: 5 },
+];
+
 export default function Admissions() {
   useHashScroll();
   const { phone, email } = useSiteContact();
   const { docs: allFaqs } = useOrderedCollection<FaqDoc>('faqs', 'order');
   const liveFaqs = allFaqs.filter((f) => f.page === 'admissions');
   const faqs = liveFaqs.length > 0 ? liveFaqs : DEFAULT_ADMISSIONS_FAQS;
-  const tuitionData = useContentBlocks('admissions', 'tuitionData');
+  const rawTuitionData = useContentBlocks('admissions', 'tuitionData');
+  const tuitionData = useMemo(() => {
+    if (!rawTuitionData || rawTuitionData.length === 0) {
+      return DEFAULT_TUITION_DATA;
+    }
+    const hasVisw = rawTuitionData.some((r) => r.title?.includes('VISW'));
+    if (!hasVisw) {
+      const mapped: Array<{ id: string; title: string; value: string }> = [];
+      rawTuitionData.forEach((row) => {
+        if (row.title?.includes('B.Tech') && !row.title?.includes('VISW')) {
+          mapped.push({ id: `${row.id}-visw`, title: 'B.Tech. (VISW)', value: '₹ 1,05,000' });
+          mapped.push({ id: `${row.id}-viswpu`, title: 'B.Tech. (VISWPU)', value: '₹ 45,000' });
+        } else {
+          mapped.push({ id: row.id, title: row.title || '', value: row.value || '' });
+        }
+      });
+      return mapped;
+    }
+    return rawTuitionData;
+  }, [rawTuitionData]);
   const admissionHub = useContentBlocks('admissions', 'admissionHub');
   const visitOptions = useContentBlocks('admissions', 'visitOptions');
   const admissionsPhotos = useSitePhotos('admissions', 'main', defaultAdmissionsPhotos);
