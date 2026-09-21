@@ -53,7 +53,7 @@ export default function HonouredGuestsSection() {
       } else {
         track.scrollBy({ left: getCardStep(), behavior: 'smooth' });
       }
-    }, 2600);
+    }, 1400);
 
     return () => clearInterval(timer);
   }, [people.length, isPaused, reducedMotion]);
