@@ -1528,7 +1528,7 @@ td.pb-activities-num {
 
 .dept-recruiters-grid--circular .dept-recruiter-tile--named img {
   object-fit: contain;
-  padding: 1rem;
+  padding: 0.1rem 0.3rem;
 }
 
 .dept-recruiters-grid--circular .dept-recruiter-tile--fallback {
@@ -5805,6 +5805,15 @@ td.pb-activities-num {
   align-items: center;
   gap: 0.6rem;
   flex-shrink: 0;
+  max-height: 280px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 6px 4px;
+  scrollbar-width: none;
+}
+
+.dept-testimonial-single-dots::-webkit-scrollbar {
+  display: none;
 }
 
 .dept-testimonial-dot {
@@ -5815,6 +5824,7 @@ td.pb-activities-num {
   border: none;
   cursor: pointer;
   padding: 0;
+  flex-shrink: 0;
   transition: transform 200ms ease, background-color 200ms ease, box-shadow 200ms ease;
 }
 
@@ -5829,6 +5839,43 @@ td.pb-activities-num {
   background: var(--color-accent);
   transform: scale(1.3);
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-accent) 25%, transparent);
+}
+
+.dept-testimonial-nav-arrows {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.dept-testimonial-arrow-btn {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  border-radius: 50%;
+  transition: color 150ms ease, transform 150ms ease, background-color 150ms ease;
+}
+
+.dept-testimonial-arrow-btn:hover {
+  color: var(--color-accent);
+  background: rgba(255, 255, 255, 0.12);
+  transform: scale(1.1);
+}
+
+.dept-testimonial-count-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.75);
+  letter-spacing: 0.04em;
+  padding: 0 0.2rem;
 }
 
 .dept-testimonial-single-card {

@@ -290,7 +290,6 @@ const navItemsData: NavItem[] = [
         items: [
           { label: 'Upcoming Events', path: '/news-awards/happenings#upcoming-events' },
           { label: 'Recent Events', path: '/news-awards/happenings#recent-events' },
-          { label: 'VWU Insights', path: '/news-awards/vwu-insights' },
           { label: 'Gallery', path: '/news-awards/gallery' },
           { label: 'Vishnu Era Newsletter', path: 'https://www.srivishnu.edu.in/vishnu-era/', external: true },
           { label: 'Prathibha Magazine', path: 'https://heyzine.com/flip-book/088b7b5629.html#page/54', external: true },
@@ -397,9 +396,24 @@ export default function Header() {
   const { docs: differentiatorItems } = useOrderedCollection<DifferentiatorItemDoc>('differentiatorItems', 'order');
   const { docs: placementItems } = useOrderedCollection<PlacementItemDoc>('placementItems', 'order');
   const { docs: campusLifeItems } = useOrderedCollection<CampusLifeItemDoc>('campusLifeItems', 'order');
-  const campusFacilityNavItems: NavChild[] = campusLifeItems
+  const rawFacilityNavItems: NavChild[] = campusLifeItems
     .filter((it) => it.group === 'facility')
     .map((it) => ({ label: it.title, path: `/campus/${it.slug}` }));
+
+  // Exchange places of 'Other Facilities' and 'Campus Security' in Quick Access column
+  const otherIdx = rawFacilityNavItems.findIndex(
+    (it) => it.path === '/campus/other-facilities' || it.label.toLowerCase().includes('other facilities')
+  );
+  const secIdx = rawFacilityNavItems.findIndex(
+    (it) => it.path === '/campus/campus-security' || it.label.toLowerCase().includes('campus security')
+  );
+
+  const campusFacilityNavItems: NavChild[] = [...rawFacilityNavItems];
+  if (otherIdx !== -1 && secIdx !== -1) {
+    const temp = campusFacilityNavItems[otherIdx];
+    campusFacilityNavItems[otherIdx] = campusFacilityNavItems[secIdx];
+    campusFacilityNavItems[secIdx] = temp;
+  }
   // The Campus Life dropdown's handful of fixed-route entries (Wellness
   // Centre, Student Clubs, ...) — admin-editable via Admin -> Campus Life ->
   // "Campus Life Menu — Other Links". Falls back to the original hardcoded
@@ -521,7 +535,19 @@ export default function Header() {
       // (campusLifeQuickLinks) — item.children (navItemsData's hardcoded
       // list) is intentionally unused here now; it stays only so
       // isEnabledNavPath's static scan still recognizes these paths.
-      return { ...item, children: [...campusFacilityNavItems, ...campusLifeQuickLinks] };
+      const combinedChildren: NavChild[] = [...campusFacilityNavItems, ...campusLifeQuickLinks];
+      const otherIdx = combinedChildren.findIndex(
+        (it) => it.path === '/campus/other-facilities' || it.label.toLowerCase().includes('other facilities')
+      );
+      const socialIdx = combinedChildren.findIndex(
+        (it) => it.path === '/social-services' || it.label.toLowerCase().includes('social services')
+      );
+      if (otherIdx !== -1 && socialIdx !== -1) {
+        const temp = combinedChildren[otherIdx];
+        combinedChildren[otherIdx] = combinedChildren[socialIdx];
+        combinedChildren[socialIdx] = temp;
+      }
+      return { ...item, children: combinedChildren };
     }
     return item;
   });

@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CalendarDays } from 'lucide-react';
-import PageHero from '../../components/PageHero/PageHero';
 import NewsCard, { type NewsArticle } from '../../components/NewsCard/NewsCard';
 import NewsArticleDialog from '../../components/NewsCard/NewsArticleDialog';
 import { useHashScroll } from '../../hooks/useHashScroll';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { happeningToArticle, isUpcomingHappening } from '../../lib/happenings';
 import type { HappeningDoc } from '../Admin/sections/NewsAwardsDataAdmin';
+import HappeningsPosterSlider from './HappeningsPosterSlider';
+import './Happenings.css';
 
 export default function Happenings() {
   useHashScroll();

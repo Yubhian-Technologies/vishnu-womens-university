@@ -16,6 +16,8 @@ import type { DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdm
 import type { FacultyDoc } from '../Academics/Faculty';
 import { talentSprintWise } from './talentSprintWise.data';
 import { foreignLanguages } from './foreignLanguages.data';
+import { medaPlmCoe } from './medaPlmCoe.data';
+import { microchipEmbedded } from './microchipEmbedded.data';
 import MicrochipPage from './MicrochipPage';
 import TiDspPage from './TiDspPage';
 import UltraTechPage from './UltraTechPage';
@@ -830,12 +832,59 @@ export default function DifferentiatorDetail() {
                 <div className="animate-fade-in-up" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#C9973A', color: '#0B1E42', fontSize: 'var(--text-xs)', fontWeight: 800, padding: '0.35rem 0.9rem', borderRadius: '9999px', marginBottom: '0.8rem', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
                   <CategoryIcon size={14} /> {category.label}
                 </div>
-                <h1 className="dept-hero-title">{item.title}</h1>
+                <h1 className="dept-hero-title">
+                  {item.slug === 'institution-innovation-cell'
+                    ? "Institution's Innovation Council"
+                    : item.slug === 'ti-dsp-coe'
+                    ? 'TI-DSP Centre of Excellence'
+                    : item.title}
+                </h1>
                 {/* Its own "Hero Subtitle" admin field — deliberately not the
                     same as the Short Description (hub-card blurb) or the
                     Description block further down the page. */}
-                {item.summary && (
-                  <p className="dept-hero-subtitle">{item.summary}</p>
+                {(item.slug === 'institution-innovation-cell' || item.slug === 'ti-dsp-coe' || item.summary || (item.slug === 'meda-plm-coe' ? medaPlmCoe.hero.subtitle : item.slug === 'microchip-embedded' ? microchipEmbedded.hero.subtitle : null)) && (
+                  <p className="dept-hero-subtitle">
+                    {item.slug === 'institution-innovation-cell'
+                      ? 'Fostering a campus ecosystem where students and faculty can explore ideas, develop innovations and advance entrepreneurship through mentoring, collaboration and institutional support.'
+                      : item.slug === 'ti-dsp-coe'
+                      ? 'Advancing digital signal processing, speech and image processing, and application-oriented research through specialised DSP platforms, MATLAB-enabled learning and hands-on technical training.'
+                      : (item.summary || (item.slug === 'meda-plm-coe' ? medaPlmCoe.hero.subtitle : item.slug === 'microchip-embedded' ? microchipEmbedded.hero.subtitle : ''))}
+                  </p>
+                )}
+                {item.slug === 'aicte-idea-lab' && (
+                  <div className="dept-hero-cta animate-fade-in-up">
+                    <a
+                      href="#overview"
+                      className="btn-hero-gold"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        window.location.hash = 'overview';
+                        window.dispatchEvent(new HashChangeEvent('hashchange'));
+                        document.getElementById('idealab-main')?.scrollIntoView({ behavior: 'smooth' });
+                      }}
+                    >
+                      Explore the IDEA Lab →
+                    </a>
+                    <a
+                      href="#facilities"
+                      className="btn-hero-outline"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        window.location.hash = 'facilities';
+                        window.dispatchEvent(new HashChangeEvent('hashchange'));
+                        document.getElementById('idealab-main')?.scrollIntoView({ behavior: 'smooth' });
+                      }}
+                    >
+                      View Facilities →
+                    </a>
+                  </div>
+                )}
+                {item.slug === 'institution-innovation-cell' && (
+                  <div style={{ marginTop: '1.2rem' }}>
+                    <a href="#iic-main" className="btn btn-accent" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+                      Explore IIC Initiatives <ArrowRight size={16} />
+                    </a>
+                  </div>
                 )}
               </div>
             </div>
@@ -1025,19 +1074,33 @@ export default function DifferentiatorDetail() {
       {isForeignLanguages ? (
         <ForeignLanguagesFooter />
       ) : (
-        <section style={{ background: 'var(--color-primary)', padding: (item.slug === 'meda-plm-coe' || item.slug === 'vsac' || item.slug === 'vehicle-design-lab' || item.slug === 'dream-house-lab' || item.slug === 'hpc-lab' || item.slug === 'aicte-idea-lab' || item.slug === 'institution-innovation-cell') ? 'var(--space-6) 0' : 'var(--space-14) 0' }}>
+        <section style={{ background: 'var(--color-primary)', padding: (item.slug === 'meda-plm-coe' || item.slug === 'microchip-embedded' || item.slug === 'vsac' || item.slug === 'vehicle-design-lab' || item.slug === 'dream-house-lab' || item.slug === 'hpc-lab' || item.slug === 'aicte-idea-lab' || item.slug === 'institution-innovation-cell') ? 'var(--space-6) 0' : 'var(--space-14) 0' }}>
           <div className="container" style={{ textAlign: 'center' }}>
             <div>
               <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>
-                Explore More Differentiators
+                {item.slug === 'aicte-idea-lab' ? 'Explore Innovation at VWU' : 'Explore More Differentiators'}
               </h2>
-              <p style={{ color: 'rgba(255,255,255,0.75)', maxWidth: 520, margin: '0 auto var(--space-6)' }}>
-                Discover all the unique initiatives, labs, and centres that make VWU an extraordinary place to learn and grow.
+              <p style={{ color: 'rgba(255,255,255,0.75)', maxWidth: 620, margin: '0 auto var(--space-6)' }}>
+                {item.slug === 'aicte-idea-lab'
+                  ? 'Discover the labs, centres and initiatives that extend learning beyond the classroom and support innovation, research and experiential education.'
+                  : (item.slug === 'meda-plm-coe' || item.slug === 'microchip-embedded')
+                  ? 'Discover the laboratories, centres and initiatives that strengthen experiential learning, industry engagement and innovation at VWU.'
+                  : item.slug === 'institution-innovation-cell'
+                  ? 'Discover the initiatives, laboratories and centres that support innovation, experiential learning and academic development at VWU.'
+                  : item.slug === 'ti-dsp-coe'
+                  ? 'Discover the laboratories, centres and academic initiatives that strengthen experiential learning, research and industry engagement at VWU.'
+                  : 'Discover all the unique initiatives, labs, and centres that make VWU an extraordinary place to learn and grow.'}
               </p>
               <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
-                <Link to="/differentiators" className="btn btn-accent">All Differentiators</Link>
-                <Link to="/apply-now" className="btn btn-secondary">Apply Now</Link>
-                <Link to="/academics" className="btn btn-secondary">Academics</Link>
+                <Link to="/differentiators" className="btn btn-accent">
+                  {(item.slug === 'aicte-idea-lab' || item.slug === 'meda-plm-coe' || item.slug === 'microchip-embedded' || item.slug === 'institution-innovation-cell' || item.slug === 'ti-dsp-coe') ? 'Explore All Differentiators →' : 'All Differentiators'}
+                </Link>
+                <Link to="/academics" className="btn btn-secondary">
+                  {(item.slug === 'aicte-idea-lab' || item.slug === 'meda-plm-coe' || item.slug === 'microchip-embedded' || item.slug === 'institution-innovation-cell' || item.slug === 'ti-dsp-coe') ? 'Explore Academics →' : 'Academics'}
+                </Link>
+                {item.slug !== 'aicte-idea-lab' && item.slug !== 'meda-plm-coe' && item.slug !== 'microchip-embedded' && item.slug !== 'institution-innovation-cell' && item.slug !== 'ti-dsp-coe' && (
+                  <Link to="/apply-now" className="btn btn-secondary">Apply Now</Link>
+                )}
               </div>
             </div>
           </div>

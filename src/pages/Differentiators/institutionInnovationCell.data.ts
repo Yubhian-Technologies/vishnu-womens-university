@@ -1,24 +1,33 @@
 // Rich hardcoded content for the Institution Innovation Cell differentiator
 // page (slug: institution-innovation-cell) — overrides that item's generic
 // Firestore intro/about text in DifferentiatorDetail.tsx.
+
 export const institutionInnovationCell = {
-  about: "The MHRD's National Innovation and Startup Policy is a guiding framework that needs to be put into place in institutions to help with actions related to innovation and entrepreneurship. According to this framework, the Institution Innovation Council of SVECW takes on the task of building an environment for innovation and entrepreneurship. This is made possible by VISHVA TBI, which was started at the college under NIDHI TBI, and the Entrepreneurship Development Cell.",
+  aboutTitle: "About the Institution's Innovation Council",
+  about: [
+    "The Institution's Innovation Council (IIC) promotes a structured culture of innovation, entrepreneurship and start-up development among students and faculty.",
+    "Established at the institution in the academic year 2018–2019, the IIC supports participation in innovation programmes and also facilitates institution-led initiatives that encourage ideation, problem-solving, entrepreneurship and collaboration.",
+    "The Council works alongside the institution's wider innovation ecosystem, including VISHVA TBI and the Entrepreneurship Development Cell, to help transform promising ideas into meaningful academic and entrepreneurial opportunities.",
+  ],
   vision: [
-    'To be recognized as a leading institution in the environment for promoting innovation and to spread the spirit of entrepreneurship in the campus.',
-    'To make products and technologies that meet the needs of society by offering the innovative minds to be job providers.',
+    "To cultivate a strong institutional environment for innovation and entrepreneurship and encourage the development of solutions that respond to societal needs.",
   ],
   mission: [
-    'Organise regular workshops, seminars, and interactive sessions with entrepreneurs, investors, and professionals to facilitate the dissemination and cultivation of creative ideas.',
-    'Engage in professional networking activities with professionals and established national organisations focused on fostering entrepreneurship.',
-    'Organize idea contests and Project Exhibitions to showcase the innovative ideas.',
-    'Create an ecosystem that will foster entrepreneurial spirit among Faculty and Students.',
-    'Offer mentorship to translate ideas into products and services that cater to the needs of the society.',
+    "Organise workshops, seminars and interactive sessions with entrepreneurs, investors and professionals to expose students and faculty to innovation and entrepreneurship.",
+    "Build professional networks with organisations and experts working in entrepreneurship and innovation.",
+    "Conduct idea competitions, project exhibitions and related programmes that provide opportunities to present innovative solutions.",
+    "Strengthen an institutional ecosystem that encourages entrepreneurial thinking among students and faculty.",
+    "Provide mentoring support to help promising ideas progress towards viable products, services and solutions.",
   ],
-  journeyTitle: 'Journey of IIC established at the Institute',
-  journey: "The Institution's Innovation Council (IIC) is one of the Unique Initiatives of MoE's Innovation Cell, Govt. of India to promote Innovation, Start-up and Entrepreneurship activities. Our college registered for IIC in A.Y: 2018-2019, to promote the vision of IIC in terms of Innovation, Start-up and Entrepreneurship among faculty members and students. College got a star rating of 4 out of 5 in IIC 5.0 and ranked in the band of 151-300 in the category of NIRF Innovation ranking 2023. Faculty and Students actively take part in various programs conducted by MIC, IIC and the college also conducts related activities on its own as self-driven activities.",
+  journeyTitle: "Our Innovation Journey",
+  journey: [
+    "Since its registration in 2018–2019, the IIC has developed as a platform connecting students and faculty with opportunities in innovation and entrepreneurship.",
+    "Its activities include institution-led programmes as well as participation in initiatives facilitated through the Ministry of Education's Innovation Cell. Through these engagements, the IIC continues to encourage students and faculty to explore ideas, interact with mentors and strengthen their understanding of innovation and entrepreneurship.",
+  ],
   constitution: {
-    intro: 'As per the Institutions Innovation Council, Ministry of Education guidelines the institute has formulated the IIC council. The IIC council is comprised up with the following members.',
-    heading: 'Key Functionaries of the IIC',
+    title: "IIC Council",
+    intro: "In accordance with the applicable Institution's Innovation Council framework, the institution has constituted an IIC comprising academic leaders, faculty members and designated coordinators responsible for supporting its innovation and entrepreneurship initiatives.",
+    heading: "Key Functionaries",
     chairman: { name: 'Sri K. V. Vishnu Raju', role: 'Chairman' },
     leadership: [
       { name: 'Dr. G. Srinivasa Rao', role: 'Head of the Institute (HOI)' },
@@ -34,23 +43,60 @@ export const institutionInnovationCell = {
       { name: 'Dr. G. Durga Prasad', role: 'NISP Coordinator' },
       { name: 'Mr. Ch. Anudeep', role: 'Startup Activity Coordinator' },
     ],
-    // The "Click here to view" council members PDF link is now
-    // admin-editable — see IicDocumentsAdmin.tsx (iicCouncilMembersLinks).
   },
-  // Innovation Ambassadors' role description, responsibilities, and the
-  // caption above the PDF links are now admin-editable Custom Sections on
-  // that tab (Admin -> Differentiators -> Institution Innovation Cell ->
-  // Tabs -> Innovation Ambassadors) — the Faculty/Student PDF links
-  // themselves were already admin-editable, see IicDocumentsAdmin.tsx
-  // (iicInnovationAmbassadorLinks).
+  ambassadors: {
+    title: "Innovation Ambassadors",
+    intro: "Innovation Ambassadors help extend the culture of innovation across the institution by supporting awareness, mentoring and engagement with innovation-related programmes.",
+    rolesTitle: "Their role includes:",
+    roles: [
+      "promoting innovation and entrepreneurship among students and faculty",
+      "mentoring and guiding participants in relevant initiatives",
+      "supporting knowledge-sharing across innovation networks",
+      "encouraging participation in competitions and innovation programmes",
+      "contributing as resource persons or evaluators where appropriate",
+    ],
+  },
   activities: {
-    intro: 'The Institute Innovation Council (IIC) plays a pivotal role in fostering an inclusive environment that actively engages faculty, students, and staff in a diverse array of innovation and entrepreneurship initiatives. These encompass ideation, problem-solving, proof of concept development, design thinking, intellectual property rights (IPR) considerations, and adept project handling and management, particularly during the critical pre-incubation and incubation stages. Through these multifaceted activities, the IIC cultivates a dynamic ecosystem conducive to the exploration and realization of innovative ideas within our college community.',
-    // Year-by-year IIC Activities PDFs are now admin-editable — see
-    // IicDocumentsAdmin.tsx (iicActivities).
+    title: "IIC Activities",
+    paragraphs: [
+      "The IIC conducts and supports activities that engage students, faculty and staff across different stages of the innovation process.",
+      "Key areas include ideation, design thinking, problem-solving, proof-of-concept development, intellectual property awareness, entrepreneurship, project development, pre-incubation and incubation-oriented activities.",
+      "These initiatives provide opportunities to explore ideas, interact with mentors and develop a stronger understanding of innovation and entrepreneurship in practice.",
+    ],
+    subheading: "Activity Reports",
+  },
+  supportsInnovation: {
+    title: "How the IIC Supports Innovation",
+    items: [
+      {
+        title: "Ideation & Problem-Solving",
+        description: "Encouraging students and faculty to identify problems, explore possibilities and develop innovative approaches.",
+      },
+      {
+        title: "Mentoring & Expert Interaction",
+        description: "Connecting participants with faculty mentors, professionals, entrepreneurs and innovation networks.",
+      },
+      {
+        title: "Innovation Programmes",
+        description: "Creating opportunities to participate in workshops, competitions, hackathons, exhibitions and related initiatives.",
+      },
+      {
+        title: "Entrepreneurship & Start-up Awareness",
+        description: "Building understanding of entrepreneurship, start-up development and pathways for progressing promising ideas.",
+      },
+      {
+        title: "Collaboration & Outreach",
+        description: "Extending the innovation ecosystem through institutional partnerships and school mentorship initiatives.",
+      },
+    ],
   },
   atalTinkeringSchools: {
-    intro: 'We are proud to announce our partnership with Atal Tinkering Labs as part of the AICTE Institution Innovation Councils (IICs) initiative. Through this collaboration, we are dedicated to empowering and mentoring school student innovators. Atal Tinkering Labs serve as vibrant centers of creativity and innovation, where young minds are encouraged to explore, experiment, and create. By providing guidance, resources, and mentorship through our IICs, we aim to inspire and support the next generation of innovators. Together, we are fostering a culture of innovation and entrepreneurship, ensuring that students have the tools and support they need to transform their ideas into impactful solutions',
-    listHeading: 'List of ATL Schools',
+    title: "Atal Tinkering Lab School Mentorship",
+    paragraphs: [
+      "Through its school mentorship engagement, the IIC supports young learners in exploring creativity, experimentation, problem-solving and innovation.",
+      "Faculty mentors engage with associated Atal Tinkering Labs to provide guidance and help school students strengthen their understanding of innovation and develop ideas through practical exploration.",
+    ],
+    listHeading: "List of ATL Schools",
     schools: [
       {
         sno: 1,
@@ -81,12 +127,20 @@ export const institutionInnovationCell = {
       },
     ],
   },
-  // Rating Certificates, IIC Annual Reports, SIH Internal Hackathon Reports,
-  // and NISP policy links are now admin-editable (label + PDF) — see
-  // IicDocumentsAdmin.tsx — rather than hardcoded here. Only the NISP tab's
-  // heading text remains static.
   nisp: {
-    heading: 'NISP - National Innovation Start-Up Policy',
+    heading: 'National Innovation and Start-up Policy (NISP)',
+    subheading: 'Access institutional and government policy documents related to innovation and start-up development.',
+  },
+  rating: {
+    heading: 'Recognition & Rating Documents',
+    subheading: 'Access official IIC rating certificates, appreciation letters and related institutional recognition documents.',
+  },
+  annualReports: {
+    heading: 'IIC Annual Reports',
+    subheading: 'Access the Institution\'s Innovation Council annual reports and documentation.',
+  },
+  sih: {
+    heading: 'Smart India Hackathon: Internal Hackathon Reports',
+    subheading: 'Access institutional documentation related to the internal Smart India Hackathon process.',
   },
 };
-

@@ -1,0 +1,8 @@
+/* =========================================================
+   Happenings Page Styling
+   ========================================================= */
+
+.happenings-page {
+  background: var(--color-bg-light, #f8fafc);
+  min-height: 100vh;
+}
