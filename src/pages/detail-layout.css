@@ -1528,7 +1528,7 @@ td.pb-activities-num {
 
 .dept-recruiters-grid--circular .dept-recruiter-tile--named img {
   object-fit: contain;
-  padding: 1rem;
+  padding: 0.1rem 0.3rem;
 }
 
 .dept-recruiters-grid--circular .dept-recruiter-tile--fallback {

@@ -23,13 +23,14 @@
 .si-top-hero-banner {
   position: relative;
   width: 100%;
-  min-height: 480px;
+  min-height: 540px;
   background-color: var(--si-navy-dark);
   overflow: hidden;
   display: flex;
   align-items: flex-end;
-  padding: 4.5rem 2rem;
-  box-shadow: 0 12px 36px rgba(11, 23, 38, 0.35);
+  padding: 5rem 3rem;
+  box-shadow: 0 14px 40px rgba(11, 23, 38, 0.35);
+  margin-top: -1rem;
 }
 
 .si-top-hero-bg {
@@ -51,14 +52,14 @@
   height: 100%;
   background: linear-gradient(
     90deg,
-    rgba(11, 23, 38, 0.94) 0%,
-    rgba(11, 23, 38, 0.78) 55%,
-    rgba(11, 23, 38, 0.5) 100%
+    rgba(11, 23, 38, 0.95) 0%,
+    rgba(11, 23, 38, 0.8) 55%,
+    rgba(11, 23, 38, 0.48) 100%
   ),
   linear-gradient(
     0deg,
-    rgba(11, 23, 38, 0.85) 0%,
-    transparent 60%
+    rgba(11, 23, 38, 0.88) 0%,
+    transparent 65%
   );
   z-index: 1;
 }
@@ -66,7 +67,7 @@
 .si-top-hero-container {
   position: relative;
   z-index: 2;
-  max-width: 1200px;
+  max-width: 1400px;
   width: 100%;
   margin: 0 auto;
   display: flex;
@@ -77,35 +78,35 @@
 .si-top-hero-badge {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.55rem;
   background-color: #d97706;
   color: #0f172a;
-  font-size: 0.75rem;
+  font-size: 0.775rem;
   font-weight: 800;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  padding: 0.4rem 1.1rem;
+  padding: 0.45rem 1.25rem;
   border-radius: 9999px;
-  margin-bottom: 1.25rem;
-  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.35);
+  margin-bottom: 1.35rem;
+  box-shadow: 0 4px 16px rgba(217, 119, 6, 0.35);
 }
 
 .si-top-hero-title {
   font-family: var(--font-serif, Georgia, serif);
-  font-size: clamp(2.25rem, 4.2vw, 3.4rem);
+  font-size: clamp(2.4rem, 4.5vw, 3.6rem);
   font-weight: 700;
   color: #ffffff;
-  margin: 0 0 1rem 0;
-  line-height: 1.15;
-  letter-spacing: -0.01em;
+  margin: 0 0 1.15rem 0;
+  line-height: 1.12;
+  letter-spacing: -0.015em;
 }
 
 .si-top-hero-desc {
-  font-size: clamp(0.95rem, 1.3vw, 1.1rem);
-  line-height: 1.65;
-  color: rgba(255, 255, 255, 0.92);
+  font-size: clamp(1rem, 1.4vw, 1.18rem);
+  line-height: 1.68;
+  color: rgba(255, 255, 255, 0.94);
   margin: 0;
-  max-width: 860px;
+  max-width: 1150px;
 }
 
 /* SECTION 1: HERO OVERVIEW BLOCK (DARK NAVY) */
@@ -118,7 +119,7 @@
 }
 
 .si-hero-container {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
 }
 
@@ -295,7 +296,7 @@
 
 /* SECTION 2: TRAINING PHASES ROADMAP */
 .si-roadmap-section {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 4rem 1.5rem;
 }
@@ -434,7 +435,7 @@
 
 /* SECTION 3: NAVIGATION LINKS GRID */
 .si-nav-section {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto 4rem auto;
   padding: 0 1.5rem;
 }
@@ -561,7 +562,7 @@
 
 /* SECTION 4: HIGHLIGHT STATS BANNER */
 .si-banner-section {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto 4.5rem auto;
   padding: 0 1.5rem;
 }
@@ -666,7 +667,7 @@
 }
 
 .si-cta-container {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   display: flex;
   justify-content: space-between;

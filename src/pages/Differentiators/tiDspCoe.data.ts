@@ -1,6 +1,7 @@
 // Rich hardcoded content for the TI-DSP Centre of Excellence
 // differentiator page (slug: ti-dsp-coe) — overrides that item's generic
 // Firestore intro/about text in DifferentiatorDetail.tsx.
+
 export interface TiDspFacultyMember {
   name: string;
   designation?: string;
@@ -29,18 +30,48 @@ export interface IicdcBatch {
 }
 
 export const tiDspCoe = {
-  overview: 'The Texas Instruments (TI) Digital Signal Processing (DSP) Lab is a pioneering facility focused on advancing DSP research and innovation. It serves as a hub for developing cutting-edge algorithms, processors, and systems in telecommunications, audio, Video, and image processing. Equipped with state-of-the-art tools, the Lab fosters collaborations with academia and industry, helps Students to drive breakthroughs in signal processing theory and practice.',
-  vision: 'Transforming academia through pioneering research, collaboration, and education in digital signal processing',
+  aboutTitle: 'About the Centre',
+  overview: [
+    'The Texas Instruments Digital Signal Processing (TI-DSP) Centre of Excellence supports teaching, research and project development in digital signal processing and related applications.',
+    'The Centre provides students and faculty with access to DSP development platforms, MATLAB resources, microcontroller boards and application-specific development kits for work in areas such as speech processing, image processing, communication systems, embedded applications and signal-processing algorithms.',
+    'Through academic projects, workshops and funded research, the Centre provides an environment in which students can apply theoretical concepts to practical signal-processing problem solving.',
+  ],
+  vision: 'To strengthen academic learning and research in digital signal processing through experimentation, interdisciplinary collaboration and application-oriented innovation.',
   mission: [
-    'Advance DSP research through interdisciplinary collaboration.',
-    'Empower students with DSP expertise for industry.',
-    'Innovate DSP solutions for societal challenges.',
+    'Advance DSP research through interdisciplinary academic and technical collaboration.',
+    'Develop student competencies in signal processing through hands-on learning, projects and specialised tools.',
+    'Apply DSP technologies to relevant engineering and societal challenges.',
+    'Encourage research, experimentation and knowledge sharing among students and faculty.',
   ],
   objectives: [
-    'Advance DSP algorithms: Develop novel algorithms to enhance signal processing efficiency and performance across various applications.',
-    'Collaborative research: Foster partnerships with academia and industry to address emerging challenges and push the boundaries of DSP technology.',
-    'Educational outreach: Offer workshops, seminars, and resources to educate students, professionals, and the broader community about DSP theory and applications.',
+    'Advance DSP Research: Support research and experimentation in speech, image and signal-processing techniques and their applications.',
+    'Strengthen Student Technical Learning: Provide students with practical exposure to DSP platforms, MATLAB, development kits and project-based problem solving.',
+    'Encourage Collaborative Research: Promote interdisciplinary work among faculty, students and external organisations in areas related to signal processing and embedded applications.',
+    'Facilitate Knowledge Sharing: Conduct workshops, technical programmes and hands-on sessions that extend DSP learning beyond the regular curriculum.',
   ],
+  keyHighlights: [
+    '₹10 lakh AICTE-MODROBS funding received for laboratory modernisation',
+    'Campus MATLAB licence supporting student and faculty academic work',
+    '233 students trained across 60 batches',
+    'Winner, TI India Analog Maker Competition 2014',
+    '₹53 lakh DST research grant for telephony speech enhancement',
+    '21 project batches registered for IIDCC 2019',
+  ],
+  facilitiesEquipment: [
+    'TI DSP Starter Kits',
+    'TMS320C6713 DSKs',
+    'Analog Starter Kits',
+    'MSP430 microcontroller boards and LaunchPads',
+    'RFID Evaluation Kits',
+    'Bluetooth transceivers',
+    'Medical-imaging development platforms',
+    'MATLAB campus licence',
+  ],
+  industryAssociation: {
+    title: 'Industry Association',
+    partner: 'Texas Instruments, India',
+    description: "Texas Instruments has contributed to the Centre's technical development through DSP platforms, development resources and support associated with student learning and project activities.",
+  },
   team: {
     inCharge: {
       name: 'E. R. Praveen Kumar',
@@ -73,42 +104,56 @@ export const tiDspCoe = {
       },
     ] as TiDspFacultyMember[],
   },
-  accordionSections: [
-    'Training / Research or Academic Projects [Completed / Ongoing]',
-    'Collaborations [National / International]',
-    'Social Impacts',
-    'Outcomes',
-    'Activities',
-    'Gallery',
-  ] as string[],
-  accordionContent: {
-    'Collaborations [National / International]': [
-      'The TI- DSP lab initially consisted of Five TMS320C6713 DSK kits along with accessories and then it received six Analog Starter Kits from Texas Instruments, India as donation. The Lab had thirty six Personal Computers a Cathode Ray Oscilloscope and Function generator other than the boards. Later, the Lab received a funding of Rs10 Lakhs in MODROBS from AICTE, New Delhi for modernizing the laboratory. Then, the following boards are purchased from Texas Instruments, India to enhance the lab facilities along with improving the research and development status of the lab.',
+  labDevelopment: [
+    'The TI-DSP Centre was initially equipped with TMS320C6713 DSKs and associated accessories. Its facilities were subsequently expanded through additional development platforms, including Analog Starter Kits and other hardware from Texas Instruments.',
+    'The laboratory also received ₹10 lakh under the AICTE-MODROBS scheme for modernisation. This support enabled the Centre to strengthen its infrastructure and expand facilities for teaching, project development and research.',
+    'Texas Instruments resources and development platforms have continued to support practical DSP learning and project implementation within the Centre.',
+  ],
+  societalImpact: [
+    'A significant research focus of the Centre is telephony speech enhancement for people with hearing impairment, supported through a ₹53 lakh DST-funded research project.',
+    'The work explores signal-processing techniques intended to improve speech clarity and communication accessibility in telephony applications. It demonstrates how DSP research can be directed towards engineering solutions with meaningful social applications.',
+  ],
+  researchOutputs: {
+    title: 'Research Outputs & Publications',
+    intro: 'Research associated with the Centre has resulted in publications and conference presentations in areas including:',
+    areas: [
+      'power-quality event classification;',
+      'real-time image enhancement;',
+      'image fusion and medical-image processing;',
+      'telephony speech enhancement;',
+      'speech processing for elderly and hearing-impaired users; and',
+      'assistive communication technologies.',
     ],
-    'Social Impacts': [
-      'The DST-sponsored lab, with a 53 lakh budget, researching Telephony Speech Enhancement for Hearing Impaired individuals, promises significant social impact. By improving communication accessibility, it empowers the hearing impaired, fostering inclusion and enhancing their quality of life. This innovative initiative bridges gaps in technology and societal needs.',
+    publications: [
+      'M.Venkata Subbarao, Chinimilli Pravallika, D.Ramesh Varma and M.Prema Kumar, "Power Quality Event Classification using Wavelets, Decision Trees and SVM Classifiers", 9th International Conference on Innovations in Electronics and Communication Engineering (ICIECE-2021), Guru Nanak Institutions, Hyderabad, August 13–14, 2021.',
+      'D.Girish Kumar and M.Venkata Subbarao, "Real-Time Image Enhancement using DCT Techniques for Video Surveillance", 6th International Conference on Micro-Electronics, Electromagnetics and Telecommunications (ICMEET-2021), Bhubaneswar Engineering College, Odisha, August 27–28, 2021.',
+      'M. Prema Kumar, V. Veer Raju, M.Venkata Subbarao and P. Rajesh Kumar, "Weighted Averaging PSO Based SWT Method of Image Fusion for X-ray Mammograms", 6th International Conference on Micro-Electronics, Electromagnetics and Telecommunications (ICMEET-2021), Bhubaneswar Engineering College, Odisha, August 27–28, 2021.',
+      'N. Prasad et al., "Adaptive Data Hiding Based Telephony Speech Enhancement", Turkish Journal of Computer and Mathematics Education, 12(3), 3913–3923, 2021.',
+      'N. Prasad, E. Praveen Kumar, P. Sitaramanjaneyulu and G. R. L. V. N. Srinivasa Raju, "Telephony Speech Enhancement for Hearing-Impaired People", 5th International Conference on Computing, Communication and Security (ICCCS), Patna, India, 2020.',
+      'R. P. K. Emani, P. Telagathoti and N. Prasad, "Telephony Speech Enhancement for Elderly People", 4th International Conference on Computer, Communication and Signal Processing (ICCCSP), Chennai, India, 2020, pp. 1–4, doi: 10.1109/ICCCSP49186.2020.9315269.',
+      'R. P. K. Emani, P. Telagathoti and N. Prasad, "Performance Assessment of Simulink Based Speech Radio Band Extension Technique on Elderly People", International Conference on Inventive Computation Technologies (ICICT), Nepal, 2022, pp. 800–804, doi: 10.1109/ICICT54344.2022.9850946.',
+      'R. P. K. Emani, P. Telagathoti and N. Prasad, "Performance Evaluation of Speech Radio band extension technique using Simulink", 2nd International Conference on Artificial Intelligence and Signal Processing (AISP), Vijayawada, India, 2022, pp. 1–5, doi: 10.1109/AISP53593.2022.9760573.',
+      'P. Kotipalli, E.R. Praveen Kumar, M.A.S. Mohan Raju and D. Murali Krishna, "Supportive Communication System for the Elderly Disabled People", Smart Intelligent Computing and Applications, Smart Innovation, Systems and Technologies, vol 104, Springer, Singapore, 2019, doi: 10.1007/978-981-13-1921-1_45.',
     ],
-    'Outcomes': [
-      'M.Venkata Subbarao, Chinimilli Pravallika, D.Ramesh Varma and M.Prema Kumar "Power Quality Event Classification using Wavelets, Decision Trees and SVM Classifiers", 9th International Conference on Innovations in Electronics and Communication Engineering, Organized by Guru Nanak Institutions Technical Campus, Hyderabad during August 13-14, 2021.',
-      'D.Girish Kumar and M.Venkata Subbarao "Real-Time Image Enhancement using DCT Techniques for Video Surveillance" in 6th International Conference on Micro-Electronics, Electromagnetics and Telecommunications(ICMEET – 2021) Organized by Bhubaneswar Engineering College, Bhubaneswar, Odisha, India during 27-28 August, 2021.',
-      'M. Prema Kumar, V. Veer Raju, M.Venkata Subbarao and P. Rajesh Kumar "Weighted Averaging PSO Based SWT Method of Image Fusion for X-ray Mammograms" in 6th International Conference on Micro-Electronics, Electromagnetics and Telecommunications(ICMEET – 2021) Organized by Bhubaneswar Engineering College, Bhubaneswar, Odisha, India during 27-28 August, 2021.',
-      'et.al, N P. (2021). Adaptive Data Hiding Based Telephony Speech Enhancement. Turkish Journal of Computer and Mathematics Education, 12(3), 3913–3923. Retrieved from https://turkomat.org/index.php/turkbilmat/article/view/1680.',
-      'N Prasad., E. Praveen Kumar., P. Sitaramanjaneyulu. and G. R. L. V. N. Srinivasa Raju., "Telephony Speech Enhancement for Hearing-Impaired People," 2020 5th International Conference on Computing, Communication and Security (ICCCS), Patna, India, 2020.',
-      'R. P. K. Emani, P. Telagathoti and N. Prasad, "Telephony Speech Enhancement for Elderly People," 2020 4th International Conference on Computer, Communication and Signal Processing (ICCCSP), Chennai, India, 2020, pp. 1-4, doi: 10.1109/ICCCSP49186.2020.9315269.',
-      'R. P. K Emani, P. Telagathoti and N. Prasad, "Performance Assessment of Simulink Based Speech Radio Band Extension Technique on Elderly People," 2022 International Conference on Inventive Computation Technologies (ICICT), Nepal, 2022, pp. 800-804, doi: 10.1109/ICICT54344.2022.9850946.',
-      'R. P. K. Emani, P. Telagathoti and N. Prasad, "Performance Evaluation of Speech Radio band extension technique using Simulink," 2022 2nd International Conference on Artificial Intelligence and Signal Processing (AISP), Vijayawada, India, 2022, pp. 1-5, doi: 10.1109/AISP53593.2022.9760573.',
-      'Kotipalli, P., Praveen Kumar, E.R., Mohan Raju, M.A.S., Murali Krishna, D. (2019). Supportive Communication System for the Elderly Disabled People. In: Satapathy, S., Bhateja, V., Das, S. (eds) Smart Intelligent Computing and Applications. Smart Innovation, Systems and Technologies, vol 104. Springer, Singapore. https://doi.org/10.1007/978-981-13-1921-1_45',
+  },
+  trainingActivities: {
+    title: 'Training & Academic Activities',
+    activities: [
+      { title: 'One-Day Training Programme on DSP Processors and Their Applications' },
+      { title: 'Two-Day Workshop on Analog Electronics Application Tools' },
+      { title: 'Two-Day Student Workshop on Speech Processing' },
+      { title: 'Two-Day Hands-on Workshop on Speech Recognition' },
     ],
-    'Activities': [
-      'A One Day Training Program on DSP Processors and their Applications',
-      'A Two Day workshop on Analog Electronics Application Tools.',
-      'A Two day student-workshop-on-speech-processing',
-      'A Two day workshop on speech recognition hands on experience.',
-    ],
-  } as Record<string, string[]>,
+  },
   trainingResearch: {
+    title: 'Student Projects & Research',
+    paragraphs: [
+      'The Centre supports undergraduate and postgraduate project work in areas related to speech processing, image processing, DSP applications, embedded systems and communication technologies.',
+      'A campus MATLAB licence supports computational work and project development, while DSP Starter Kits, evaluation platforms, MSP430 microcontroller boards, LaunchPads, RFID kits and Bluetooth transceivers provide opportunities for hands-on implementation.',
+      'Students have also participated in specialised learning activities such as speech-processing and machine-learning workshops using MATLAB.',
+    ],
+    archiveTitle: 'Year-wise Project Archive',
     workshopTitle: 'Student Workshop on Speech Processing and Machine learning for Speech Processing using MATLAB',
-    intro: 'The TI Lab is now equipped with a campus license of MATLAB, offering unlimited access to users. This resource enriches student projects, with most undergraduate major projects leveraging its capabilities for enhanced outcomes. The students are carrying out some projects in TI DSP lab at our institution. The Post graduate students are also doing projects in this lab along with the under graduate students. The lab is equipped with TI DSP Starter Kits which include heterogeneous and medical imaging platforms, RFID Evaluation Kits, Bluetooth Transceivers, MSP430F microcontroller boards and also Launch Pads. So, there is a large scope of areas for the students to take up their projects.',
     years: [
       {
         label: 'AY- 2011-2012',
