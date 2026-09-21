@@ -91,7 +91,7 @@ const DEFAULT_ADMISSIONS_FAQS: FaqDoc[] = [
 
 const DEFAULT_TUITION_DATA = [
   { id: 'tuition-visw', title: 'B.Tech. (VISW)', value: '₹ 1,05,000', order: 1 },
-  { id: 'tuition-viswpu', title: 'B.Tech. (VISWPU)', value: '₹ 45,000', order: 2 },
+  { id: 'tuition-viswpu', title: 'B.Tech. (VISWPU)', value: '₹ 47,000', order: 2 },
   { id: 'tuition-mtech', title: 'M.Tech. (per year)', value: '₹ 55,800', order: 3 },
   { id: 'tuition-mba', title: 'MBA (per year)', value: '₹ 55,000', order: 4 },
   { id: 'tuition-pmv', title: 'PM Vidyalaxmi Scheme', value: 'Available', order: 5 },
@@ -114,14 +114,19 @@ export default function Admissions() {
       rawTuitionData.forEach((row) => {
         if (row.title?.includes('B.Tech') && !row.title?.includes('VISW')) {
           mapped.push({ id: `${row.id}-visw`, title: 'B.Tech. (VISW)', value: '₹ 1,05,000' });
-          mapped.push({ id: `${row.id}-viswpu`, title: 'B.Tech. (VISWPU)', value: '₹ 45,000' });
+          mapped.push({ id: `${row.id}-viswpu`, title: 'B.Tech. (VISWPU)', value: '₹ 47,000' });
         } else {
           mapped.push({ id: row.id, title: row.title || '', value: row.value || '' });
         }
       });
       return mapped;
     }
-    return rawTuitionData;
+    return rawTuitionData.map((row) => {
+      if (row.title?.includes('VISWPU') && (row.value?.includes('45,000') || !row.value)) {
+        return { ...row, value: '₹ 47,000' };
+      }
+      return row;
+    });
   }, [rawTuitionData]);
   const admissionHub = useContentBlocks('admissions', 'admissionHub');
   const visitOptions = useContentBlocks('admissions', 'visitOptions');
