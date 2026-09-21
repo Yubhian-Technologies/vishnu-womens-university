@@ -39,15 +39,9 @@ export default function Happenings() {
   const upcoming = happenings.filter(h => h.type === 'upcoming' && isUpcomingHappening(h));
 
   return (
-    <main className="page-wrapper">
-      {/* Hero */}
-      <PageHero
-        page="news-awards-happenings"
-        defaultTitle="Happenings at VWU"
-  defaultSubtitle="Workshops, MoUs, competitions, achievements, and institutional milestones — a running record of life at VWU."
-        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'News & Awards', to: '/news-awards' }, { label: 'Happenings' }]}
-        hideCta
-      />
+    <main className="page-wrapper happenings-page">
+      {/* Event & Achievement Poster Showcase Banner (SVECW Style) */}
+      <HappeningsPosterSlider />
 
       {/* Upcoming Events */}
       {upcoming.length > 0 && (
