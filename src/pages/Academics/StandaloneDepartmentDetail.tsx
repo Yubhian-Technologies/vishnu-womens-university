@@ -4,6 +4,7 @@ import { Check, Sparkles, Mail, BookOpen, Hash, ChevronDown } from 'lucide-react
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import FacultyCarousel from '../../components/FacultyCarousel/FacultyCarousel';
 import LabsCarousel from '../../components/LabsCarousel/LabsCarousel';
+import { ResearchSection } from './DepartmentDetail';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useEapcetCode } from '../../hooks/useContentBlocks';
 import { normalizeLab, type NewsEventsYear } from '../Admin/sections/ProgramsAdmin';
@@ -334,6 +335,11 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
           description="Industry-aligned experimental facilities engineered for hands-on technical immersion and practical learning."
         />
       )}
+
+      {/* Research & Innovation — same admin-entered stats/slides as the
+          grouped department pages (Admin → Academic Departments → Research
+          & Innovation), just never rendered here before. */}
+      <ResearchSection deptName={deptName} heroImage={dept.heroImage || ''} stats={dept?.researchStats} slides={dept?.researchSlides} navOffset={NAV_OFFSET} />
 
       <CustomSectionsRenderer sections={visibleCustomSections} navOffset={NAV_OFFSET} />
 

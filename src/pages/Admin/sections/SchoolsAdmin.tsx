@@ -70,11 +70,16 @@ export default function SchoolsAdmin() {
   const save = async () => {
     if (!form.title) return alert('Title is required.');
     setSaving(true);
+    // Drop any departmentIds that no longer match a real `departments` doc
+    // (e.g. that department was since deleted) — those ids have no checkbox
+    // to uncheck, so without this they'd silently survive every save and
+    // inflate the department count forever.
+    const cleanedDepartmentIds = form.departmentIds.filter((id) => departmentById.has(id));
     try {
       if (editing) {
-        await updateDoc(doc(db, 'schools', editing), { ...form });
+        await updateDoc(doc(db, 'schools', editing), { ...form, departmentIds: cleanedDepartmentIds });
       } else {
-        await addDoc(collection(db, 'schools'), { ...form, order: form.order || schools.length, createdAt: serverTimestamp() });
+        await addDoc(collection(db, 'schools'), { ...form, departmentIds: cleanedDepartmentIds, order: form.order || schools.length, createdAt: serverTimestamp() });
       }
       setForm(EMPTY); setEditing(null);
     } catch (e) {
@@ -85,7 +90,8 @@ export default function SchoolsAdmin() {
   const startEdit = (s: SchoolDoc) => {
     setEditing(s.id);
     setForm({
-      title: s.title, description: s.description || '', order: s.order, departmentIds: s.departmentIds || [],
+      title: s.title, description: s.description || '', order: s.order,
+      departmentIds: (s.departmentIds || []).filter((id) => departmentById.has(id)),
       imageUrl: s.imageUrl || '', imageStoragePath: s.imageStoragePath || '',
     });
   };
@@ -208,7 +214,7 @@ export default function SchoolsAdmin() {
                 {schools.map((s) => (
                   <tr key={s.id}>
                     <td><strong>{s.title}</strong></td>
-                    <td>{(s.departmentIds || []).length}</td>
+                    <td>{(s.departmentIds || []).filter((id) => departmentById.has(id)).length}</td>
                     <td>{s.order}</td>
                     <td>
                       <button className="admin-btn admin-btn--sm" onClick={() => startEdit(s)}>Edit</button>
