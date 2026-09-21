@@ -59,7 +59,12 @@ export default function Schools() {
           </div>
         </section>
       ) : (
-        schools.map((school, i) => (
+        schools.map((school, i) => {
+          // Only count departmentIds that still resolve to a real
+          // `departments` doc — matches the dept-grid below, which already
+          // silently drops ids of departments that have since been deleted.
+          const validDeptCount = (school.departmentIds || []).filter((id) => departmentById.has(id)).length;
+          return (
           <section key={school.id} className={`section ${i % 2 === 0 ? 'bg-white' : 'bg-off-white'}`}>
             <div className="container">
               <div className={`school-header${school.imageUrl ? ' school-header--with-image' : ''}`} style={{ marginBottom: 'var(--space-10)' }}>
@@ -75,7 +80,7 @@ export default function Schools() {
                   <div className="academics-stat-row">
                     <span className="chip-badge">
                       <Layers size={14} strokeWidth={2} />
-                      {(school.departmentIds || []).length} Department{(school.departmentIds || []).length === 1 ? '' : 's'}
+                      {validDeptCount} Department{validDeptCount === 1 ? '' : 's'}
                     </span>
                   </div>
                 </div>
@@ -125,7 +130,8 @@ export default function Schools() {
               </div>
             </div>
           </section>
-        ))
+          );
+        })
       )}
     </main>
   );

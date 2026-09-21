@@ -182,7 +182,7 @@ function VmExpandableCard({ title, content }: { title: string; content: string |
 // (Admin → Academic Departments → Research & Innovation) — no mock/
 // placeholder content; renders nothing at all when a department has neither,
 // same as every other data-gated section on this page.
-function ResearchSection({
+export function ResearchSection({
   deptName,
   heroImage,
   stats = [],
