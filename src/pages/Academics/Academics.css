@@ -344,16 +344,37 @@
 }
 
 @media (max-width: 640px) {
+  /* .programs-tabs is a CSS Grid with equal-width columns sized to fit the
+     widest label ("B.Tech (10)") — on narrow screens that pushes the row
+     wider than the viewport and clips the last tab. `flex-wrap`/`overflow-x`
+     alone are no-ops on a grid container, so switch to a scrollable flex row
+     here instead (each tab sized to its own content). The sliding indicator's
+     default width/transform math assumes equal grid columns, so here it's
+     repositioned from --mobile-indicator-left/-width instead (set in
+     Academics.tsx from each button's actual measured offset/width) —
+     same sliding motion as the desktop pill, just pixel- instead of
+     percentage-based. */
   .programs-tabs {
+    display: flex;
     flex-wrap: nowrap;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     padding-bottom: var(--space-1);
     gap: var(--space-1);
+    max-width: 100%;
   }
   .programs-tabs::-webkit-scrollbar {
     display: none;
+  }
+  .programs-tabs-indicator {
+    left: var(--mobile-indicator-left, 4px);
+    width: var(--mobile-indicator-width, auto);
+    transform: none;
+    transition: left var(--transition-smooth), width var(--transition-smooth);
+  }
+  .prog-tab {
+    flex: 0 0 auto;
   }
   .dept-card {
     padding: clamp(1.1rem, 3.5vw, 1.4rem);

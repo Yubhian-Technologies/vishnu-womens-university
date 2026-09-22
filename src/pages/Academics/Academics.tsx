@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import './Academics.css';
 import PageHero from '../../components/PageHero/PageHero';
@@ -136,6 +136,28 @@ export default function Academics() {
   const initialTab = TABS.some((t) => t.id === requestedTab) ? requestedTab! : 'btech';
   const [activeTab, setActiveTab] = useState<string>(initialTab);
   const { docs: programs, loading } = useOrderedCollection<ProgramDoc>('programs', 'order');
+
+  // Below Academics.css's max-width:640px breakpoint, the tab row becomes a
+  // horizontally-scrollable flex row of variable-width tabs (see that file)
+  // instead of the desktop's equal-width grid columns — the desktop sliding
+  // indicator's percentage-based transform only works for equal columns, so
+  // on mobile it's positioned from each button's actual measured pixel
+  // offset/width instead, kept in sync via --mobile-indicator-left/-width.
+  const tabsRowRef = useRef<HTMLDivElement | null>(null);
+  const tabButtonRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const [mobileIndicator, setMobileIndicator] = useState<{ left: number; width: number } | null>(null);
+  useLayoutEffect(() => {
+    const measure = () => {
+      const btn = tabButtonRefs.current[activeTab];
+      if (btn) setMobileIndicator({ left: btn.offsetLeft, width: btn.offsetWidth });
+    };
+    measure();
+    const row = tabsRowRef.current;
+    if (!row || typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver(measure);
+    observer.observe(row);
+    return () => observer.disconnect();
+  }, [activeTab, programs.length]);
   const { docs: departments } = useOrderedCollection<DepartmentDoc>('departments', 'order');
   const academicsPhotos = useSitePhotos('academics', 'main', defaultAcademicsPhotos);
   const classroomsLabsPhotos = useSitePhotos('academics', 'classrooms-labs', defaultClassroomsLabsPhotos);
@@ -246,7 +268,15 @@ export default function Academics() {
 
           <div
             className="programs-tabs"
-            style={{ '--tab-count': TABS.length, '--active-index': Math.max(0, TABS.findIndex((t) => t.id === activeTab)) } as React.CSSProperties}
+            ref={tabsRowRef}
+            style={{
+              '--tab-count': TABS.length,
+              '--active-index': Math.max(0, TABS.findIndex((t) => t.id === activeTab)),
+              ...(mobileIndicator ? {
+                '--mobile-indicator-left': `${mobileIndicator.left}px`,
+                '--mobile-indicator-width': `${mobileIndicator.width}px`,
+              } : {}),
+            } as React.CSSProperties}
           >
             <div className="programs-tabs-indicator" aria-hidden="true" />
             {TABS.map((tab) => {
@@ -254,6 +284,7 @@ export default function Academics() {
               return (
                 <button
                   key={tab.id}
+                  ref={(el) => { tabButtonRefs.current[tab.id] = el; }}
                   className={`prog-tab${activeTab === tab.id ? ' active' : ''}`}
                   onClick={() => setActiveTab(tab.id)}
                 >
