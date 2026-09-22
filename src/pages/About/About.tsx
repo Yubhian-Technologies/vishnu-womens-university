@@ -80,6 +80,10 @@ export interface CoreExecutiveMember {
   /** Long-form description — rendered as paragraphs (split on blank lines)
       in the expanded executive detail banner. Managed from the admin. */
   description?: string;
+  /** Optional external profile link (LinkedIn, faculty page, etc.) —
+      shown as a highlighted link at the start of the description in the
+      expanded detail banner. Managed from the admin. */
+  linkUrl?: string;
 }
 
 export const defaultExecutives: Omit<CoreExecutiveMember, 'id'>[] = [
@@ -394,9 +398,20 @@ export default function About() {
                   )}
                 </div>
                 {activeExec.bio && <p className="exec-detail-banner__bio">{activeExec.bio}</p>}
-                {activeExec.description && (
+                {(activeExec.description || activeExec.linkUrl) && (
                   <div className="exec-detail-banner__description">
-                    {activeExec.description.split(/\n\s*\n/).map((para, i) => (
+                    {activeExec.linkUrl && (
+                      <a
+                        className="exec-detail-banner__link"
+                        href={activeExec.linkUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {activeExec.linkUrl}
+                      </a>
+                    )}
+                    {activeExec.description && activeExec.description.split(/\n\s*\n/).map((para, i) => (
                       <p key={i}>{para.trim()}</p>
                     ))}
                   </div>
@@ -492,13 +507,13 @@ export default function About() {
       {/* Campus Snapshot */}
       <section className="section bg-off-white">
         <div className="container">
-          <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-12)', alignItems: 'center' }}>
+          <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-12)', alignItems: 'stretch' }}>
             {campusSnapshotImg && (
-              <div className="sves-image-wrapper reveal-left">
+              <div className="sves-image-wrapper reveal-left" style={{ height: '100%', minHeight: '420px', display: 'flex' }}>
                 <img loading="lazy"
                   src={campusSnapshotImg.src}
                   alt={campusSnapshotImg.alt}
-                  style={{ width: '100%', height: '360px', objectFit: 'cover' }}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 />
               </div>
             )}

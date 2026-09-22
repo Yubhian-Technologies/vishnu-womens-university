@@ -83,6 +83,7 @@ export default function HeroSlider() {
   // even though the carousel only shows one at a time.
   const [visited, setVisited] = useState<Set<number>>(new Set([0]));
   const videoRef = useRef<HTMLVideoElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
 
   // The video element renders immediately now since Cloudinary handles
   // fast CDN delivery and auto-optimization. We rely on the poster image
@@ -101,6 +102,39 @@ export default function HeroSlider() {
         });
       }
     }
+  }, []);
+
+  // Pause the video (and its bandwidth/decode cost) once the hero scrolls
+  // out of view OR the tab is backgrounded, resume only when both the hero
+  // is on-screen and the tab is active — avoids paying to keep a looping
+  // video decoding/streaming while the visitor is elsewhere on the page or tab.
+  useEffect(() => {
+    const section = sectionRef.current;
+    const video = videoRef.current;
+    if (!section || !video) return;
+
+    let isIntersecting = false;
+    const sync = () => {
+      if (isIntersecting && document.visibilityState === 'visible') {
+        video.play().catch(() => {});
+      } else {
+        video.pause();
+      }
+    };
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isIntersecting = entry.isIntersecting;
+        sync();
+      },
+      { threshold: 0.1 },
+    );
+    observer.observe(section);
+    document.addEventListener('visibilitychange', sync);
+    return () => {
+      observer.disconnect();
+      document.removeEventListener('visibilitychange', sync);
+    };
   }, []);
 
   // Admin-uploaded Hero Banners (page="home") are appended after the fixed
@@ -161,7 +195,7 @@ export default function HeroSlider() {
   };
 
   return (
-    <section className="hero-slider" aria-label="Featured content">
+    <section className="hero-slider" ref={sectionRef} aria-label="Featured content">
       <h1 className="sr-only">Vishnu Women&apos;s University — Leading by Design</h1>
 
       {/* Background video — rendered immediately with a highly-optimized poster image */}

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useState } from 'react';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import SmoothImage from '../SmoothImage/SmoothImage';
 import type { WithId } from '../../hooks/useCollection';
@@ -15,98 +15,46 @@ export interface HonouredGuestDoc {
 type HonouredGuestItem = WithId & HonouredGuestDoc;
 
 /**
- * Home page-only section — photo, name, and role for eminent personalities
- * VWU has hosted. Admin-managed via /admin → Home — Eminent Personalities;
- * renders nothing until at least one entry has been added, same fallback
- * pattern as every other Firestore-backed section on this page (see
- * CLAUDE.md's content model notes).
- *
- * ponytail: Firestore collection is still `honouredGuests` (its original
- * name) — kept as-is so existing entries and the admin section don't need
- * a data migration. Only the visible labels + layout changed.
- *
- * Marquee is pure CSS (duplicated list + translateX(-50%)), the same
- * approach as Home's `.activity-track` — no IntersectionObserver, so the
- * Firestore-vs-`.reveal` gotcha doesn't apply here.
+ * Home page section — photo, name, and role for eminent personalities
+ * VWU has hosted. Admin-managed via /admin → Home — Eminent Personalities.
+ * Uses continuous marquee carousel scroll with seamless looping.
  */
 export default function HonouredGuestsSection() {
   const { docs: people } = useOrderedCollection<HonouredGuestItem>('honouredGuests', 'order');
-  const trackRef = useRef<HTMLDivElement>(null);
   const [isPaused, setIsPaused] = useState(false);
-  const reducedMotion = useMemo(
-    () => typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches,
-    []
-  );
-
-  // One-by-one auto-scroll: advance exactly one card, then pause
-  useEffect(() => {
-    if (reducedMotion || people.length <= 1) return;
-    const el = trackRef.current;
-    if (!el) return;
-
-    const timer = setInterval(() => {
-      if (isPaused || !trackRef.current) return;
-      const track = trackRef.current;
-      const atEnd = track.scrollLeft >= track.scrollWidth - track.clientWidth - 8;
-      if (atEnd) {
-        track.scrollTo({ left: 0, behavior: 'smooth' });
-      } else {
-        track.scrollBy({ left: getCardStep(), behavior: 'smooth' });
-      }
-    }, 1400);
-
-    return () => clearInterval(timer);
-  }, [people.length, isPaused, reducedMotion]);
 
   if (people.length === 0) return null;
 
-  const loop = [...people, ...people];
+  // Duplicate items enough times to guarantee a seamless continuous loop
+  const repeatedSet = people.length < 5
+    ? [...people, ...people, ...people]
+    : people;
+  const loop = [...repeatedSet, ...repeatedSet];
 
-  const getCardStep = () => {
-    const el = trackRef.current;
-    if (!el) return 320;
-    const card = el.querySelector('.eminent-card') as HTMLElement | null;
-    if (card) {
-      const style = getComputedStyle(el);
-      const gap = parseFloat(style.columnGap || style.gap || '12') || 12;
-      return card.offsetWidth + gap;
-    }
-    return 320;
-  };
+  // Adjust duration based on count so velocity remains consistent and comfortable
+  const duration = Math.max(30, repeatedSet.length * 6);
 
   return (
     <section
-      className="eminent-section eminent-section--onebyone"
+      className="eminent-section"
       aria-label="Eminent Personalities at VWU"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       onTouchStart={() => setIsPaused(true)}
-      onTouchEnd={() => setTimeout(() => setIsPaused(false), 4000)}
+      onTouchEnd={() => setTimeout(() => setIsPaused(false), 3000)}
     >
       <div className="container">
         <h2 className="eminent-title">Eminent Personalities at VWU</h2>
       </div>
       <div className="eminent-marquee">
         <div
-          ref={trackRef}
-          className="eminent-track"
-          tabIndex={0}
+          className={`eminent-track ${isPaused ? 'is-paused' : ''}`}
+          style={{ '--eminent-duration': `${duration}s` } as React.CSSProperties}
           role="region"
-          aria-roledescription="carousel"
-          aria-label="Eminent personalities carousel"
-          onKeyDown={(e) => {
-            if (e.key === 'ArrowRight') {
-              e.preventDefault();
-              trackRef.current?.scrollBy({ left: getCardStep(), behavior: reducedMotion ? 'auto' : 'smooth' });
-            }
-            if (e.key === 'ArrowLeft') {
-              e.preventDefault();
-              trackRef.current?.scrollBy({ left: -getCardStep(), behavior: reducedMotion ? 'auto' : 'smooth' });
-            }
-          }}
+          aria-label="Eminent personalities marquee"
         >
           {loop.map((p, i) => (
-            <figure key={`${p.id}-${i}`} className="eminent-card" aria-hidden={i >= people.length}>
+            <figure key={`${p.id}-${i}`} className="eminent-card" aria-hidden={i >= repeatedSet.length}>
               <div className="eminent-photo-wrap">
                 <SmoothImage
                   src={p.imageUrl}
