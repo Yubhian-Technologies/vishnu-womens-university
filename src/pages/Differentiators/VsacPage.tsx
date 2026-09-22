@@ -12,6 +12,7 @@ import {
   Globe2,
   Sparkles,
   Maximize2,
+  Award,
 } from 'lucide-react';
 import { vsac, type VsacMember, type SimpleTable } from './vsac.data';
 import type { DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
@@ -27,7 +28,7 @@ export default function VsacPage({ sections }: VsacPageProps) {
   const [activeTab, setActiveTab] = useState<number>(0);
   const [lightboxImg, setLightboxImg] = useState<string | null>(null);
 
-  // Extract existing photos safely (100% exact retention, no photos added or removed)
+  // Extract existing photos safely
   const gallerySection = sections.find(
     (s) => s.id === 'gallery' || s.label?.toLowerCase() === 'gallery' || s.contentType === 'gallery'
   );
@@ -49,7 +50,6 @@ export default function VsacPage({ sections }: VsacPageProps) {
     }
   }
 
-  // Helper component to render a section's assigned photo frame using modulo index
   const RenderPhotoFrame = ({ index }: { index: number }) => {
     if (galleryItems.length === 0) return null;
     const photo = galleryItems[index % galleryItems.length];
@@ -66,7 +66,6 @@ export default function VsacPage({ sections }: VsacPageProps) {
 
   const hasPhotos = galleryItems.length > 0;
 
-  // Helper component to render an expandable table (+ to see entire list, - to collapse)
   const RenderTable = ({ table }: { table: SimpleTable }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const PREVIEW_COUNT = 5;
@@ -112,7 +111,7 @@ export default function VsacPage({ sections }: VsacPageProps) {
 
   return (
     <div className="vsac-container" style={{ paddingBottom: 'var(--space-8)' }}>
-      {/* Telemetry Mission Control Header Banner (Paired with Photo 0) */}
+      {/* 1. ABOUT VSAC & TELEMETRY HEADER BANNER */}
       <section className={`vsac-telemetry-banner ${hasPhotos ? 'has-photo' : 'no-photo'}`}>
         <div>
           <div className="vsac-callsign-bar">
@@ -130,6 +129,10 @@ export default function VsacPage({ sections }: VsacPageProps) {
             </span>
           </div>
 
+          <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#00E5FF', margin: '1rem 0 0.85rem', letterSpacing: '0.05em' }}>
+            {vsac.aboutTitle}
+          </h2>
+
           {vsac.paragraphs.map((para, idx) => (
             <p key={idx} className="vsac-overview-text">
               {para}
@@ -139,7 +142,7 @@ export default function VsacPage({ sections }: VsacPageProps) {
         {hasPhotos && <RenderPhotoFrame index={0} />}
       </section>
 
-      {/* Orbit Directives: Vision, Mission & Objectives (Paired with Photo 1) */}
+      {/* 2. VISION, MISSION & OBJECTIVES */}
       <div className="vsac-block">
         <div className="vsac-block-header">
           <h2 className="vsac-block-title">
@@ -149,17 +152,17 @@ export default function VsacPage({ sections }: VsacPageProps) {
         <div className="vsac-block-body">
           <div className={`vsac-split ${hasPhotos ? 'has-photo' : 'no-photo'}`}>
             <div className="vsac-orbit-grid">
-              {/* Vision */}
+              {/* Vision & Mission */}
               <div className="vsac-orbit-card">
                 <div className="vsac-orbit-title">
-                  <Compass size={16} style={{ color: '#00E5FF' }} /> Vision
+                  <Compass size={16} style={{ color: '#00E5FF' }} /> {vsac.visionTitle}
                 </div>
-                <p className="vsac-orbit-item" style={{ fontStyle: 'italic', fontWeight: 600 }}>
-                  {vsac.vision}
+                <p className="vsac-orbit-item" style={{ fontStyle: 'italic', fontWeight: 500, lineHeight: 1.6, color: '#E2E8F0' }}>
+                  &ldquo;{vsac.vision}&rdquo;
                 </p>
 
-                <div className="vsac-orbit-title" style={{ marginTop: 'var(--space-3)' }}>
-                  <Sparkles size={16} style={{ color: '#FFB300' }} /> Mission
+                <div className="vsac-orbit-title" style={{ marginTop: '1.25rem' }}>
+                  <Sparkles size={16} style={{ color: '#FFB300' }} /> {vsac.missionTitle}
                 </div>
                 <ul className="vsac-orbit-list">
                   {vsac.mission.map((m, idx) => (
@@ -174,7 +177,7 @@ export default function VsacPage({ sections }: VsacPageProps) {
               {/* Objectives */}
               <div className="vsac-orbit-card" style={{ borderLeftColor: '#FFB300' }}>
                 <div className="vsac-orbit-title">
-                  <Target size={16} style={{ color: '#FFB300' }} /> Objectives
+                  <Target size={16} style={{ color: '#FFB300' }} /> {vsac.objectivesTitle}
                 </div>
                 <ul className="vsac-orbit-list">
                   {vsac.objectives.map((obj, idx) => (
@@ -195,7 +198,7 @@ export default function VsacPage({ sections }: VsacPageProps) {
         </div>
       </div>
 
-      {/* Flight Operations Team (HAM Radio Operators) */}
+      {/* 3. FLIGHT OPERATIONS TEAM */}
       <div className="vsac-block">
         <div className="vsac-block-header">
           <h2 className="vsac-block-title">
@@ -249,7 +252,7 @@ export default function VsacPage({ sections }: VsacPageProps) {
         </div>
       </div>
 
-      {/* Training & Research Operations (Paired with Photo 2) */}
+      {/* 4. SPACE RESEARCH & TRAINING OPERATIONS */}
       <div className="vsac-block">
         <div className="vsac-block-header">
           <h2 className="vsac-block-title">
@@ -282,7 +285,7 @@ export default function VsacPage({ sections }: VsacPageProps) {
                     {vsac.trainingResearch[activeTab].title}
                   </h3>
                   {vsac.trainingResearch[activeTab].paragraphs.map((p, pIdx) => (
-                    <p key={pIdx} className="vsac-orbit-item" style={{ marginBottom: 'var(--space-2)' }}>
+                    <p key={pIdx} className="vsac-orbit-item" style={{ marginBottom: 'var(--space-2)', lineHeight: 1.6 }}>
                       {p}
                     </p>
                   ))}
@@ -292,7 +295,7 @@ export default function VsacPage({ sections }: VsacPageProps) {
                   )}
 
                   {vsac.trainingResearch[activeTab].secondParagraph && (
-                    <p className="vsac-orbit-item" style={{ marginTop: 'var(--space-3)', marginBottom: 'var(--space-2)' }}>
+                    <p className="vsac-orbit-item" style={{ marginTop: 'var(--space-3)', marginBottom: 'var(--space-2)', lineHeight: 1.6 }}>
                       {vsac.trainingResearch[activeTab].secondParagraph}
                     </p>
                   )}
@@ -307,88 +310,74 @@ export default function VsacPage({ sections }: VsacPageProps) {
         </div>
       </div>
 
-      {/* Industry Collaboration & Social Impact (Paired with Photo 3) */}
+      {/* 5. DHRUVA SPACE COLLABORATION */}
       <div className="vsac-block">
         <div className="vsac-block-header">
           <h2 className="vsac-block-title">
-            <Building2 size={18} style={{ color: '#00E5FF' }} /> Industry Collaboration & Social Impact
+            <Building2 size={18} style={{ color: '#00E5FF' }} /> {vsac.industryCollaboration.title}
           </h2>
         </div>
         <div className="vsac-block-body">
-          <div className={`vsac-split ${hasPhotos ? 'has-photo' : 'no-photo'}`} style={{ marginBottom: 'var(--space-3)' }}>
-            <div>
-              {/* Dhruva Space Collaboration */}
-              {vsac.collaborations[0] && (
-                <div className="vsac-orbit-card" style={{ borderLeftColor: '#070F26' }}>
-                  <h3 style={{ fontSize: '0.95rem', fontWeight: 800, color: '#070F26', marginBottom: 'var(--space-2)' }}>
-                    {vsac.collaborations[0].title}
-                  </h3>
-                  {vsac.collaborations[0].paragraphs?.map((p, idx) => (
-                    <p key={idx} className="vsac-orbit-item">
-                      {p}
-                    </p>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Photo 3 */}
-            {hasPhotos && <RenderPhotoFrame index={3} />}
+          <div className="vsac-orbit-card" style={{ borderLeftColor: '#00E5FF', background: '#FFFFFF' }}>
+            {vsac.industryCollaboration.paragraphs.map((p, idx) => (
+              <p key={idx} className="vsac-orbit-item" style={{ color: '#334155', lineHeight: 1.65, marginBottom: idx < vsac.industryCollaboration.paragraphs.length - 1 ? '0.75rem' : 0 }}>
+                {p}
+              </p>
+            ))}
           </div>
-
-          {/* Social Impacts Grid */}
-          {vsac.collaborations[1] && (
-            <div style={{ marginBottom: 'var(--space-3)' }}>
-              <h3 style={{ fontSize: '0.9rem', fontWeight: 800, color: '#070F26', marginBottom: 'var(--space-2)' }}>
-                {vsac.collaborations[1].title}
-              </h3>
-              {vsac.collaborations[1].intro && (
-                <p className="vsac-orbit-item" style={{ marginBottom: 'var(--space-2)' }}>
-                  {vsac.collaborations[1].intro}
-                </p>
-              )}
-              <div className="vsac-bullets-grid">
-                {vsac.collaborations[1].bullets?.map((b, bIdx) => (
-                  <div key={bIdx} className="vsac-bullet-card">
-                    <span className="vsac-bullet-lead">{b.lead}</span>
-                    <span className="vsac-bullet-text">{b.text}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Outcomes Grid */}
-          {vsac.collaborations[2] && (
-            <div>
-              <h3 style={{ fontSize: '0.9rem', fontWeight: 800, color: '#070F26', marginBottom: 'var(--space-2)' }}>
-                {vsac.collaborations[2].title}
-              </h3>
-              {vsac.collaborations[2].intro && (
-                <p className="vsac-orbit-item" style={{ marginBottom: 'var(--space-2)' }}>
-                  {vsac.collaborations[2].intro}
-                </p>
-              )}
-              <div className="vsac-bullets-grid">
-                {vsac.collaborations[2].bullets?.map((b, bIdx) => (
-                  <div key={bIdx} className="vsac-bullet-card" style={{ borderLeft: '3px solid #FFB300' }}>
-                    <span className="vsac-bullet-lead">{b.lead}</span>
-                    <span className="vsac-bullet-text">{b.text}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </div>
 
-      {/* Satellite Photo Gallery Showcase (Using Existing Photos) */}
+      {/* 6. EXTENDING THE IMPACT OF SPACE EDUCATION (SOCIAL IMPACT) */}
+      <div className="vsac-block">
+        <div className="vsac-block-header">
+          <h2 className="vsac-block-title">
+            <Globe2 size={18} style={{ color: '#00E5FF' }} /> {vsac.socialImpacts.title}
+          </h2>
+        </div>
+        <div className="vsac-block-body">
+          <div className="vsac-bullets-grid">
+            {vsac.socialImpacts.bullets.map((b, bIdx) => (
+              <div key={bIdx} className="vsac-bullet-card">
+                <span className="vsac-bullet-lead">{b.lead}</span>
+                <span className="vsac-bullet-text">{b.text}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* 7. LEARNING OUTCOMES */}
+      <div className="vsac-block">
+        <div className="vsac-block-header">
+          <h2 className="vsac-block-title">
+            <Award size={18} style={{ color: '#FFB300' }} /> {vsac.learningOutcomes.title}
+          </h2>
+        </div>
+        <div className="vsac-block-body">
+          <div className="vsac-bullets-grid">
+            {vsac.learningOutcomes.bullets.map((b, bIdx) => (
+              <div key={bIdx} className="vsac-bullet-card" style={{ borderLeft: '3px solid #FFB300' }}>
+                <span className="vsac-bullet-lead">{b.lead}</span>
+                <span className="vsac-bullet-text">{b.text}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* 8. GALLERY SHOWCASE */}
       {galleryItems.length > 0 && (
         <div className="vsac-block">
           <div className="vsac-block-header">
-            <h2 className="vsac-block-title">
-              <ImageIcon size={18} style={{ color: '#00E5FF' }} /> Satellite Ground Station Gallery
-            </h2>
+            <div>
+              <h2 className="vsac-block-title">
+                <ImageIcon size={18} style={{ color: '#00E5FF' }} /> {vsac.galleryTitle}
+              </h2>
+              <p style={{ color: '#94A3B8', fontSize: '0.85rem', margin: '0.2rem 0 0', fontWeight: 500 }}>
+                {vsac.galleryCaption}
+              </p>
+            </div>
           </div>
           <div className="vsac-block-body">
             <div className="vsac-gallery-grid">
@@ -405,7 +394,7 @@ export default function VsacPage({ sections }: VsacPageProps) {
         </div>
       )}
 
-      {/* Modal Lightbox */}
+      {/* Lightbox Modal */}
       {lightboxImg && (
         <div className="meda-lightbox-backdrop" onClick={() => setLightboxImg(null)}>
           <div className="meda-lightbox-content" onClick={(e) => e.stopPropagation()}>

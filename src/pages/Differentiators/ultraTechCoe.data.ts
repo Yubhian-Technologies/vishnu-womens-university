@@ -1,6 +1,7 @@
 // Rich hardcoded content for the Ultra Tech CoE differentiator page
 // (slug: ultratech-coe) — overrides that item's generic Firestore
 // intro/about text in DifferentiatorDetail.tsx.
+
 export interface UltraTechInCharge {
   name: string;
   designation?: string;
@@ -15,16 +16,100 @@ export interface StudentsBenefitedGroup {
 }
 
 export const ultraTechCoe = {
-  pageTitle: 'CoE - Sustainable Construction Practices and Materials',
-  overview: 'The Centre of Excellence for Sustainable Construction Practices and Materials (CSCPM) in the Department of Civil Engineering, in collaboration with UltraTech Cement Ltd, embodies a commitment to advancing sustainable practices in the construction industry. By leveraging the expertise and resources of both academia and industry, CSCPM aims to address pressing challenges and foster innovation in sustainable construction.',
-  vision: 'We strive to be a beacon of excellence, shaping a world where sustainable construction materials lead the way in creating resilient, environmentally conscious, cost effective and socially responsible built environments.',
-  mission: [
-    'Empower individuals, especially women, in civil engineering with comprehensive education on sustainable construction materials.',
-    'Develop skills for successful careers with a focus on social responsibility.',
-    'Nurture professionalism and mentorship while encouraging research and innovation to bridge the gap between academia and industry.',
-    'Deliver cutting-edge education for a sustainable competitive edge.',
+  pageTitle: 'Centre of Excellence for Sustainable Construction Practices and Materials',
+  heroSubtitle: 'Strengthening civil engineering education through industry-supported learning, sustainable construction practices and hands-on exposure to construction materials and technologies in collaboration with UltraTech Cement Ltd.',
+  taglineTitle: 'Sustainable Construction Through Innovation & Training',
+  taglineDesc: 'The Centre of Excellence connects civil engineering education with industry practice through specialised learning in construction materials, sustainability, concrete technology, research and professional training.',
+  aboutTitle: 'Centre of Excellence for Sustainable Construction Practices and Materials',
+  overview: [
+    'The Centre of Excellence for Sustainable Construction Practices and Materials (CSCPM) in the Department of Civil Engineering operates in collaboration with UltraTech Cement Ltd.',
+    'The Centre supports learning, training and research related to sustainable construction materials and practices while providing students with opportunities to interact with industry professionals and understand current applications in civil engineering.',
+    'Its activities focus on connecting academic learning with areas such as construction materials, concrete technology, environmental responsibility, health and safety, and professional capacity building.',
   ],
-  objectives: 'The Centre of Excellence for Sustainable Construction Practices and Materials (CSCPM) in partnership with UltraTech Cement Ltd aims to promote sustainability and innovation in the construction industry. The key objectives include Research and Development (R&D), Education and Training, Industry Collaboration, Technology Transfer and Consultancy Services.',
+  focusDomains: [
+    {
+      title: 'Sustainable Materials',
+      desc: 'Learning and research related to sustainable construction materials and responsible material use.',
+    },
+    {
+      title: 'Water & Environment',
+      desc: 'Awareness of resource conservation, environmental management and sustainable construction practices.',
+    },
+    {
+      title: 'Health & Safety',
+      desc: 'Promoting safe construction practices, occupational awareness and social responsibility.',
+    },
+    {
+      title: 'Training & Capacity Building',
+      desc: 'Industry-supported learning and professional development for students and other participants.',
+    },
+  ],
+  vision: 'To advance education and practice in sustainable construction materials and technologies and contribute to the development of resilient, environmentally responsible and resource-conscious built environments.',
+  mission: [
+    'Provide students with specialised learning in sustainable construction materials and technologies.',
+    'Develop practical and professional competencies through industry interaction and technical training.',
+    'Encourage research and innovation in sustainable construction and material applications.',
+    'Strengthen industry-academia engagement through knowledge sharing, mentorship and collaborative activities.',
+    'Promote environmental responsibility, health and safety within civil engineering practice.',
+  ],
+  objectivesIntro: 'The Centre integrates education, research, awareness and capacity building to strengthen sustainable construction learning and industry engagement.',
+  objectives: [
+    {
+      index: '01',
+      badge: 'Education',
+      title: '01. Education',
+      desc: 'Provide specialised learning in sustainable construction materials, concrete technology and related civil engineering practices.',
+    },
+    {
+      index: '02',
+      badge: 'Research',
+      title: '02. Research',
+      desc: 'Encourage research and innovation in sustainable materials, construction technologies and environmental management.',
+    },
+    {
+      index: '03',
+      badge: 'Awareness',
+      title: '03. Awareness',
+      desc: 'Promote health, safety, environmental responsibility and socially responsible construction practices.',
+    },
+    {
+      index: '04',
+      badge: 'Capacity Building',
+      title: '04. Capacity Building',
+      desc: 'Provide training and industry exposure that strengthen the technical and professional capabilities of students.',
+    },
+  ],
+  activitiesList: [
+    {
+      eventTag: 'MoU Signing',
+      dateStr: '20 March 2024',
+      desc: 'The Department of Civil Engineering signed a Memorandum of Understanding with UltraTech Cement Ltd to strengthen industry-academia engagement in sustainable construction education and training.',
+    },
+    {
+      eventTag: 'Technical Webinar',
+      dateStr: '30 March 2024',
+      desc: 'A webinar on “An Overview of Cement and Concrete” was delivered by Er. J. Y. Breetha, Technical Service Coordinator, UltraTech Cement Ltd, providing students with industry perspectives on cement and concrete applications.',
+    },
+    {
+      eventTag: 'Expert Technical Session',
+      dateStr: '14 March 2024',
+      desc: 'An expert session on “Concrete Mix Design” was conducted for students, engineers and contractors by Er. K. Venkataraman, Regional Head – Technical, UltraTech Cement Ltd.',
+    },
+  ],
+  keyHighlights: [
+    'MoU with UltraTech Cement Ltd signed on 20 March 2024',
+    '50 Civil Engineering students participating across second- and third-year cohorts',
+    'Industry-led technical sessions on cement, concrete and concrete mix design',
+    'Focus on sustainable construction materials and practices',
+    'Industry interaction supporting technical learning and professional exposure',
+    'Academic focus on research, training and industry collaboration',
+  ],
+  outcomes: [
+    'Students received direct exposure to industry perspectives on cement technology, concrete and mix design.',
+    '50 students participated in the current industry-supported learning cohorts.',
+    'The Centre has created a platform for industry interaction, technical training and academic engagement in sustainable construction.',
+    'The collaboration supports opportunities for research and knowledge exchange in sustainable construction materials.',
+  ],
   inCharge: {
     name: 'Mr. Ramgopal. L',
     designation: 'Assistant Professor',
@@ -32,7 +117,7 @@ export const ultraTechCoe = {
     mobile: '8148638402',
     interests: 'Concrete Technology, Light weight Concrete, Sustainable Construction Materials.',
   } as UltraTechInCharge,
-  accordionSections: ['In-charge', 'Students Benefited', 'Activities'] as string[],
+  accordionSections: ['In-charge', 'Students Benefited', 'Activities', 'Key Highlights', 'Outcomes'] as string[],
   studentsBenefited: [
     {
       yearLabel: 'III YEAR',
@@ -95,11 +180,4 @@ export const ultraTechCoe = {
       ],
     },
   ] as StudentsBenefitedGroup[],
-  accordionContent: {
-    'Activities': [
-      'Department of Civil Engineering, SVECW(A) Signed a MoU with UltraTech Cement Ltd on March 20, 2024.',
-      'Department of Civil Engineering conducted a Webinar Talk Session on "A overview of Cement and Concrete" delivered by Er. J. Y. Breetha, Technical Service coordinator, UltraTech Cement Ltd on March 30, 2024.',
-      'Department of Civil Engineering conducted a expert talk session for local Engineers, Contractors and Students on "Concrete Mix Design Program" delivered by Er. K. Venkataraman, Regional Head – Technical, UltraTech Cement Ltd on March 14, 2024.',
-    ],
-  } as Record<string, string[]>,
 };
