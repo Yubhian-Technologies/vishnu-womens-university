@@ -28,6 +28,13 @@ const PILLAR_ITEMS = [
   { title: '80+ Acre Campus', desc: 'Advanced labs, smart classrooms, ICT tools and seminar halls.', icon: Globe },
 ];
 
+// Admin-entered links may omit the scheme (e.g. "linkedin.com/in/..."),
+// which the browser would otherwise resolve as a path relative to the
+// current page instead of an external redirect.
+function toAbsoluteUrl(url: string) {
+  return /^[a-z][a-z0-9+.-]*:/i.test(url) ? url : `https://${url}`;
+}
+
 function getInitials(name: string) {
   const cleaned = name.replace(/\b(Dr|Sri|Prof|Mr|Mrs|Ms)\.?\s*/gi, '');
   const parts = cleaned.trim().split(/\s+/).filter(Boolean);
@@ -403,7 +410,7 @@ export default function About() {
                     {activeExec.linkUrl && (
                       <a
                         className="exec-detail-banner__link"
-                        href={activeExec.linkUrl}
+                        href={toAbsoluteUrl(activeExec.linkUrl)}
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={(e) => e.stopPropagation()}
@@ -507,13 +514,13 @@ export default function About() {
       {/* Campus Snapshot */}
       <section className="section bg-off-white">
         <div className="container">
-          <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-12)', alignItems: 'stretch' }}>
+          <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-12)', alignItems: 'center' }}>
             {campusSnapshotImg && (
-              <div className="sves-image-wrapper reveal-left" style={{ height: '100%', minHeight: '420px', display: 'flex' }}>
+              <div className="sves-image-wrapper reveal-left">
                 <img loading="lazy"
                   src={campusSnapshotImg.src}
                   alt={campusSnapshotImg.alt}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  style={{ width: '100%', height: '360px', objectFit: 'cover' }}
                 />
               </div>
             )}
