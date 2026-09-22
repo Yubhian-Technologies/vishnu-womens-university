@@ -837,17 +837,25 @@ export default function DifferentiatorDetail() {
                     ? "Institution's Innovation Council"
                     : item.slug === 'ti-dsp-coe'
                     ? 'TI-DSP Centre of Excellence'
+                    : item.slug === 'ultratech-coe'
+                    ? 'UltraTech Centre of Excellence'
+                    : item.slug === 'vsac'
+                    ? 'Vishnu Space Application Center (VSAC)'
                     : item.title}
                 </h1>
                 {/* Its own "Hero Subtitle" admin field — deliberately not the
                     same as the Short Description (hub-card blurb) or the
                     Description block further down the page. */}
-                {(item.slug === 'institution-innovation-cell' || item.slug === 'ti-dsp-coe' || item.summary || (item.slug === 'meda-plm-coe' ? medaPlmCoe.hero.subtitle : item.slug === 'microchip-embedded' ? microchipEmbedded.hero.subtitle : null)) && (
+                {(item.slug === 'institution-innovation-cell' || item.slug === 'ti-dsp-coe' || item.slug === 'ultratech-coe' || item.slug === 'vsac' || item.summary || (item.slug === 'meda-plm-coe' ? medaPlmCoe.hero.subtitle : item.slug === 'microchip-embedded' ? microchipEmbedded.hero.subtitle : null)) && (
                   <p className="dept-hero-subtitle">
                     {item.slug === 'institution-innovation-cell'
                       ? 'Fostering a campus ecosystem where students and faculty can explore ideas, develop innovations and advance entrepreneurship through mentoring, collaboration and institutional support.'
                       : item.slug === 'ti-dsp-coe'
                       ? 'Advancing digital signal processing, speech and image processing, and application-oriented research through specialised DSP platforms, MATLAB-enabled learning and hands-on technical training.'
+                      : item.slug === 'ultratech-coe'
+                      ? 'Strengthening civil engineering education through industry-supported learning, sustainable construction practices and hands-on exposure to construction materials and technologies in collaboration with UltraTech Cement Ltd.'
+                      : item.slug === 'vsac'
+                      ? 'Connecting students with space technology through satellite tracking, CubeSat design, High-Altitude Balloon payload development, and hands-on ground-station operations.'
                       : (item.summary || (item.slug === 'meda-plm-coe' ? medaPlmCoe.hero.subtitle : item.slug === 'microchip-embedded' ? microchipEmbedded.hero.subtitle : ''))}
                   </p>
                 )}
@@ -1074,14 +1082,24 @@ export default function DifferentiatorDetail() {
       {isForeignLanguages ? (
         <ForeignLanguagesFooter />
       ) : (
-        <section style={{ background: 'var(--color-primary)', padding: (item.slug === 'meda-plm-coe' || item.slug === 'microchip-embedded' || item.slug === 'vsac' || item.slug === 'vehicle-design-lab' || item.slug === 'dream-house-lab' || item.slug === 'hpc-lab' || item.slug === 'aicte-idea-lab' || item.slug === 'institution-innovation-cell') ? 'var(--space-6) 0' : 'var(--space-14) 0' }}>
+        <section style={{ background: 'var(--color-primary)', padding: (item.slug === 'meda-plm-coe' || item.slug === 'microchip-embedded' || item.slug === 'vsac' || item.slug === 'vehicle-design-lab' || item.slug === 'dream-house-lab' || item.slug === 'hpc-lab' || item.slug === 'aicte-idea-lab' || item.slug === 'institution-innovation-cell' || item.slug === 'ti-dsp-coe' || item.slug === 'ultratech-coe' || item.slug === 'chips-to-startup') ? 'var(--space-6) 0' : 'var(--space-14) 0' }}>
           <div className="container" style={{ textAlign: 'center' }}>
             <div>
               <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>
-                {item.slug === 'aicte-idea-lab' ? 'Explore Innovation at VWU' : 'Explore More Differentiators'}
+                {item.slug === 'vsac'
+                  ? 'There’s More to Explore'
+                  : item.slug === 'chips-to-startup'
+                  ? 'Explore What Powers the Next Big Idea'
+                  : item.slug === 'aicte-idea-lab'
+                  ? 'Explore Innovation at VWU'
+                  : 'Explore More Differentiators'}
               </h2>
               <p style={{ color: 'rgba(255,255,255,0.75)', maxWidth: 620, margin: '0 auto var(--space-6)' }}>
-                {item.slug === 'aicte-idea-lab'
+                {item.slug === 'vsac'
+                  ? 'From space technology and advanced research to industry-led learning and innovation, discover more places at VWU where curiosity becomes capability.'
+                  : item.slug === 'chips-to-startup'
+                  ? 'From advanced technology and research to innovation and entrepreneurship, discover the initiatives that turn learning into real-world possibilities.'
+                  : item.slug === 'aicte-idea-lab'
                   ? 'Discover the labs, centres and initiatives that extend learning beyond the classroom and support innovation, research and experiential education.'
                   : (item.slug === 'meda-plm-coe' || item.slug === 'microchip-embedded')
                   ? 'Discover the laboratories, centres and initiatives that strengthen experiential learning, industry engagement and innovation at VWU.'
@@ -1089,18 +1107,28 @@ export default function DifferentiatorDetail() {
                   ? 'Discover the initiatives, laboratories and centres that support innovation, experiential learning and academic development at VWU.'
                   : item.slug === 'ti-dsp-coe'
                   ? 'Discover the laboratories, centres and academic initiatives that strengthen experiential learning, research and industry engagement at VWU.'
+                  : item.slug === 'ultratech-coe'
+                  ? 'Discover the centres, laboratories and initiatives that strengthen experiential learning, research and industry engagement at VWU.'
                   : 'Discover all the unique initiatives, labs, and centres that make VWU an extraordinary place to learn and grow.'}
               </p>
               <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
                 <Link to="/differentiators" className="btn btn-accent">
-                  {(item.slug === 'aicte-idea-lab' || item.slug === 'meda-plm-coe' || item.slug === 'microchip-embedded' || item.slug === 'institution-innovation-cell' || item.slug === 'ti-dsp-coe') ? 'Explore All Differentiators →' : 'All Differentiators'}
+                  {(item.slug === 'vsac' || item.slug === 'chips-to-startup')
+                    ? 'Explore All Differentiators'
+                    : (item.slug === 'aicte-idea-lab' || item.slug === 'meda-plm-coe' || item.slug === 'microchip-embedded' || item.slug === 'institution-innovation-cell' || item.slug === 'ti-dsp-coe' || item.slug === 'ultratech-coe')
+                    ? 'Explore All Differentiators →'
+                    : 'All Differentiators'}
                 </Link>
                 <Link to="/academics" className="btn btn-secondary">
-                  {(item.slug === 'aicte-idea-lab' || item.slug === 'meda-plm-coe' || item.slug === 'microchip-embedded' || item.slug === 'institution-innovation-cell' || item.slug === 'ti-dsp-coe') ? 'Explore Academics →' : 'Academics'}
+                  {(item.slug === 'vsac' || item.slug === 'chips-to-startup')
+                    ? 'Discover Academics'
+                    : (item.slug === 'aicte-idea-lab' || item.slug === 'meda-plm-coe' || item.slug === 'microchip-embedded' || item.slug === 'institution-innovation-cell' || item.slug === 'ti-dsp-coe' || item.slug === 'ultratech-coe')
+                    ? 'Explore Academics →'
+                    : 'Academics'}
                 </Link>
-                {item.slug !== 'aicte-idea-lab' && item.slug !== 'meda-plm-coe' && item.slug !== 'microchip-embedded' && item.slug !== 'institution-innovation-cell' && item.slug !== 'ti-dsp-coe' && (
-                  <Link to="/apply-now" className="btn btn-secondary">Apply Now</Link>
-                )}
+                <Link to="/admissions" className="btn btn-secondary">
+                  {(item.slug === 'vsac' || item.slug === 'chips-to-startup') ? 'Apply to VWU' : 'Apply Now'}
+                </Link>
               </div>
             </div>
           </div>
