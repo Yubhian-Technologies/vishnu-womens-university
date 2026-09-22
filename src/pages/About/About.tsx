@@ -28,6 +28,15 @@ const PILLAR_ITEMS = [
   { title: '80+ Acre Campus', desc: 'Advanced labs, smart classrooms, ICT tools and seminar halls.', icon: Globe },
 ];
 
+// Admin-entered links may omit the scheme (e.g. "linkedin.com/in/..."),
+// which the browser would otherwise resolve as a path relative to the
+// current page instead of an external redirect. Respect whatever scheme
+// (http/https) the admin actually typed — only fall back to a
+// protocol-relative "//" (not a hardcoded https) when none was given.
+function toAbsoluteUrl(url: string) {
+  return /^[a-z][a-z0-9+.-]*:/i.test(url) ? url : `//${url.replace(/^\/+/, '')}`;
+}
+
 function getInitials(name: string) {
   const cleaned = name.replace(/\b(Dr|Sri|Prof|Mr|Mrs|Ms)\.?\s*/gi, '');
   const parts = cleaned.trim().split(/\s+/).filter(Boolean);
@@ -403,7 +412,7 @@ export default function About() {
                     {activeExec.linkUrl && (
                       <a
                         className="exec-detail-banner__link"
-                        href={activeExec.linkUrl}
+                        href={toAbsoluteUrl(activeExec.linkUrl)}
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={(e) => e.stopPropagation()}
