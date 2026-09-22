@@ -45,19 +45,29 @@ export default function UltraTechPage({
   customSections = [],
   introBlocks = [],
 }: UltraTechPageProps) {
-  const { overview, vision, mission, objectives, inCharge, studentsBenefited, accordionContent } = ultraTechCoe;
+  const {
+    overview,
+    vision,
+    mission,
+    objectives,
+    objectivesIntro,
+    inCharge,
+    studentsBenefited,
+    activitiesList,
+    keyHighlights,
+    outcomes,
+    focusDomains,
+    taglineTitle,
+    taglineDesc,
+    aboutTitle,
+  } = ultraTechCoe;
 
   const overviewText = overview;
-  
-  const visionBlock = introBlocks.find((s) => s.id === 'vision');
-  const visionText = visionBlock?.textContent?.trim() || (typeof vision === 'string' ? vision : '');
 
-  const missionBlock = introBlocks.find((s) => s.id === 'mission');
-  const missionList = missionBlock?.listText?.split('\n').map((s) => s.trim()).filter(Boolean) || mission;
+  const visionText = (typeof vision === 'string' ? vision : '') || introBlocks.find((s) => s.id === 'vision')?.textContent?.trim() || '';
+  const missionList = mission || introBlocks.find((s) => s.id === 'mission')?.listText?.split('\n').map((s) => s.trim()).filter(Boolean) || [];
+  const objectivesText = objectivesIntro || introBlocks.find((s) => s.id === 'objectives')?.textContent?.trim() || '';
 
-  const objBlock = introBlocks.find((s) => s.id === 'objectives');
-  const objectivesText = objBlock?.textContent?.trim() || objBlock?.listText?.trim() || objectives;
-  
   // Total count of students
   const totalStudents = studentsBenefited.reduce((acc, curr) => acc + curr.students.length, 0);
 
@@ -72,7 +82,9 @@ export default function UltraTechPage({
       text.includes('incharge') ||
       text.includes('in-charge') ||
       text.includes('students-benefited') ||
-      text.includes('activities')
+      text.includes('activities') ||
+      text.includes('highlight') ||
+      text.includes('outcome')
     );
   };
 
@@ -101,8 +113,22 @@ export default function UltraTechPage({
       id: 'activities',
       num: '03',
       label: 'Activities',
-      badge: '3 Milestones',
+      badge: `${activitiesList.length} Milestones`,
       icon: Calendar,
+    },
+    {
+      id: 'key-highlights',
+      num: '04',
+      label: 'Key Highlights',
+      badge: `${keyHighlights.length} Highlights`,
+      icon: Award,
+    },
+    {
+      id: 'outcomes',
+      num: '05',
+      label: 'Outcomes',
+      badge: `${outcomes.length} Key Outcomes`,
+      icon: FileCheck2,
     },
   ];
 
@@ -119,7 +145,7 @@ export default function UltraTechPage({
       .filter((sec) => !isExcluded(sec.id, sec.label))
       .map((sec, idx) => ({
         id: sec.id,
-        num: String(idx + 4).padStart(2, '0'),
+        num: String(idx + 6).padStart(2, '0'),
         label: sec.label,
         badge: sec.contentType || 'Details',
         icon: getCustomIcon(sec.id, sec.label),
@@ -150,21 +176,20 @@ export default function UltraTechPage({
                   <span className="utec-beacon-dot" />
                 </span>
                 <span className="utec-kicker-slash">///</span>
-                <span>UTEC R&D WATER, HEALTH CARE & TRAINING</span>
+                <span>INDUSTRY CENTRES OF EXCELLENCE</span>
               </div>
               <div className="utec-partner-chip">
                 <Building2 size={13} />
-                <span>Industry CoE Collaboration</span>
+                <span>UltraTech Cement Ltd</span>
               </div>
             </div>
 
             <h1 className="utec-hero-title">
-              Empowering Communities <br />
-              <span className="utec-hero-script">Through Innovation & Training</span>
+              {taglineTitle}
             </h1>
 
             <p className="utec-hero-subtitle">
-              Partnering with UltraTech Cement Ltd to empower civil engineering students with hands-on training in sustainable construction materials and technologies.
+              {taglineDesc}
             </p>
           </div>
 
@@ -174,8 +199,8 @@ export default function UltraTechPage({
               <Leaf size={22} className="utec-watermark-leaf" />
             </div>
             <div className="utec-watermark-text-wrap">
-              <span className="utec-watermark-main">Better Materials</span>
-              <span className="utec-watermark-sub">A Healthier Tomorrow</span>
+              <span className="utec-watermark-main">Sustainable Construction</span>
+              <span className="utec-watermark-sub">Innovation & Training</span>
             </div>
             <div className="utec-watermark-pill">
               <Sparkles size={11} /> Sustainable Future
@@ -196,8 +221,8 @@ export default function UltraTechPage({
           </div>
           <div className="utec-hstat-divider" />
           <div className="utec-hstat-item">
-            <span className="utec-hstat-number">4 Key Pillars</span>
-            <span className="utec-hstat-label">Research & Skilling</span>
+            <span className="utec-hstat-number">4 Focus Areas</span>
+            <span className="utec-hstat-label">Research & Training</span>
           </div>
           <div className="utec-hstat-divider" />
           <div className="utec-hstat-item">
@@ -220,54 +245,38 @@ export default function UltraTechPage({
               <span className="utec-badge-outline">Civil Engineering</span>
             </div>
 
-            <h2 className="utec-about-title">{ultraTechCoe.pageTitle}</h2>
-            <p className="utec-about-desc">{overviewText}</p>
+            <h2 className="utec-about-title">{aboutTitle}</h2>
+            {Array.isArray(overviewText) ? (
+              overviewText.map((p, i) => (
+                <p key={i} className="utec-about-desc" style={{ marginBottom: i < overviewText.length - 1 ? '1rem' : 0 }}>
+                  {p}
+                </p>
+              ))
+            ) : (
+              <p className="utec-about-desc">{overviewText}</p>
+            )}
 
             {/* 4 FEATURE PILLARS INTEGRATED */}
             <div className="utec-pillars-wrapper">
               <div className="utec-pillars-label">
-                <Layers size={14} /> Core Focus Domains
+                <Layers size={14} /> Core Focus Areas
               </div>
               <div className="utec-pillars-grid">
-                <div className="utec-pillar-card p-green">
-                  <div className="utec-pillar-icon-box green">
-                    <Leaf size={18} />
-                  </div>
-                  <div className="utec-pillar-body">
-                    <h4 className="utec-pillar-title">Sustainable Materials</h4>
-                    <p className="utec-pillar-desc">Innovating for a greener tomorrow</p>
-                  </div>
-                </div>
-
-                <div className="utec-pillar-card p-blue">
-                  <div className="utec-pillar-icon-box blue">
-                    <Droplets size={18} />
-                  </div>
-                  <div className="utec-pillar-body">
-                    <h4 className="utec-pillar-title">Water & Environment</h4>
-                    <p className="utec-pillar-desc">Conserving resources, protecting ecosystems</p>
-                  </div>
-                </div>
-
-                <div className="utec-pillar-card p-pink">
-                  <div className="utec-pillar-icon-box pink">
-                    <HeartPulse size={18} />
-                  </div>
-                  <div className="utec-pillar-body">
-                    <h4 className="utec-pillar-title">Health & Safety</h4>
-                    <p className="utec-pillar-desc">Creating safer communities</p>
-                  </div>
-                </div>
-
-                <div className="utec-pillar-card p-purple">
-                  <div className="utec-pillar-icon-box purple">
-                    <GraduationCap size={18} />
-                  </div>
-                  <div className="utec-pillar-body">
-                    <h4 className="utec-pillar-title">Training & Capacity</h4>
-                    <p className="utec-pillar-desc">Skilling for a stronger future</p>
-                  </div>
-                </div>
+                {focusDomains.map((domain, idx) => {
+                  const theme = ['green', 'blue', 'pink', 'purple'][idx % 4];
+                  const Icon = idx === 0 ? Leaf : idx === 1 ? Droplets : idx === 2 ? HeartPulse : GraduationCap;
+                  return (
+                    <div key={idx} className={`utec-pillar-card p-${theme}`}>
+                      <div className={`utec-pillar-icon-box ${theme}`}>
+                        <Icon size={18} />
+                      </div>
+                      <div className="utec-pillar-body">
+                        <h4 className="utec-pillar-title">{domain.title}</h4>
+                        <p className="utec-pillar-desc">{domain.desc}</p>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
@@ -319,12 +328,12 @@ export default function UltraTechPage({
               </div>
 
               <ul className="utec-mission-checklist">
-                {missionList.map((item, idx) => (
+                {missionList.map((itemText, idx) => (
                   <li key={idx} className="utec-mission-item">
                     <div className="utec-mission-bullet-gold">
                       <CheckCircle2 size={15} />
                     </div>
-                    <span className="utec-mission-text">{item}</span>
+                    <span className="utec-mission-text">{itemText}</span>
                   </li>
                 ))}
               </ul>
@@ -365,57 +374,25 @@ export default function UltraTechPage({
           )}
 
           <div className="utec-objectives-grid">
-            <div className="utec-obj-card card-green">
-              <div className="utec-obj-card-top">
-                <div className="utec-obj-icon-circle green">
-                  <Leaf size={20} />
+            {objectives.map((obj, idx) => {
+              const theme = ['green', 'blue', 'pink', 'purple'][idx % 4];
+              const Icon = idx === 0 ? Leaf : idx === 1 ? Droplets : idx === 2 ? HeartPulse : GraduationCap;
+              return (
+                <div key={idx} className={`utec-obj-card card-${theme}`}>
+                  <div className="utec-obj-card-top">
+                    <div className={`utec-obj-icon-circle ${theme}`}>
+                      <Icon size={20} />
+                    </div>
+                    <span className="utec-obj-index">{obj.index}</span>
+                  </div>
+                  <div className={`utec-obj-badge ${theme}`}>{obj.badge}</div>
+                  <h4 style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: '#0F2547', margin: '0.6rem 0 0.3rem' }}>
+                    {obj.title}
+                  </h4>
+                  <p className="utec-obj-text">{obj.desc}</p>
                 </div>
-                <span className="utec-obj-index">01</span>
-              </div>
-              <div className="utec-obj-badge green">Education</div>
-              <p className="utec-obj-text">
-                Provide quality education in sustainable construction materials and technology.
-              </p>
-            </div>
-
-            <div className="utec-obj-card card-blue">
-              <div className="utec-obj-card-top">
-                <div className="utec-obj-icon-circle blue">
-                  <Droplets size={20} />
-                </div>
-                <span className="utec-obj-index">02</span>
-              </div>
-              <div className="utec-obj-badge blue">Research</div>
-              <p className="utec-obj-text">
-                Encourage research and innovation in sustainable materials and environmental management.
-              </p>
-            </div>
-
-            <div className="utec-obj-card card-pink">
-              <div className="utec-obj-card-top">
-                <div className="utec-obj-icon-circle pink">
-                  <HeartPulse size={20} />
-                </div>
-                <span className="utec-obj-index">03</span>
-              </div>
-              <div className="utec-obj-badge pink">Awareness</div>
-              <p className="utec-obj-text">
-                Promote health and safety awareness and social responsibility practices.
-              </p>
-            </div>
-
-            <div className="utec-obj-card card-purple">
-              <div className="utec-obj-card-top">
-                <div className="utec-obj-icon-circle purple">
-                  <GraduationCap size={20} />
-                </div>
-                <span className="utec-obj-index">04</span>
-              </div>
-              <div className="utec-obj-badge purple">Capacity</div>
-              <p className="utec-obj-text">
-                Offer training and capacity building for students and industry professionals.
-              </p>
-            </div>
+              );
+            })}
           </div>
         </section>
 
@@ -592,44 +569,66 @@ export default function UltraTechPage({
                 {/* 3. ACTIVITIES */}
                 {activeTabId === 'activities' && (
                   <div className="utec-timeline-wrapper animate-tab-fade">
-                    {(accordionContent['Activities'] || []).map((activity, idx) => {
-                      const dateMatch = activity.match(/on\s+([A-Za-z]+\s+\d{1,2},\s+\d{4})/i);
-                      const dateStr = dateMatch ? dateMatch[1] : null;
+                    {activitiesList.map((act, idx) => (
+                      <div key={idx} className="utec-timeline-card">
+                        <div className="utec-timeline-marker">
+                          <div className="utec-marker-ring">
+                            <span className="utec-marker-dot" />
+                          </div>
+                          {idx < activitiesList.length - 1 && (
+                            <div className="utec-timeline-line" />
+                          )}
+                        </div>
 
-                      let eventTag = 'Event';
-                      if (activity.toLowerCase().includes('mou')) eventTag = 'MoU Signing';
-                      else if (activity.toLowerCase().includes('webinar')) eventTag = 'Webinar Session';
-                      else if (activity.toLowerCase().includes('expert talk')) eventTag = 'Expert Talk';
-
-                      return (
-                        <div key={idx} className="utec-timeline-card">
-                          <div className="utec-timeline-marker">
-                            <div className="utec-marker-ring">
-                              <span className="utec-marker-dot" />
-                            </div>
-                            {idx < (accordionContent['Activities']?.length || 1) - 1 && (
-                              <div className="utec-timeline-line" />
+                        <div className="utec-timeline-content">
+                          <div className="utec-timeline-header">
+                            <span className="utec-event-type-badge">{act.eventTag}</span>
+                            {act.dateStr && (
+                              <span className="utec-event-date">
+                                <Calendar size={13} /> {act.dateStr}
+                              </span>
                             )}
                           </div>
-
-                          <div className="utec-timeline-content">
-                            <div className="utec-timeline-header">
-                              <span className="utec-event-type-badge">{eventTag}</span>
-                              {dateStr && (
-                                <span className="utec-event-date">
-                                  <Calendar size={13} /> {dateStr}
-                                </span>
-                              )}
-                            </div>
-                            <p className="utec-timeline-desc">{activity}</p>
-                          </div>
+                          <p className="utec-timeline-desc">{act.desc}</p>
                         </div>
-                      );
-                    })}
+                      </div>
+                    ))}
                   </div>
                 )}
 
-                {/* 4. DYNAMIC CUSTOM SECTION CONTENT */}
+                {/* 4. KEY HIGHLIGHTS */}
+                {activeTabId === 'key-highlights' && (
+                  <div className="utec-highlights-wrapper animate-tab-fade">
+                    <ul className="utec-mission-checklist" style={{ gap: '0.85rem' }}>
+                      {keyHighlights.map((itemText, idx) => (
+                        <li key={idx} className="utec-mission-item" style={{ background: '#F8FAFC', padding: '0.85rem 1.1rem', borderRadius: '10px', border: '1px solid #E2E8F0' }}>
+                          <div className="utec-mission-bullet-gold">
+                            <CheckCircle2 size={16} />
+                          </div>
+                          <span className="utec-mission-text" style={{ fontSize: '0.95rem', fontWeight: 500, color: '#1E293B' }}>{itemText}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* 5. OUTCOMES */}
+                {activeTabId === 'outcomes' && (
+                  <div className="utec-outcomes-wrapper animate-tab-fade">
+                    <ul className="utec-mission-checklist" style={{ gap: '0.85rem' }}>
+                      {outcomes.map((itemText, idx) => (
+                        <li key={idx} className="utec-mission-item" style={{ background: '#F8FAFC', padding: '0.85rem 1.1rem', borderRadius: '10px', border: '1px solid #E2E8F0' }}>
+                          <div className="utec-mission-bullet-gold">
+                            <Award size={16} />
+                          </div>
+                          <span className="utec-mission-text" style={{ fontSize: '0.95rem', fontWeight: 500, color: '#1E293B' }}>{itemText}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* 6. DYNAMIC CUSTOM SECTION CONTENT */}
                 {activeTab?.customSection && (
                   <div className="utec-custom-tab-content animate-tab-fade">
                     <SectionSubtree section={activeTab.customSection} />
@@ -656,12 +655,21 @@ export default function UltraTechPage({
           </div>
         </div>
 
-        {/* PHOTO GALLERIES AT VERY BOTTOM IF CUSTOM SECTIONS CARRY ANY */}
-        {customSections.length > 0 && (
-          <section className="utec-gallery-section" style={{ marginTop: '3rem' }}>
+        {/* PHOTO GALLERIES AT VERY BOTTOM WITH CAPTION */}
+        <section className="utec-gallery-section" style={{ marginTop: '3rem' }}>
+          <div className="utec-gallery-header" style={{ marginBottom: '1.5rem' }}>
+            <div className="utec-section-kicker">
+              <span className="utec-yellow-bar" />
+              <span>GALLERY</span>
+            </div>
+            <h3 className="utec-section-heading" style={{ fontSize: '1.5rem', margin: 0 }}>
+              Student Technical Learning Activity
+            </h3>
+          </div>
+          {customSections.length > 0 && (
             <CustomSectionsGalleries sections={customSections} />
-          </section>
-        )}
+          )}
+        </section>
       </div>
     </div>
   );

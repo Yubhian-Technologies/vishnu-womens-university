@@ -1,6 +1,7 @@
 // Rich hardcoded content for the Vishnu Space Application Center (VSAC)
 // differentiator page (slug: vsac) — overrides that item's generic
 // Firestore intro/about text in DifferentiatorDetail.tsx.
+
 export interface VsacMember {
   name: string;
   designation?: string;
@@ -38,26 +39,40 @@ export interface CollaborationItem {
 }
 
 export const vsac = {
+  heroCategory: 'RESEARCH & SPECIALISED LABS',
+  heroTitle: 'Vishnu Space Application Center (VSAC)',
+  heroSubtitle:
+    'Connecting students with space technology through satellite tracking, CubeSat design, High-Altitude Balloon payload development, and hands-on ground-station operations.',
+
+  aboutTitle: 'ABOUT VSAC',
   paragraphs: [
-    'The Vishnu Space Application Center–VSAC (call sign VU2VEP), established in the Department of Electronics and Communication Engineering at Shri Vishnu Engineering College for Women, Bhimavaram, is a collaborative effort between Sri Vishnu Educational Society (SVES) and Dhruva Space Private Limited. The initiative began with the signing of a Memorandum of Understanding (MOU) between the two entities, facilitated by the presence of esteemed leaders including Sri K. Phani Raj, Chairman of SVES, and Sri Ravikrishnan Rajagopal, Vice Chairman of SVES.',
-    'At its core, the Vishnu Space Application Center serves as an S-band ground station dedicated to tracking data from satellites operating under the S-band frequency. The Lab possesses a state-of-the-art 3-meter parabolic mesh reflector antenna with an operating frequency range of 2200-2290 MHz and a gain of 35.4 dBi, ensuring precise and efficient satellite tracking capabilities. Along with the hardware setup, the advanced tracking software helps students and faculty efficiently decode and encrypt the data received from the antenna. The center is empowering students and faculty to design and launch CubeSats, none satellites that hold immense potential for scientific research and exploration endeavours.',
-    'In addition to CubeSat design and satellite tracking, the Vishnu Space Application Center offers students the opportunity to participate in the design of payloads for High Altitude Balloon (HAB) experiments. This hands-on experience exposes students to real-world challenges and encourages innovative problem-solving in the pursuit of scientific discovery.',
+    'The Vishnu Space Application Center (VSAC), established in the Department of Electronics and Communication Engineering at Shri Vishnu Engineering College for Women, is a dedicated platform for experiential learning, research, and skill development in space technology. Developed in collaboration with Dhruva Space Private Limited, the Centre connects academic learning with practical applications in satellite communication and space systems.',
+    'At the heart of VSAC is an S-band ground station equipped with a 3-metre parabolic mesh reflector antenna operating in the 2200–2290 MHz frequency range. The facility enables students and faculty to receive, decode, and analyse satellite data while developing an understanding of satellite tracking, communication systems, and ground-station operations.',
+    'The Centre also supports learning in CubeSat design and development and High-Altitude Balloon payload experimentation, enabling students to move beyond theoretical study and engage with real engineering challenges. Through training, projects, research, and industry interaction, VSAC creates opportunities for students to explore emerging areas of space technology and develop relevant technical and problem-solving skills.',
   ],
-  vision: 'To pioneer advancements in space technology and foster a culture of innovation and excellence in satellite tracking and CubeSat design at the Vishnu Space Application Center, led by the students of Shri Vishnu Engineering College for Women.',
+
+  visionTitle: 'Our Vision',
+  vision:
+    'To foster a vibrant centre for learning, research, and innovation in satellite and space technologies, enabling students to contribute meaningfully to the evolving space ecosystem.',
+
+  missionTitle: 'Our Mission',
   mission: [
-    'Empower students to lead pioneering advancements in space technology.',
-    'Create an environment of innovation and excellence in satellite tracking and CubeSat design.',
-    'Provide students with the resources and mentorship needed to excel in satellite technology research and development.',
-    'Foster a collaborative and inclusive community that drives continuous progress and contributes significantly to the field of space exploration.',
+    'Empower students with practical knowledge and experience in satellite communication, tracking, CubeSat systems, and related space technologies.',
+    'Create opportunities for project-based learning, experimentation, research, and interdisciplinary collaboration.',
+    'Provide students with mentorship, technical resources, and industry exposure to strengthen their readiness for emerging careers in the space sector.',
+    'Build an inclusive learning environment that encourages curiosity, innovation, problem-solving, and sustained engagement with space science and engineering.',
   ],
+
+  objectivesTitle: 'Objectives',
   objectives: [
-    'Acquire, decode, and analyse satellite data to contribute to scientific research and space exploration efforts.',
-    'Provide hands-on training and practical experience for students in satellite tracking techniques and CubeSat design.',
-    'Collaborate with industry partners and space agencies to enhance knowledge sharing and technological advancements.',
-    'Conduct research and development projects aimed at improving satellite communication and tracking systems.',
-    'Inspire and support students to pursue careers in fields related to space technology and exploration.',
-    'To attain HAM radio license for students and knowledge on Morse code.',
+    'Acquire, decode, analyse, and interpret satellite data for academic learning and research.',
+    'Provide practical training in satellite tracking, ground-station operations, CubeSat development, and related communication technologies.',
+    'Facilitate collaborative projects with industry, research organisations, and space-sector partners.',
+    'Encourage research aimed at improving satellite communication, tracking, data interpretation, and associated technologies.',
+    'Inspire students to pursue advanced study, research, entrepreneurship, and careers related to space technology.',
+    'Provide relevant technical exposure, including HAM radio communication and Morse code, where applicable to programme activities.',
   ],
+
   team: {
     inCharge: [
       {
@@ -125,11 +140,14 @@ export const vsac = {
       },
     ] as VsacMember[],
   },
+
   trainingResearch: [
     {
-      title: 'One week training programme on Ham Radio Morse Code',
+      title: 'One-Week Training Programme on HAM Radio and Morse Code',
       paragraphs: [
-        'During 17th-23rd July, 2023, the Department of Electronics and Communication Engineering organized a one-week training programme on "Ham Radio Morse Code" for students and faculty at VSAC. This initiative aimed to provide faculty members seeking to explore HAM radio knowledge with hands-on experience and training in Morse code. The programme covered basic concepts of communication protocols as well as Morse key transmission and reception techniques. A total of 7 faculty members and 28 students participated in the training programme, enriching their understanding of HAM radio technology.',
+        'From 17–23 July 2023, the Department of Electronics and Communication Engineering organised a one-week training programme on HAM Radio and Morse Code for VSAC students and faculty.',
+        'The programme introduced participants to the fundamentals of amateur radio communication, operating practices, and Morse code. Through guided sessions and hands-on exposure, participants gained practical insight into radio communication systems and their relevance to satellite and space-related applications.',
+        'Seven faculty members and 28 students participated in the programme.',
       ],
       table: {
         headers: ['S.No', 'Name', 'Designation'],
@@ -214,7 +232,8 @@ export const vsac = {
           ['21', 'M. Naveena'],
         ],
       },
-      secondParagraph: 'The training session by the faculty members Dr. Ratikanta Sahoo and Mr. G. Challa Ram for the HAM radio license exam during 20th to 25th Feb, 2024 was a comprehensive and engaging experience for all participating students. Throughout the program, students were introduced to fundamental concepts of amateur radio, including frequency bands, modulation techniques, study guides, and practice exams, to ensure a well-rounded preparation. Additionally, interactive sessions and hands-on exercises on Morse Code provided students with practical experience. As a result of diligent study and regular practice, students demonstrated significant progress in their understanding of HAM radio principles and regulations.',
+      secondParagraph:
+        'The training session by the faculty members Dr. Ratikanta Sahoo and Mr. G. Challa Ram for the HAM radio license exam during 20th to 25th Feb, 2024 was a comprehensive and engaging experience for all participating students. Throughout the program, students were introduced to fundamental concepts of amateur radio, including frequency bands, modulation techniques, study guides, and practice exams, to ensure a well-rounded preparation.',
       secondTable: {
         headers: ['Sl. No', 'Name of the Student', 'Roll No', 'Section', 'Batch No'],
         rows: [
@@ -247,38 +266,77 @@ export const vsac = {
       },
     },
   ] as TrainingResearchItem[],
-  collaborations: [
-    {
-      title: 'Dhruva Space Private Limited, Hyderabad',
-      paragraphs: [
-        'Dhruva Space Private Limited is a National Award-winning space technology company focused on building full-stack space engineering solutions. The company is based out of Hyderabad, India, and is actively building application-agnostic satellite platforms. Dhruva Space offers Satellites coupled with Earth stations and Launch services as an integrated solution or individually as a technology solution to power Space-based applications, on Earth and beyond. The founding team are business & technology leaders, who formerly worked with Exseed Space, ams AG, Cisco, and KPMG. The whole team sees close to 80 members, from a variety of backgrounds: engineering, business development, research, marketing, legal, and more.',
-      ],
-    },
-    {
-      title: 'Social Impacts',
-      intro: 'The Vishnu Space Application Center at Shri Vishnu Engineering College for Women has several social impacts:',
-      bullets: [
-        { lead: 'Empowering Women in STEM:', text: ' By offering hands-on experience and training in satellite technology and space exploration, the Lab empowers women to pursue careers in STEM fields.' },
-        { lead: 'Advancing Space Education:', text: ' The Lab contributes to advancing space education within the local community and beyond. By engaging students and faculty in satellite tracking, CubeSat design, and other space-related activities, the Lab inspires interest and enthusiasm for space exploration among young learners and the wider community.' },
-        { lead: 'Community Engagement and Awareness:', text: ' The activities and initiatives of the Lab raise awareness about space technology and its applications among the local community. This enhances public understanding of the significance of space research and its impact on various aspects of modern life, including communication, weather forecasting, disaster management, and more.' },
-        { lead: 'Encouraging Innovation and Entrepreneurship:', text: ' Through collaboration with industry partners and space agencies, the Lab fosters innovation and entrepreneurship in space technology. This can lead to the development of new technologies, startups, and solutions that benefit society and contribute to economic growth.' },
-        { lead: 'Scientific Advancement and Research:', text: ' The Lab focus on acquiring, analyzing, and applying satellite data for scientific research contributes to broader scientific knowledge and understanding. This knowledge can be used to address global challenges such as climate change, natural disasters, and environmental monitoring.' },
-      ],
-    },
-    {
-      title: 'Outcomes',
-      intro: 'The Vishnu Space Application Center at Shri Vishnu Engineering College for Women, established through collaboration with Dhruva Space Private Limited, is driving significant outcomes in space technology education.',
-      bullets: [
-        { lead: 'Hands-on Learning:', text: ' The VSAC offers students practical experience in satellite tracking techniques, CubeSat design, and payload development. Through hands-on activities and projects, students gain valuable skills and insights into space technology and engineering.' },
-        { lead: 'Scientific Research Contribution:', text: ' The Lab acquires, decodes, and analyzes satellite data, contributing to scientific research and space exploration efforts. By studying the data received from satellite tracking, students and faculty advance knowledge in space-related phenomena and satellite communication.' },
-        { lead: 'Technological Advancements:', text: ' Collaborating with industry partners and space agencies, the Lab drives technological advancements in satellite communication and tracking systems. This collaboration enhances knowledge sharing and promotes innovation in space technology.' },
-        { lead: 'Skill Development:', text: ' The Lab empowers students to pursue careers in fields related to space technology and exploration by providing resources, mentorship, and hands-on training. Students develop technical expertise and problem-solving skills essential for success in the space industry.' },
-        { lead: 'Community Engagement:', text: ' Engaging the community in discussions about space exploration, the Lab raises awareness and interest in space science. By fostering dialogue and collaboration, the Lab contributes to a broader understanding of space-related topics and their societal impact.' },
-      ],
-    },
-    {
-      title: 'Gallery',
-      isGallery: true,
-    },
-  ] as CollaborationItem[],
+
+  industryCollaboration: {
+    title: 'Industry Collaboration with Dhruva Space',
+    paragraphs: [
+      'VSAC collaborates with Dhruva Space Private Limited to strengthen student exposure to satellite communication, ground-station systems, CubeSat technologies, and the wider space-engineering ecosystem.',
+      'The collaboration supports the Centre in connecting academic learning with industry practices, providing students with opportunities to understand real-world systems, emerging technologies, and professional pathways within the space sector.',
+      'Through such industry engagement, VSAC aims to strengthen experiential learning, technical capability, research orientation, and innovation among students.',
+    ],
+  },
+
+  socialImpacts: {
+    title: 'Extending the Impact of Space Education',
+    bullets: [
+      {
+        lead: 'Empowering Women in STEM',
+        text: 'VSAC gives women engineering students direct exposure to satellite communication, tracking systems, CubeSat development, and space-related technologies, helping broaden participation in emerging STEM fields.',
+      },
+      {
+        lead: 'Advancing Space Education',
+        text: 'Training programmes, laboratory activities, projects, and demonstrations help students connect classroom concepts with practical applications in satellite and communication technologies.',
+      },
+      {
+        lead: 'Building Awareness and Curiosity',
+        text: 'The Centre encourages students to explore space science, satellite systems, radio communication, and related technologies beyond the conventional curriculum.',
+      },
+      {
+        lead: 'Encouraging Innovation',
+        text: 'Hands-on experimentation and industry interaction provide students with opportunities to investigate problems, develop ideas, and undertake technology-oriented projects.',
+      },
+      {
+        lead: 'Supporting Research',
+        text: 'Satellite data, communication systems, and associated facilities create opportunities for faculty and students to pursue applied research and interdisciplinary exploration.',
+      },
+    ],
+  },
+
+  learningOutcomes: {
+    title: 'Learning Outcomes',
+    bullets: [
+      {
+        lead: 'Hands-on Technical Experience',
+        text: 'Students gain practical exposure to satellite tracking, ground-station operations, communication systems, CubeSat concepts, and payload-related activities.',
+      },
+      {
+        lead: 'Applied Data Skills',
+        text: 'Working with satellite signals and data helps students understand acquisition, decoding, interpretation, and analysis in real-world contexts.',
+      },
+      {
+        lead: 'Research Exposure',
+        text: 'The Centre provides an environment in which students and faculty can explore projects and research related to communication, satellite systems, data processing, and associated technologies.',
+      },
+      {
+        lead: 'Industry Awareness',
+        text: 'Interaction with space-sector partners helps students understand contemporary technologies, professional practices, and emerging opportunities in the industry.',
+      },
+      {
+        lead: 'Career-oriented Skill Development',
+        text: 'Projects, technical training, mentorship, and laboratory experience strengthen problem-solving, experimentation, teamwork, and specialised technical competencies.',
+      },
+    ],
+  },
+
+  galleryTitle: 'VSAC in Action',
+  galleryCaption: 'Satellite Ground Station • Training • Projects • Student Exploration',
+
+  cta: {
+    title: 'There’s More to Explore',
+    subtitle:
+      'From space technology and advanced research to industry-led learning and innovation, discover more places at VWU where curiosity becomes capability.',
+    btn1: 'Explore All Differentiators',
+    btn2: 'Discover Academics',
+    btn3: 'Apply to VWU',
+  },
 };

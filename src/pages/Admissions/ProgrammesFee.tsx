@@ -6,6 +6,7 @@ import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
 import { dotTech } from '../../lib/academicDegreeNames';
 
 const BTECH_FEE = '₹ 1,05,000';
+const VISWPU_BTECH_FEE = '₹ 47,000';
 const MTECH_FEE = '₹ 55,800';
 const MBA_FEE = '₹ 55,000';
 
@@ -30,8 +31,8 @@ const BTECH_VISW_PROGRAMS: ProgramRow[] = [
 
 // Second AP EAPCET college code (VISWPU) — separate B.Tech seats.
 const VISWPU_BTECH_PROGRAMS: ProgramRow[] = [
-  { name: 'CSE [Artificial Intelligence & Machine Learning]', code: 'CSM', intake: 120, fee: '₹ 47,000' },
-  { name: 'Electronics Engineering (VLSI Design & Technology)', code: 'EVT', intake: 60, fee: '₹ 47,000' },
+  { name: 'CSE [Artificial Intelligence & Machine Learning]', code: 'CSM', intake: 120, fee: VISWPU_BTECH_FEE },
+  { name: 'Electronics Engineering (VLSI Design & Technology)', code: 'EVT', intake: 60, fee: VISWPU_BTECH_FEE },
 ];
 
 const MTECH_PROGRAMS: ProgramRow[] = [
@@ -126,7 +127,7 @@ export default function ProgrammesFee() {
             <div style={{ display: 'flex', gap: 'var(--space-6)', flexWrap: 'wrap', marginTop: 'var(--space-4)' }}>
               {[
                 { label: 'Duration', value: '4 Years' },
-                { label: 'Tuition Fee', value: BTECH_FEE },
+                { label: 'Tuition Fee (VISW / VISWPU)', value: `${BTECH_FEE} / ${VISWPU_BTECH_FEE}` },
                 { label: 'Total Intake', value: `${BTECH_TOTAL_INTAKE} Seats` },
               ].map(s => (
                 <div key={s.label} style={{ background: 'var(--color-primary)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4) var(--space-6)', textAlign: 'center' }}>

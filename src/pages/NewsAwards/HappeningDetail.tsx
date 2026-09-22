@@ -146,19 +146,15 @@ export default function HappeningDetail() {
             )}
 
             {/* Article Description / Body */}
-            <div className="happ-detail-body">
-              {item.description ? (
-                item.description.split('\n\n').map((paragraph, idx) => (
+            {item.description && item.description.trim() ? (
+              <div className="happ-detail-body">
+                {item.description.split('\n\n').map((paragraph, idx) => (
                   <p key={idx} className="happ-detail-paragraph">
                     {paragraph}
                   </p>
-                ))
-              ) : (
-                <p className="happ-detail-paragraph">
-                  No additional details provided for this campus event.
-                </p>
-              )}
-            </div>
+                ))}
+              </div>
+            ) : null}
           </article>
 
           {/* Related / Other Recent Events */}
