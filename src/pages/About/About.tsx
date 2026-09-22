@@ -508,13 +508,13 @@ export default function About() {
       {/* Campus Snapshot */}
       <section className="section bg-off-white">
         <div className="container">
-          <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-12)', alignItems: 'center' }}>
+          <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-12)', alignItems: 'stretch' }}>
             {campusSnapshotImg && (
-              <div className="sves-image-wrapper reveal-left">
+              <div className="sves-image-wrapper reveal-left" style={{ height: '100%', minHeight: '420px', display: 'flex' }}>
                 <img loading="lazy"
                   src={campusSnapshotImg.src}
                   alt={campusSnapshotImg.alt}
-                  style={{ width: '100%', height: '360px', objectFit: 'cover' }}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 />
               </div>
             )}
