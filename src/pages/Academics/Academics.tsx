@@ -234,7 +234,7 @@ export default function Academics() {
         </div>
       </section>
 
-      {/* Programs */}
+          {/* Programs */}
       <section className="academics-programs-section">
         <div className="container">
           <div className="reveal">
@@ -244,16 +244,23 @@ export default function Academics() {
             </p>
           </div>
 
-          <div className="programs-tabs">
-            {TABS.map(tab => (
-              <button
-                key={tab.id}
-                className={`prog-tab${activeTab === tab.id ? ' active' : ''}`}
-                onClick={() => setActiveTab(tab.id)}
-              >
-                {tab.label}
-              </button>
-            ))}
+          <div
+            className="programs-tabs"
+            style={{ '--tab-count': TABS.length, '--active-index': Math.max(0, TABS.findIndex((t) => t.id === activeTab)) } as React.CSSProperties}
+          >
+            <div className="programs-tabs-indicator" aria-hidden="true" />
+            {TABS.map((tab) => {
+              const count = programs.filter((p) => p.category === tab.id).length;
+              return (
+                <button
+                  key={tab.id}
+                  className={`prog-tab${activeTab === tab.id ? ' active' : ''}`}
+                  onClick={() => setActiveTab(tab.id)}
+                >
+                  {tab.label}{count > 0 ? ` (${count})` : ''}
+                </button>
+              );
+            })}
           </div>
 
           <div className="programs-grid">
