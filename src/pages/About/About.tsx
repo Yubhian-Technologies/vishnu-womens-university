@@ -12,7 +12,7 @@ import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import {
   Rocket, Target, Calendar, MapPin, GraduationCap, Users,
   Briefcase, Award, CheckCircle, BookOpen, Lightbulb, Sparkles,
-  Globe, ArrowRight, Wifi, Building2
+  Globe, ArrowRight, Wifi, Building2, ExternalLink
 } from 'lucide-react';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import { isEnabledNavPath } from '../../components/Header/Header';
@@ -80,6 +80,10 @@ export interface CoreExecutiveMember {
   /** Long-form description — rendered as paragraphs (split on blank lines)
       in the expanded executive detail banner. Managed from the admin. */
   description?: string;
+  /** Optional external profile link (LinkedIn, faculty page, etc.) —
+      shown as a highlighted link at the start of the description in the
+      expanded detail banner. Managed from the admin. */
+  linkUrl?: string;
 }
 
 export const defaultExecutives: Omit<CoreExecutiveMember, 'id'>[] = [
@@ -394,9 +398,21 @@ export default function About() {
                   )}
                 </div>
                 {activeExec.bio && <p className="exec-detail-banner__bio">{activeExec.bio}</p>}
-                {activeExec.description && (
+                {(activeExec.description || activeExec.linkUrl) && (
                   <div className="exec-detail-banner__description">
-                    {activeExec.description.split(/\n\s*\n/).map((para, i) => (
+                    {activeExec.linkUrl && (
+                      <a
+                        className="exec-detail-banner__link"
+                        href={activeExec.linkUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <ExternalLink size={14} strokeWidth={2.25} />
+                        View External Profile
+                      </a>
+                    )}
+                    {activeExec.description && activeExec.description.split(/\n\s*\n/).map((para, i) => (
                       <p key={i}>{para.trim()}</p>
                     ))}
                   </div>
