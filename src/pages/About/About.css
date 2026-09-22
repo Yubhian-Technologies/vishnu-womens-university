@@ -460,9 +460,8 @@
 }
 
 .exec-detail-banner__link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+  display: inline-block;
+  max-width: 100%;
   padding: 6px 14px;
   margin-bottom: 0.9rem;
   border-radius: 4px;
@@ -470,9 +469,8 @@
   border: 1px solid var(--color-accent);
   color: var(--color-primary);
   font-size: 0.85rem;
-  font-weight: 800;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
+  font-weight: 700;
+  word-break: break-all;
   transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
