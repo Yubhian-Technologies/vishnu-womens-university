@@ -12,7 +12,7 @@ import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import {
   Rocket, Target, Calendar, MapPin, GraduationCap, Users,
   Briefcase, Award, CheckCircle, BookOpen, Lightbulb, Sparkles,
-  Globe, ArrowRight, Wifi, Building2, ExternalLink
+  Globe, ArrowRight, Wifi, Building2
 } from 'lucide-react';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import { isEnabledNavPath } from '../../components/Header/Header';
@@ -408,8 +408,7 @@ export default function About() {
                         rel="noopener noreferrer"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        <ExternalLink size={14} strokeWidth={2.25} />
-                        View External Profile
+                        {activeExec.linkUrl}
                       </a>
                     )}
                     {activeExec.description && activeExec.description.split(/\n\s*\n/).map((para, i) => (
