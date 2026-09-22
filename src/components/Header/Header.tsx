@@ -3,7 +3,6 @@ import { Link, useLocation } from 'react-router-dom';
 import { ArrowRight, ChevronDown, ArrowUpRight } from 'lucide-react';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useNavLinkOverride } from '../../hooks/useNavLinkOverride';
-import type { ProgramDoc } from '../../pages/Admin/sections/ProgramsAdmin';
 import { DIFFERENTIATOR_CATEGORIES } from '../../pages/Admin/sections/DifferentiatorsAdmin';
 import type { DifferentiatorItemDoc } from '../../pages/Admin/sections/DifferentiatorsAdmin';
 import type { PlacementItemDoc } from '../../pages/Admin/sections/PlacementItemsAdmin';
@@ -124,7 +123,43 @@ const navItemsData: NavItem[] = [
           { label: 'Examinations Portal', path: 'https://www.svecwexams.in/', external: true },
         ],
       },
-      { groupLabel: 'Departments / Courses', groupPath: '/academics/departments', items: [] },
+      {
+        groupLabel: 'UG Programs',
+        groupPath: '/academics/programs?tab=btech',
+        items: [
+          { label: 'Computer Science & Engineering', path: '/academics/cse' },
+          { label: 'Artificial Intelligence', path: '/academics/ai-ds' },
+          { label: 'Information Technology', path: '/academics/it' },
+          { label: 'Electronics & Communication Engineering', path: '/academics/ece' },
+          { label: 'Electrical & Electronics Engineering', path: '/academics/eee' },
+          { label: 'Civil Engineering', path: '/academics/ce' },
+          { label: 'Mechanical Engineering', path: '/academics/me' },
+          { label: 'Department of Mathematics', path: '/academics/mathematics' },
+          { label: 'Department of Physics', path: '/academics/physics' },
+          { label: 'Department of Chemistry', path: '/academics/chemistry' },
+          { label: 'Department of English', path: '/academics/english' },
+        ],
+      },
+      {
+        groupLabel: 'PG Programs',
+        groupPath: '/academics/programs?tab=mtech',
+        items: [
+          { label: 'Computer Science & Engineering', path: '/academics/mtech-cse' },
+          { label: 'VLSI Design', path: '/academics/mtech-vlsi' },
+          { label: 'Power Electronics', path: '/academics/mtech-power-electronics' },
+          { label: 'Software Engineering', path: '/academics/mtech-software-engineering' },
+          { label: 'Department of Management Studies', path: '/academics/mba' },
+        ],
+      },
+      {
+        groupLabel: 'PhD Programs',
+        groupPath: '/academics/programs?tab=phd',
+        items: [
+          { label: 'Computer Science & Engineering', path: '/academics/cse' },
+          { label: 'Electronics & Communication Engineering', path: '/academics/ece' },
+          { label: 'Electrical & Electronics Engineering', path: '/academics/eee' },
+        ],
+      },
       {
         groupLabel: 'Information',
         groupPath: '/information',
@@ -382,16 +417,6 @@ export default function Header() {
   const headerApplyNow = useNavLinkOverride('header-apply-now', '/apply-now');
   const orgChart = useNavLinkOverride('header-organizational-chart', '/downloads/SVECWOrganizationChart.jpg');
 
-  const { docs: programs } = useOrderedCollection<ProgramDoc>('programs', 'order');
-  const isVlsiProgram = (p: ProgramDoc) =>
-    (p.slug || '').toUpperCase() === 'EVT' || /VLSI|VSLI/.test((p.name || '').toUpperCase());
-  const programItem = (p: ProgramDoc): NavChild => ({
-    label: p.name || p.slug || 'Programme',
-    path: isVlsiProgram(p) ? '/academics/ece' : p.slug ? `/academics/${p.slug}` : '/academics',
-    external: true,
-    hideExternalIcon: true,
-  });
-  const ugProgrammes = programs.filter((p) => p.category === 'btech').map(programItem);
 
   const { docs: differentiatorItems } = useOrderedCollection<DifferentiatorItemDoc>('differentiatorItems', 'order');
   const { docs: placementItems } = useOrderedCollection<PlacementItemDoc>('placementItems', 'order');
@@ -495,13 +520,7 @@ export default function Header() {
       });
       return { ...item, groups };
     }
-    if (item.label === 'Academics' && item.groups) {
-      const groups = item.groups.map((group) => {
-        if (group.groupLabel === 'Departments / Courses') return { ...group, items: ugProgrammes };
-        return group;
-      });
-      return { ...item, groups };
-    }
+
     if (item.label === 'Differentiators' && item.groups) {
       const groups = item.groups.map((group) => {
         const cat = DIFFERENTIATOR_CATEGORIES.find((c) => c.label === group.groupLabel);
