@@ -30,9 +30,11 @@ const PILLAR_ITEMS = [
 
 // Admin-entered links may omit the scheme (e.g. "linkedin.com/in/..."),
 // which the browser would otherwise resolve as a path relative to the
-// current page instead of an external redirect.
+// current page instead of an external redirect. Respect whatever scheme
+// (http/https) the admin actually typed — only fall back to a
+// protocol-relative "//" (not a hardcoded https) when none was given.
 function toAbsoluteUrl(url: string) {
-  return /^[a-z][a-z0-9+.-]*:/i.test(url) ? url : `https://${url}`;
+  return /^[a-z][a-z0-9+.-]*:/i.test(url) ? url : `//${url.replace(/^\/+/, '')}`;
 }
 
 function getInitials(name: string) {
