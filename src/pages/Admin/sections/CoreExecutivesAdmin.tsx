@@ -12,7 +12,7 @@ type CoreExecutiveDoc = CoreExecutiveMember & { storagePath?: string };
 
 const EMPTY: Omit<CoreExecutiveDoc, 'id'> = {
   name: '', role: '', photoUrl: '', storagePath: '', order: 0, level: 1,
-  qualification: '', experience: '', email: '', bio: '', description: '',
+  qualification: '', experience: '', email: '', bio: '', description: '', linkUrl: '',
 };
 
 export default function CoreExecutivesAdmin() {
@@ -50,7 +50,7 @@ export default function CoreExecutivesAdmin() {
     setForm({
       name: m.name, role: m.role, photoUrl: m.photoUrl || '', storagePath: m.storagePath || '', order: m.order, level: m.level || 1,
       qualification: m.qualification || '', experience: m.experience || '', email: m.email || '', bio: m.bio || '',
-      description: m.description || '',
+      description: m.description || '', linkUrl: m.linkUrl || '',
     });
   };
 
@@ -124,6 +124,10 @@ export default function CoreExecutivesAdmin() {
           <div className="admin-field" style={{ gridColumn: '1 / -1' }}>
             <label htmlFor="field-bio">Short Bio (shown on hover)</label>
             <textarea id="field-bio" rows={3} value={form.bio || ''} onChange={(e) => set('bio', e.target.value)} placeholder="A brief note about this executive's role and contribution." />
+          </div>
+          <div className="admin-field" style={{ gridColumn: '1 / -1' }}>
+            <label htmlFor="field-link-url">External Link (LinkedIn, profile page, etc. — shown as a highlighted link at the start of the description)</label>
+            <input id="field-link-url" type="url" value={form.linkUrl || ''} onChange={(e) => set('linkUrl', e.target.value)} placeholder="https://linkedin.com/in/..." />
           </div>
           <div className="admin-field" style={{ gridColumn: '1 / -1' }}>
             <label htmlFor="field-description">Full Description (paragraphs — shown in the expanded detail panel)</label>
