@@ -35,7 +35,7 @@ export default function PhotoGrid({
   columns = 3,
   variant = 'collage',
   layout = 'default',
-  showGalleryLink = true,
+  showGalleryLink = false,
   galleryLinkText = 'View Full Gallery →',
   className = '',
 }: PhotoGridProps) {

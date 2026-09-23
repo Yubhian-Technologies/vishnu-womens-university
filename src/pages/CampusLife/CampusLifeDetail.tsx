@@ -423,7 +423,6 @@ export default function CampusLifeDetail({ slug: slugProp }: { slug?: string }) 
               label={slug === 'other-facilities' ? 'Campus Facilities Gallery' : ''}
               title={slug === 'other-facilities' ? 'Explore the Spaces That Support Campus Life' : title}
               subtitle={slug === 'other-facilities' ? 'Take a closer look at the infrastructure, services, learning spaces, and shared facilities across Vishnu Women’s University.' : undefined}
-              galleryLinkText={slug === 'other-facilities' ? 'View Full Gallery' : undefined}
               columns={3}
               layout="default"
             />

@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { Heart, Users, ShieldCheck, Star, Activity } from 'lucide-react';
 import PageHero from '../../components/PageHero/PageHero';
 import CustomSectionsRenderer from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
@@ -189,12 +188,6 @@ export default function HealthCare() {
                 </div>
               ))}
             </div>
-          </div>
-
-          <div style={{ textAlign: 'center', marginTop: 'var(--space-6)' }}>
-            <Link to="/news-awards/gallery" className="btn btn-outline">
-              View Full Gallery →
-            </Link>
           </div>
         </div>
       </section>
