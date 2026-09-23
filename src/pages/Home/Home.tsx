@@ -16,6 +16,7 @@ import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { useSitePhotos } from '../../hooks/useSitePhotos';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import { resolveContentIcon } from '../../lib/contentIcons';
+import { isUpcomingHappening, parseHappeningDate } from '../../lib/happenings';
 import type { HappeningDoc } from '../Admin/sections/NewsAwardsDataAdmin';
 import type { ContentBlockDoc } from '../Admin/sections/ContentBlocksAdmin';
 
@@ -161,8 +162,24 @@ export default function Home() {
   // "Upcoming at VWU" and "Recent Campus Activities" are driven by the
   // Happenings collection (see NewsAwardsDataAdmin.tsx / Happenings.tsx).
   const { docs: happenings, loading: happeningsLoading } = useOrderedCollection<HappeningDoc>('happenings', 'order');
+  // UpcomingEvents itself already drops anything whose date has passed (see
+  // its own isUpcomingHappening filter), so this raw list is fine as-is.
   const upcomingHappenings = happenings.filter(h => h.type === 'upcoming');
-  const recentHappenings = happenings.filter(h => h.type === 'recent');
+  // A happening typed 'upcoming' whose date has already elapsed moves into
+  // Recent automatically instead of just vanishing from Upcoming with
+  // nowhere to land — same fix as Happenings.tsx's Recent Events section,
+  // merged with the explicitly-typed 'recent' ones and sorted by date (most
+  // recent first). Unparseable dates sink to the bottom rather than being
+  // hidden (same fail-open choice as isUpcomingHappening).
+  const recentHappenings = happenings
+    .filter(h => h.type === 'recent' || (h.type === 'upcoming' && !isUpcomingHappening(h)))
+    .sort((a, b) => {
+      const ta = parseHappeningDate(a.date).timestamp;
+      const tb = parseHappeningDate(b.date).timestamp;
+      if (ta === null) return tb === null ? 0 : 1;
+      if (tb === null) return -1;
+      return tb - ta;
+    });
 
   const liveTestimonials = useContentBlocks('home', 'testimonials');
   const testimonials = liveTestimonials.length > 0 ? liveTestimonials : defaultTestimonials;

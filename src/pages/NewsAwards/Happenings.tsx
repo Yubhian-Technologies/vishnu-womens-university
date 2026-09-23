@@ -5,7 +5,7 @@ import NewsCard, { type NewsArticle } from '../../components/NewsCard/NewsCard';
 import NewsArticleDialog from '../../components/NewsCard/NewsArticleDialog';
 import { useHashScroll } from '../../hooks/useHashScroll';
 import { useOrderedCollection } from '../../hooks/useCollection';
-import { happeningToArticle, isUpcomingHappening } from '../../lib/happenings';
+import { happeningToArticle, isUpcomingHappening, parseHappeningDate } from '../../lib/happenings';
 import type { HappeningDoc } from '../Admin/sections/NewsAwardsDataAdmin';
 import HappeningsPosterSlider from './HappeningsPosterSlider';
 import './Happenings.css';
@@ -33,10 +33,25 @@ export default function Happenings() {
     return () => observer.disconnect();
   }, []);
 
-  const recent = happenings.filter(h => h.type === 'recent');
   // Admins don't always flip type back once an event's date passes, so
   // drop anything already past regardless of type (see isUpcomingHappening).
   const upcoming = happenings.filter(h => h.type === 'upcoming' && isUpcomingHappening(h));
+  // A happening typed 'upcoming' whose date has already elapsed moves into
+  // Recent automatically instead of just vanishing once it drops out of
+  // `upcoming` above — merged with the explicitly-typed 'recent' ones and
+  // sorted by date (most recent first) so a lapsed event lands in the right
+  // place relative to them, not just tacked onto the end. Unparseable dates
+  // sink to the bottom rather than being hidden (same fail-open choice as
+  // isUpcomingHappening).
+  const recent = happenings
+    .filter(h => h.type === 'recent' || (h.type === 'upcoming' && !isUpcomingHappening(h)))
+    .sort((a, b) => {
+      const ta = parseHappeningDate(a.date).timestamp;
+      const tb = parseHappeningDate(b.date).timestamp;
+      if (ta === null) return tb === null ? 0 : 1;
+      if (tb === null) return -1;
+      return tb - ta;
+    });
 
   return (
     <main className="page-wrapper happenings-page">
