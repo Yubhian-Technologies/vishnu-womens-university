@@ -122,7 +122,7 @@ export default function RecruitersSection() {
           <div className="recruiters-header-text">
             <h2 className="section-title gradient-text">Our Prominent Recruiters</h2>
             <p className="section-desc">
-              Over 100+ industry leaders trust and recruit VWU engineers every year.
+              Over 100+ industry leaders trust and recruits VWU talent every year.
             </p>
           </div>
 

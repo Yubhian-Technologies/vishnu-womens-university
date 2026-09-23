@@ -289,7 +289,7 @@ export default function Home() {
             <div className="activity-section-titlebar">
               <div className="activity-section-meta">
                 <p className="activity-section-eyebrow">Campus Life</p>
-                <h2 className="section-title">Recent Campus Activities</h2>
+                <h2 className="section-title">Recent Events/ News</h2>
               </div>
               <p className="activity-section-desc">
                 A rolling glimpse of the events, celebrations, and everyday moments that shape life at VWU.

@@ -233,10 +233,15 @@ export default function About() {
               <h2 className="section-title">First Private State Women's University in Telugu States</h2>
               <div className="divider" />
               <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-6)', color: 'var(--color-text-light)' }}>
-                Vishnu Women's University is at Vishnupur, Bhimavaram, West Godavari district, Andhra Pradesh. It was established in 2016 under the Andhra Pradesh Private Universities Act.
+                Vishnu Women's University (VWU), located at Vishnupur, Bhimavaram, Andhra Pradesh, is dedicated to
+                providing quality higher education for women. Established in 2001, the institution transitioned into
+                a Brownfield University in 2026 under the Andhra Pradesh Private Universities Act, 2016, carrying
+                forward the rich educational legacy of the Sri Vishnu Educational Society.
               </p>
               <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-6)', color: 'var(--color-text-light)' }}>
-                The University is run by the Sri Vishnu Educational Society — the group behind SVECW and other institutions in Bhimavaram, which together have graduated over 15,000 women. VWU offers B.Tech, M.Tech, MBA and Ph.D. programmes, built only for women.
+                With a focus on education, innovation, leadership, and entrepreneurship, VWU aims to empower women
+                to achieve their academic and professional goals. Over 15,000 women have graduated from the
+                institution, which currently offers B.Tech, M.Tech, MBA, and Ph.D. programmes exclusively for women.
               </p>
               <div style={{ display: 'flex', gap: 'var(--space-4)', flexWrap: 'wrap' }}>
                 <Link to="/vision-mission" className="btn btn-primary">Vision & Mission</Link>
@@ -570,7 +575,7 @@ export default function About() {
               </p>
               <p style={{ color: 'rgba(255,255,255,0.75)', lineHeight: 1.8, marginBottom: 'var(--space-4)' }}>
                 With <strong style={{ color: 'var(--color-accent)' }}>11 institutions</strong> across four campuses in across two Telugu States with
-                <strong style={{ color: 'var(--color-accent)' }}> 25,000+ students</strong> every year, creating opportunities across education,
+                <strong style={{ color: 'var(--color-accent)' }}> 25,000+ students</strong>, creating opportunities across education,
                 technology, healthcare, and professional learning.
               </p>
               <p style={{ color: 'rgba(255,255,255,0.7)', lineHeight: 1.8, marginBottom: 'var(--space-6)' }}>

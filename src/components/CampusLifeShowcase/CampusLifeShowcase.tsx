@@ -39,7 +39,7 @@ export default function CampusLifeShowcase() {
 
           {/* Lead Paragraph */}
           <div className="campus-showcase-desc">
-            <p>Most of what happens outside class here is run by students. Clubs are led by students, the annual fest is organised by students, and the student council is elected by the campus each year.</p>
+            <p>Most of what happens outside class here is run by students. Clubs are led by students, the annual fest is organised by students & Vishnu student success centre students are hand holding their juniors & peers to achieve their goals.</p>
             <p>Twenty-two clubs. Eight sports teams. One fest, one technical symposium, and a council that decides how both are run.</p>
             <p>Discover. Create. Connect. Lead.<br />Your journey begins here.</p>
           </div>
