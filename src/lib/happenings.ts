@@ -42,8 +42,12 @@ export function parseHappeningDate(dateStr: string): ParsedHappeningDate {
   }
   const clean = dateStr.trim();
 
-  // Matches "Month DD, YYYY" or "Month DD" (e.g. "March 28, 2026", "April 15")
-  const match = clean.match(/^([A-Za-z]+)\s+(\d{1,2})(?:,?\s*(\d{4}))?/);
+  // Matches "Month DD, YYYY" or "Month DD" (e.g. "March 28, 2026", "April 15"),
+  // and a "Month D–D, YYYY" range (e.g. "October 6–13, 2025") — the optional
+  // "–D" group lets the year still be found right after the range's second
+  // day instead of being skipped (it used to silently default to the
+  // current year whenever a range came between the day and the year).
+  const match = clean.match(/^([A-Za-z]+)\s+(\d{1,2})(?:\s*[–—-]\s*\d{1,2})?(?:,?\s*(\d{4}))?/);
   if (match) {
     const month = match[1].slice(0, 3).toUpperCase();
     const day = match[2].padStart(2, '0');
@@ -60,8 +64,9 @@ export function parseHappeningDate(dateStr: string): ParsedHappeningDate {
     return { month, day, year, weekday, fullDateStr: clean, timestamp };
   }
 
-  // Matches "DD Month YYYY" (e.g. "28 March 2026")
-  const match2 = clean.match(/^(\d{1,2})\s+([A-Za-z]+)(?:,?\s*(\d{4}))?/);
+  // Matches "DD Month YYYY" (e.g. "28 March 2026") and a "D–D Month YYYY"
+  // range, same reasoning as the range group above.
+  const match2 = clean.match(/^(\d{1,2})(?:\s*[–—-]\s*\d{1,2})?\s+([A-Za-z]+)(?:,?\s*(\d{4}))?/);
   if (match2) {
     const day = match2[1].padStart(2, '0');
     const month = match2[2].slice(0, 3).toUpperCase();
