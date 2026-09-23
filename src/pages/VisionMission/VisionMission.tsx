@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Trophy, Check, ChevronDown } from 'lucide-react';
+import { Trophy, Check } from 'lucide-react';
 import './VisionMission.css';
 import '../About/About.css';
 import PageHero from '../../components/PageHero/PageHero';
@@ -20,8 +20,6 @@ const defaultInspirationPhotos = [
   // Slot 5: standalone "Quality Policy" section image below
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'VWU quality education', caption: '' },
 ];
-
-const MISSION_PREVIEW_LEN = 100;
 
 const QUALITY_COMMITMENT_ITEMS = [
   { title: 'Academic Quality', desc: 'Maintain high standards across teaching, learning and research.' },
@@ -117,25 +115,10 @@ export default function VisionMission() {
               <ul className="vm-mission-list">
                 {missionPoints.map((point, i) => {
                   const num = String(i + 1).padStart(2, '0');
-                  const isLong = point.title.length > MISSION_PREVIEW_LEN;
-                  if (!isLong) {
-                    return (
-                      <li key={point.id} className="vm-mission-item">
-                        <span className="vm-mission-num">{num}</span>
-                        <p>{point.title}</p>
-                      </li>
-                    );
-                  }
                   return (
-                    <li key={point.id} className="vm-mission-item vm-mission-item--collapsible">
-                      <details>
-                        <summary>
-                          <span className="vm-mission-num">{num}</span>
-                          <span className="vm-mission-preview">{point.title.slice(0, MISSION_PREVIEW_LEN).trimEnd()}…</span>
-                          <ChevronDown size={18} className="vm-mission-chevron" />
-                        </summary>
-                        <p className="vm-mission-full">{point.title}</p>
-                      </details>
+                    <li key={point.id} className="vm-mission-item">
+                      <span className="vm-mission-num">{num}</span>
+                      <p>{point.title}</p>
                     </li>
                   );
                 })}

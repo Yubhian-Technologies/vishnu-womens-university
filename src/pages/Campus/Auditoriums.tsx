@@ -316,9 +316,6 @@ export default function Auditoriums() {
                 </div>
               ))}
             </div>
-            <div style={{ textAlign: 'center', marginTop: 'var(--space-8)' }}>
-              <Link to="/news-awards/gallery" className="btn btn-outline">View Full Gallery →</Link>
-            </div>
           </div>
         </section>
       )}
