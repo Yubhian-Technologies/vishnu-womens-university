@@ -86,14 +86,9 @@ const Sports = lazyWithRetry(() => import('./pages/Campus/Sports'));
 const SportsDetail = lazyWithRetry(() => import('./pages/Campus/SportsDetail'));
 const CampusLifeDetail = lazyWithRetry(() => import('./pages/CampusLife/CampusLifeDetail'));
 const SocialServicesPage = lazyWithRetry(() => import('./pages/CampusLife/SocialServicesPage'));
-const SewageTreatment = lazyWithRetry(() => import('./pages/Campus/SewageTreatment'));
 const WellnessCenter = lazyWithRetry(() => import('./pages/Campus/WellnessCenter'));
 const Wellness = lazyWithRetry(() => import('./pages/Campus/Wellness'));
 const Auditoriums = lazyWithRetry(() => import('./pages/Campus/Auditoriums'));
-const SmartClassrooms = lazyWithRetry(() => import('./pages/Campus/SmartClassrooms'));
-const StateOfTheArtLabs = lazyWithRetry(() => import('./pages/Campus/StateOfTheArtLabs'));
-const CentralLibrary = lazyWithRetry(() => import('./pages/Campus/CentralLibrary'));
-const CampusHostels = lazyWithRetry(() => import('./pages/Campus/CampusHostels'));
 const FitnessCentre = lazyWithRetry(() => import('./pages/Campus/FitnessCentre'));
 const Television = lazyWithRetry(() => import('./pages/Campus/Television'));
 const HealthCare = lazyWithRetry(() => import('./pages/Campus/HealthCare'));
@@ -101,8 +96,6 @@ const Temples = lazyWithRetry(() => import('./pages/Campus/Temples'));
 const TravelDesk = lazyWithRetry(() => import('./pages/Campus/TravelDesk'));
 const StaffQuarters = lazyWithRetry(() => import('./pages/Campus/StaffQuarters'));
 const Clubs = lazyWithRetry(() => import('./pages/Campus/Clubs'));
-const FoodCourts = lazyWithRetry(() => import('./pages/Campus/FoodCourts'));
-const WifiCampus = lazyWithRetry(() => import('./pages/Campus/WifiCampus'));
 const Information = lazyWithRetry(() => import('./pages/Information/Information'));
 const ProgrammesFee = lazyWithRetry(() => import('./pages/Admissions/ProgrammesFee'));
 const AdmissionProcedure = lazyWithRetry(() => import('./pages/Admissions/AdmissionProcedure'));
@@ -214,11 +207,7 @@ function PublicApp() {
             <Route path="/research/mous/:group" element={<MousGroupDetail />} />
             <Route path="/about-sves" element={<AboutSVES />} />
             <Route path="/campus" element={<Campus />} />
-            {/* Static segment declared alongside the /campus/:slug catch-all —
-                React Router ranks the literal path higher, so this page (whose
-                content lives in code, not the campusLifeItems collection)
-                renders instead of CampusLifeDetail redirecting to /campus. */}
-            <Route path="/campus/sewage-treatment-plants" element={<SewageTreatment />} />
+            {/* Specialized bespoke pages with dedicated admin sections / content block schemas */}
             <Route path="/campus/wellness-center" element={<WellnessCenter />} />
             <Route path="/campus/wellness" element={<Wellness />} />
             <Route path="/campus/television" element={<Television />} />
@@ -235,13 +224,8 @@ function PublicApp() {
             <Route path="/campus/sports/:id" element={<SportsDetail />} />
             <Route path="/campus/clubs" element={<Clubs />} />
             <Route path="/campus/auditoriums" element={<Auditoriums />} />
-            <Route path="/campus/smart-classrooms" element={<SmartClassrooms />} />
-            <Route path="/campus/state-of-the-art-labs" element={<StateOfTheArtLabs />} />
-            <Route path="/campus/central-library" element={<CentralLibrary />} />
-            <Route path="/campus/food-courts" element={<FoodCourts />} />
-            <Route path="/campus/wifi-campus" element={<WifiCampus />} />
-            <Route path="/campus/campus-hostels" element={<CampusHostels />} />
             <Route path="/campus/fitness-centre" element={<FitnessCentre />} />
+            {/* Dynamic Campus Life pages backed by campusLifeItems Firestore collection (Central Library, Hostels, Smart Classrooms, Wi-Fi, Food Courts, etc.) */}
             <Route path="/campus/:slug" element={<CampusLifeDetail />} />
             <Route path="/information" element={<Information />} />
             <Route path="/programmes-fee-structure" element={<ProgrammesFee />} />
