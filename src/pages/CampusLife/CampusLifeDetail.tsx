@@ -12,6 +12,7 @@ import VwuSportsSection from '../../components/VwuSportsSection/VwuSportsSection
 import CampusEventsShowcase from '../../components/CampusEventsShowcase/CampusEventsShowcase';
 import FlexibleTable from '../../components/FlexibleTable/FlexibleTable';
 import type { CampusLifeItemDoc } from '../Admin/sections/CampusLifeAdmin';
+import { CAMPUS_LIFE_LEGACY_SEEDS } from './campusLifeLegacySeeds';
 import '../detail-layout.css';
 import '../Campus/tabbed-section.css';
 
@@ -303,7 +304,17 @@ export default function CampusLifeDetail({ slug: slugProp }: { slug?: string }) 
   const { slug: slugParam } = useParams<{ slug: string }>();
   const slug = slugProp ?? slugParam ?? '';
   const { docs: items, loading } = useOrderedCollection<CampusLifeItemDoc>('campusLifeItems', 'order');
-  const item = items.find((i) => i.slug === slug);
+  const firestoreDoc = items.find((i) => i.slug === slug);
+  const legacySeed = !firestoreDoc && CAMPUS_LIFE_LEGACY_SEEDS[slug] ? CAMPUS_LIFE_LEGACY_SEEDS[slug]() : undefined;
+  const item: CampusLifeItemDoc | undefined = firestoreDoc || (legacySeed ? {
+    id: slug,
+    slug,
+    title: findCampusFacilityBySlug(slug)?.title || ACTIVITY_DEFAULTS[slug]?.title || slug,
+    group: (ACTIVITY_SLUGS.includes(slug) ? 'activity' : 'facility') as 'activity' | 'facility',
+    order: 0,
+    customSections: legacySeed.customSections,
+    tabs: legacySeed.tabs,
+  } : undefined);
 
   const visibleTabs = (item?.tabs || []).filter((t) => t.sections.some(hasCustomSectionContent));
   const [activeTabId, setActiveTabId] = useState<string | null>(null);
