@@ -37,13 +37,11 @@ const DEPARTMENT_GROUPS: { label: string; departments: string[] }[] = [
   { label: 'MBA', departments: ['MBA', 'Management Studies'] },
 ];
 
-// Exactly 4 visual designation groups a department's faculty are always
-// sorted into, regardless of the order they were added in — data-driven off
-// each person's own `designation` text (via /admin → Faculty), never a
-// hardcoded per-person position. A new HOD, Dean, or Professor added later
-// automatically lands in the right group without anyone re-ordering by hand.
-// HOD/Dean Academics/Dean Statutory share one group (rank 0) — spacing is
-// only ever added between these 4 ranks, never within one.
+// Designation rank of each faculty member, data-driven off their own
+// `designation` text (via /admin → Faculty). Used only to decide where
+// dividers go between cards — it never re-orders anyone (display order is
+// always /admin → Faculty's order; see `filtered` below).
+// HOD/Dean Academics/Dean Statutory share one rank (0).
 function designationGroupRank(designation: string): number {
   const d = (designation || '').toLowerCase();
   // strip dots/spaces so "H.O.D." / "H O D" still register as HOD (some
@@ -55,16 +53,6 @@ function designationGroupRank(designation: string): number {
   if (d.includes('associate') || d.includes('assoc')) return 2;
   if (d.includes('professor')) return 1;
   return 4;
-}
-
-// Within the merged leadership group only, keeps HOD before Dean Academics
-// before Dean Statutory — same visual group, still a defined internal order.
-function leadershipSubRank(designation: string): number {
-  const d = (designation || '').toLowerCase();
-  if (d.replace(/[.\s]/g, '').includes('hod') || d.includes('head')) return 0;
-  if (d.includes('dean academic')) return 1;
-  if (d.includes('dean statutory')) return 2;
-  return 3;
 }
 
 export type { FacultyFact, FacultySection };
@@ -157,35 +145,39 @@ export default function Faculty() {
   // requiring the visitor to pick one — there's no "All" view anymore.
   const activeGroup = availableGroups.find((g) => g.label === activeDept) ?? availableGroups[0] ?? null;
 
-  const filtered = useMemo(
-    () => (activeGroup ? faculty.filter((f) => activeGroup.departments.includes(f.department)) : []),
-    [faculty, activeGroup]
-  );
+  // NOTE: display order here is exactly /admin → Faculty's drag-to-reorder
+  // order (the `order` field) — nothing on this page re-sorts it. `faculty`
+  // already arrives sorted by `order`; since admin orders per raw
+  // `department` value, a tab that merges several spellings (e.g. IT +
+  // "Information Technology") keeps each department's run together, in the
+  // tab's `departments` order, rather than interleaving by order number.
+  const filtered = useMemo(() => {
+    if (!activeGroup) return [];
+    const deptIndex = (f: FacultyDoc) => activeGroup.departments.indexOf(f.department);
+    return faculty
+      .filter((f) => activeGroup.departments.includes(f.department))
+      .sort((a, b) => deptIndex(a) - deptIndex(b));
+  }, [faculty, activeGroup]);
 
-  // Grouped into exactly 4 visual groups: (HOD/Dean Academics/Dean
-  // Statutory) → Professors → Associate Professors → Assistant Professors.
-  // A group with no one in it is simply omitted, never rendered as an empty
-  // gap — spacing is only ever added between these 4, never within one.
-  // Faculty within the same group keep their existing relative order
-  // (Array.sort is stable), so /admin → Faculty's manual ordering still
-  // applies there — except the leadership group, which is always
-  // additionally sorted HOD → Dean Academics → Dean Statutory.
+  // Visual designation groups (HOD/Dean → Professors → Associate →
+  // Assistant) are only used to place dividers: consecutive faculty (in
+  // admin order) with the same rank share one grid, and a divider is added
+  // wherever the rank changes. Faculty are never moved to match their rank —
+  // arrange them by designation in /admin to get one divider per group.
   const designationGroups = useMemo(() => {
-    const buckets = new Map<number, FacultyDoc[]>();
+    const runs: FacultyDoc[][] = [];
+    let prevRank: number | null = null;
     for (const f of filtered) {
       // A per-person groupOverride (set in /admin → Faculty) wins over the
       // designation-text guess; anything absent or < 0 falls back to auto.
       const rank = typeof f.groupOverride === 'number' && f.groupOverride >= 0
         ? f.groupOverride
         : designationGroupRank(f.designation);
-      if (!buckets.has(rank)) buckets.set(rank, []);
-      buckets.get(rank)!.push(f);
+      if (rank !== prevRank) runs.push([]);
+      runs[runs.length - 1].push(f);
+      prevRank = rank;
     }
-    const leadership = buckets.get(0);
-    if (leadership) {
-      buckets.set(0, [...leadership].sort((a, b) => leadershipSubRank(a.designation) - leadershipSubRank(b.designation)));
-    }
-    return [...buckets.entries()].sort(([a], [b]) => a - b).map(([, members]) => members);
+    return runs;
   }, [filtered]);
 
   return (
