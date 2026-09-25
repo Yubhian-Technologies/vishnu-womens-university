@@ -9,6 +9,8 @@ import './RouteFallback.css';
 // identical everywhere instead of drifting across call sites.
 export default function RouteFallback() {
   return (
+    <>
+    <div className="route-fallback__spacer" aria-hidden="true" />
     <div className="route-fallback" role="status" aria-live="polite">
       <span className="route-fallback__sr-only">Loading…</span>
       <div className="route-fallback__aurora" aria-hidden="true" />
@@ -22,5 +24,6 @@ export default function RouteFallback() {
         </div>
       </div>
     </div>
+    </>
   );
 }
