@@ -559,9 +559,6 @@ export default function CampusEventsShowcase({ sourceItem }: { sourceItem: Campu
                   <div className="container ces-celebrate-grid">
                     <div>
                       {copy}
-                      <Link to="/events" className="ces-btn ces-btn--solid" style={{ marginTop: 'var(--space-5)' }}>
-                        View All Events <ArrowRight size={16} strokeWidth={2.25} />
-                      </Link>
                     </div>
                     <div>{photos.length > 0 && <PhotoCarousel photos={photos} altPrefix={section.label} />}</div>
                   </div>

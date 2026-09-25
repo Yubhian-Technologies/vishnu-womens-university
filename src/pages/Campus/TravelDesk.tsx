@@ -319,7 +319,6 @@ export default function TravelDesk() {
           <h2>Explore More Campus Life Facilities</h2>
           <p>Discover the library, hostel facilities, health care, sports centres, and other student amenities across the Vishnu Women's University campus.</p>
           <div className="td-cta-buttons">
-            <Link to="/campus" className="td-btn td-btn-gold">Back to Campus Life →</Link>
             <Link to="/contact" className="td-btn td-btn-outline">Contact Us →</Link>
           </div>
         </div>

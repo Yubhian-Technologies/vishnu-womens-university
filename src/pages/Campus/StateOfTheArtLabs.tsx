@@ -125,7 +125,6 @@ export default function StateOfTheArtLabs() {
             Discover the academic spaces and facilities that support practical learning and student development at Vishnu Women’s University.
           </p>
           <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link to="/campus" className="btn btn-accent">Explore Campus Facilities</Link>
             <Link to="/student-life" className="btn btn-secondary">Discover Student Life</Link>
           </div>
         </div>

@@ -264,7 +264,7 @@ export default function Clubs() {
   
   const heroTagline = heroExtra?.title || DEFAULT_HERO_TAGLINE;
   const heroCornerLines = (heroExtra?.desc || DEFAULT_HERO_CORNER).split('\n').filter(Boolean);
-  const heroCta2Link = heroExtra?.slug || '/events';
+  const heroCta2Link = heroExtra?.slug || '';
 
   const categoriesPresent = useMemo(
     () => categories.filter((c) => allClubs.some((club) => club.category === c.name)),
@@ -351,11 +351,11 @@ export default function Clubs() {
                     {heroCta1Label} <ArrowRight size={16} />
                   </button>
                 )}
-                {heroCta2Link.startsWith('http') ? (
+                {heroCta2Link && (heroCta2Link.startsWith('http') ? (
                   <a href={heroCta2Link} target="_blank" rel="noopener noreferrer" className="btn-hero-outline">Upcoming Events</a>
                 ) : (
                   <Link to={heroCta2Link} className="btn-hero-outline">Upcoming Events</Link>
-                )}
+                ))}
               </div>
             </div>
 
@@ -657,7 +657,6 @@ export default function Clubs() {
               >
                 Explore All Clubs &rarr;
               </button>
-              <Link to="/events" className="btn clubs-cta-btn clubs-cta-btn--outline">View Upcoming Events &rarr;</Link>
             </div>
           </div>
         </div>

@@ -340,7 +340,7 @@ export default function CampusLifeDetail({ slug: slugProp }: { slug?: string }) 
     if (item) document.title = `${item.title} | VWU`;
   }, [item]);
 
-  if (!loading && !item) return <Navigate to={isActivity ? '/student-life' : '/campus'} replace />;
+  if (!loading && !item) return <Navigate to={isActivity ? '/student-life' : '/'} replace />;
   if (!item) return null;
 
   const title = item.title || facilityDefault?.title || activityDefault?.title || slug;
@@ -357,7 +357,7 @@ export default function CampusLifeDetail({ slug: slugProp }: { slug?: string }) 
           defaultSubtitle={subtitle}
           breadcrumb={isActivity
             ? [{ label: 'Home', to: '/' }, { label: 'Student Life', to: '/student-life' }, { label: title }]
-            : [{ label: 'Home', to: '/' }, { label: 'Campus Life', to: '/campus' }, { label: title }]}
+            : [{ label: 'Home', to: '/' }, { label: 'Campus Life' }, { label: title }]}
           hideCta={true}
         />
       )}
@@ -475,9 +475,6 @@ export default function CampusLifeDetail({ slug: slugProp }: { slug?: string }) 
                 </>
               ) : (
                 <>
-                  <Link to="/campus" className="btn btn-accent">
-                    {slug === 'campus-book-stores' ? 'Explore Campus Facilities' : slug === 'swimming-pool' ? 'Back to Campus Life →' : 'Back to Campus Life'}
-                  </Link>
                   {slug === 'swimming-pool' ? (
                     <Link to="/campus/sports" className="btn btn-secondary">Explore Fitness & Sports →</Link>
                   ) : (

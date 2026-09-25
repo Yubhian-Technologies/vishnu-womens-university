@@ -557,7 +557,6 @@ export default function About() {
                   );
                 })}
               </div>
-              <Link to="/campus" className="btn btn-primary">Explore Campus Facilities →</Link>
             </div>
           </div>
         </div>
@@ -673,7 +672,6 @@ export default function About() {
             </div>
             <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
               <Link to="/apply-now" className="btn btn-accent btn-lg">Apply Now</Link>
-              <Link to="/campus" className="btn btn-secondary btn-lg">Visit Campus</Link>
             </div>
           </div>
         </div>

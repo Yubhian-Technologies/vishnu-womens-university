@@ -70,10 +70,6 @@ export default function CampusLife({ images }: Props) {
             <Reveal index={0} className="lpe-cl__featured">
               <h3 className="lpe-cl__featured-title">{CAMPUS_LIFE_FEATURED.title}</h3>
               <p className="lpe-cl__featured-desc">{CAMPUS_LIFE_FEATURED.desc}</p>
-              <Link to={CAMPUS_LIFE_FEATURED.link} className="lpe-cl__cta">
-                {CAMPUS_LIFE_FEATURED.linkLabel}
-                <ArrowRight size={16} className="lpe-cl__cta-arrow" />
-              </Link>
             </Reveal>
 
             <Reveal index={1} variant="media" className="lpe-cl-story lpe-cl-story--primary">

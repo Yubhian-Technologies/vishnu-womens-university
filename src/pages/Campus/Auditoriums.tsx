@@ -329,7 +329,6 @@ export default function Auditoriums() {
             Discover the spaces and facilities that support learning, collaboration and student life at Vishnu Women&rsquo;s University.
           </p>
           <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link to="/campus" className="btn btn-accent">Explore Campus Facilities</Link>
             <Link to="/student-life" className="btn btn-secondary">Discover Student Life</Link>
           </div>
         </div>

@@ -156,7 +156,6 @@ export default function WifiCampus() {
             Women&rsquo;s University.
           </p>
           <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link to="/campus" className="btn btn-accent">Explore Campus Life</Link>
             <Link to="/student-life" className="btn btn-secondary">Student Life</Link>
           </div>
         </div>

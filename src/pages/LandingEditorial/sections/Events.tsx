@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom';
 import { MapPin, Clock } from 'lucide-react';
 import { useOrderedCollection } from '../../../hooks/useCollection';
 import Reveal from '../Reveal';
@@ -29,9 +28,6 @@ export default function Events() {
           <Reveal index={0}>
             <span className="lpe-eyebrow">Upcoming at VWU</span>
             <h2 className="lpe-h2">Mark your<br /><span className="lpe-italic">calendar.</span></h2>
-          </Reveal>
-          <Reveal index={1}>
-            <Link to="/events" className="lpe-btn lpe-btn--outline-dark">All Events</Link>
           </Reveal>
         </div>
 

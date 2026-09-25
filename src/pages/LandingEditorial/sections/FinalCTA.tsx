@@ -16,7 +16,6 @@ export default function FinalCTA() {
         <Reveal index={2} className="lpe-btn-row">
           <Link to="/apply-now" className="lpe-btn lpe-btn--gold">Apply Now</Link>
           <Link to="/academics" className="lpe-btn lpe-btn--outline-dark">Explore Programs</Link>
-          <Link to="/campus" className="lpe-btn lpe-btn--outline-dark">Visit Campus</Link>
           <Link to="/contact" className="lpe-btn lpe-btn--text">Contact Admissions →</Link>
         </Reveal>
       </div>

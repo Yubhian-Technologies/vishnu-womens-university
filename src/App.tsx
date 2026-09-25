@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Suspense, lazy, useEffect } from 'react';
 import type { ComponentType } from 'react';
 import { GraduationCap } from 'lucide-react';
@@ -72,7 +72,6 @@ const StudentLife = lazyWithRetry(() => import('./pages/StudentLife/StudentLife'
 const AlumniGiving = lazyWithRetry(() => import('./pages/AlumniGiving/AlumniGiving'));
 const About = lazyWithRetry(() => import('./pages/About/About'));
 const News = lazyWithRetry(() => import('./pages/News/News'));
-const Events = lazyWithRetry(() => import('./pages/Events/Events'));
 const VisionMission = lazyWithRetry(() => import('./pages/VisionMission/VisionMission'));
 const Governance = lazyWithRetry(() => import('./pages/Governance/Governance'));
 const GovernanceDetail = lazyWithRetry(() => import('./pages/Governance/GovernanceDetail'));
@@ -82,7 +81,6 @@ const ResearchDetail = lazyWithRetry(() => import('./pages/Research/ResearchDeta
 const ProfessionalBodyDetail = lazyWithRetry(() => import('./pages/Research/ProfessionalBodyDetail'));
 const MousGroupDetail = lazyWithRetry(() => import('./pages/Research/MousGroupDetail'));
 const AboutSVES = lazyWithRetry(() => import('./pages/AboutSVES/AboutSVES'));
-const Campus = lazyWithRetry(() => import('./pages/Campus/Campus'));
 const Sports = lazyWithRetry(() => import('./pages/Campus/Sports'));
 const SportsDetail = lazyWithRetry(() => import('./pages/Campus/SportsDetail'));
 const CampusLifeDetail = lazyWithRetry(() => import('./pages/CampusLife/CampusLifeDetail'));
@@ -103,7 +101,6 @@ const ProgrammesFee = lazyWithRetry(() => import('./pages/Admissions/ProgrammesF
 const AdmissionProcedure = lazyWithRetry(() => import('./pages/Admissions/AdmissionProcedure'));
 const VWUNET = lazyWithRetry(() => import('./pages/Admissions/VWUNET'));
 const ResultAnalysis = lazyWithRetry(() => import('./pages/Admissions/ResultAnalysis'));
-const StudentClubs = lazyWithRetry(() => import('./pages/StudentActivities/StudentClubs'));
 const StudentClubDetail = lazyWithRetry(() => import('./pages/StudentActivities/StudentClubDetail'));
 const Differentiators = lazyWithRetry(() => import('./pages/Differentiators/Differentiators'));
 const DifferentiatorDetail = lazyWithRetry(() => import('./pages/Differentiators/DifferentiatorDetail'));
@@ -209,7 +206,6 @@ function PublicApp() {
             <Route path="/research/professional-bodies/:key" element={<ProfessionalBodyDetail />} />
             <Route path="/research/mous/:group" element={<MousGroupDetail />} />
             <Route path="/about-sves" element={<AboutSVES />} />
-            <Route path="/campus" element={<Campus />} />
             {/* Specialized bespoke pages with dedicated admin sections / content block schemas */}
             <Route path="/campus/sewage-treatment-plants" element={<SewageTreatment />} />
             <Route path="/campus/sewage-treatment" element={<SewageTreatment />} />
@@ -243,7 +239,7 @@ function PublicApp() {
             <Route path="/vwunet" element={<VWUNET />} />
             <Route path="/result-analysis" element={<ResultAnalysis />} />
             <Route path="/vishnu-tv-academy" element={<CampusLifeDetail slug="vishnu-tv-academy" />} />
-            <Route path="/student-clubs" element={<StudentClubs />} />
+            <Route path="/student-clubs" element={<Navigate to="/campus/clubs" replace />} />
             <Route path="/student-clubs/:slug" element={<StudentClubDetail />} />
             <Route path="/social-services" element={<SocialServicesPage />} />
             <Route path="/campus-magazines" element={<CampusLifeDetail slug="campus-magazines" />} />
@@ -262,7 +258,6 @@ function PublicApp() {
             <Route path="/placements" element={<Placements />} />
             <Route path="/placements/:slug" element={<PlacementDetail />} />
             <Route path="/news" element={<News />} />
-            <Route path="/events" element={<Events />} />
             <Route path="/news-awards" element={<NewsAwards />} />
             <Route path="/news-awards/happenings" element={<Happenings />} />
             <Route path="/news-awards/happenings/:id" element={<HappeningDetail />} />

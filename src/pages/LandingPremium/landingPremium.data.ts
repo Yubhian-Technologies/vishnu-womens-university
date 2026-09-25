@@ -109,7 +109,6 @@ export const TESTIMONIALS = [
 export const QUICK_LINKS = [
   { label: 'Admissions', to: '/admissions' },
   { label: 'Programs', to: '/academics' },
-  { label: 'Campus Life', to: '/campus' },
   { label: 'Placements', to: '/placements' },
   { label: 'Research', to: '/research' },
   { label: 'Alumni & Giving', to: '/alumni-giving' },

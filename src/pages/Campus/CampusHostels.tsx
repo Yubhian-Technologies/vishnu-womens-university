@@ -268,7 +268,6 @@ export default function CampusHostels() {
             Discover the learning spaces, services and facilities that support academic and residential life at Vishnu Women’s University.
           </p>
           <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link to="/campus" className="btn btn-accent">Explore Campus Facilities</Link>
             <Link to="/student-life" className="btn btn-secondary">Discover Student Life</Link>
           </div>
         </div>
