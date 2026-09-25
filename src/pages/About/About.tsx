@@ -249,7 +249,7 @@ export default function About() {
               </div>
             </div>
             {whoWeAreImg && (
-              <div className="about-who-img-card reveal-right">
+              <div className="about-who-img-card">
                 <img loading="lazy"
                   src={whoWeAreImg.src}
                   alt={whoWeAreImg.alt}
