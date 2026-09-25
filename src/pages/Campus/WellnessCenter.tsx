@@ -405,7 +405,6 @@ export default function WellnessCenter() {
             </p>
             <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
               <Link to="/contact" className="btn btn-accent">Get in Touch</Link>
-              <Link to="/campus" className="btn btn-secondary">Back to Campus Life</Link>
             </div>
           </div>
         </div>

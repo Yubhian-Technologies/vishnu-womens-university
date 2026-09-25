@@ -147,7 +147,6 @@ export default function Differentiators() {
             </p>
             <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
               <Link to="/apply-now" className="btn btn-accent">Apply Now</Link>
-              <Link to="/campus" className="btn btn-secondary">Campus Life</Link>
               <Link to="/academics" className="btn btn-secondary">Academics</Link>
             </div>
           </div>

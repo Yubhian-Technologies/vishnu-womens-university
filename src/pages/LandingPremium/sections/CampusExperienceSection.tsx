@@ -1,6 +1,4 @@
-import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
 import SmoothImage from '../../../components/SmoothImage/SmoothImage';
 
 interface Props {
@@ -18,9 +16,6 @@ export default function CampusExperienceSection({ imageUrl, imageAlt }: Props) {
       <div className="container">
         <div className="lph-campus-exp__head">
           <h2>A Campus Experience<br />Designed for Excellence</h2>
-          <Link to="/campus" className="lph-campus-exp__link">
-            Infrastructure <ArrowRight size={16} />
-          </Link>
         </div>
         <motion.div className="lph-campus-exp__photo" initial={{ opacity: 0, scale: 0.96 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, amount: 0.2 }} transition={{ duration: 0.7 }}>
           <SmoothImage src={imageUrl} alt={imageAlt} />

@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Droplets, Recycle, FlaskConical, IndianRupee, CalendarDays,
-  ShieldCheck, Waves, Factory, ArrowRight
+  ShieldCheck, Waves, Factory
 } from 'lucide-react';
 import SEO from '../../components/SEO/SEO';
 import PageHero from '../../components/PageHero/PageHero';
@@ -377,9 +377,6 @@ export default function SewageTreatment() {
           <h2>Explore More Campus Life Facilities</h2>
           <p>Discover our central library, hosteller amenities, health care, and sustainability initiatives across VWU.</p>
           <div className="stp-cta-btns">
-            <Link to="/campus" className="stp-btn stp-btn-emerald">
-              Back to Campus Life <ArrowRight size={18} style={{ marginLeft: 6 }} />
-            </Link>
             <Link to="/campus/other-facilities" className="stp-btn stp-btn-outline">
               Other Facilities
             </Link>
