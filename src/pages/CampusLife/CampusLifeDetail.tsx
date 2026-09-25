@@ -334,7 +334,7 @@ export default function CampusLifeDetail({ slug: slugProp }: { slug?: string }) 
   // swapping to the real one a moment later on every page load/refresh.
   // Shares useSitePhotos' subscription (not a separate listener) so this
   // resolves at the exact same moment as `photos` itself.
-  const photosLoading = useSitePhotosLoading();
+  const photosLoading = useSitePhotosLoading('campus');
 
   useEffect(() => {
     if (item) document.title = `${item.title} | VWU`;
