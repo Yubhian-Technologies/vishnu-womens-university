@@ -87,6 +87,7 @@ const Sports = lazyWithRetry(() => import('./pages/Campus/Sports'));
 const SportsDetail = lazyWithRetry(() => import('./pages/Campus/SportsDetail'));
 const CampusLifeDetail = lazyWithRetry(() => import('./pages/CampusLife/CampusLifeDetail'));
 const SocialServicesPage = lazyWithRetry(() => import('./pages/CampusLife/SocialServicesPage'));
+const SewageTreatment = lazyWithRetry(() => import('./pages/Campus/SewageTreatment'));
 const WellnessCenter = lazyWithRetry(() => import('./pages/Campus/WellnessCenter'));
 const Wellness = lazyWithRetry(() => import('./pages/Campus/Wellness'));
 const Auditoriums = lazyWithRetry(() => import('./pages/Campus/Auditoriums'));
@@ -210,6 +211,13 @@ function PublicApp() {
             <Route path="/about-sves" element={<AboutSVES />} />
             <Route path="/campus" element={<Campus />} />
             {/* Specialized bespoke pages with dedicated admin sections / content block schemas */}
+            <Route path="/campus/sewage-treatment-plants" element={<SewageTreatment />} />
+            <Route path="/campus/sewage-treatment" element={<SewageTreatment />} />
+            <Route path="/campus/sewage-treatment-plant" element={<SewageTreatment />} />
+            <Route path="/sewage-treatment-plants" element={<SewageTreatment />} />
+            <Route path="/sewage-treatment-plant" element={<SewageTreatment />} />
+            <Route path="/sewage-treatment" element={<SewageTreatment />} />
+            <Route path="/sewagetreatment" element={<SewageTreatment />} />
             <Route path="/campus/wellness-center" element={<WellnessCenter />} />
             <Route path="/campus/wellness" element={<Wellness />} />
             <Route path="/campus/television" element={<Television />} />
