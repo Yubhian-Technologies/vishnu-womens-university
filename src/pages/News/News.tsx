@@ -164,7 +164,7 @@ export default function News() {
       <section className="section bg-off-white">
         <div className="container">
           {loading ? (
-            <div className="news-empty"><p>Loading articles…</p></div>
+            <div className="news-empty" style={{ minHeight: '70vh' }}><p>Loading articles…</p></div>
           ) : error ? (
             <div className="news-empty"><p>Couldn't load news right now. Please try again later.</p></div>
           ) : filtered.length > 0 ? (
