@@ -878,7 +878,7 @@ function SingleProgramDetail() {
             faculty={faculty}
             departmentName={deptTitle || program.name}
             title="The People Behind Expertise"
-            viewMoreLink="/faculty"
+            viewMoreLink={`/faculty?dept=${encodeURIComponent(faculty[0]?.department ?? '')}`}
           />
         </div>
       )}

@@ -323,7 +323,7 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
       {/* Faculty Carousel — same component CSE/ECE/etc. use */}
       {faculty.length > 0 && (
         <div id="faculty" style={{ scrollMarginTop: NAV_OFFSET }}>
-          <FacultyCarousel faculty={faculty} departmentName={deptName} title="Learn from our impactful faculty" viewMoreLink="/faculty" />
+          <FacultyCarousel faculty={faculty} departmentName={deptName} title="Learn from our impactful faculty" viewMoreLink={`/faculty?dept=${encodeURIComponent(faculty[0]?.department ?? '')}`} />
         </div>
       )}
 

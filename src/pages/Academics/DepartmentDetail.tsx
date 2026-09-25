@@ -2055,7 +2055,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
             faculty={faculty}
             departmentName={deptName}
             title="The People Behind Expertise"
-            viewMoreLink="/faculty"
+            viewMoreLink={`/faculty?dept=${encodeURIComponent(faculty[0]?.department ?? '')}`}
           />
         </div>
       )}
