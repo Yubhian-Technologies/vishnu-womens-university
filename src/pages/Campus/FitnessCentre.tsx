@@ -20,7 +20,7 @@ const DEFAULT_PHOTOS = [
 
 export default function FitnessCentre() {
   const photos = useSitePhotos('campus', 'fitness-centre', DEFAULT_PHOTOS);
-  const photosLoading = useSitePhotosLoading();
+  const photosLoading = useSitePhotosLoading('campus');
 
   useEffect(() => {
     document.title = `Vishnu Fitness Centre | Vishnu Women's University`;

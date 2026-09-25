@@ -73,6 +73,8 @@ function PlacementProfileMarquee3Layers({ records }: { records: PlacementItem[] 
     </div>
   );
 }
+import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore';
+import { db } from '../../lib/firebase';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { usePageBanner } from '../../hooks/usePageBanner';
 import { useEapcetCode } from '../../hooks/useContentBlocks';
@@ -149,8 +151,24 @@ function SingleProgramDetail() {
   const resolveDeptCode = (d: string) => (DEPT_CODE_ALIASES[d] || d || '').trim().toUpperCase();
   const deptCode = resolveDeptCode(program?.department || '');
 
-  const { docs: allFaculty } = useOrderedCollection<FacultyDoc>('faculty', 'order');
-  const faculty = program?.department ? allFaculty.filter((f) => resolveDeptCode(f.department) === deptCode) : [];
+  // Filtered server-side by department instead of reading the whole `faculty`
+  // collection (260+ docs site-wide) and filtering client-side — this page
+  // only ever needs the ~10-40 people in one department. Faculty and
+  // program department values already use the same raw prose spelling for
+  // every department (verified against live data, including "Civil" and
+  // "Mechanical" — the DEPT_CODE_ALIASES resolution above is only needed for
+  // matching against the separate `departments` collection's shortCode
+  // field, not for this comparison), so a plain equality filter is safe.
+  const [faculty, setFaculty] = useState<FacultyDoc[]>([]);
+  useEffect(() => {
+    const dept = program?.department;
+    if (!dept) { setFaculty([]); return; }
+    const q = query(collection(db, 'faculty'), where('department', '==', dept), orderBy('order'));
+    const unsub = onSnapshot(q, (snap) => {
+      setFaculty(snap.docs.map((d) => ({ id: d.id, ...d.data() } as FacultyDoc)));
+    });
+    return unsub;
+  }, [program?.department]);
   const { docs: deptNews } = useOrderedCollection<DepartmentNewsDoc>('departmentNews', 'date', 'desc');
   const hasDeptNews = deptNews.some((n) => n.program === slug);
   const { docs: allDepartments, loading: deptLoading } = useOrderedCollection<DepartmentDoc>('departments', 'order');
