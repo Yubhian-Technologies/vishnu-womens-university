@@ -14,6 +14,7 @@ import FirestoreErrorBanner from './components/FirestoreErrorBanner/FirestoreErr
 import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
 import PopupOverlay from './components/PopupOverlay/PopupOverlay';
 import { smoothScrollTo } from './lib/smoothScroll';
+import { useRevealSafetyNet } from './hooks/useRevealSafetyNet';
 
 // A failed dynamic import() is almost always a stale chunk after a new deploy:
 // the previous build's hashed filenames 404, and React surfaces that inside
@@ -166,6 +167,7 @@ function RouteScrollReset() {
 
 function PublicApp() {
   const location = useLocation();
+  useRevealSafetyNet();
 
   return (
     <>
