@@ -11,8 +11,8 @@ import './Footer.css';
 type FooterNavItem = { label: string; href: string; external?: boolean; disabled?: boolean };
 
 // Note (2026-09-26, updated 2026-09-27): the columns/links below (University,
-// Academics & Portals, Student Life & Services, Compliance & Disclosures)
-// were originally hardcoded here directly. They're now the DEFAULT/fallback
+// Academics & Portals, Student Life & Services, Quick Links, Feedback
+// Facility) were originally hardcoded here directly. They're now the DEFAULT/fallback
 // content only — Admin -> Footer Columns & Links can migrate them into
 // Firestore with a one-click "Load Existing Footer Links" button
 // (FooterLinksAdmin.tsx), after which columns and their links become fully
@@ -76,13 +76,18 @@ const STUDENT_SERVICE_LINKS: { label: string; href: string; external?: boolean }
   { label: 'Library & Information Center', href: '/campus/central-library' },
   { label: 'Anti-Ragging Cell', href: '/anti-ragging' },
   { label: 'Grievance Redressal', href: '/policies-procedures' },
+];
+
+// Its own column (after Quick Links) rather than mixed into Student Life &
+// Services, per request — every feedback form/facility link grouped together.
+const FEEDBACK_LINKS: { label: string; href: string; external?: boolean }[] = [
   { label: "Students' Feedback", href: 'https://forms.gle/UuURnxKUZw7wW1NW9', external: true },
   { label: "Parents' Feedback", href: 'https://forms.gle/eT2QF3WNJZDwpEzj8', external: true },
   { label: "Faculty's Feedback", href: 'https://forms.gle/K89PMmjNbJNGSVEa9', external: true },
   { label: 'AICTE Feedback Facility', href: '/aicte-feedback-facility' },
 ];
 
-const COMPLIANCE_LINKS: { label: string; href: string; external?: boolean }[] = [
+const QUICK_LINKS: { label: string; href: string; external?: boolean }[] = [
   { label: 'Mandatory Disclosures', href: '/disclosures/ugc' },
   { label: 'NIRF Data', href: '/information' },
   { label: 'NAAC Certificate', href: '/news-awards/accreditations-awards' },
@@ -104,7 +109,8 @@ export const DEFAULT_FOOTER_COLUMNS: { label: string; links: FooterNavItem[] }[]
   { label: 'University', links: UNIVERSITY_LINKS },
   { label: 'Academics & Portals', links: ACADEMIC_LINKS },
   { label: 'Student Life & Services', links: STUDENT_SERVICE_LINKS },
-  { label: 'Compliance & Disclosures', links: COMPLIANCE_LINKS },
+  { label: 'Quick Links', links: QUICK_LINKS },
+  { label: 'Feedback Facility', links: FEEDBACK_LINKS },
 ];
 
 const LEGAL_LINKS = [
