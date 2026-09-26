@@ -2,9 +2,25 @@ import { useState, useId } from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, Phone, Mail, ExternalLink, ChevronDown, Navigation, ArrowRight } from 'lucide-react';
 import { useSiteContact, telHref } from '../../hooks/useSiteContact';
+import { useOrderedCollection } from '../../hooks/useCollection';
+import { FOOTER_LINKS_COLLECTION, type FooterLinkDoc, type FooterLinkColumn } from '../../pages/Admin/sections/FooterLinksAdmin';
 import { InstagramIcon, FacebookIcon, TwitterIcon, LinkedInIcon, YouTubeIcon } from './SocialIcons';
 import SmoothCollapse from '../SmoothCollapse/SmoothCollapse';
 import './Footer.css';
+
+// Note (2026-09-26): every link array below (UNIVERSITY_LINKS, ACADEMIC_LINKS,
+// STUDENT_SERVICE_LINKS, COMPLIANCE_LINKS, and everything else in this file)
+// stays exactly as it was — hardcoded, untouched. The only admin-manageable
+// part of the footer is EXTRA links appended to the end of one of those four
+// columns, added from Admin -> Footer Extra Links (FooterLinksAdmin.tsx),
+// each pointing at another page on the site, an external website, or an
+// uploaded PDF/image. See footerLinkToNavItem() below for how a saved one is
+// turned into the same {label, href, external} shape renderNavLink() already
+// understands, so it renders identically to a hardcoded link.
+function footerLinkToNavItem(l: FooterLinkDoc): { label: string; href: string; external?: boolean } {
+  if (l.linkType === 'internal') return { label: l.label, href: l.url || '/' };
+  return { label: l.label, href: (l.linkType === 'external' ? l.url : l.fileUrl) || '#', external: true };
+}
 
 /* -------------------------------------------------------------------------- */
 /* Static Data & Navigation Structures                                        */
@@ -92,6 +108,15 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
   const accordionBaseId = useId();
   const { phone, email } = useSiteContact();
+
+  // Admin-added extra links (see the note above) — appended after each
+  // column's existing hardcoded list, never replacing any of it.
+  const { docs: extraFooterLinks } = useOrderedCollection<FooterLinkDoc>(FOOTER_LINKS_COLLECTION, 'order');
+  const extrasFor = (column: FooterLinkColumn) => extraFooterLinks.filter((l) => l.column === column).map(footerLinkToNavItem);
+  const universityItems = [...UNIVERSITY_LINKS, ...extrasFor('university')];
+  const academicItems = [...ACADEMIC_LINKS, ...extrasFor('academics')];
+  const studentServiceItems = [...STUDENT_SERVICE_LINKS, ...extrasFor('student')];
+  const complianceItems = [...COMPLIANCE_LINKS, ...extrasFor('compliance')];
 
   const [openMobileSections, setOpenMobileSections] = useState<Set<string>>(new Set());
 
@@ -198,7 +223,7 @@ export default function Footer() {
             <div className="vwu-footer-col">
               <h3 className="vwu-footer-heading">University</h3>
               <ul className="vwu-footer-list" role="list">
-                {UNIVERSITY_LINKS.map((item) => (
+                {universityItems.map((item) => (
                   <li key={item.label}>{renderNavLink(item)}</li>
                 ))}
               </ul>
@@ -207,7 +232,7 @@ export default function Footer() {
             <div className="vwu-footer-col">
               <h3 className="vwu-footer-heading">Academics &amp; Portals</h3>
               <ul className="vwu-footer-list" role="list">
-                {ACADEMIC_LINKS.map((item) => (
+                {academicItems.map((item) => (
                   <li key={item.label}>{renderNavLink(item)}</li>
                 ))}
               </ul>
@@ -216,7 +241,7 @@ export default function Footer() {
             <div className="vwu-footer-col">
               <h3 className="vwu-footer-heading">Student Life &amp; Services</h3>
               <ul className="vwu-footer-list" role="list">
-                {STUDENT_SERVICE_LINKS.map((item) => (
+                {studentServiceItems.map((item) => (
                   <li key={item.label}>{renderNavLink(item)}</li>
                 ))}
               </ul>
@@ -225,7 +250,7 @@ export default function Footer() {
             <div className="vwu-footer-col">
               <h3 className="vwu-footer-heading">Compliance &amp; Disclosures</h3>
               <ul className="vwu-footer-list" role="list">
-                {COMPLIANCE_LINKS.map((item) => (
+                {complianceItems.map((item) => (
                   <li key={item.label}>{renderNavLink(item)}</li>
                 ))}
               </ul>
@@ -252,7 +277,7 @@ export default function Footer() {
             <SmoothCollapse open={openMobileSections.has('university')}>
               <div id={`${accordionBaseId}-uni`} className="vwu-footer-acc-body">
                 <ul className="vwu-footer-list" role="list">
-                  {UNIVERSITY_LINKS.map((item) => (
+                  {universityItems.map((item) => (
                     <li key={item.label}>{renderNavLink(item)}</li>
                   ))}
                 </ul>
@@ -275,7 +300,7 @@ export default function Footer() {
             <SmoothCollapse open={openMobileSections.has('academics')}>
               <div id={`${accordionBaseId}-acad`} className="vwu-footer-acc-body">
                 <ul className="vwu-footer-list" role="list">
-                  {ACADEMIC_LINKS.map((item) => (
+                  {academicItems.map((item) => (
                     <li key={item.label}>{renderNavLink(item)}</li>
                   ))}
                 </ul>
@@ -298,7 +323,7 @@ export default function Footer() {
             <SmoothCollapse open={openMobileSections.has('services')}>
               <div id={`${accordionBaseId}-serv`} className="vwu-footer-acc-body">
                 <ul className="vwu-footer-list" role="list">
-                  {STUDENT_SERVICE_LINKS.map((item) => (
+                  {studentServiceItems.map((item) => (
                     <li key={item.label}>{renderNavLink(item)}</li>
                   ))}
                 </ul>
@@ -321,7 +346,7 @@ export default function Footer() {
             <SmoothCollapse open={openMobileSections.has('compliance')}>
               <div id={`${accordionBaseId}-comp`} className="vwu-footer-acc-body">
                 <ul className="vwu-footer-list" role="list">
-                  {COMPLIANCE_LINKS.map((item) => (
+                  {complianceItems.map((item) => (
                     <li key={item.label}>{renderNavLink(item)}</li>
                   ))}
                 </ul>
