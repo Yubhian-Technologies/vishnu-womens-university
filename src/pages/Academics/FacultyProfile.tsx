@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { Mail, ExternalLink, FileText, ChevronRight } from 'lucide-react';
-import PageHero from '../../components/PageHero/PageHero';
 import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import { useCollection, useOrderedCollection } from '../../hooks/useCollection';
@@ -126,13 +125,10 @@ export default function FacultyProfile() {
         ogImage={person.imageUrl}
         jsonLd={facultyJsonLd}
       />
-      <PageHero
-        page="faculty-profile"
-        defaultTitle={person.name}
-        defaultSubtitle={person.designation}
-        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Academics', to: '/academics' }, { label: 'Faculty', to: '/faculty' }, { label: person.name }]}
-        size="small"
-      />
+      {/* Hero banner intentionally removed per request (2026-09-26) — the
+          profile card immediately below already carries the name/designation,
+          so this page no longer renders a PageHero at all. Applies to every
+          faculty member since this is the one shared profile page. */}
 
       <section className="section bg-white">
         <div className="container">
