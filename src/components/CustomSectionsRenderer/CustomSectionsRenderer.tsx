@@ -20,7 +20,7 @@ function SectionSubtitle({ subtitle }: { subtitle?: string }) {
   if (!subtitle?.trim()) return null;
   return (
     <p style={{ margin: '0.3rem 0 0', color: 'var(--color-text-light)', fontSize: 'var(--text-sm)', fontWeight: 600 }}>
-      {subtitle}
+      {renderBold(subtitle)}
     </p>
   );
 }
@@ -494,7 +494,7 @@ function GalleryGrid({ photos }: { photos: CustomSectionPhoto[] }) {
                   color: 'var(--color-white)', fontSize: 'var(--text-xs)', textAlign: 'left',
                 }}
               >
-                {p.caption}
+                {renderBold(p.caption)}
               </span>
             )}
           </button>
@@ -562,7 +562,7 @@ function StaticGalleryStrip({ photos }: { photos: CustomSectionPhoto[] }) {
                   width: '100%',
                 }}
               >
-                {p.caption}
+                {renderBold(p.caption)}
               </span>
             )}
           </button>
@@ -606,6 +606,7 @@ function CustomSectionBody({ section, departmentSlug, categorySlug }: { section:
 }
 
 import HorizontalEventsShowcase from '../HorizontalEventsShowcase/HorizontalEventsShowcase';
+import { renderBold } from '../../lib/boldText';
 
 function CustomSectionBodyContent({ section, departmentSlug, categorySlug }: { section: CustomSection; departmentSlug?: string; categorySlug?: string }) {
   if (section.contentType === 'text') {
@@ -702,7 +703,7 @@ function CustomSectionBodyContent({ section, departmentSlug, categorySlug }: { s
                 </h4>
               )}
               {card.description && (
-                <p style={{ color: 'var(--color-text)', lineHeight: 1.6, margin: 0, whiteSpace: 'pre-line' }}>{card.description}</p>
+                <p style={{ color: 'var(--color-text)', lineHeight: 1.6, margin: 0, whiteSpace: 'pre-line' }}>{renderBold(card.description)}</p>
               )}
             </div>
           </div>

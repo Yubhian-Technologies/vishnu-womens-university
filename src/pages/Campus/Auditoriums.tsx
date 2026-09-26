@@ -5,6 +5,7 @@ import { usePageBanners } from "../../hooks/usePageBanners";
 import { useContentBlocks } from "../../hooks/useContentBlocks";
 import { useSitePhotos } from "../../hooks/useSitePhotos";
 import type { PhotoItem } from "../../components/PhotoGrid/PhotoGrid";
+import { renderBold } from '../../lib/boldText';
 import "./Auditoriums.css";
 
 // Bespoke page (not the generic CampusLifeDetail.tsx -> campusLifeItems
@@ -196,7 +197,7 @@ export default function Auditoriums() {
         <div className="aud-hero-card">
           <div className="aud-hero-text">
             <h1 className="aud-hero-title">{heroTitle}</h1>
-            <p className="aud-hero-subtitle">{heroSubtitle}</p>
+            <p className="aud-hero-subtitle">{renderBold(heroSubtitle)}</p>
             <div className="aud-hero-tagline">
               {heroTagline.map((word) => (
                 <span key={word}>{word}</span>
@@ -208,10 +209,10 @@ export default function Auditoriums() {
             <div className="aud-hero-media-overlay" />
             <div className="aud-hero-screen" aria-hidden="true">
               {heroScreenLines.map((line, i) => (
-                <p key={i}>{line}</p>
+                <p key={i}>{renderBold(line)}</p>
               ))}
             </div>
-            <div className="aud-hero-caption">{heroCaption}</div>
+            <div className="aud-hero-caption">{renderBold(heroCaption)}</div>
           </div>
         </div>
       </section>
@@ -224,7 +225,7 @@ export default function Auditoriums() {
               {heroTitle}
             </h2>
             <p style={{ fontSize: '1.15rem', color: 'var(--color-text)', lineHeight: 1.7, marginBottom: '3rem' }}>
-              {heroSubtitle}
+              {renderBold(heroSubtitle)}
             </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
@@ -234,7 +235,7 @@ export default function Auditoriums() {
                     {f.title}
                   </h3>
                   <p style={{ fontSize: '1.1rem', color: 'var(--color-text-light)' }}>
-                    {f.desc}
+                    {renderBold(f.desc)}
                   </p>
                 </div>
               ))}
@@ -252,7 +253,7 @@ export default function Auditoriums() {
               <h2 className="aud-about-heading">{aboutHeading}</h2>
               <div className="aud-about-body">
                 {aboutBody.map((para, i) => (
-                  <p key={i}>{para}</p>
+                  <p key={i}>{renderBold(para)}</p>
                 ))}
               </div>
             </div>
@@ -283,7 +284,7 @@ export default function Auditoriums() {
                 {s.title}
               </p>
               <p className="aud-tile-desc" style={{ color: color.fg }}>
-                {s.desc}
+                {renderBold(s.desc)}
               </p>
             </div>
           );

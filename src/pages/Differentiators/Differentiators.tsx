@@ -6,6 +6,7 @@ import { useHashScroll } from '../../hooks/useHashScroll';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { DIFFERENTIATOR_CATEGORIES } from '../Admin/sections/DifferentiatorsAdmin';
 import type { DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
+import { renderBold } from '../../lib/boldText';
 import './Differentiators.css';
 
 // Fixed top-level categories — not admin content. Items within each are Firestore-backed.
@@ -109,7 +110,7 @@ export default function Differentiators() {
                   </h3>
 
                   <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.65, flex: 1, marginBottom: 'var(--space-4)' }}>
-                    {item.desc}
+                    {renderBold(item.desc)}
                   </p>
 
                   {/* Learn More */}

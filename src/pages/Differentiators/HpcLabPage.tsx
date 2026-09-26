@@ -21,6 +21,7 @@ import { highPerformanceComputingLab } from './highPerformanceComputingLab.data'
 import type { DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
 import type { CustomSection } from '../../lib/customSections';
 import { CustomSectionsGalleries } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
+import { renderBold } from '../../lib/boldText';
 import './HpcLabPage.css';
 
 interface HpcLabPageProps {
@@ -136,7 +137,7 @@ export default function HpcLabPage({ sections = [] }: HpcLabPageProps) {
             <div className="hpc-paragraphs">
               {hpc.paragraphs.map((para, idx) => (
                 <p key={idx} className="hpc-lead-paragraph">
-                  {para}
+                  {renderBold(para)}
                 </p>
               ))}
             </div>
@@ -161,7 +162,7 @@ export default function HpcLabPage({ sections = [] }: HpcLabPageProps) {
                 {hpc.mission.map((item, idx) => (
                   <li key={idx} className="hpc-mission-item">
                     <CheckCircle2 className="hpc-bullet-icon cyan" size={18} />
-                    <span>{item}</span>
+                    <span>{renderBold(item)}</span>
                   </li>
                 ))}
               </ul>
@@ -178,7 +179,7 @@ export default function HpcLabPage({ sections = [] }: HpcLabPageProps) {
               {hpc.objectives.map((obj, idx) => (
                 <div key={idx} className="hpc-objective-tile">
                   <span className="hpc-objective-num">0{idx + 1}</span>
-                  <p className="hpc-objective-text">{obj}</p>
+                  <p className="hpc-objective-text">{renderBold(obj)}</p>
                 </div>
               ))}
             </div>
@@ -202,7 +203,7 @@ export default function HpcLabPage({ sections = [] }: HpcLabPageProps) {
                     <span className="hpc-badge-grant">DST Sponsored Project</span>
                     <span className="hpc-grant-no">DST /SEED/SCSP/STI/ 2019/140/G</span>
                   </div>
-                  <p className="hpc-funded-desc">{proj}</p>
+                  <p className="hpc-funded-desc">{renderBold(proj)}</p>
                 </div>
               ))}
             </div>
@@ -222,7 +223,7 @@ export default function HpcLabPage({ sections = [] }: HpcLabPageProps) {
                   </div>
                   <div className="hpc-research-body">
                     <span className="hpc-research-tag">AI & Machine Learning R&D</span>
-                    <p className="hpc-research-text">{res}</p>
+                    <p className="hpc-research-text">{renderBold(res)}</p>
                   </div>
                 </div>
               ))}
@@ -258,7 +259,7 @@ export default function HpcLabPage({ sections = [] }: HpcLabPageProps) {
                       </span>
                       <span className="hpc-pub-index">#{idx + 1}</span>
                     </div>
-                    <p className="hpc-pub-title">{paper}</p>
+                    <p className="hpc-pub-title">{renderBold(paper)}</p>
                   </div>
                 );
               })}
@@ -375,7 +376,7 @@ export default function HpcLabPage({ sections = [] }: HpcLabPageProps) {
                   </div>
                   <div className="hpc-activity-content">
                     <span className="hpc-activity-tag">Capacity Building Event</span>
-                    <p className="hpc-activity-text">{act}</p>
+                    <p className="hpc-activity-text">{renderBold(act)}</p>
                   </div>
                 </div>
               ))}

@@ -9,6 +9,7 @@ import type { SchoolDoc } from '../Admin/sections/SchoolsAdmin';
 import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
 import { findDeptProgramSlug } from './Academics';
+import { renderBold } from '../../lib/boldText';
 import '../Academics/Academics.css';
 import '../detail-layout.css';
 import './Schools.css';
@@ -75,7 +76,7 @@ export default function Schools() {
                     <p className="school-tagline">{SCHOOL_TAGLINES[school.title.trim().toLowerCase()]}</p>
                   )}
                   {school.description && (
-                    <p className="section-desc">{school.description}</p>
+                    <p className="section-desc">{renderBold(school.description)}</p>
                   )}
                   <div className="academics-stat-row">
                     <span className="chip-badge">
@@ -105,7 +106,7 @@ export default function Schools() {
                           <span className="dept-code">{dept.shortCode}</span>
                         </div>
                         <h3 className="dept-name">{dept.title}</h3>
-                        <p className="dept-desc">{dept.description}</p>
+                        <p className="dept-desc">{renderBold(dept.description)}</p>
                       </>
                     );
                     return linkSlug ? (

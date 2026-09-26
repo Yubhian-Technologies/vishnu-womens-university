@@ -6,6 +6,7 @@ import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import { useCollection, useOrderedCollection } from '../../hooks/useCollection';
 import { linkify } from '../../lib/linkify';
+import { renderBold } from '../../lib/boldText';
 import { getSectionBlocks } from '../../lib/facultySections';
 import FacultySectionContent from '../../components/FacultySectionContent/FacultySectionContent';
 import { hasCustomSectionContent } from '../../lib/customSections';
@@ -175,7 +176,7 @@ export default function FacultyProfile() {
 
               {hodMatches && hodMessage && (
                 <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.7, marginTop: 'var(--space-4)', paddingTop: 'var(--space-4)', borderTop: '1px solid var(--color-light-gray)' }}>
-                  {hodMessage}
+                  {renderBold(hodMessage)}
                 </p>
               )}
               {hodMatches && hodResearchProfiles.length > 0 && (

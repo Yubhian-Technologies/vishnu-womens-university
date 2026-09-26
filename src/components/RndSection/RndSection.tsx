@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { FileText, Check } from 'lucide-react';
 import { parseFlexibleTable, parseProjectAccordion } from '../../lib/structuredTable';
 import type { RndYear } from '../../pages/Admin/sections/ProgramsAdmin';
+import { renderBold } from '../../lib/boldText';
 
 const NAV_OFFSET = 'calc(var(--topbar-height) + var(--header-height) + 1rem)';
 
@@ -109,7 +110,7 @@ export default function RndSection({ years, sectionClassName = 'section bg-white
 
         {activeYear.intro && (
           <p style={{ color: 'var(--color-text)', lineHeight: 1.85, fontSize: 'var(--text-base)', marginBottom: 'var(--space-6)', maxWidth: 760, whiteSpace: 'pre-line' }}>
-            {activeYear.intro}
+            {renderBold(activeYear.intro)}
           </p>
         )}
 
@@ -214,7 +215,7 @@ export default function RndSection({ years, sectionClassName = 'section bg-white
                                 <div key={fi} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.5 }}>
                                   <strong style={{ color: 'var(--color-primary)' }}>{f.label}:</strong>{' '}
                                   {f.href ? (
-                                    <a href={f.href} download target="_blank" rel="noopener noreferrer" className="thrust-accordion-link">{f.value}</a>
+                                    <a href={f.href} download target="_blank" rel="noopener noreferrer" className="thrust-accordion-link">{renderBold(f.value)}</a>
                                   ) : (
                                     f.value
                                   )}
@@ -228,7 +229,7 @@ export default function RndSection({ years, sectionClassName = 'section bg-white
                                 {project.outcomes.map((o, oi) => (
                                   <li key={oi} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2)' }}>
                                     <Check size={13} strokeWidth={2.5} style={{ color: 'var(--color-accent)', flexShrink: 0, marginTop: 3 }} />
-                                    <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.5 }}>{o}</span>
+                                    <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.5 }}>{renderBold(o)}</span>
                                   </li>
                                 ))}
                               </ul>

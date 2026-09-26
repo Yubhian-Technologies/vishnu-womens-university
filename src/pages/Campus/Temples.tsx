@@ -15,6 +15,7 @@ import {
   DEFAULT_TEMPLES_ABOUT,
   DEFAULT_TEMPLES_PILLARS,
 } from '../Admin/sections/TemplesAdmin';
+import { renderBold } from '../../lib/boldText';
 import './Temples.css';
 
 // Default Fallback Photos
@@ -135,7 +136,7 @@ export default function Temples() {
                         <Icon size={18} />
                       </div>
                       <div>
-                        <div className="tmpl-stat-val">{st.value}</div>
+                        <div className="tmpl-stat-val">{renderBold(st.value)}</div>
                         <div className="tmpl-stat-lbl">{st.label}</div>
                       </div>
                     </div>
@@ -163,7 +164,7 @@ export default function Temples() {
               {aboutData.title}
             </h2>
             <p className="tmpl-section-subtitle">
-              {aboutData.subtitle}
+              {renderBold(aboutData.subtitle)}
             </p>
           </div>
 
@@ -172,7 +173,7 @@ export default function Temples() {
               “Worship is putting the spotlight on God. This whole idea is to engage our students in an atmosphere and attitude of reverence and joy.”
             </div>
             <p className="tmpl-philosophy-text">
-              {aboutData.philosophyText}
+              {renderBold(aboutData.philosophyText)}
             </p>
           </div>
         </div>
@@ -212,7 +213,7 @@ export default function Temples() {
                   </div>
                   <h3 className="tmpl-pillar-title">{p.title}</h3>
                   <p className="tmpl-pillar-desc">
-                    {p.desc}
+                    {renderBold(p.desc)}
                   </p>
                 </div>
               );

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { RANKINGS } from '../landingPremium.data';
+import { renderBold } from '../../../lib/boldText';
 
 // Mirrors lpu.in's "Rising Beyond Standards" band exactly: a circular CTA
 // beside a bold multi-line heading + description in the top row, then a
@@ -44,11 +45,11 @@ export default function RankingsSection() {
         <div className="lph-rankings__row">
           <div>
             <div className="lph-rankings__big">{r.big}</div>
-            <p className="lph-rankings__caption">{r.caption}</p>
+            <p className="lph-rankings__caption">{renderBold(r.caption)}</p>
           </div>
           <div className="lph-rankings__body">
             <p className="lph-rankings__label">{r.title}</p>
-            <span>{r.desc}</span>
+            <span>{renderBold(r.desc)}</span>
             <div className="lph-rankings__arrows">
               <button onClick={() => goTo((active - 1 + RANKINGS.length) % RANKINGS.length)} aria-label="Previous"><ChevronLeft size={18} /></button>
               <button onClick={() => goTo((active + 1) % RANKINGS.length)} aria-label="Next"><ChevronRight size={18} /></button>

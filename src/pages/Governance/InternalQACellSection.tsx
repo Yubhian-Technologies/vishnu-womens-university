@@ -1,6 +1,7 @@
 import { useState, type CSSProperties } from 'react';
 import { Check } from 'lucide-react';
 import { IQAC_CELL_MEMBERS, IQAC_CELL_FUNCTIONS } from './internalQACellDefault';
+import { renderBold } from '../../lib/boldText';
 
 const TH_STYLE: CSSProperties = {
   padding: 'var(--space-3) var(--space-4)',
@@ -72,7 +73,7 @@ export default function InternalQACellSection() {
           {IQAC_CELL_FUNCTIONS.map((f, i) => (
             <li key={i}>
               <Check size={13} strokeWidth={2.5} className="pb-bullet-icon" />
-              <span>{f}</span>
+              <span>{renderBold(f)}</span>
             </li>
           ))}
         </ul>

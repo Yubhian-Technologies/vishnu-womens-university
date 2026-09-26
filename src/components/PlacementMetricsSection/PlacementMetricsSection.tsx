@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { renderBold } from '../../lib/boldText';
 import './PlacementMetricsSection.css';
 
 interface MetricItem {
@@ -92,7 +93,7 @@ export default function PlacementMetricsSection() {
               style={{ animationDelay: `${index * 120}ms` }}
             >
               <div className="vwu-pm-circle-inner">
-                <span className="vwu-pm-circle-val">{item.value}</span>
+                <span className="vwu-pm-circle-val">{renderBold(item.value)}</span>
                 <span className="vwu-pm-circle-bold">{item.boldText}</span>
                 <span className="vwu-pm-circle-sub">{item.line1}</span>
                 <span className="vwu-pm-circle-sub">{item.line2}</span>

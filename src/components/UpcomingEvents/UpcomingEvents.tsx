@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import type { HappeningDoc } from '../../pages/Admin/sections/NewsAwardsDataAdmin';
 import { parseHappeningDate, isUpcomingHappening } from '../../lib/happenings';
+import { renderBold } from '../../lib/boldText';
 import './UpcomingEvents.css';
 
 function getGoogleCalendarUrl(event: { title: string; date: string; description?: string; dept?: string }): string {
@@ -168,7 +169,7 @@ export default function UpcomingEvents({ happenings = [] }: Props) {
                   </div>
                   <h3 className="m3-featured-title">{featuredEvent.title}</h3>
                   {featuredEvent.description && (
-                    <p className="m3-featured-desc">{featuredEvent.description}</p>
+                    <p className="m3-featured-desc">{renderBold(featuredEvent.description)}</p>
                   )}
 
                   <div className="m3-featured-meta-row">

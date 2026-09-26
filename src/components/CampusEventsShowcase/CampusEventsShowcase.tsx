@@ -8,6 +8,7 @@ import type { CampusLifeItemDoc } from '../../pages/Admin/sections/CampusLifeAdm
 import type { CustomSection } from '../../lib/customSections';
 import { SECTION_ACCENT_COLORS, findSectionAccentColor } from '../../lib/sectionAccentColors';
 import { usePageBanners } from '../../hooks/usePageBanners';
+import { renderBold } from '../../lib/boldText';
 import './CampusEventsShowcase.css';
 
 // Fixed page chrome (not read from any admin field) — the reference
@@ -111,7 +112,7 @@ function PhotoCarousel({ photos, altPrefix }: { photos: { url: string; caption?:
         {photos.map((p) => (
           <div key={p.url} className="ces-rich-photo">
             <img src={p.url} alt={p.caption || altPrefix} loading="lazy" />
-            {p.caption && <span className="ces-rich-photo-caption">{p.caption}</span>}
+            {p.caption && <span className="ces-rich-photo-caption">{renderBold(p.caption)}</span>}
           </div>
         ))}
       </div>
@@ -128,7 +129,7 @@ function PhotoCarousel({ photos, altPrefix }: { photos: { url: string; caption?:
         {[...photos, ...photos].map((p, i) => (
           <div key={`${p.url}-${i}`} className="ces-rich-photo" aria-hidden={i >= photos.length}>
             <img src={p.url} alt={p.caption || altPrefix} loading="lazy" />
-            {p.caption && <span className="ces-rich-photo-caption">{p.caption}</span>}
+            {p.caption && <span className="ces-rich-photo-caption">{renderBold(p.caption)}</span>}
           </div>
         ))}
       </div>
@@ -229,7 +230,7 @@ function PhotoGridShowMore({
             onClick={() => setLightbox(i)}
           >
             <img src={p.url} alt={p.caption || altPrefix} loading="lazy" />
-            {p.caption && <figcaption>{p.caption}</figcaption>}
+            {p.caption && <figcaption>{renderBold(p.caption)}</figcaption>}
           </figure>
         ))}
       </div>
@@ -381,7 +382,7 @@ export default function CampusEventsShowcase({ sourceItem }: { sourceItem: Campu
                         <div>
                           <span className="ces-eyebrow ces-eyebrow--dark">— {section.label}</span>
                           <h2 className="ces-section-title">{section.label}</h2>
-                          {section.subtitle && <p className="ces-close-desc">{section.subtitle}</p>}
+                          {section.subtitle && <p className="ces-close-desc">{renderBold(section.subtitle)}</p>}
                         </div>
                       </div>
                       {rows.length > 0 && (
@@ -436,7 +437,7 @@ export default function CampusEventsShowcase({ sourceItem }: { sourceItem: Campu
                         <div>
                           <span className="ces-eyebrow">— {section.label}</span>
                           <h2 className="ces-section-title ces-section-title--light">{section.label}</h2>
-                          {section.subtitle && <p className="ces-events-sub">{section.subtitle}</p>}
+                          {section.subtitle && <p className="ces-events-sub">{renderBold(section.subtitle)}</p>}
                         </div>
                       </div>
                       {rows.length > 0 && (
@@ -456,7 +457,7 @@ export default function CampusEventsShowcase({ sourceItem }: { sourceItem: Campu
                                 )}
                                 <div className="ces-event-card-body">
                                   <h3>{card.title}</h3>
-                                  <p>{card.desc}</p>
+                                  <p>{renderBold(card.desc)}</p>
                                 </div>
                               </div>
                             );
@@ -492,10 +493,10 @@ export default function CampusEventsShowcase({ sourceItem }: { sourceItem: Campu
                 <h2 className={`ces-section-title${isDark ? ' ces-section-title--light' : ''}`}>
                   {isGalleryLabel ? GALLERY_HEADING_OVERRIDE : section.label}
                 </h2>
-                {section.subtitle && <p className={isDark ? 'ces-events-sub' : 'ces-close-desc'}>{section.subtitle}</p>}
+                {section.subtitle && <p className={isDark ? 'ces-events-sub' : 'ces-close-desc'}>{renderBold(section.subtitle)}</p>}
                 {section.textContent?.trim() && (
                   <p className={isDark ? 'ces-events-sub' : 'ces-close-desc'} style={{ whiteSpace: 'pre-line' }}>
-                    {section.textContent}
+                    {renderBold(section.textContent)}
                   </p>
                 )}
                 {isGalleryLabel && !hasOwnSectionCopy && (

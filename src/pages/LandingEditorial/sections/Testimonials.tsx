@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { TESTIMONIALS } from '../landingEditorial.data';
 import Reveal from '../Reveal';
+import { renderBold } from '../../../lib/boldText';
 
 export default function Testimonials() {
   const [active, setActive] = useState(0);
@@ -41,7 +42,7 @@ export default function Testimonials() {
                 exit={{ opacity: 0, y: -12 }}
                 transition={{ duration: 0.4 }}
               >
-                <p className="lpe-testimonial-quote">&ldquo;{current.quote}&rdquo;</p>
+                <p className="lpe-testimonial-quote">&ldquo;{renderBold(current.quote)}&rdquo;</p>
                 <div className="lpe-testimonial-who">
                   {current.name}
                   <span>{current.role}</span>

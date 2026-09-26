@@ -17,6 +17,7 @@ import {
 import { microchipEmbedded } from './microchipEmbedded.data';
 import type { CustomSection } from '../../lib/customSections';
 import { CustomSectionsAccordion } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
+import { renderBold } from '../../lib/boldText';
 import './MicrochipPage.css';
 
 interface MicrochipPageProps {
@@ -67,7 +68,7 @@ export default function MicrochipPage({ customSections = [] }: MicrochipPageProp
           </div>
           <div className="mc-about-body">
             {data.about.paragraphs.map((para, idx) => (
-              <p key={idx} className="mc-about-text">{para}</p>
+              <p key={idx} className="mc-about-text">{renderBold(para)}</p>
             ))}
           </div>
 
@@ -105,12 +106,12 @@ export default function MicrochipPage({ customSections = [] }: MicrochipPageProp
               <Target size={14} /> Institutional Mission
             </span>
             <h3 className="mc-vm-title">{data.mission.title}</h3>
-            <p className="mc-mission-intro">{data.mission.intro}</p>
+            <p className="mc-mission-intro">{renderBold(data.mission.intro)}</p>
             <ul className="mc-mission-list">
               {data.mission.points.map((point, idx) => (
                 <li key={idx} className="mc-mission-item">
                   <CheckCircle2 size={16} className="mc-mission-check" />
-                  <span>{point}</span>
+                  <span>{renderBold(point)}</span>
                 </li>
               ))}
             </ul>
@@ -131,7 +132,7 @@ export default function MicrochipPage({ customSections = [] }: MicrochipPageProp
               <div className="mc-learning-num">{area.number}</div>
               <div className="mc-learning-content">
                 <h4 className="mc-learning-card-title">{area.title}</h4>
-                <p className="mc-learning-card-desc">{area.description}</p>
+                <p className="mc-learning-card-desc">{renderBold(area.description)}</p>
               </div>
             </div>
           ))}
@@ -147,7 +148,7 @@ export default function MicrochipPage({ customSections = [] }: MicrochipPageProp
               <Award size={14} /> {data.trainingAndActivities.title}
             </div>
             <h3 className="mc-training-title">{data.trainingAndActivities.programmeName}</h3>
-            <p className="mc-training-desc">{data.trainingAndActivities.description}</p>
+            <p className="mc-training-desc">{renderBold(data.trainingAndActivities.description)}</p>
           </div>
 
           {/* Programme Outcome */}
@@ -156,7 +157,7 @@ export default function MicrochipPage({ customSections = [] }: MicrochipPageProp
               <Sparkles size={14} /> {data.programmeOutcome.title}
             </div>
             <h3 className="mc-outcome-title">Faculty Development & Impact</h3>
-            <p className="mc-outcome-desc">{data.programmeOutcome.description}</p>
+            <p className="mc-outcome-desc">{renderBold(data.programmeOutcome.description)}</p>
           </div>
         </div>
       </section>
@@ -174,7 +175,7 @@ export default function MicrochipPage({ customSections = [] }: MicrochipPageProp
               {data.technicalHighlights.items.map((item, idx) => (
                 <li key={idx} className="mc-highlight-item">
                   <div className="mc-highlight-bullet" />
-                  <span>{item}</span>
+                  <span>{renderBold(item)}</span>
                 </li>
               ))}
             </ul>
@@ -186,12 +187,12 @@ export default function MicrochipPage({ customSections = [] }: MicrochipPageProp
               <Wrench size={20} className="mc-details-icon" />
               <h3 className="mc-details-title">{data.facilities.title}</h3>
             </div>
-            <p className="mc-facilities-intro">{data.facilities.intro}</p>
+            <p className="mc-facilities-intro">{renderBold(data.facilities.intro)}</p>
             <ul className="mc-facilities-list">
               {data.facilities.items.map((item, idx) => (
                 <li key={idx} className="mc-facility-item">
                   <CheckCircle2 size={16} className="mc-facility-icon" />
-                  <span>{item}</span>
+                  <span>{renderBold(item)}</span>
                 </li>
               ))}
             </ul>
@@ -218,7 +219,7 @@ export default function MicrochipPage({ customSections = [] }: MicrochipPageProp
                   <span className="mc-partner-badge">Official Learning Partner</span>
                 </div>
               </div>
-              <p className="mc-partner-desc">{partner.description}</p>
+              <p className="mc-partner-desc">{renderBold(partner.description)}</p>
             </div>
           ))}
         </div>
@@ -229,7 +230,7 @@ export default function MicrochipPage({ customSections = [] }: MicrochipPageProp
         <div className="mc-section-header">
           <span className="mc-section-label">Visual Documentation</span>
           <h2 className="mc-section-title">{data.gallery.title}</h2>
-          <p className="mc-gallery-caption-subtitle">{data.gallery.caption}</p>
+          <p className="mc-gallery-caption-subtitle">{renderBold(data.gallery.caption)}</p>
         </div>
 
         {galleryItems.length > 0 ? (
@@ -254,7 +255,7 @@ export default function MicrochipPage({ customSections = [] }: MicrochipPageProp
               <div className="mc-showcase-icon">
                 <GraduationCap size={32} />
               </div>
-              <h4 className="mc-showcase-title">{data.gallery.caption}</h4>
+              <h4 className="mc-showcase-title">{renderBold(data.gallery.caption)}</h4>
               <p className="mc-showcase-desc">
                 Interactive practical workshops and faculty development sessions covering PIC microcontrollers, embedded programming, and IoT interfacing.
               </p>

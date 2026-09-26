@@ -4,6 +4,7 @@ import { usePageBanners, type BannerSlide } from '../../hooks/usePageBanners';
 import SmoothImage from '../SmoothImage/SmoothImage';
 import { smoothScrollTo } from '../../lib/smoothScroll';
 import { fetchPriorityAttr } from '../../lib/domAttrs';
+import { renderBold } from '../../lib/boldText';
 import './PageHero.css';
 
 export interface BreadcrumbItem {
@@ -182,7 +183,7 @@ export default function PageHero({
 
           {slide.subtitle && (
             <p key={`sub-${current}`} className="page-hero__subtitle animate-fade-in-up">
-              {slide.subtitle}
+              {renderBold(slide.subtitle)}
             </p>
           )}
 

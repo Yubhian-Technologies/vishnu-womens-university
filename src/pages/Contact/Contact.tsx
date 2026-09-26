@@ -33,6 +33,7 @@ import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { useSiteContact, DEFAULT_PHONE } from '../../hooks/useSiteContact';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import type { ContactDoc } from '../Admin/sections/ContactsAdmin';
+import { renderBold } from '../../lib/boldText';
 import './Contact.css';
 
 interface ContactForm {
@@ -350,7 +351,7 @@ export default function Contact() {
                   {c.value && (
                     <div className="contact-card-clean__timing">
                       <Clock size={13} />
-                      <span>{c.value}</span>
+                      <span>{renderBold(c.value)}</span>
                     </div>
                   )}
                 </div>

@@ -17,6 +17,7 @@ import {
 import { resolveContentIcon } from '../../lib/contentIcons';
 import { isEnabledNavPath } from '../../components/Header/Header';
 import BentoInnovationGrid from '../../components/BentoInnovationGrid/BentoInnovationGrid';
+import { renderBold } from '../../lib/boldText';
 
 const STAT_ICONS = [Calendar, MapPin, GraduationCap, Users, Briefcase, Award, CheckCircle, Sparkles];
 
@@ -213,7 +214,7 @@ export default function About() {
               return (
                 <div key={s.id} className="about-fact">
                   <IconComp size={20} className="about-fact-icon" strokeWidth={2} />
-                  <div className="about-fact-value">{s.value}</div>
+                  <div className="about-fact-value">{renderBold(s.value)}</div>
                   <div className="about-fact-label">{s.title}</div>
                 </div>
               );
@@ -281,7 +282,7 @@ export default function About() {
                     <IconComp size={26} strokeWidth={1.8} />
                   </div>
                   <h3 className="about-pillar-title">{pillar.title}</h3>
-                  <p className="about-pillar-desc">{pillar.desc}</p>
+                  <p className="about-pillar-desc">{renderBold(pillar.desc)}</p>
                 </div>
               );
             })}
@@ -332,7 +333,7 @@ export default function About() {
                 {academicSnapshotStats.map(p => (
                   <div key={p.id} className="about-program-card">
                     <div style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', fontWeight: 800, color: 'var(--color-accent)', letterSpacing: '0.08em', marginBottom: 4 }}>{p.title}</div>
-                    <div style={{ fontFamily: 'var(--font-sans)', fontWeight: 900, color: 'var(--color-primary)', fontSize: '1.05rem' }}>{p.value}</div>
+                    <div style={{ fontFamily: 'var(--font-sans)', fontWeight: 900, color: 'var(--color-primary)', fontSize: '1.05rem' }}>{renderBold(p.value)}</div>
                   </div>
                 ))}
               </div>
@@ -411,7 +412,7 @@ export default function About() {
                     <div className="exec-detail-banner__fact"><span>Email</span><a href={`mailto:${activeExec.email}`}>{activeExec.email}</a></div>
                   )}
                 </div>
-                {activeExec.bio && <p className="exec-detail-banner__bio">{activeExec.bio}</p>}
+                {activeExec.bio && <p className="exec-detail-banner__bio">{renderBold(activeExec.bio)}</p>}
                 {(activeExec.description || activeExec.linkUrl) && (
                   <div className="exec-detail-banner__description">
                     {activeExec.linkUrl && (
@@ -552,7 +553,7 @@ export default function About() {
                         <IconComp size={26} strokeWidth={1.8} />
                       </div>
                       <h3 className="about-pillar-title">{card.title}</h3>
-                      <p className="about-pillar-desc">{card.desc}</p>
+                      <p className="about-pillar-desc">{renderBold(card.desc)}</p>
                     </div>
                   );
                 })}
@@ -631,7 +632,7 @@ export default function About() {
                 <>
                   <span className="about-discover-icon"><Icon size={26} strokeWidth={1.8} /></span>
                   <h3>{item.title}</h3>
-                  <p>{item.desc}</p>
+                  <p>{renderBold(item.desc)}</p>
                   {linkable && (
                     <span className="about-discover-link">
                       Explore <ArrowRight size={13} />

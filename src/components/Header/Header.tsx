@@ -9,6 +9,7 @@ import type { PlacementItemDoc } from '../../pages/Admin/sections/PlacementItems
 import { DEFAULT_CAMPUS_LIFE_QUICK_LINKS } from '../../pages/Admin/sections/CampusLifeAdmin';
 import type { CampusLifeItemDoc, CampusLifeQuickLinkDoc } from '../../pages/Admin/sections/CampusLifeAdmin';
 import SmoothCollapse from '../SmoothCollapse/SmoothCollapse';
+import { renderBold } from '../../lib/boldText';
 import './Header.css';
 
 interface NavChild {
@@ -880,7 +881,7 @@ export default function Header() {
                       {activeItemData.highlight.title}
                     </h4>
                     <p className="mega-highlight-desc">
-                      {activeItemData.highlight.description}
+                      {renderBold(activeItemData.highlight.description)}
                     </p>
                     {activeItemData.highlight.linkPath && (
                       <Link

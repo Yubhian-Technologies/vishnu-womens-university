@@ -10,6 +10,7 @@ import { hasCustomSectionContent } from '../../lib/customSections';
 import { SectionSubtree } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import MarqueeText from '../../components/MarqueeText/MarqueeText';
 import type { FacultyDoc } from './Faculty';
+import { renderBold } from '../../lib/boldText';
 import '../detail-layout.css';
 
 // Only "About Freshman Department" and the sections below (Vision &
@@ -43,7 +44,7 @@ function Bullets({ items }: { items: ReactNode[] }) {
       {items.map((item, i) => (
         <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-3)' }}>
           <span style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--color-accent)', flexShrink: 0, marginTop: 9 }} />
-          <span style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.7 }}>{item}</span>
+          <span style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.7 }}>{renderBold(item)}</span>
         </li>
       ))}
     </ul>
@@ -64,19 +65,19 @@ function BlockRenderer({ block }: { block: ContentBlock }) {
     case 'paragraph':
       return (
         <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-5)' }}>
-          {block.text}
+          {renderBold(block.text)}
         </p>
       );
     case 'lead':
       return (
         <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', marginBottom: 'var(--space-3)' }}>
-          {block.text}
+          {renderBold(block.text)}
         </p>
       );
     case 'heading':
       return (
         <h4 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--color-primary)', marginTop: 'var(--space-6)', marginBottom: 'var(--space-3)' }}>
-          {block.text}
+          {renderBold(block.text)}
         </h4>
       );
     case 'bullets':
@@ -155,7 +156,7 @@ function PosSection() {
       <Bullets
         items={POS.map((po) => (
           <>
-            <strong>{po.code}. {po.title}:</strong> {po.text}
+            <strong>{po.code}. {po.title}:</strong> {renderBold(po.text)}
           </>
         ))}
       />
@@ -457,11 +458,11 @@ function OneLabSection({ lab }: { lab: LabInfo }) {
         {lab.title}
       </h4>
       <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-4)' }}>
-        {lab.intro}
+        {renderBold(lab.intro)}
       </p>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', fontSize: 'var(--text-sm)', color: 'var(--color-text)', marginBottom: 'var(--space-5)' }}>
         {lab.facts.map((f) => (
-          <div key={f.label}><strong style={{ color: 'var(--color-primary)' }}>{f.label}:</strong> {f.value}</div>
+          <div key={f.label}><strong style={{ color: 'var(--color-primary)' }}>{f.label}:</strong> {renderBold(f.value)}</div>
         ))}
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'var(--space-4)' }}>

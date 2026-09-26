@@ -7,6 +7,7 @@ import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import type { PlacementItemDoc } from '../Admin/sections/PlacementItemsAdmin';
 import PlacementYearAccordion from './PlacementYearAccordion';
+import { renderBold } from '../../lib/boldText';
 
 export default function Placements() {
   const { docs: placementItems } = useOrderedCollection<PlacementItemDoc>('placementItems', 'order');
@@ -50,7 +51,7 @@ export default function Placements() {
           <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-14)', flexWrap: 'wrap' }}>
             {stats.length > 0 ? stats.map((s) => (
               <div key={s.id} style={{ textAlign: 'center' }}>
-                <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', fontWeight: 900, color: 'var(--color-accent)' }}>{s.value}</div>
+                <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', fontWeight: 900, color: 'var(--color-accent)' }}>{renderBold(s.value)}</div>
                 <div style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)' }}>{s.title}</div>
               </div>
             )) : (
@@ -103,7 +104,7 @@ export default function Placements() {
                   </h3>
 
                   <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.65, flex: 1, marginBottom: 'var(--space-4)' }}>
-                    {item.desc}
+                    {renderBold(item.desc)}
                   </p>
 
                   {item.external && item.url ? (

@@ -7,6 +7,7 @@ import { DEPARTMENT_GROUPS, STANDALONE_DEPARTMENTS } from '../../lib/departmentG
 import { hasCustomSectionContent, type CustomSection } from '../../lib/customSections';
 import type { NewsEventsCategory } from '../../components/NewsEventsTabs/NewsEventsTabs';
 import { ArrowLeft } from 'lucide-react';
+import { renderBold } from '../../lib/boldText';
 import '../detail-layout.css';
 
 // Shown per department/category before "Load More" reveals the rest —
@@ -122,7 +123,7 @@ export default function DepartmentEventsPage() {
                   )}
                   {card.description && (
                     <p style={{ color: 'var(--color-text)', lineHeight: 1.6, margin: 0, whiteSpace: 'pre-line', fontSize: '0.95rem' }}>
-                      {card.description}
+                      {renderBold(card.description)}
                     </p>
                   )}
                 </div>

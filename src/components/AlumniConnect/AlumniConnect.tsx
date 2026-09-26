@@ -2,6 +2,7 @@ import { useRef, useEffect, useState, useCallback } from 'react';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import SmoothImage from '../SmoothImage/SmoothImage';
 import type { AlumniEvent } from '../../pages/Admin/sections/AlumniEventsAdmin';
+import { renderBold } from '../../lib/boldText';
 import './AlumniConnect.css';
 
 // Row 1 text content
@@ -112,7 +113,7 @@ export default function AlumniConnect() {
           </div>
           <div className="alumni-connect-text">
             <h3 className="alumni-connect-text-title">{ROW1_TEXT.title}</h3>
-            <p className="alumni-connect-text-desc">{ROW1_TEXT.desc}</p>
+            <p className="alumni-connect-text-desc">{renderBold(ROW1_TEXT.desc)}</p>
           </div>
         </div>
 
@@ -120,7 +121,7 @@ export default function AlumniConnect() {
         <div className="alumni-connect-row alumni-connect-row--reversed">
           <div className="alumni-connect-text">
             <h3 className="alumni-connect-text-title">{ROW2_TEXT.title}</h3>
-            <p className="alumni-connect-text-desc">{ROW2_TEXT.desc}</p>
+            <p className="alumni-connect-text-desc">{renderBold(ROW2_TEXT.desc)}</p>
           </div>
           <div className="alumni-connect-photos">
             {row2Photos.length > 0 ? (

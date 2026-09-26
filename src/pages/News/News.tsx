@@ -14,6 +14,7 @@ import { useHashScroll } from '../../hooks/useHashScroll';
 import { useSiteContact } from '../../hooks/useSiteContact';
 import SEO from '../../components/SEO/SEO';
 import { getArticleSchema, getBreadcrumbSchema } from '../../lib/seo/schemas';
+import { renderBold } from '../../lib/boldText';
 
 const categories = ['All', ...NEWS_CATEGORIES];
 
@@ -120,8 +121,8 @@ export default function News() {
               <div className="news-featured-content">
                 <div className="news-card-date">{formatDate(featuredItem.date)}</div>
                 <h2>{featuredItem.title}</h2>
-                <p>{featuredItem.summary}</p>
-                {featuredItem.body && <p>{featuredItem.body}</p>}
+                <p>{renderBold(featuredItem.summary)}</p>
+                {featuredItem.body && <p>{renderBold(featuredItem.body)}</p>}
               </div>
             </div>
           </div>

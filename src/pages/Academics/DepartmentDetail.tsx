@@ -31,6 +31,7 @@ import { usePlacementYears } from '../Placements/usePlacementYears';
 import { hasCustomSectionContent } from '../../lib/customSections';
 import CustomSectionsRenderer from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import { getDepartmentTagline } from '../../lib/departmentTaglines';
+import { renderBold } from '../../lib/boldText';
 import '../detail-layout.css';
 import '../Campus/tabbed-section.css';
 
@@ -151,7 +152,7 @@ function VmExpandableCard({ title, content }: { title: string; content: string |
                   <span style={{ width: 18, height: 18, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
                     <svg width="9" height="9" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
                   </span>
-                  <span style={{ color: 'var(--color-text)', lineHeight: 1.6 }}>{c}</span>
+                  <span style={{ color: 'var(--color-text)', lineHeight: 1.6 }}>{renderBold(c)}</span>
                 </li>
               ))}
             </ul>
@@ -161,7 +162,7 @@ function VmExpandableCard({ title, content }: { title: string; content: string |
                 <span style={{ width: 18, height: 18, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
                   <svg width="9" height="9" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
                 </span>
-                <span style={{ color: 'var(--color-text)', lineHeight: 1.6 }}>{content}</span>
+                <span style={{ color: 'var(--color-text)', lineHeight: 1.6 }}>{renderBold(content)}</span>
               </li>
             </ul>
           )}
@@ -332,7 +333,7 @@ export function ResearchSection({
                       {/* Caption overlay */}
                       <div className="dept-research-slide-caption">
                         <h3 className="dept-research-slide-title">{s.title}</h3>
-                        <p className="dept-research-slide-desc">{s.desc}</p>
+                        <p className="dept-research-slide-desc">{renderBold(s.desc)}</p>
                       </div>
                     </div>
                   );
@@ -949,7 +950,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                 <div className="dept-about-body">
                   <div className="dept-about-card">
                     <p className="dept-about-lead-text">
-                      {shared.about}
+                      {renderBold(shared.about)}
                     </p>
                   </div>
 
@@ -975,7 +976,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                           <div className="dept-highlight-check-circle">
                             <Check size={13} strokeWidth={3} />
                           </div>
-                          <p className="dept-highlight-text">{h}</p>
+                          <p className="dept-highlight-text">{renderBold(h)}</p>
                         </div>
                       ))}
                     </div>
@@ -1029,7 +1030,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                     {shared.coreValues.map((v, vi) => (
                       <span key={vi} className="dept-value-pill">
                         <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-block' }} />
-                        <span>{v}</span>
+                        <span>{renderBold(v)}</span>
                       </span>
                     ))}
                   </div>
@@ -1087,14 +1088,14 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
             <div>
             {shared.placementIntro && (
               <p style={{ color: 'var(--color-text)', lineHeight: 1.85, fontSize: 'var(--text-base)', marginBottom: 'var(--space-6)', maxWidth: 760 }}>
-                {shared.placementIntro}
+                {renderBold(shared.placementIntro)}
               </p>
             )}
             {shared.placementStats.length > 0 && (
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-8)', marginBottom: 'var(--space-8)' }}>
                 {shared.placementStats.map((s, si) => (
                   <div key={si} style={{ textAlign: 'center' }}>
-                    <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.5rem', fontWeight: 900, color: 'var(--color-accent)' }}>{s.value}</div>
+                    <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.5rem', fontWeight: 900, color: 'var(--color-accent)' }}>{renderBold(s.value)}</div>
                     <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', fontFamily: 'var(--font-sans)', marginTop: 2, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{s.label}</div>
                   </div>
                 ))}
@@ -1429,7 +1430,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                           items={establishmentItems}
                           renderItem={(item) => (
                             <div className="dept-timeline-item" key={item.id}>
-                              <span className="dept-timeline-year">{item.value}</span>
+                              <span className="dept-timeline-year">{renderBold(item.value)}</span>
                               <span className="dept-timeline-label">{item.label}</span>
                             </div>
                           )}
@@ -1454,7 +1455,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                           renderItem={(item) => (
                             <div className="dept-intake-row" role="row" key={item.id}>
                               <span role="cell">{item.label}</span>
-                              <span role="cell" className="dept-intake-seats">{item.value}</span>
+                              <span role="cell" className="dept-intake-seats">{renderBold(item.value)}</span>
                             </div>
                           )}
                         />
@@ -1495,7 +1496,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                                   </span>
                                   <div>
                                     <span className="dept-accreditation-programme">{item.label}</span>
-                                    <span className="dept-accreditation-status">{item.value}</span>
+                                    <span className="dept-accreditation-status">{renderBold(item.value)}</span>
                                   </div>
                                 </div>
                               )}
@@ -1783,7 +1784,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                               {activeOutcome.key.slice(0, -1).toUpperCase()}
                               {i + 1}
                             </span>
-                            <p className="dept-outcome-desc">{item}</p>
+                            <p className="dept-outcome-desc">{renderBold(item)}</p>
                           </li>
                         ))}
                       </ul>
@@ -1864,7 +1865,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                     </div>
                   )}
                   {activeRndYear?.intro && (
-                    <p className="dept-rnd-intro">{activeRndYear.intro}</p>
+                    <p className="dept-rnd-intro">{renderBold(activeRndYear.intro)}</p>
                   )}
                   {rndTableSections.map((section, si) => (
               <div key={si} className="dept-rnd-table-group">
@@ -1960,7 +1961,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                                       <span className="dept-rnd-project-field-label">{f.label}</span>
                                       <span className="dept-rnd-project-field-value">
                                         {f.href ? (
-                                          <a href={f.href} download target="_blank" rel="noopener noreferrer" className="thrust-accordion-link">{f.value}</a>
+                                          <a href={f.href} download target="_blank" rel="noopener noreferrer" className="thrust-accordion-link">{renderBold(f.value)}</a>
                                         ) : (
                                           f.value
                                         )}
@@ -1975,7 +1976,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                                     {project.outcomes.map((o, oi) => (
                                       <li key={oi} className="dept-rnd-outcome-item">
                                         <Check size={13} strokeWidth={2.5} />
-                                        <span>{o}</span>
+                                        <span>{renderBold(o)}</span>
                                       </li>
                                     ))}
                                   </ul>
@@ -2040,7 +2041,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                 <h2 className="dept-hod-message-title">Brief Profile</h2>
 
                 {shared.hodMessage && (
-                  <p className="dept-hod-message-text-plain">{shared.hodMessage}</p>
+                  <p className="dept-hod-message-text-plain">{renderBold(shared.hodMessage)}</p>
                 )}
               </div>
             </div>
@@ -2198,7 +2199,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                 </button>
                 <div className="dept-faq-collapse" aria-hidden={openFaq !== i}>
                   <div className="dept-faq-collapse-inner">
-                    <div className="dept-faq-answer">{faq.answer}</div>
+                    <div className="dept-faq-answer">{renderBold(faq.answer)}</div>
                   </div>
                 </div>
               </div>

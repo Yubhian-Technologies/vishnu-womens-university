@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { X } from 'lucide-react';
+import { renderBold } from '../../lib/boldText';
 
 interface PhotoCarouselCard {
   name: string;
@@ -130,7 +131,7 @@ export default function PhotoCarouselStrip({ cards, pixelsPerSecond = 60 }: Prop
             {card.name}
           </p>
           <p style={{ color: 'var(--color-text-light)', fontSize: 'var(--text-xs)' }}>
-            {card.subtitle}
+            {renderBold(card.subtitle)}
           </p>
         </>
       )}

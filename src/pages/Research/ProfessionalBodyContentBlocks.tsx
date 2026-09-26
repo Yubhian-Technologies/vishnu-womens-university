@@ -1,5 +1,6 @@
 import { Check, User } from 'lucide-react';
 import type { ParsedProfessionalBody } from '../../lib/professionalBodyContent';
+import { renderBold } from '../../lib/boldText';
 
 // The actual paragraphs/bullets/people/chapter-info/activities content for
 // one Professional Body — shared between... nowhere else yet, but pulled
@@ -10,7 +11,7 @@ export default function ProfessionalBodyContentBlocks({ body }: { body: ParsedPr
   return (
     <div className="pb-item-content">
       {body.paragraphs.map((p, pi) => (
-        <p key={pi} className="pb-paragraph">{p}</p>
+        <p key={pi} className="pb-paragraph">{renderBold(p)}</p>
       ))}
 
       {body.bullets && body.bullets.length > 0 && (
@@ -20,7 +21,7 @@ export default function ProfessionalBodyContentBlocks({ body }: { body: ParsedPr
               <Check size={13} strokeWidth={2.5} className="pb-bullet-icon" />
               <span>
                 {b.label && <strong>{b.label}: </strong>}
-                {b.text}
+                {renderBold(b.text)}
               </span>
             </li>
           ))}
@@ -36,7 +37,7 @@ export default function ProfessionalBodyContentBlocks({ body }: { body: ParsedPr
                 <span className="pb-person-role">{person.role}</span>
                 <span className="pb-person-name">{person.name}</span>
                 {person.details?.map((d, di) => (
-                  <span key={di} className="pb-person-detail">{d}</span>
+                  <span key={di} className="pb-person-detail">{renderBold(d)}</span>
                 ))}
               </div>
             </div>
@@ -49,7 +50,7 @@ export default function ProfessionalBodyContentBlocks({ body }: { body: ParsedPr
           {body.chapterInfo.map((row, ri) => (
             <div key={ri} className="pb-chapter-info-row">
               <span>{row.label}</span>
-              <strong>{row.value}</strong>
+              <strong>{renderBold(row.value)}</strong>
             </div>
           ))}
         </div>
