@@ -6,6 +6,7 @@ import { useOrderedCollection } from '../../hooks/useCollection';
 import { useHashScroll } from '../../hooks/useHashScroll';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import type { ResearchItemDoc } from '../Admin/sections/ResearchItemsAdmin';
+import { renderBold } from '../../lib/boldText';
 
 // Fixed, always-present category shells — the items within each one are
 // admin-editable (researchItems collection), matching the pattern used by
@@ -80,7 +81,7 @@ export default function Research() {
             <div className="container">
               <div className="reveal" style={{ marginBottom: 'var(--space-10)' }}>
                 <h2 className="section-title">{cat.label}</h2>
-                <p style={{ color: 'var(--color-text-light)', maxWidth: 600, lineHeight: 1.7 }}>{cat.desc}</p>
+                <p style={{ color: 'var(--color-text-light)', maxWidth: 600, lineHeight: 1.7 }}>{renderBold(cat.desc)}</p>
               </div>
 
               <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(280px, 100%), 1fr))', gap: 'var(--space-5)' }}>
@@ -99,7 +100,7 @@ export default function Research() {
                         {displayTitle}
                       </h3>
                       <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.65, flex: 1, marginBottom: 'var(--space-4)' }}>
-                        {item.desc}
+                        {renderBold(item.desc)}
                       </p>
                       <Link
                         to={`/research/${item.slug}`}

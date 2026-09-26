@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { renderBold } from '../../lib/boldText';
 import './NewsCard.css';
 
 export interface NewsArticle {
@@ -59,7 +60,7 @@ export default function NewsCard({ article, className = '', isFeatured = false, 
             {article.title}
           </Link>
         )}
-        <p className="news-card-excerpt">{article.excerpt}</p>
+        <p className="news-card-excerpt">{renderBold(article.excerpt)}</p>
         <div className="news-card-footer">
           {onReadMore ? (
             <button type="button" className="news-card-link news-card-link--btn" onClick={onReadMore}>

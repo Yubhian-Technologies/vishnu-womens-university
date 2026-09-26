@@ -12,6 +12,7 @@ import { useOrderedCollection } from '../../hooks/useCollection';
 import { useSitePhotos } from '../../hooks/useSitePhotos';
 import { hasCustomSectionContent } from '../../lib/customSections';
 import type { CampusLifeItemDoc } from '../Admin/sections/CampusLifeAdmin';
+import { renderBold } from '../../lib/boldText';
 import './SewageTreatment.css';
 
 // Campus & sewage-load figures quoted in the DST project write-up
@@ -116,7 +117,7 @@ export default function SewageTreatment() {
           <div className="stp-stats-grid">
             {CAMPUS_STATS.map((s) => (
               <div key={s.label} className="stp-stat-card">
-                <div className="stp-stat-val">{s.value}</div>
+                <div className="stp-stat-val">{renderBold(s.value)}</div>
                 <div className="stp-stat-lbl">{s.label}</div>
               </div>
             ))}

@@ -5,6 +5,7 @@ import { useOrderedCollection } from '../../hooks/useCollection';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import PageHero from '../../components/PageHero/PageHero';
 import type { GovernanceItemDoc } from '../Admin/sections/GovernanceItemsAdmin';
+import { renderBold } from '../../lib/boldText';
 import './GoverningBody.css';
 
 const DEFAULT_OVERVIEW = "The Governing Body of Shri Vishnu Engineering College for Women serves as the apex decision-making authority responsible for guiding the institution's vision, strategic planning, academic excellence, and overall development. Comprising representatives from the management, distinguished academicians, industry experts, university nominees, government officials, faculty members, and the Principal, the Governing Body ensures transparent governance, quality education, innovation, and continuous institutional growth while upholding the values and mission of the college.";
@@ -114,11 +115,11 @@ export default function GoverningBody() {
           <div className="gb-overview__grid reveal">
             <div className="gb-overview__inner">
               <h2 className="gb-overview__title">Institutional Overview</h2>
-              <p>{overviewText}</p>
+              <p>{renderBold(overviewText)}</p>
               {overviewItem?.highlights && overviewItem.highlights.length > 0 && (
                 <ul style={{ marginTop: 'var(--space-4)', paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                   {overviewItem.highlights.map((h) => (
-                    <li key={h} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6 }}>{h}</li>
+                    <li key={h} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6 }}>{renderBold(h)}</li>
                   ))}
                 </ul>
               )}

@@ -18,6 +18,7 @@ import type { PhotoItem } from '../../components/PhotoGrid/PhotoGrid';
 import type { ClubDoc } from '../Admin/sections/StudentClubsAdmin';
 import { useClubCategories } from '../../lib/clubCategories';
 import { clubDesc } from '../../lib/clubDescriptionOverrides';
+import { renderBold } from '../../lib/boldText';
 import './Clubs.css';
 
 // Defaults shown until an admin sets a real "clubs" Hero Banner (title,
@@ -315,7 +316,7 @@ export default function Clubs() {
             <div className="clubs-hero-overlay" />
 
             <div className="clubs-hero-corner" aria-hidden="true">
-              {heroCornerLines.map((line, i) => <span key={i}>{line}</span>)}
+              {heroCornerLines.map((line, i) => <span key={i}>{renderBold(line)}</span>)}
             </div>
 
             <div className="clubs-hero-content">
@@ -327,7 +328,7 @@ export default function Clubs() {
                     key={i}
                     className={`clubs-hero-headline-line${heroHeadlineLines.length === 3 && i === 1 ? ' clubs-hero-headline-line--accent' : ''}`}
                   >
-                    {line}
+                    {renderBold(line)}
                   </span>
                 ))}
               </h1>
@@ -368,7 +369,7 @@ export default function Clubs() {
                 <div key={s.id} className="clubs-hero-stat">
                   <s.icon size={26} strokeWidth={1.75} />
                   <div>
-                    <div className="clubs-hero-stat-value">{s.value}</div>
+                    <div className="clubs-hero-stat-value">{renderBold(s.value)}</div>
                     <div className="clubs-hero-stat-label">{s.label}</div>
                   </div>
                 </div>
@@ -380,7 +381,7 @@ export default function Clubs() {
                       <div key={s.id} className="clubs-hero-stat">
                         <Icon size={26} strokeWidth={1.75} />
                         <div>
-                          <div className="clubs-hero-stat-value">{s.value}</div>
+                          <div className="clubs-hero-stat-value">{renderBold(s.value)}</div>
                           <div className="clubs-hero-stat-label">{s.title}</div>
                         </div>
                       </div>
@@ -526,7 +527,7 @@ export default function Clubs() {
               </div>
 
               <Quote size={30} className="clubs-story-quote-icon" />
-              <p className="clubs-story-quote">"{activeStory.desc}"</p>
+              <p className="clubs-story-quote">"{renderBold(activeStory.desc)}"</p>
 
               <div className="clubs-story-author">
                 {activeStory.slug && activeStory.slug.startsWith('http') ? (
@@ -540,7 +541,7 @@ export default function Clubs() {
                   <div className="clubs-story-name">
                     {activeStory.title} <BadgeCheck size={14} className="clubs-story-verified" />
                   </div>
-                  <div className="clubs-story-role">{activeStory.value}</div>
+                  <div className="clubs-story-role">{renderBold(activeStory.value)}</div>
                 </div>
               </div>
 
@@ -607,7 +608,7 @@ export default function Clubs() {
                       </span>
                       <div>
                         <div className="clubs-why-join-item-title">{item.title}</div>
-                        <div className="clubs-why-join-item-desc">{item.desc}</div>
+                        <div className="clubs-why-join-item-desc">{renderBold(item.desc)}</div>
                       </div>
                     </li>
                   );

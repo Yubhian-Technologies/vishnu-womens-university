@@ -18,6 +18,7 @@ import AnnualReportsSection from './AnnualReportsSection';
 import NirfReportsSection from './NirfReportsSection';
 import NbaDataSection from './NbaDataSection';
 import type { GovernanceItemDoc } from '../Admin/sections/GovernanceItemsAdmin';
+import { renderBold } from '../../lib/boldText';
 import '../detail-layout.css';
 
 // Fallback intro/about for About IQAC and Quality Parameters, used only
@@ -195,14 +196,14 @@ export default function GovernanceDetail() {
               </h2>
               {intro && (
                 <p style={{ fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-5)' }}>
-                  {intro}
+                  {renderBold(intro)}
                 </p>
               )}
               {aboutBlocks.map((block, bi) => {
                 if (block.type === 'heading') {
                   return (
                     <h3 key={bi} style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>
-                      {block.text}
+                      {renderBold(block.text)}
                     </h3>
                   );
                 }
@@ -230,13 +231,13 @@ export default function GovernanceDetail() {
                 }
                 return (
                   <p key={bi} style={{ fontSize: 'var(--text-base)', color: 'var(--color-text-light)', lineHeight: 1.75, marginBottom: 'var(--space-4)' }}>
-                    {block.text}
+                    {renderBold(block.text)}
                   </p>
                 );
               })}
               {!intro && aboutBlocks.length === 0 && (
                 <p style={{ fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: 1.75 }}>
-                  {item.desc}
+                  {renderBold(item.desc)}
                 </p>
               )}
             </div>
@@ -272,7 +273,7 @@ export default function GovernanceDetail() {
                             <span style={{ width: 20, height: 20, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
                               <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                             </span>
-                            <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.5 }}>{h}</span>
+                            <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.5 }}>{renderBold(h)}</span>
                           </li>
                         ))}
                       </ul>
@@ -440,7 +441,7 @@ export default function GovernanceDetail() {
                           <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)', lineHeight: 1.5 }}>{row.name}</td>
                           <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)', lineHeight: 1.5 }}>{row.role}</td>
                           {section.rows.some((r) => r.notes) && (
-                            <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)', lineHeight: 1.5 }}>{row.notes}</td>
+                            <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)', lineHeight: 1.5 }}>{renderBold(row.notes)}</td>
                           )}
                         </tr>
                       ))}
@@ -465,7 +466,7 @@ export default function GovernanceDetail() {
                 <div key={o}
                   style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
                   <Trophy size={20} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-accent)' }} />
-                  <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6 }}>{o}</span>
+                  <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6 }}>{renderBold(o)}</span>
                 </div>
               ))}
             </div>

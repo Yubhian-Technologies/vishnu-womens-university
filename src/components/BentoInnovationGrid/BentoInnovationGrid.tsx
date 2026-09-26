@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Microscope, Briefcase, Rocket, Crown } from 'lucide-react';
+import { renderBold } from '../../lib/boldText';
 import './BentoInnovationGrid.css';
 
 const CARDS = [
@@ -75,7 +76,7 @@ export default function BentoInnovationGrid() {
               <div className="bento-card-content">
                 <span className="bento-card-label">{card.label}</span>
                 <h3 className="bento-card-title">{card.title}</h3>
-                <p className="bento-card-desc">{card.desc}</p>
+                <p className="bento-card-desc">{renderBold(card.desc)}</p>
               </div>
             </div>
           ))}

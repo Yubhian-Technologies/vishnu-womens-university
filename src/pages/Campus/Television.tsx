@@ -10,6 +10,7 @@ import { hasCustomSectionContent } from '../../lib/customSections';
 import { findCampusFacilityBySlug } from './campusFacilities.data';
 import { TELEVISION_PILLAR_KEYS, TELEVISION_PILLAR_LABELS, toTelevisionPillarsForm, type TelevisionPillarKey } from '../../lib/televisionPillars';
 import type { CampusLifeItemDoc } from '../Admin/sections/CampusLifeAdmin';
+import { renderBold } from '../../lib/boldText';
 import './Television.css';
 
 const PILLAR_ICONS: Record<TelevisionPillarKey, typeof GraduationCap> = {
@@ -106,7 +107,7 @@ export default function Television() {
                     <img src={pillar.imageUrl} alt={TELEVISION_PILLAR_LABELS[key]} className="tv-pillar-img" loading="lazy" />
                     <div className="tv-pillar-icon"><Icon size={22} /></div>
                     <h3 className="tv-pillar-title">{TELEVISION_PILLAR_LABELS[key]}</h3>
-                    {pillar.desc && <p className="tv-pillar-desc">{pillar.desc}</p>}
+                    {pillar.desc && <p className="tv-pillar-desc">{renderBold(pillar.desc)}</p>}
                   </div>
                 );
               })}
@@ -149,13 +150,13 @@ export default function Television() {
                 </div>
                 <div className="tv-tech-details">
                   <h3>{activeFacility.title}</h3>
-                  <p>{activeFacility.desc}</p>
+                  <p>{renderBold(activeFacility.desc)}</p>
                   {activeFacility.specs.length > 0 && (
                     <ul className="tv-tech-specs-list">
                       {activeFacility.specs.map((spec, idx) => (
                         <li key={idx} className="tv-tech-spec-item">
                           <CheckCircle2 size={16} className="tv-tech-spec-icon" />
-                          <span>{spec}</span>
+                          <span>{renderBold(spec)}</span>
                         </li>
                       ))}
                     </ul>

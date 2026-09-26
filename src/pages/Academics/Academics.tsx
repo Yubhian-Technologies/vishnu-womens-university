@@ -13,6 +13,7 @@ import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
 import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import { groupForDeptShortCode } from '../../lib/departmentGroups';
 import { Radio } from 'lucide-react';
+import { renderBold } from '../../lib/boldText';
 
 const defaultAcademicsPhotos = [
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Smart lecture halls', caption: 'Smart Lecture Halls' },
@@ -248,7 +249,7 @@ export default function Academics() {
             </div>
             {quickStats.map(s => (
               <div key={s.id} style={{ textAlign: 'center' }}>
-                <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', fontWeight: 900, color: 'var(--color-accent)' }}>{s.value}</div>
+                <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', fontWeight: 900, color: 'var(--color-accent)' }}>{renderBold(s.value)}</div>
                 <div style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)', fontFamily: 'var(--font-sans)' }}>{s.title}</div>
               </div>
             ))}
@@ -468,7 +469,7 @@ export default function Academics() {
               <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
                 {careerOutcomeStats.map(s => (
                   <div key={s.id} style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', borderLeft: '4px solid var(--color-accent)', textAlign: 'center' }}>
-                    <div style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(1.2rem, 2.5vw, 1.8rem)', fontWeight: 900, color: 'var(--color-primary)' }}>{s.value}</div>
+                    <div style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(1.2rem, 2.5vw, 1.8rem)', fontWeight: 900, color: 'var(--color-primary)' }}>{renderBold(s.value)}</div>
                     <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', fontFamily: 'var(--font-sans)', marginTop: 4 }}>{s.title}</div>
                   </div>
                 ))}

@@ -31,6 +31,7 @@ import { fetchPriorityAttr } from '../../lib/domAttrs';
 import { hasCustomSectionContent, type CustomSectionPhoto } from '../../lib/customSections';
 import { DIFFERENTIATOR_CATEGORIES, type DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
 import { concreteCanoeLab } from './concreteCanoeLab.data';
+import { renderBold } from '../../lib/boldText';
 import './ConcreteCanoeLab.css';
 
 const SLUG = 'concrete-canoe-lab';
@@ -207,7 +208,7 @@ export default function ConcreteCanoeLab() {
             <Anchor size={120} className="canoe-overview-quote-mark" aria-hidden="true" />
             <div className="canoe-prose">
               {concreteCanoeLab.paragraphs.map((p, i) => (
-                <p key={i}>{p}</p>
+                <p key={i}>{renderBold(p)}</p>
               ))}
             </div>
           </div>
@@ -241,7 +242,7 @@ export default function ConcreteCanoeLab() {
                     <span className="canoe-check-badge">
                       <Check size={12} strokeWidth={3} />
                     </span>
-                    <span>{item}</span>
+                    <span>{renderBold(item)}</span>
                   </li>
                 ))}
               </ul>
@@ -290,7 +291,7 @@ export default function ConcreteCanoeLab() {
 
             {concreteCanoeLab.outcomes.paragraphs.map((para, i) => (
               <p key={i} className="canoe-spotlight-desc">
-                {para}
+                {renderBold(para)}
               </p>
             ))}
 
@@ -331,7 +332,7 @@ export default function ConcreteCanoeLab() {
             <div className="canoe-project-body">
               <div className="canoe-project-prose">
                 {concreteCanoeLab.academicProject.paragraphs.map((p, i) => (
-                  <p key={i}>{p}</p>
+                  <p key={i}>{renderBold(p)}</p>
                 ))}
               </div>
 
@@ -442,7 +443,7 @@ export default function ConcreteCanoeLab() {
                     <div className="canoe-students-chips">
                       {comp.students.map((student, sIdx) => (
                         <span key={sIdx} className="canoe-student-chip">
-                          {student}
+                          {renderBold(student)}
                         </span>
                       ))}
                     </div>
@@ -464,7 +465,7 @@ export default function ConcreteCanoeLab() {
             <h3 className="canoe-event-title">National Concrete Canoe Competition (NCCC)</h3>
             <div className="canoe-event-body">
               {concreteCanoeLab.activities.map((act, i) => (
-                <p key={i}>{act}</p>
+                <p key={i}>{renderBold(act)}</p>
               ))}
             </div>
           </div>
@@ -528,7 +529,7 @@ export default function ConcreteCanoeLab() {
                       <span className="canoe-check-badge">
                         <Check size={12} strokeWidth={3} />
                       </span>
-                      <span>{mentor}</span>
+                      <span>{renderBold(mentor)}</span>
                     </li>
                   ))}
                 </ul>
@@ -549,7 +550,7 @@ export default function ConcreteCanoeLab() {
                       <div className="canoe-students-chips">
                         {team.students.map((student, sIdx) => (
                           <span key={sIdx} className="canoe-student-chip">
-                            {student}
+                            {renderBold(student)}
                           </span>
                         ))}
                       </div>
@@ -588,7 +589,7 @@ export default function ConcreteCanoeLab() {
                       <Maximize2 size={24} />
                     </div>
                   </div>
-                  {photo.caption && <div className="canoe-gallery-caption">{photo.caption}</div>}
+                  {photo.caption && <div className="canoe-gallery-caption">{renderBold(photo.caption)}</div>}
                 </button>
               ))}
             </div>
@@ -611,7 +612,7 @@ export default function ConcreteCanoeLab() {
                     <span className="canoe-check-badge">
                       <Check size={12} strokeWidth={3} />
                     </span>
-                    <span>{item}</span>
+                    <span>{renderBold(item)}</span>
                   </li>
                 ))}
               </ul>
@@ -628,7 +629,7 @@ export default function ConcreteCanoeLab() {
                     <span className="canoe-check-badge">
                       <Check size={12} strokeWidth={3} />
                     </span>
-                    <span>{item}</span>
+                    <span>{renderBold(item)}</span>
                   </li>
                 ))}
               </ul>

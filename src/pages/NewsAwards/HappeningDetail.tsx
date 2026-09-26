@@ -8,6 +8,7 @@ import { useDocument } from '../../hooks/useDocument';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { happeningToArticle } from '../../lib/happenings';
 import type { HappeningDoc } from '../Admin/sections/NewsAwardsDataAdmin';
+import { renderBold } from '../../lib/boldText';
 import './HappeningDetail.css';
 
 export default function HappeningDetail() {
@@ -150,7 +151,7 @@ export default function HappeningDetail() {
               <div className="happ-detail-body">
                 {item.description.split('\n\n').map((paragraph, idx) => (
                   <p key={idx} className="happ-detail-paragraph">
-                    {paragraph}
+                    {renderBold(paragraph)}
                   </p>
                 ))}
               </div>

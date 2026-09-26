@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { useOrderedCollection } from '../../hooks/useCollection';
+import { renderBold } from '../../lib/boldText';
 import './AnnouncementsTicker.css';
 
 interface Announcement {
@@ -26,7 +27,7 @@ export default function AnnouncementsTicker({ fallback }: Props) {
   if (active.length === 0) return <>{fallback}</>;
 
   const renderItem = (a: Announcement, key: string) => {
-    const content = <span className="announcements-ticker__item">{a.text}</span>;
+    const content = <span className="announcements-ticker__item">{renderBold(a.text)}</span>;
     if (!a.link) return <span key={key}>{content}</span>;
     if (a.link.startsWith('http')) {
       return <a key={key} href={a.link} target="_blank" rel="noopener noreferrer">{content}</a>;

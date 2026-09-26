@@ -24,6 +24,7 @@ import type { AicteIdeaLabTeamMemberDoc } from '../Admin/sections/AicteIdeaLabTe
 import type { AicteIdeaLabAmbassadorDoc } from '../Admin/sections/AicteIdeaLabAmbassadorsAdmin';
 import { CustomSectionsPlain, CustomSectionsPills } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
+import { renderBold } from '../../lib/boldText';
 import './IdeaLabPage.css';
 
 interface IdeaLabPageProps {
@@ -151,7 +152,7 @@ export default function IdeaLabPage({ item }: IdeaLabPageProps) {
                 <h2 className="idealab-card-title">{idea.overview.title}</h2>
                 <div className="idealab-paragraphs">
                   {idea.overview.paragraphs.map((p, idx) => (
-                    <p key={idx} className="idealab-lead-text">{p}</p>
+                    <p key={idx} className="idealab-lead-text">{renderBold(p)}</p>
                   ))}
                 </div>
 
@@ -162,7 +163,7 @@ export default function IdeaLabPage({ item }: IdeaLabPageProps) {
                   </div>
                   <h3 className="idealab-subcard-title">{idea.process.title}</h3>
                   <p className="idealab-lead-text" style={{ marginBottom: '0.75rem' }}>
-                    {idea.process.intro}
+                    {renderBold(idea.process.intro)}
                   </p>
 
                   <div className="idealab-process-grid">
@@ -173,7 +174,7 @@ export default function IdeaLabPage({ item }: IdeaLabPageProps) {
                           <Sparkles size={16} color="#C9973A" />
                         </div>
                         <h4 className="idealab-process-title">{step.title}</h4>
-                        <p className="idealab-process-desc">{step.description}</p>
+                        <p className="idealab-process-desc">{renderBold(step.description)}</p>
                       </div>
                     ))}
                   </div>
@@ -198,7 +199,7 @@ export default function IdeaLabPage({ item }: IdeaLabPageProps) {
                         <Sparkles size={16} color="#0B1E42" />
                       </div>
                       <h3 className="idealab-pillar-title">{pillar.title}</h3>
-                      <p className="idealab-pillar-text">{pillar.description}</p>
+                      <p className="idealab-pillar-text">{renderBold(pillar.description)}</p>
                     </div>
                   ))}
                 </div>
@@ -215,7 +216,7 @@ export default function IdeaLabPage({ item }: IdeaLabPageProps) {
                 </div>
                 <h2 className="idealab-card-title">{idea.team.title}</h2>
                 <p className="idealab-lead-text" style={{ marginBottom: '1.25rem' }}>
-                  {idea.team.intro}
+                  {renderBold(idea.team.intro)}
                 </p>
 
                 <div className="idealab-table-responsive">
@@ -260,7 +261,7 @@ export default function IdeaLabPage({ item }: IdeaLabPageProps) {
                 </div>
                 <h2 className="idealab-card-title">{idea.ambassadors.title}</h2>
                 <p className="idealab-lead-text" style={{ marginBottom: '1.25rem' }}>
-                  {idea.ambassadors.intro}
+                  {renderBold(idea.ambassadors.intro)}
                 </p>
 
                 <div className="idealab-table-responsive">
@@ -306,7 +307,7 @@ export default function IdeaLabPage({ item }: IdeaLabPageProps) {
                 <h2 className="idealab-card-title">{idea.facilities.title}</h2>
                 <div className="idealab-paragraphs">
                   {idea.facilities.paragraphs.map((p, idx) => (
-                    <p key={idx} className="idealab-lead-text">{p}</p>
+                    <p key={idx} className="idealab-lead-text">{renderBold(p)}</p>
                   ))}
                 </div>
 
@@ -372,7 +373,7 @@ export default function IdeaLabPage({ item }: IdeaLabPageProps) {
                     <span className="idealab-official-label">Faculty Coordinators</span>
                     <div className="idealab-official-val-list">
                       {idea.officialInfo.facultyCoordinators.map((coord, idx) => (
-                        <span key={idx} className="idealab-official-val">• {coord}</span>
+                        <span key={idx} className="idealab-official-val">• {renderBold(coord)}</span>
                       ))}
                     </div>
                   </div>

@@ -26,6 +26,7 @@ import { hasCustomSectionContent, type CustomSection } from '../../lib/customSec
 import { smoothScrollTo } from '../../lib/smoothScroll';
 import type { DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
 import { chipsToStartup } from './chipsToStartup.data';
+import { renderBold } from '../../lib/boldText';
 import './ChipsToStartupPage.css';
 
 const MODULE_ICONS: Record<string, typeof FileText> = {
@@ -104,7 +105,7 @@ export default function ChipsToStartupPage({
               {heroTitle}
             </h1>
             <p className="cts-hero-sub" style={{ fontSize: '1rem', lineHeight: '1.65' }}>
-              {heroSubtitle}
+              {renderBold(heroSubtitle)}
             </p>
             <button
               type="button"
@@ -126,7 +127,7 @@ export default function ChipsToStartupPage({
           <h2 className="cts-card-title">{aboutTitle}</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
             {aboutParagraphs.map((p, i) => (
-              <p key={i}>{p}</p>
+              <p key={i}>{renderBold(p)}</p>
             ))}
           </div>
         </div>
@@ -146,7 +147,7 @@ export default function ChipsToStartupPage({
                 {sc.val}
               </div>
               <div style={{ fontSize: '0.8rem', color: '#475569', fontWeight: 400 }}>
-                {sc.desc}
+                {renderBold(sc.desc)}
               </div>
             </div>
           ))}
@@ -164,7 +165,7 @@ export default function ChipsToStartupPage({
             {objectives.map((o, i) => (
               <li key={i}>
                 <CheckCircle2 size={16} strokeWidth={2} className="cts-check-icon" />
-                <span>{o}</span>
+                <span>{renderBold(o)}</span>
               </li>
             ))}
           </ul>
@@ -243,7 +244,7 @@ export default function ChipsToStartupPage({
             {projectOutlay.investigators.map((inv, idx) => (
               <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', color: '#1E293B', fontWeight: 500 }}>
                 <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: idx === 0 ? '#C9973A' : '#64748B', flexShrink: 0 }} />
-                <span>{inv}</span>
+                <span>{renderBold(inv)}</span>
               </div>
             ))}
           </div>
@@ -257,16 +258,16 @@ export default function ChipsToStartupPage({
         </span>
         <h2 className="cts-card-title">{resources.title}</h2>
         <p style={{ color: '#475569', fontSize: '0.95rem', lineHeight: 1.6, margin: '0 0 1rem' }}>
-          {resources.intro}
+          {renderBold(resources.intro)}
         </p>
         <p style={{ fontWeight: 600, color: '#0F2547', margin: '0 0 0.75rem', fontSize: '0.95rem' }}>
-          {resources.keyIntro}
+          {renderBold(resources.keyIntro)}
         </p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '0.75rem' }}>
           {resources.items.map((itemStr, idx) => (
             <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.6rem', background: '#F8FAFC', padding: '0.85rem 1rem', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
               <CheckCircle2 size={16} className="cts-check-icon" style={{ marginTop: '2px' }} />
-              <span style={{ fontSize: '0.9rem', color: '#1E293B', fontWeight: 500, lineHeight: '1.4' }}>{itemStr}</span>
+              <span style={{ fontSize: '0.9rem', color: '#1E293B', fontWeight: 500, lineHeight: '1.4' }}>{renderBold(itemStr)}</span>
             </div>
           ))}
         </div>
@@ -279,7 +280,7 @@ export default function ChipsToStartupPage({
         </span>
         <h2 className="cts-card-title">{edaTools.title}</h2>
         <p style={{ color: '#475569', fontSize: '0.95rem', lineHeight: 1.65, margin: '0 0 1.25rem' }}>
-          {edaTools.intro}
+          {renderBold(edaTools.intro)}
         </p>
 
         <div style={{ overflowX: 'auto', borderRadius: '10px', border: '1px solid #E2E8F0' }}>
@@ -319,7 +320,7 @@ export default function ChipsToStartupPage({
                 0{idx + 1}
               </div>
               <span style={{ fontSize: '0.92rem', color: '#1E293B', fontWeight: 500, lineHeight: '1.6' }}>
-                {itemStr}
+                {renderBold(itemStr)}
               </span>
             </div>
           ))}
@@ -333,7 +334,7 @@ export default function ChipsToStartupPage({
         </span>
         <h2 className="cts-card-title">{facilities.title}</h2>
         <p style={{ color: '#475569', fontSize: '0.95rem', lineHeight: 1.6, margin: '0 0 1.25rem' }}>
-          {facilities.intro}
+          {renderBold(facilities.intro)}
         </p>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.25rem' }}>
@@ -345,7 +346,7 @@ export default function ChipsToStartupPage({
               {facilities.developmentHardware.map((hw, idx) => (
                 <li key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', fontSize: '0.88rem', color: '#334155' }}>
                   <CheckCircle2 size={15} className="cts-check-icon" style={{ marginTop: '2px' }} />
-                  <span>{hw}</span>
+                  <span>{renderBold(hw)}</span>
                 </li>
               ))}
             </ul>
@@ -359,7 +360,7 @@ export default function ChipsToStartupPage({
               {facilities.designInfrastructure.map((infra, idx) => (
                 <li key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', fontSize: '0.88rem', color: '#334155' }}>
                   <CheckCircle2 size={15} className="cts-check-icon" style={{ marginTop: '2px' }} />
-                  <span>{infra}</span>
+                  <span>{renderBold(infra)}</span>
                 </li>
               ))}
             </ul>
@@ -380,7 +381,7 @@ export default function ChipsToStartupPage({
                 <Star size={13} />
               </div>
               <span style={{ fontSize: '0.9rem', color: '#1E293B', fontWeight: 500, lineHeight: '1.5' }}>
-                {kh}
+                {renderBold(kh)}
               </span>
             </div>
           ))}
@@ -395,7 +396,7 @@ export default function ChipsToStartupPage({
         <div style={{ marginBottom: '1rem' }}>
           <h2 className="cts-card-title" style={{ margin: 0 }}>Gallery</h2>
           <p style={{ color: '#64748B', fontSize: '0.9rem', margin: '0.35rem 0 0', fontWeight: 500 }}>
-            {galleryCaption}
+            {renderBold(galleryCaption)}
           </p>
         </div>
         <CustomSectionsGalleries sections={customSections} />

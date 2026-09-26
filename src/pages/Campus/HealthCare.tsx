@@ -10,6 +10,7 @@ import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import { hasCustomSectionContent } from '../../lib/customSections';
 import type { CampusLifeItemDoc } from '../Admin/sections/CampusLifeAdmin';
 import { DEFAULT_HC_PILLS } from '../Admin/sections/HealthCareAdmin';
+import { renderBold } from '../../lib/boldText';
 import './HealthCare.css';
 
 // Default Fallback Photos
@@ -95,7 +96,7 @@ export default function HealthCare() {
                         <Icon size={18} />
                       </div>
                       <div className="hc-pill-text">
-                        {pill.title}<br />{pill.desc}
+                        {pill.title}<br />{renderBold(pill.desc)}
                       </div>
                     </div>
                   );
@@ -137,7 +138,7 @@ export default function HealthCare() {
             ].map((card) => (
               <div key={card.title} style={{ padding: '1.5rem', background: 'var(--color-off-white)', borderRadius: '8px', borderLeft: '4px solid var(--color-primary)' }}>
                 <strong style={{ display: 'block', fontSize: '1.15rem', marginBottom: '0.5rem', color: 'var(--color-heading)' }}>{card.title}</strong>
-                <span style={{ color: 'var(--color-text-light)', lineHeight: 1.6, display: 'block' }}>{card.desc}</span>
+                <span style={{ color: 'var(--color-text-light)', lineHeight: 1.6, display: 'block' }}>{renderBold(card.desc)}</span>
               </div>
             ))}
           </div>

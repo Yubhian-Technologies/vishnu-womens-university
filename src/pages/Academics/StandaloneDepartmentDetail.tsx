@@ -15,6 +15,7 @@ import NewsEventsTabs, { type NewsEventsCategory } from '../../components/NewsEv
 import { hasCustomSectionContent, toQuickLinkItems } from '../../lib/customSections';
 import CustomSectionsRenderer from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import { getDepartmentTagline } from '../../lib/departmentTaglines';
+import { renderBold } from '../../lib/boldText';
 import '../detail-layout.css';
 
 const NAV_OFFSET = 'calc(var(--topbar-height) + var(--header-height) + 1rem)';
@@ -224,7 +225,7 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
                 </h2>
               </div>
               <div className="dept-about-card">
-                <p className="dept-about-lead-text" style={{ whiteSpace: 'pre-line' }}>{dept.about}</p>
+                <p className="dept-about-lead-text" style={{ whiteSpace: 'pre-line' }}>{renderBold(dept.about)}</p>
               </div>
               {(dept.highlights?.length ?? 0) > 0 && (
                 <div style={{ marginTop: 'var(--space-8)' }}>
@@ -237,7 +238,7 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
                         <div className="dept-highlight-check-circle">
                           <Check size={13} strokeWidth={3} />
                         </div>
-                        <p className="dept-highlight-text">{h}</p>
+                        <p className="dept-highlight-text">{renderBold(h)}</p>
                       </div>
                     ))}
                   </div>
@@ -267,7 +268,7 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
                     {dept.coreValues!.map((v) => (
                       <span key={v} className="dept-value-pill">
                         <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-block' }} />
-                        <span>{v}</span>
+                        <span>{renderBold(v)}</span>
                       </span>
                     ))}
                   </div>
@@ -304,7 +305,7 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
               <div className="dept-hod-content">
                 <h2 className="dept-hod-message-title">Brief Profile</h2>
                 {dept.hodMessage && (
-                  <p className="dept-hod-message-text-plain">{dept.hodMessage}</p>
+                  <p className="dept-hod-message-text-plain">{renderBold(dept.hodMessage)}</p>
                 )}
                 {dept.hodEmail && (
                   <div className="dept-hod-actions">
@@ -357,7 +358,7 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
             </div>
             <div className="dept-library-container">
               {dept.libraryIntro && (
-                <p style={{ color: 'var(--color-text)', lineHeight: 1.85, fontSize: 'var(--text-base)', whiteSpace: 'pre-line', maxWidth: 840 }}>{dept.libraryIntro}</p>
+                <p style={{ color: 'var(--color-text)', lineHeight: 1.85, fontSize: 'var(--text-base)', whiteSpace: 'pre-line', maxWidth: 840 }}>{renderBold(dept.libraryIntro)}</p>
               )}
               {dept.libraryInCharge && (
                 <div className="dept-library-incharge-card">
@@ -385,7 +386,7 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
                             <div className="dept-library-icon-badge"><BookOpen size={18} strokeWidth={2.2} /></div>
                           </div>
                           <div>
-                            <div className="dept-library-value">{item.value}</div>
+                            <div className="dept-library-value">{renderBold(item.value)}</div>
                             <div className="dept-library-label">{item.label}</div>
                           </div>
                         </div>
@@ -429,7 +430,7 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
                 </button>
                 <div className="dept-faq-collapse" aria-hidden={openFaq !== i}>
                   <div className="dept-faq-collapse-inner">
-                    <div className="dept-faq-answer">{faq.answer}</div>
+                    <div className="dept-faq-answer">{renderBold(faq.answer)}</div>
                   </div>
                 </div>
               </div>

@@ -25,6 +25,7 @@ import type { VdlAchievementReportDoc } from '../Admin/sections/VdlAchievementsA
 import type { VdlTeamMemberDoc } from '../Admin/sections/VdlTeamAdmin';
 import type { CustomSection } from '../../lib/customSections';
 import { useOrderedCollection } from '../../hooks/useCollection';
+import { renderBold } from '../../lib/boldText';
 import './VehicleDesignLabPage.css';
 
 interface VehicleDesignLabPageProps {
@@ -131,7 +132,7 @@ export default function VehicleDesignLabPage({ sections }: VehicleDesignLabPageP
           <div className="vdl-hero-text-block">
             {vehicleDesignLab.paragraphs.map((para, idx) => (
               <p key={idx} className="vdl-overview-text">
-                {para}
+                {renderBold(para)}
               </p>
             ))}
           </div>
@@ -141,7 +142,7 @@ export default function VehicleDesignLabPage({ sections }: VehicleDesignLabPageP
             {vehicleDesignLab.fundamentals.map((fund, idx) => (
               <div key={idx} className="vdl-fund-chip">
                 <Gauge size={13} style={{ color: '#FF5722' }} />
-                <span>{fund}</span>
+                <span>{renderBold(fund)}</span>
               </div>
             ))}
           </div>
@@ -194,7 +195,7 @@ export default function VehicleDesignLabPage({ sections }: VehicleDesignLabPageP
               {vehicleDesignLab.objectives.map((obj: VdlObjective, idx: number) => (
                 <div key={idx} className="vdl-objective-card">
                   <span className="vdl-obj-lead">{obj.lead}</span>
-                  <span className="vdl-obj-text">{obj.text}</span>
+                  <span className="vdl-obj-text">{renderBold(obj.text)}</span>
                 </div>
               ))}
             </div>
@@ -272,7 +273,7 @@ export default function VehicleDesignLabPage({ sections }: VehicleDesignLabPageP
         </div>
         <div className="vdl-block-body">
           <p className="vdl-overview-text" style={{ color: '#2D3748', marginBottom: 'var(--space-4)' }}>
-            {vehicleDesignLab.facilities.overview}
+            {renderBold(vehicleDesignLab.facilities.overview)}
           </p>
 
           <div className={`vdl-split ${hasPhotos ? 'has-photo reverse' : 'no-photo'}`}>
@@ -320,14 +321,14 @@ export default function VehicleDesignLabPage({ sections }: VehicleDesignLabPageP
           <div className={`vdl-split ${hasPhotos ? 'has-photo' : 'no-photo'}`} style={{ marginBottom: 'var(--space-4)' }}>
             <div>
               <p className="vdl-overview-text" style={{ color: '#2D3748', marginBottom: 'var(--space-4)' }}>
-                {vehicleDesignLab.facilities.campusUtilityIntro}
+                {renderBold(vehicleDesignLab.facilities.campusUtilityIntro)}
               </p>
 
               <div className="vdl-projects-grid">
                 {visibleUtilityProjects.map((proj: VdlProjectBullet, idx: number) => (
                   <div key={idx} className="vdl-project-card">
                     <span className="vdl-proj-lead">{proj.lead}</span>
-                    <span className="vdl-proj-text">{proj.text}</span>
+                    <span className="vdl-proj-text">{renderBold(proj.text)}</span>
                   </div>
                 ))}
               </div>
@@ -367,7 +368,7 @@ export default function VehicleDesignLabPage({ sections }: VehicleDesignLabPageP
         </div>
         <div className="vdl-block-body">
           <p className="vdl-overview-text" style={{ color: '#2D3748', marginBottom: 'var(--space-4)' }}>
-            {vehicleDesignLab.industryCollaborations.intro}
+            {renderBold(vehicleDesignLab.industryCollaborations.intro)}
           </p>
 
           <div className={`vdl-split ${hasPhotos ? 'has-photo' : 'no-photo'}`} style={{ marginBottom: 'var(--space-4)' }}>
@@ -402,7 +403,7 @@ export default function VehicleDesignLabPage({ sections }: VehicleDesignLabPageP
         </div>
         <div className="vdl-block-body">
           <p className="vdl-overview-text" style={{ color: '#2D3748', marginBottom: 'var(--space-4)' }}>
-            {vehicleDesignLab.studentsAchievements.intro}
+            {renderBold(vehicleDesignLab.studentsAchievements.intro)}
           </p>
 
           {/* Motorsport Competitions Grid */}
@@ -412,7 +413,7 @@ export default function VehicleDesignLabPage({ sections }: VehicleDesignLabPageP
                 <div className="vdl-comp-title">
                   <Flame size={16} style={{ color: '#FF5722' }} /> {comp.title}
                 </div>
-                <p className="vdl-comp-text">{comp.text}</p>
+                <p className="vdl-comp-text">{renderBold(comp.text)}</p>
               </div>
             ))}
           </div>
@@ -436,7 +437,7 @@ export default function VehicleDesignLabPage({ sections }: VehicleDesignLabPageP
                   <div className="vdl-comp-title">
                     <Award size={16} style={{ color: '#FF5722' }} /> {card.label}
                   </div>
-                  {card.description && <p className="vdl-comp-text">{card.description}</p>}
+                  {card.description && <p className="vdl-comp-text">{renderBold(card.description)}</p>}
                   {card.fileUrl && (
                     <a href={card.fileUrl} target="_blank" rel="noopener noreferrer" className="vdl-report-link">
                       View Report
@@ -454,7 +455,7 @@ export default function VehicleDesignLabPage({ sections }: VehicleDesignLabPageP
             </h3>
             {vehicleDesignLab.studentsAchievements.placementsParagraphs.map((para, idx) => (
               <p key={idx} className="vdl-overview-text" style={{ color: '#2D3748', marginBottom: 'var(--space-2)' }}>
-                {para}
+                {renderBold(para)}
               </p>
             ))}
           </div>
@@ -475,7 +476,7 @@ export default function VehicleDesignLabPage({ sections }: VehicleDesignLabPageP
               {vehicleDesignLab.outcomes.map((out: VdlOutcomeItem, idx: number) => (
                 <div key={idx} className="vdl-outcome-card">
                   <div className="vdl-outcome-title">{out.title}</div>
-                  <p className="vdl-outcome-text">{out.text}</p>
+                  <p className="vdl-outcome-text">{renderBold(out.text)}</p>
                 </div>
               ))}
             </div>

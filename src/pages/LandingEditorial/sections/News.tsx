@@ -3,6 +3,7 @@ import { useOrderedCollection } from '../../../hooks/useCollection';
 import { NEWS_FALLBACK_IMAGE } from '../../../lib/news';
 import SmoothImage from '../../../components/SmoothImage/SmoothImage';
 import Reveal from '../Reveal';
+import { renderBold } from '../../../lib/boldText';
 
 interface NewsDoc {
   id: string;
@@ -47,7 +48,7 @@ export default function News() {
               <div className="lpe-card__body">
                 <span className="lpe-card__meta lpe-card__meta--category">{n.category}</span>
                 <h3 className="lpe-card__title">{n.title}</h3>
-                <p className="lpe-card__desc">{n.summary}</p>
+                <p className="lpe-card__desc">{renderBold(n.summary)}</p>
                 <span className="lpe-card__meta">{readTime(n.body)} &nbsp;|&nbsp; {n.date}</span>
               </div>
             </Reveal>

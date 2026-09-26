@@ -9,6 +9,7 @@ import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import { slugify } from '../../lib/slugify';
 import { clubDesc } from '../../lib/clubDescriptionOverrides';
 import type { ClubDoc } from '../Admin/sections/StudentClubsAdmin';
+import { renderBold } from '../../lib/boldText';
 import '../detail-layout.css';
 
 export default function StudentClubDetail() {
@@ -195,7 +196,7 @@ export default function StudentClubDetail() {
                     {card.label}
                   </h3>
                   <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.75, whiteSpace: 'pre-line' }}>
-                    {card.content}
+                    {renderBold(card.content)}
                   </p>
                 </div>
               ))}

@@ -9,6 +9,7 @@ import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { HERO_VIDEO_SRC } from '../../lib/heroVideo';
 import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
 import { Users, Target, Globe, School } from 'lucide-react';
+import { renderBold } from '../../lib/boldText';
 
 type VisitType = 'group' | 'individual' | 'virtual' | 'openday';
 
@@ -156,7 +157,7 @@ export default function CampusVisit() {
                 >
                   <div className="cv-type-icon"><Icon size={32} strokeWidth={1.75} /></div>
                   <h3>{t.title}</h3>
-                  <p>{t.desc}</p>
+                  <p>{renderBold(t.desc)}</p>
                   <div className="cv-type-card-btn">{t.buttonText}</div>
                 </button>
               );

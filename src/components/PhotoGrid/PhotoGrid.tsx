@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { X } from 'lucide-react';
 import SmoothImage from '../SmoothImage/SmoothImage';
+import { renderBold } from '../../lib/boldText';
 import './PhotoGrid.css';
 
 export interface PhotoItem {
@@ -105,7 +106,7 @@ export default function PhotoGrid({
             aria-label={`View ${img.alt}`}
           >
             <img loading="lazy" src={img.src} alt={img.alt} />
-            {img.caption && <div className="photo-grid-caption">{img.caption}</div>}
+            {img.caption && <div className="photo-grid-caption">{renderBold(img.caption)}</div>}
             <div className="photo-grid-overlay">
               <span className="photo-grid-zoom">⤢</span>
             </div>
@@ -118,13 +119,13 @@ export default function PhotoGrid({
   const textPanel = (
     <div className="photo-text-panel">
       {title && <h2 className="section-title">{title}</h2>}
-      {subtitle && <p className="photo-text-desc">{subtitle}</p>}
+      {subtitle && <p className="photo-text-desc">{renderBold(subtitle)}</p>}
       {highlights && highlights.length > 0 && (
         <ul className="photo-highlights">
           {highlights.map((h, i) => (
             <li key={i}>
               <span className="photo-highlight-dot" />
-              {h}
+              {renderBold(h)}
             </li>
           ))}
         </ul>
@@ -184,7 +185,7 @@ export default function PhotoGrid({
         <div className="photo-grid-header">
           {label && <span className="section-label" style={{ marginBottom: 'var(--space-3)' }}>{label}</span>}
           {title && <h2 className="section-title">{title}</h2>}
-          {subtitle && <p className="section-desc">{subtitle}</p>}
+          {subtitle && <p className="section-desc">{renderBold(subtitle)}</p>}
         </div>
       )}
       {imageGrid}

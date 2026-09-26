@@ -31,6 +31,7 @@ import type { CustomTab } from '../../lib/customTabs';
 import { useOrderedCollection, type WithId } from '../../hooks/useCollection';
 import { CustomSectionsPlain, CustomSectionsPills } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
+import { renderBold } from '../../lib/boldText';
 import './IicPage.css';
 
 interface IicDocEntryDoc extends WithId {
@@ -232,7 +233,7 @@ export default function IicPage({ item }: IicPageProps) {
                 <h2 className="iic-card-title">{iic.aboutTitle}</h2>
                 {iic.about.map((paragraph, i) => (
                   <p key={i} className="iic-lead-text" style={{ marginBottom: i < iic.about.length - 1 ? '1rem' : 0 }}>
-                    {paragraph}
+                    {renderBold(paragraph)}
                   </p>
                 ))}
               </div>
@@ -245,7 +246,7 @@ export default function IicPage({ item }: IicPageProps) {
                 <h3 className="iic-subcard-title">{iic.journeyTitle}</h3>
                 {iic.journey.map((p, i) => (
                   <p key={i} className="iic-lead-text" style={{ marginBottom: i < iic.journey.length - 1 ? '1rem' : 0 }}>
-                    {p}
+                    {renderBold(p)}
                   </p>
                 ))}
               </div>
@@ -261,7 +262,7 @@ export default function IicPage({ item }: IicPageProps) {
                     {iic.vision.map((v, i) => (
                       <li key={i}>
                         <CheckCircle2 size={16} className="iic-check-icon cyan" />
-                        <span>{v}</span>
+                        <span>{renderBold(v)}</span>
                       </li>
                     ))}
                   </ul>
@@ -276,7 +277,7 @@ export default function IicPage({ item }: IicPageProps) {
                     {iic.mission.map((m, i) => (
                       <li key={i}>
                         <CheckCircle2 size={16} className="iic-check-icon gold" />
-                        <span>{m}</span>
+                        <span>{renderBold(m)}</span>
                       </li>
                     ))}
                   </ul>
@@ -302,7 +303,7 @@ export default function IicPage({ item }: IicPageProps) {
                             {item.title}
                           </h4>
                           <p style={{ fontSize: '0.875rem', color: '#4A5568', lineHeight: 1.5, margin: 0 }}>
-                            {item.description}
+                            {renderBold(item.description)}
                           </p>
                         </div>
                       </div>
@@ -323,7 +324,7 @@ export default function IicPage({ item }: IicPageProps) {
                   <Users size={14} /> Council Roster
                 </div>
                 <h2 className="iic-card-title">{iic.constitution.title}</h2>
-                <p className="iic-lead-text">{iic.constitution.intro}</p>
+                <p className="iic-lead-text">{renderBold(iic.constitution.intro)}</p>
                 <h3 className="iic-subcard-title" style={{ marginTop: '1.5rem' }}>{iic.constitution.heading}</h3>
 
                 {/* Firestore Council Roster (if any) or Fallback Roster */}
@@ -396,7 +397,7 @@ export default function IicPage({ item }: IicPageProps) {
                   <Award size={14} /> MoE Innovation Ambassadors
                 </div>
                 <h2 className="iic-card-title">{iic.ambassadors.title}</h2>
-                <p className="iic-lead-text">{iic.ambassadors.intro}</p>
+                <p className="iic-lead-text">{renderBold(iic.ambassadors.intro)}</p>
                 <h3 className="iic-subcard-title" style={{ marginTop: '1.25rem', marginBottom: '0.75rem' }}>
                   {iic.ambassadors.rolesTitle}
                 </h3>
@@ -404,7 +405,7 @@ export default function IicPage({ item }: IicPageProps) {
                   {iic.ambassadors.roles.map((role, idx) => (
                     <li key={idx}>
                       <CheckCircle2 size={16} className="iic-check-icon gold" />
-                      <span>{role}</span>
+                      <span>{renderBold(role)}</span>
                     </li>
                   ))}
                 </ul>
@@ -426,7 +427,7 @@ export default function IicPage({ item }: IicPageProps) {
                 <h2 className="iic-card-title">{iic.activities.title}</h2>
                 {iic.activities.paragraphs.map((p, i) => (
                   <p key={i} className="iic-lead-text" style={{ marginBottom: i < iic.activities.paragraphs.length - 1 ? '1rem' : 0 }}>
-                    {p}
+                    {renderBold(p)}
                   </p>
                 ))}
                 <h3 className="iic-subcard-title" style={{ marginTop: '1.5rem' }}>{iic.activities.subheading}</h3>
@@ -544,7 +545,7 @@ export default function IicPage({ item }: IicPageProps) {
                 <h2 className="iic-card-title">{iic.atalTinkeringSchools.title}</h2>
                 {iic.atalTinkeringSchools.paragraphs.map((p, i) => (
                   <p key={i} className="iic-lead-text" style={{ marginBottom: i < iic.atalTinkeringSchools.paragraphs.length - 1 ? '1rem' : 0 }}>
-                    {p}
+                    {renderBold(p)}
                   </p>
                 ))}
                 <h3 className="iic-subcard-title" style={{ marginTop: '1.5rem' }}>{iic.atalTinkeringSchools.listHeading}</h3>

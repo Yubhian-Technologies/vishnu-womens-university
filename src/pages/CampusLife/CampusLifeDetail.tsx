@@ -13,6 +13,7 @@ import CampusEventsShowcase from '../../components/CampusEventsShowcase/CampusEv
 import FlexibleTable from '../../components/FlexibleTable/FlexibleTable';
 import type { CampusLifeItemDoc } from '../Admin/sections/CampusLifeAdmin';
 import { CAMPUS_LIFE_LEGACY_SEEDS } from './campusLifeLegacySeeds';
+import { renderBold } from '../../lib/boldText';
 import '../detail-layout.css';
 import '../Campus/tabbed-section.css';
 
@@ -83,7 +84,7 @@ function VishnuTvAboutSection() {
         </div>
         {VISHNU_TV_ABOUT_PARAGRAPHS.map((para, i) => (
           <p key={i} style={{ color: 'var(--color-text)', lineHeight: 1.8, marginBottom: i < VISHNU_TV_ABOUT_PARAGRAPHS.length - 1 ? 'var(--space-4)' : 0 }}>
-            {para}
+            {renderBold(para)}
           </p>
         ))}
       </div>
@@ -144,7 +145,7 @@ function VishnuTvProcessSection() {
                 background: 'var(--color-off-white)', border: '1px solid var(--color-light-gray)',
                 color: 'var(--color-primary)', fontWeight: 700, fontSize: 'var(--text-sm)', whiteSpace: 'nowrap',
               }}>
-                {step}
+                {renderBold(step)}
               </span>
               {i < VISHNU_TV_PROCESS_STEPS.length - 1 && (
                 <span aria-hidden="true" style={{ color: 'var(--color-accent)', fontWeight: 700 }}>&rarr;</span>
@@ -192,7 +193,7 @@ function VishnuTvDocumentariesSection() {
           {VISHNU_TV_DOCUMENTARY_THEMES.map((t) => (
             <div key={t.title} style={{ padding: 'var(--space-5)', background: 'var(--color-white)', borderRadius: '8px', borderLeft: '4px solid var(--color-primary)' }}>
               <strong style={{ display: 'block', fontSize: '1.05rem', marginBottom: 'var(--space-2)', color: 'var(--color-heading)' }}>{t.title}</strong>
-              <span style={{ color: 'var(--color-text-light)', lineHeight: 1.6, display: 'block' }}>{t.desc}</span>
+              <span style={{ color: 'var(--color-text-light)', lineHeight: 1.6, display: 'block' }}>{renderBold(t.desc)}</span>
             </div>
           ))}
         </div>
@@ -274,7 +275,7 @@ function SwimmingPoolContent() {
         {SWIMMING_POOL_FACILITIES.map((f) => (
           <div key={f.title} style={{ padding: 'var(--space-5)', background: 'var(--color-off-white)', borderRadius: 'var(--radius-md)', borderLeft: '4px solid var(--color-primary)' }}>
             <strong style={{ display: 'block', fontSize: 'var(--text-base)', marginBottom: 'var(--space-2)', color: 'var(--color-heading)' }}>{f.title}</strong>
-            <span style={{ color: 'var(--color-text-light)', lineHeight: 1.6, display: 'block' }}>{f.desc}</span>
+            <span style={{ color: 'var(--color-text-light)', lineHeight: 1.6, display: 'block' }}>{renderBold(f.desc)}</span>
           </div>
         ))}
       </div>

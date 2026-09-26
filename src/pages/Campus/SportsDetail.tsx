@@ -4,6 +4,7 @@ import { ArrowLeft } from 'lucide-react';
 import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import { useDocument } from '../../hooks/useDocument';
 import type { SportsCategoryDoc } from '../../lib/sportsPage';
+import { renderBold } from '../../lib/boldText';
 import './SportsDetail.css';
 
 const GALLERY_PREVIEW_COUNT = 3;
@@ -50,7 +51,7 @@ export default function SportsDetail() {
           </Link>
           {sport.categoryTag && <span className="sports-detail__tag">{sport.categoryTag}</span>}
           <h1 className="sports-detail__title">{sport.title}</h1>
-          {sport.subtitle && <p className="sports-detail__subtitle">{sport.subtitle}</p>}
+          {sport.subtitle && <p className="sports-detail__subtitle">{renderBold(sport.subtitle)}</p>}
         </div>
       </div>
 
@@ -59,7 +60,7 @@ export default function SportsDetail() {
           <div className="container sports-detail__about">
             <h2 className="sports-detail__section-title">{sport.title}</h2>
             {sport.about.split('\n').filter((p) => p.trim()).map((para, i) => (
-              <p key={i} className="sports-detail__about-para">{para}</p>
+              <p key={i} className="sports-detail__about-para">{renderBold(para)}</p>
             ))}
           </div>
         </section>

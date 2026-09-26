@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { ContentBlockDoc } from '../../pages/Admin/sections/ContentBlocksAdmin';
+import { renderBold } from '../../lib/boldText';
 import './TestimonialSlider.css';
 
 interface TestimonialSliderProps {
@@ -190,7 +191,7 @@ export default function TestimonialSlider({
 
                   {/* Main Quote (Clamped 3-4 lines) */}
                   <blockquote className="m3-testi-quote-text">
-                    "{item.desc}"
+                    "{renderBold(item.desc)}"
                   </blockquote>
 
                   {/* Prominent Author Name & Subtle Designation */}

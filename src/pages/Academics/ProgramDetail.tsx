@@ -91,6 +91,7 @@ import { hasCustomSectionContent, toQuickLinkItems } from '../../lib/customSecti
 import CustomSectionsRenderer from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import SEO from '../../components/SEO/SEO';
 import { getProgramSchema, getBreadcrumbSchema } from '../../lib/seo/schemas';
+import { renderBold } from '../../lib/boldText';
 import '../detail-layout.css';
 import '../Campus/tabbed-section.css';
 
@@ -516,7 +517,7 @@ function SingleProgramDetail() {
               {program.outcomes.map((o) => (
                 <li key={o} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', padding: 'var(--space-2) 0', borderBottom: '1px solid var(--color-light-gray)', display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
                   <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--color-accent)', flexShrink: 0, display: 'inline-block' }} />
-                  {o}
+                  {renderBold(o)}
                 </li>
               ))}
             </ul>
@@ -719,7 +720,7 @@ function SingleProgramDetail() {
 
               <div className="dept-about-card">
                 <p className="dept-about-lead-text">
-                  {dept?.about}
+                  {renderBold(dept?.about)}
                 </p>
               </div>
 
@@ -736,7 +737,7 @@ function SingleProgramDetail() {
                         <div className="dept-highlight-check-circle">
                           <Check size={13} strokeWidth={3} />
                         </div>
-                        <p className="dept-highlight-text">{h}</p>
+                        <p className="dept-highlight-text">{renderBold(h)}</p>
                       </div>
                     ))}
                   </div>
@@ -783,7 +784,7 @@ function SingleProgramDetail() {
 
                 {shared.hodMessage && (
                   <div className="dept-hod-message-box">
-                    <p className="dept-hod-message-text">{shared.hodMessage}</p>
+                    <p className="dept-hod-message-text">{renderBold(shared.hodMessage)}</p>
                   </div>
                 )}
 
@@ -834,7 +835,7 @@ function SingleProgramDetail() {
                           <span className="dept-vm-bullet-circle">
                             <Check size={12} strokeWidth={3} />
                           </span>
-                          <span>{m}</span>
+                          <span>{renderBold(m)}</span>
                         </li>
                       ))}
                     </ul>
@@ -848,7 +849,7 @@ function SingleProgramDetail() {
                       {shared.coreValues.map((v) => (
                         <span key={v} className="dept-value-pill">
                           <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-block' }} />
-                          <span>{v}</span>
+                          <span>{renderBold(v)}</span>
                         </span>
                       ))}
                     </div>
@@ -894,7 +895,7 @@ function SingleProgramDetail() {
             )}
             <div className="dept-about-card">
               <p className="dept-about-lead-text">
-                {program.about}
+                {renderBold(program.about)}
               </p>
             </div>
           </div>
@@ -972,7 +973,7 @@ function SingleProgramDetail() {
                       <span className="dept-outcome-code-badge">
                         {activeOutcome.key.slice(0, -1).toUpperCase()}{i + 1}
                       </span>
-                      <p className="dept-outcome-desc">{item}</p>
+                      <p className="dept-outcome-desc">{renderBold(item)}</p>
                     </li>
                   ))}
                 </ul>
@@ -1249,7 +1250,7 @@ function SingleProgramDetail() {
                             </div>
                           </div>
                           <div>
-                            <div className="dept-library-value">{item.value}</div>
+                            <div className="dept-library-value">{renderBold(item.value)}</div>
                             <div className="dept-library-label">{item.label}</div>
                           </div>
                         </div>

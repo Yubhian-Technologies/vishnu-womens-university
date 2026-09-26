@@ -5,6 +5,7 @@ import { ArrowRight } from 'lucide-react';
 import SmoothImage from '../../../components/SmoothImage/SmoothImage';
 import { CAMPUS_LIFE_FEATURED, CAMPUS_LIFE_STORIES } from '../landingEditorial.data';
 import Reveal from '../Reveal';
+import { renderBold } from '../../../lib/boldText';
 
 interface ImageRef { url: string; alt: string; }
 
@@ -69,7 +70,7 @@ export default function CampusLife({ images }: Props) {
           <div className="lpe-cl__primary-row">
             <Reveal index={0} className="lpe-cl__featured">
               <h3 className="lpe-cl__featured-title">{CAMPUS_LIFE_FEATURED.title}</h3>
-              <p className="lpe-cl__featured-desc">{CAMPUS_LIFE_FEATURED.desc}</p>
+              <p className="lpe-cl__featured-desc">{renderBold(CAMPUS_LIFE_FEATURED.desc)}</p>
             </Reveal>
 
             <Reveal index={1} variant="media" className="lpe-cl-story lpe-cl-story--primary">
@@ -79,7 +80,7 @@ export default function CampusLife({ images }: Props) {
                 </div>
                 <span className="lpe-cl-story__cat">{primary.category}</span>
                 <h4 className="lpe-cl-story__title">{primary.title}</h4>
-                <p className="lpe-cl-story__desc">{primary.desc}</p>
+                <p className="lpe-cl-story__desc">{renderBold(primary.desc)}</p>
                 <span className="lpe-cl-story__more">Read More <ArrowRight size={13} /></span>
               </Link>
             </Reveal>
@@ -93,7 +94,7 @@ export default function CampusLife({ images }: Props) {
                 </div>
                 <span className="lpe-cl-story__cat">{wide.category}</span>
                 <h4 className="lpe-cl-story__title">{wide.title}</h4>
-                <p className="lpe-cl-story__desc">{wide.desc}</p>
+                <p className="lpe-cl-story__desc">{renderBold(wide.desc)}</p>
                 <span className="lpe-cl-story__more">Read More <ArrowRight size={13} /></span>
               </Link>
             </Reveal>

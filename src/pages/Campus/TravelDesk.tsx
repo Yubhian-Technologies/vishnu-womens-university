@@ -19,6 +19,7 @@ import {
   DEFAULT_TRAVEL_ABOUT,
   DEFAULT_TRAVEL_SERVICES,
 } from '../Admin/sections/TravelDeskAdmin';
+import { renderBold } from '../../lib/boldText';
 import './TravelDesk.css';
 
 const DEFAULT_TRAVEL_FAQS: Pick<FaqDoc, 'question' | 'answer'>[] = [
@@ -127,7 +128,7 @@ export default function TravelDesk() {
                 Campus <span className="td-hero-highlight">Travel Desk</span>
               </h1>
               <p className="td-hero-subtitle">
-                {subtitle}
+                {renderBold(subtitle)}
               </p>
 
               {/* Quick Highlight Pills */}
@@ -177,7 +178,7 @@ export default function TravelDesk() {
               {aboutData.title}
             </h2>
             <p className="td-section-subtitle">
-              {aboutData.subtitle}
+              {renderBold(aboutData.subtitle)}
             </p>
           </div>
 
@@ -185,7 +186,7 @@ export default function TravelDesk() {
             <div className="td-about-main">
               {aboutData.paragraphs.map((p, idx) => (
                 <p key={idx} className="td-about-paragraph">
-                  {p}
+                  {renderBold(p)}
                 </p>
               ))}
             </div>
@@ -254,7 +255,7 @@ export default function TravelDesk() {
                     <Icon size={24} />
                   </div>
                   <h3 className="td-service-title">{s.title}</h3>
-                  <p className="td-service-desc">{s.desc}</p>
+                  <p className="td-service-desc">{renderBold(s.desc)}</p>
                   <div className="td-service-check">
                     <CheckCircle2 size={16} />
                     <span>On-Campus Assistance</span>
@@ -284,7 +285,7 @@ export default function TravelDesk() {
                   {faq.question}
                 </summary>
                 <p style={{ marginTop: '0.75rem', color: 'var(--color-text-light)', lineHeight: 1.6 }}>
-                  {faq.answer}
+                  {renderBold(faq.answer)}
                 </p>
               </details>
             ))}

@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { X, Microscope, FileText } from 'lucide-react';
 import type { LabItem } from '../../pages/Admin/sections/ProgramsAdmin';
+import { renderBold } from '../../lib/boldText';
 import './LabDialog.css';
 
 interface Props {
@@ -38,7 +39,7 @@ export default function LabDialog({ lab, onClose }: Props) {
           <div className="lab-dialog-icon"><Microscope size={22} strokeWidth={1.75} /></div>
           <h3 className="lab-dialog-title">{lab.name}</h3>
           {lab.description
-            ? <p className="lab-dialog-desc">{lab.description}</p>
+            ? <p className="lab-dialog-desc">{renderBold(lab.description)}</p>
             : <p className="lab-dialog-desc lab-dialog-desc--empty">No description added yet.</p>}
           {lab.pdfUrl ? (
             <a href={lab.pdfUrl} target="_blank" rel="noopener noreferrer" className="lab-dialog-pdf-link">

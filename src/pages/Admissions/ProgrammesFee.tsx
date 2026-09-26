@@ -4,6 +4,7 @@ import PageHero from '../../components/PageHero/PageHero';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
 import { dotTech } from '../../lib/academicDegreeNames';
+import { renderBold } from '../../lib/boldText';
 
 const BTECH_FEE = '₹ 1,05,000';
 const VISWPU_BTECH_FEE = '₹ 47,000';
@@ -131,7 +132,7 @@ export default function ProgrammesFee() {
                 { label: 'Total Intake', value: `${BTECH_TOTAL_INTAKE} Seats` },
               ].map(s => (
                 <div key={s.label} style={{ background: 'var(--color-primary)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4) var(--space-6)', textAlign: 'center' }}>
-                  <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.4rem', fontWeight: 900, color: 'var(--color-accent)' }}>{s.value}</div>
+                  <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.4rem', fontWeight: 900, color: 'var(--color-accent)' }}>{renderBold(s.value)}</div>
                   <div style={{ fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.7)', marginTop: 2 }}>{s.label}</div>
                 </div>
               ))}
@@ -194,7 +195,7 @@ export default function ProgrammesFee() {
                 { label: 'Total Intake', value: `${MTECH_TOTAL_INTAKE} Seats` },
               ].map(s => (
                 <div key={s.label} style={{ background: 'var(--color-primary)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4) var(--space-6)', textAlign: 'center' }}>
-                  <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.4rem', fontWeight: 900, color: 'var(--color-accent)' }}>{s.value}</div>
+                  <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.4rem', fontWeight: 900, color: 'var(--color-accent)' }}>{renderBold(s.value)}</div>
                   <div style={{ fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.7)', marginTop: 2 }}>{s.label}</div>
                 </div>
               ))}
@@ -232,7 +233,7 @@ export default function ProgrammesFee() {
                 { label: 'Total Intake', value: '60 Seats' },
               ].map(s => (
                 <div key={s.label} style={{ background: 'var(--color-primary)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4) var(--space-6)', textAlign: 'center' }}>
-                  <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.4rem', fontWeight: 900, color: 'var(--color-accent)' }}>{s.value}</div>
+                  <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.4rem', fontWeight: 900, color: 'var(--color-accent)' }}>{renderBold(s.value)}</div>
                   <div style={{ fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.7)', marginTop: 2 }}>{s.label}</div>
                 </div>
               ))}
