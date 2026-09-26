@@ -2,9 +2,29 @@ import { useState, useId } from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, Phone, Mail, ExternalLink, ChevronDown, Navigation, ArrowRight } from 'lucide-react';
 import { useSiteContact, telHref } from '../../hooks/useSiteContact';
+import { useOrderedCollection } from '../../hooks/useCollection';
+import { FOOTER_COLUMNS_COLLECTION, FOOTER_LINKS_COLLECTION, type FooterColumnDoc, type FooterLinkDoc } from '../../lib/footerLinks';
 import { InstagramIcon, FacebookIcon, TwitterIcon, LinkedInIcon, YouTubeIcon } from './SocialIcons';
 import SmoothCollapse from '../SmoothCollapse/SmoothCollapse';
 import './Footer.css';
+
+type FooterNavItem = { label: string; href: string; external?: boolean; disabled?: boolean };
+
+// Note (2026-09-26, updated 2026-09-27): the columns/links below (University,
+// Academics & Portals, Student Life & Services, Quick Links, Feedback
+// Facility) were originally hardcoded here directly. They're now the DEFAULT/fallback
+// content only — Admin -> Footer Columns & Links can migrate them into
+// Firestore with a one-click "Load Existing Footer Links" button
+// (FooterLinksAdmin.tsx), after which columns and their links become fully
+// admin-editable (add/rename/delete/reorder columns, add/edit/delete/reorder
+// links within them) and this footer renders from Firestore instead. Until
+// that migration happens (fresh install, or before an admin has touched it),
+// nothing changes — the footer renders these exact arrays, same as always.
+function footerLinkToNavItem(l: FooterLinkDoc): FooterNavItem {
+  if (l.disabled) return { label: l.label, href: '#', disabled: true };
+  if (l.linkType === 'internal') return { label: l.label, href: l.url || '/' };
+  return { label: l.label, href: (l.linkType === 'external' ? l.url : l.fileUrl) || '#', external: true };
+}
 
 /* -------------------------------------------------------------------------- */
 /* Static Data & Navigation Structures                                        */
@@ -56,13 +76,18 @@ const STUDENT_SERVICE_LINKS: { label: string; href: string; external?: boolean }
   { label: 'Library & Information Center', href: '/campus/central-library' },
   { label: 'Anti-Ragging Cell', href: '/anti-ragging' },
   { label: 'Grievance Redressal', href: '/policies-procedures' },
+];
+
+// Its own column (after Quick Links) rather than mixed into Student Life &
+// Services, per request — every feedback form/facility link grouped together.
+const FEEDBACK_LINKS: { label: string; href: string; external?: boolean }[] = [
   { label: "Students' Feedback", href: 'https://forms.gle/UuURnxKUZw7wW1NW9', external: true },
   { label: "Parents' Feedback", href: 'https://forms.gle/eT2QF3WNJZDwpEzj8', external: true },
   { label: "Faculty's Feedback", href: 'https://forms.gle/K89PMmjNbJNGSVEa9', external: true },
   { label: 'AICTE Feedback Facility', href: '/aicte-feedback-facility' },
 ];
 
-const COMPLIANCE_LINKS: { label: string; href: string; external?: boolean }[] = [
+const QUICK_LINKS: { label: string; href: string; external?: boolean }[] = [
   { label: 'Mandatory Disclosures', href: '/disclosures/ugc' },
   { label: 'NIRF Data', href: '/information' },
   { label: 'NAAC Certificate', href: '/news-awards/accreditations-awards' },
@@ -75,6 +100,17 @@ const COMPLIANCE_LINKS: { label: string; href: string; external?: boolean }[] = 
   { label: 'Structural Stability', href: 'https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2FSVECWStructuralStability.pdf?alt=media&token=e88445e0-448e-4009-bb72-a3bde520bb2b' },
   { label: 'Land Use Certificate', href: 'https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2FSVECWLandUseCertificate.pdf?alt=media&token=351b20dd-fe3d-44ee-b382-f60ecb644dc0' },
   { label: 'Land Conversion Certificate', href: 'https://svecw.edu.in/wp-content/uploads/2024/07/SVECWLandConversion.pdf', external: true },
+];
+
+// Exported so FooterLinksAdmin.tsx's "Load Existing Footer Links" button can
+// seed Firestore with exactly this content, in one place — see the note atop
+// this file. Not consumed by anything else.
+export const DEFAULT_FOOTER_COLUMNS: { label: string; links: FooterNavItem[] }[] = [
+  { label: 'University', links: UNIVERSITY_LINKS },
+  { label: 'Academics & Portals', links: ACADEMIC_LINKS },
+  { label: 'Student Life & Services', links: STUDENT_SERVICE_LINKS },
+  { label: 'Quick Links', links: QUICK_LINKS },
+  { label: 'Feedback Facility', links: FEEDBACK_LINKS },
 ];
 
 const LEGAL_LINKS = [
@@ -92,6 +128,20 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
   const accordionBaseId = useId();
   const { phone, email } = useSiteContact();
+
+  // See the note atop this file — footerColumns is empty until an admin has
+  // used "Load Existing Footer Links", so the fallback branch below (the
+  // original hardcoded DEFAULT_FOOTER_COLUMNS) is what every visitor sees
+  // until then, unchanged from before this admin feature existed.
+  const { docs: footerColumnDocs } = useOrderedCollection<FooterColumnDoc>(FOOTER_COLUMNS_COLLECTION, 'order');
+  const { docs: footerLinkDocs } = useOrderedCollection<FooterLinkDoc>(FOOTER_LINKS_COLLECTION, 'order');
+  const columns: { key: string; label: string; items: FooterNavItem[] }[] = footerColumnDocs.length > 0
+    ? footerColumnDocs.map((col) => ({
+        key: col.id,
+        label: col.label,
+        items: footerLinkDocs.filter((l) => l.columnId === col.id).map(footerLinkToNavItem),
+      }))
+    : DEFAULT_FOOTER_COLUMNS.map((col, i) => ({ key: `default-${i}`, label: col.label, items: col.links }));
 
   const [openMobileSections, setOpenMobileSections] = useState<Set<string>>(new Set());
 
@@ -193,43 +243,19 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Navigation Columns */}
+          {/* Navigation Columns — see the `columns` derivation above: either
+              the original hardcoded 4, or fully admin-defined once migrated. */}
           <nav className="vwu-footer-nav" aria-label="Footer navigation">
-            <div className="vwu-footer-col">
-              <h3 className="vwu-footer-heading">University</h3>
-              <ul className="vwu-footer-list" role="list">
-                {UNIVERSITY_LINKS.map((item) => (
-                  <li key={item.label}>{renderNavLink(item)}</li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="vwu-footer-col">
-              <h3 className="vwu-footer-heading">Academics &amp; Portals</h3>
-              <ul className="vwu-footer-list" role="list">
-                {ACADEMIC_LINKS.map((item) => (
-                  <li key={item.label}>{renderNavLink(item)}</li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="vwu-footer-col">
-              <h3 className="vwu-footer-heading">Student Life &amp; Services</h3>
-              <ul className="vwu-footer-list" role="list">
-                {STUDENT_SERVICE_LINKS.map((item) => (
-                  <li key={item.label}>{renderNavLink(item)}</li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="vwu-footer-col">
-              <h3 className="vwu-footer-heading">Compliance &amp; Disclosures</h3>
-              <ul className="vwu-footer-list" role="list">
-                {COMPLIANCE_LINKS.map((item) => (
-                  <li key={item.label}>{renderNavLink(item)}</li>
-                ))}
-              </ul>
-            </div>
+            {columns.map((col) => (
+              <div className="vwu-footer-col" key={col.key}>
+                <h3 className="vwu-footer-heading">{col.label}</h3>
+                <ul className="vwu-footer-list" role="list">
+                  {col.items.map((item) => (
+                    <li key={item.label}>{renderNavLink(item)}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </nav>
         </div>
       </div>
@@ -237,97 +263,29 @@ export default function Footer() {
       {/* ─── MOBILE ACCORDIONS ─── */}
       <div className="vwu-footer-mobile">
         <div className="vwu-footer-inner">
-          {/* University */}
-          <div className="vwu-footer-acc">
-            <button
-              type="button"
-              className="vwu-footer-acc-btn"
-              onClick={() => toggleMobileSection('university')}
-              aria-expanded={openMobileSections.has('university')}
-              aria-controls={`${accordionBaseId}-uni`}
-            >
-              <span>University</span>
-              <ChevronDown size={16} className={`vwu-footer-acc-chevron${openMobileSections.has('university') ? ' open' : ''}`} aria-hidden="true" />
-            </button>
-            <SmoothCollapse open={openMobileSections.has('university')}>
-              <div id={`${accordionBaseId}-uni`} className="vwu-footer-acc-body">
-                <ul className="vwu-footer-list" role="list">
-                  {UNIVERSITY_LINKS.map((item) => (
-                    <li key={item.label}>{renderNavLink(item)}</li>
-                  ))}
-                </ul>
-              </div>
-            </SmoothCollapse>
-          </div>
-
-          {/* Academics */}
-          <div className="vwu-footer-acc">
-            <button
-              type="button"
-              className="vwu-footer-acc-btn"
-              onClick={() => toggleMobileSection('academics')}
-              aria-expanded={openMobileSections.has('academics')}
-              aria-controls={`${accordionBaseId}-acad`}
-            >
-              <span>Academics &amp; Portals</span>
-              <ChevronDown size={16} className={`vwu-footer-acc-chevron${openMobileSections.has('academics') ? ' open' : ''}`} aria-hidden="true" />
-            </button>
-            <SmoothCollapse open={openMobileSections.has('academics')}>
-              <div id={`${accordionBaseId}-acad`} className="vwu-footer-acc-body">
-                <ul className="vwu-footer-list" role="list">
-                  {ACADEMIC_LINKS.map((item) => (
-                    <li key={item.label}>{renderNavLink(item)}</li>
-                  ))}
-                </ul>
-              </div>
-            </SmoothCollapse>
-          </div>
-
-          {/* Student Life */}
-          <div className="vwu-footer-acc">
-            <button
-              type="button"
-              className="vwu-footer-acc-btn"
-              onClick={() => toggleMobileSection('services')}
-              aria-expanded={openMobileSections.has('services')}
-              aria-controls={`${accordionBaseId}-serv`}
-            >
-              <span>Student Life &amp; Services</span>
-              <ChevronDown size={16} className={`vwu-footer-acc-chevron${openMobileSections.has('services') ? ' open' : ''}`} aria-hidden="true" />
-            </button>
-            <SmoothCollapse open={openMobileSections.has('services')}>
-              <div id={`${accordionBaseId}-serv`} className="vwu-footer-acc-body">
-                <ul className="vwu-footer-list" role="list">
-                  {STUDENT_SERVICE_LINKS.map((item) => (
-                    <li key={item.label}>{renderNavLink(item)}</li>
-                  ))}
-                </ul>
-              </div>
-            </SmoothCollapse>
-          </div>
-
-          {/* Compliance */}
-          <div className="vwu-footer-acc">
-            <button
-              type="button"
-              className="vwu-footer-acc-btn"
-              onClick={() => toggleMobileSection('compliance')}
-              aria-expanded={openMobileSections.has('compliance')}
-              aria-controls={`${accordionBaseId}-comp`}
-            >
-              <span>Compliance &amp; Disclosures</span>
-              <ChevronDown size={16} className={`vwu-footer-acc-chevron${openMobileSections.has('compliance') ? ' open' : ''}`} aria-hidden="true" />
-            </button>
-            <SmoothCollapse open={openMobileSections.has('compliance')}>
-              <div id={`${accordionBaseId}-comp`} className="vwu-footer-acc-body">
-                <ul className="vwu-footer-list" role="list">
-                  {COMPLIANCE_LINKS.map((item) => (
-                    <li key={item.label}>{renderNavLink(item)}</li>
-                  ))}
-                </ul>
-              </div>
-            </SmoothCollapse>
-          </div>
+          {columns.map((col) => (
+            <div className="vwu-footer-acc" key={col.key}>
+              <button
+                type="button"
+                className="vwu-footer-acc-btn"
+                onClick={() => toggleMobileSection(col.key)}
+                aria-expanded={openMobileSections.has(col.key)}
+                aria-controls={`${accordionBaseId}-${col.key}`}
+              >
+                <span>{col.label}</span>
+                <ChevronDown size={16} className={`vwu-footer-acc-chevron${openMobileSections.has(col.key) ? ' open' : ''}`} aria-hidden="true" />
+              </button>
+              <SmoothCollapse open={openMobileSections.has(col.key)}>
+                <div id={`${accordionBaseId}-${col.key}`} className="vwu-footer-acc-body">
+                  <ul className="vwu-footer-list" role="list">
+                    {col.items.map((item) => (
+                      <li key={item.label}>{renderNavLink(item)}</li>
+                    ))}
+                  </ul>
+                </div>
+              </SmoothCollapse>
+            </div>
+          ))}
         </div>
       </div>
 
