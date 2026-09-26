@@ -3,7 +3,48 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, ChevronRight, Award, Briefcase } from 'lucide-react';
 import type { FacultyDoc } from '../../pages/Academics/Faculty';
 import SmoothImage from '../SmoothImage/SmoothImage';
+import { smoothScrollTo } from '../../lib/smoothScroll';
 import './FacultyCarousel.css';
+
+// Set on the page's own history entry when a faculty profile is opened from
+// this carousel, so pressing Back returns to the Faculty section instead of
+// the top of the page. The page re-loads its Firestore content on return —
+// too late for the browser's own scroll restoration (turned off site-wide in
+// App.tsx's RouteScrollReset anyway) — so the carousel restores it itself.
+const RETURN_FLAG = 'vwuFacultyCarouselReturn';
+
+function markFacultyReturn(facultyId: string) {
+  try {
+    window.history.replaceState({ ...(window.history.state ?? {}), [RETURN_FLAG]: true }, '');
+  } catch { /* history unavailable — Back just behaves as before */ }
+  // Remembers the exact page (e.g. /academics/cse, not just "some CSE
+  // programme") this profile was opened from, for the profile page's
+  // "Back to … Faculty" button — see facultyReturnPath in FacultyProfile.tsx.
+  try {
+    sessionStorage.setItem(`vwu:faculty-return:${facultyId}`, window.location.pathname);
+  } catch { /* storage unavailable — the button falls back to the department's page */ }
+}
+
+// The faculty profile page's "Back to … Faculty" link sets the same flag as
+// React Router link state, which lands under history.state.usr.
+function hasFacultyReturn(): boolean {
+  const state = window.history.state;
+  return !!(state?.[RETURN_FLAG] || state?.usr?.[RETURN_FLAG]);
+}
+
+function clearFacultyReturn() {
+  try {
+    const state = window.history.state;
+    if (!state?.[RETURN_FLAG] && !state?.usr?.[RETURN_FLAG]) return;
+    const rest = { ...state };
+    delete rest[RETURN_FLAG];
+    if (rest.usr && typeof rest.usr === 'object') {
+      rest.usr = { ...rest.usr };
+      delete rest.usr[RETURN_FLAG];
+    }
+    window.history.replaceState(rest, '');
+  } catch { /* ignore */ }
+}
 
 interface FacultyCarouselProps {
   faculty: FacultyDoc[];
@@ -44,6 +85,47 @@ export default function FacultyCarousel({
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isPaused, setIsPaused] = useState(false);
   const resumeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+  // Read once at mount (not inside the effect) so React.StrictMode's dev-only
+  // effect double-run can't consume the flag on the first pass.
+  const returningRef = useRef<boolean>(hasFacultyReturn());
+  const hasFaculty = !!faculty && faculty.length > 0;
+
+  // Back from a faculty profile → scroll to this carousel's section (the
+  // page's id="faculty" wrapper, so its scroll-margin clears the sticky
+  // header). Sections above keep loading from Firestore after this mounts and
+  // push it further down, so its position is re-checked every frame and
+  // corrected, for up to 6s, and abandoned the moment the visitor scrolls,
+  // taps, clicks or presses a key themselves.
+  useEffect(() => {
+    if (!hasFaculty || !returningRef.current) return;
+    clearFacultyReturn();
+    const target = sectionRef.current?.closest<HTMLElement>('[id]') ?? sectionRef.current;
+    if (!target) return;
+
+    const interactionEvents = ['wheel', 'touchstart', 'keydown', 'mousedown'] as const;
+    let raf = 0;
+    const check = () => {
+      const margin = parseFloat(getComputedStyle(target).scrollMarginTop) || 0;
+      const offBy = target.getBoundingClientRect().top - margin;
+      if (Math.abs(offBy) > 2) smoothScrollTo(Math.max(0, window.scrollY + offBy), { immediate: true });
+      raf = requestAnimationFrame(check);
+    };
+    raf = requestAnimationFrame(check);
+
+    const cleanup = () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(timer);
+      interactionEvents.forEach((e) => window.removeEventListener(e, stop));
+    };
+    function stop() {
+      returningRef.current = false;
+      cleanup();
+    }
+    const timer = setTimeout(stop, 6000);
+    interactionEvents.forEach((e) => window.addEventListener(e, stop, { passive: true }));
+    return cleanup;
+  }, [hasFaculty]);
 
   // Circular Array Data Structure: Triplicate faculty list so the last card connects
   // directly to the first card seamlessly without any sudden revert/rewind to start.
@@ -123,6 +205,7 @@ export default function FacultyCarousel({
 
   return (
     <section
+      ref={sectionRef}
       className="faculty-impact-section"
       aria-label={title}
       onMouseEnter={() => setIsPaused(true)}
@@ -178,7 +261,7 @@ export default function FacultyCarousel({
                 {/* Entire Card in Circular White Background */}
                 <div className="faculty-impact-card">
                   {/* Portrait Photo Frame */}
-                  <Link to={`/faculty/${f.id}`} className="faculty-impact-photo-frame" aria-label={`View ${f.name} profile`}>
+                  <Link to={`/faculty/${f.id}`} onClick={() => markFacultyReturn(f.id)} className="faculty-impact-photo-frame" aria-label={`View ${f.name} profile`}>
                     {f.imageUrl ? (
                       <SmoothImage
                         src={f.imageUrl}
@@ -197,7 +280,7 @@ export default function FacultyCarousel({
                     {/* Faculty Name & Designation */}
                     <div className="faculty-impact-heading-group">
                       <h3 className="faculty-impact-name">
-                        <Link to={`/faculty/${f.id}`} className="faculty-impact-name-link">
+                        <Link to={`/faculty/${f.id}`} onClick={() => markFacultyReturn(f.id)} className="faculty-impact-name-link">
                           {f.name}
                         </Link>
                       </h3>
@@ -224,7 +307,7 @@ export default function FacultyCarousel({
 
                     {/* View Full Profile Action Button with Arrow Circle */}
                     <div className="faculty-impact-footer">
-                      <Link to={`/faculty/${f.id}`} className="faculty-card-profile-btn">
+                      <Link to={`/faculty/${f.id}`} onClick={() => markFacultyReturn(f.id)} className="faculty-card-profile-btn">
                         <span>View Full Profile</span>
                         <span className="faculty-btn-arrow-circle">
                           <ChevronRight size={13} strokeWidth={2.4} />

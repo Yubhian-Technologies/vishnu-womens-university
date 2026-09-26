@@ -132,14 +132,19 @@
    page's full width instead of staying compact. */
 .faculty-sections-grid {
   display: grid;
-  grid-template-columns: 300px 1fr;
+  /* minmax(0, 1fr), not plain 1fr: a plain 1fr track can't shrink below its
+     widest content, so a wide table in a section stretched the column past
+     the screen on mobile and cut off everything in it (tables, publication
+     lists). With a 0 minimum the column fits the screen, text wraps, and a
+     wide table scrolls sideways inside its own box instead. */
+  grid-template-columns: 300px minmax(0, 1fr);
   gap: var(--space-10);
   align-items: start;
 }
 
 @media (max-width: 900px) {
   .faculty-sections-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .faculty-sections-nav {

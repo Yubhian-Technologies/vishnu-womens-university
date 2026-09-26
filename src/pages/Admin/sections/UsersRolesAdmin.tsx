@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useOrderedCollection } from '../../../hooks/useCollection';
 import { SECTION_GROUPS, SECTIONS } from '../AdminLayout';
@@ -6,6 +6,7 @@ import {
   listAdminUsers, saveAdminUser, createAdminLogin, deleteAdminUser, ROLE_PRESETS,
   type AdminUserDoc, type AdminRole, type ModuleLevel,
 } from '../../../lib/rbac';
+import { changeFirebaseAuthPassword } from '../../../lib/firebaseAdmin';
 
 const ROLE_LABELS: Record<AdminRole, string> = {
   superadmin: 'Super Admin',
@@ -22,7 +23,20 @@ function roleLabelFor(u: Pick<AdminUserDoc, 'role' | 'roleName'>): string {
   return u.role === 'custom' && u.roleName?.trim() ? u.roleName : ROLE_LABELS[u.role];
 }
 
-const EMPTY: Omit<AdminUserDoc, 'id'> = { email: '', department: '', role: 'custom', roleName: '', active: true, modules: {}, resources: [] };
+/** Plain-language message for the Firebase auth errors Change Password can hit. */
+function passwordErrorMessage(e: unknown): string {
+  const code = (e as { code?: string })?.code || '';
+  if (code === 'auth/invalid-credential' || code === 'auth/wrong-password') return 'The current password is incorrect.';
+  if (code === 'auth/user-not-found') return 'No sign-in exists for this email.';
+  if (code === 'auth/weak-password') return 'The new password is too weak — use at least 6 characters.';
+  if (code === 'auth/too-many-requests') return 'Too many attempts — please wait a few minutes and try again.';
+  if (code === 'auth/user-disabled') return 'This sign-in has been disabled in Firebase.';
+  return (e as Error)?.message || 'Something went wrong.';
+}
+
+const EMPTY_PW = { current: '', next: '', confirm: '' };
+
+const EMPTY: Omit<AdminUserDoc, 'id'> ={ email: '', department: '', role: 'custom', roleName: '', active: true, modules: {}, resources: [] };
 
 /**
  * Super Admin-only: manage who else can sign in to /admin and what they can
@@ -94,6 +108,39 @@ export default function UsersRolesAdmin() {
       alert(`Couldn't save: ${(e as Error).message}`);
     } finally {
       setSaving(false);
+    }
+  };
+
+  // Change Password — one row open at a time.
+  const [pwUserId, setPwUserId] = useState<string | null>(null);
+  const [pw, setPw] = useState(EMPTY_PW);
+  const [pwSaving, setPwSaving] = useState(false);
+  const [pwError, setPwError] = useState('');
+  // Live check, shown as soon as something is typed in Confirm New Password.
+  const pwMismatch = pw.confirm.length > 0 && pw.next !== pw.confirm;
+
+  const openChangePassword = (u: AdminUserDoc) => {
+    setPwUserId(pwUserId === u.id ? null : u.id);
+    setPw(EMPTY_PW);
+    setPwError('');
+  };
+
+  const changePassword = async (u: AdminUserDoc) => {
+    if (!pw.current) return setPwError('Enter the current password.');
+    if (pw.next.length < 6) return setPwError('The new password must be at least 6 characters.');
+    if (pw.next !== pw.confirm) return setPwError('The new passwords don’t match.');
+    if (pw.next === pw.current) return setPwError('The new password must be different from the current one.');
+    setPwSaving(true);
+    setPwError('');
+    try {
+      await changeFirebaseAuthPassword(u.email, pw.current, pw.next);
+      setPwUserId(null);
+      setPw(EMPTY_PW);
+      alert(`Password changed for ${u.email}. Share the new password with them.`);
+    } catch (e) {
+      setPwError(passwordErrorMessage(e));
+    } finally {
+      setPwSaving(false);
     }
   };
 
@@ -207,17 +254,61 @@ export default function UsersRolesAdmin() {
             <thead><tr><th>Email</th><th>Role</th><th>Department</th><th>Modules</th><th>Status</th><th></th></tr></thead>
             <tbody>
               {users.map((u) => (
-                <tr key={u.id}>
-                  <td>{u.email}</td>
-                  <td>{roleLabelFor(u)}</td>
-                  <td>{u.department || '—'}</td>
-                  <td>{Object.keys(u.modules).length}</td>
-                  <td>{u.active ? 'Active' : 'Disabled'}</td>
-                  <td>
-                    <button className="admin-btn admin-btn--sm" onClick={() => edit(u)}>Edit</button>{' '}
-                    <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(u)}>Remove</button>
-                  </td>
-                </tr>
+                <Fragment key={u.id}>
+                  <tr>
+                    <td>{u.email}</td>
+                    <td>{roleLabelFor(u)}</td>
+                    <td>{u.department || '—'}</td>
+                    <td>{Object.keys(u.modules).length}</td>
+                    <td>{u.active ? 'Active' : 'Disabled'}</td>
+                    <td style={{ whiteSpace: 'nowrap' }}>
+                      <button className="admin-btn admin-btn--sm" onClick={() => edit(u)}>Edit</button>{' '}
+                      <button className="admin-btn admin-btn--sm" onClick={() => openChangePassword(u)} aria-expanded={pwUserId === u.id}>Change Password</button>{' '}
+                      <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(u)}>Remove</button>
+                    </td>
+                  </tr>
+                  {pwUserId === u.id && (
+                    <tr>
+                      <td colSpan={6}>
+                        <form
+                          onSubmit={(e) => { e.preventDefault(); changePassword(u); }}
+                          style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: '0.75rem', padding: '0.5rem 0' }}
+                        >
+                          <div className="admin-field" style={{ flex: '1 1 180px', margin: 0 }}>
+                            <label htmlFor={`pw-current-${u.id}`}>Current Password</label>
+                            <input id={`pw-current-${u.id}`} type="password" autoComplete="off" value={pw.current} onChange={(e) => setPw((p) => ({ ...p, current: e.target.value }))} />
+                          </div>
+                          <div className="admin-field" style={{ flex: '1 1 180px', margin: 0 }}>
+                            <label htmlFor={`pw-next-${u.id}`}>New Password (min. 6 characters)</label>
+                            <input id={`pw-next-${u.id}`} type="password" autoComplete="new-password" value={pw.next} onChange={(e) => setPw((p) => ({ ...p, next: e.target.value }))} />
+                          </div>
+                          <div className="admin-field" style={{ flex: '1 1 180px', margin: 0 }}>
+                            <label htmlFor={`pw-confirm-${u.id}`}>Confirm New Password</label>
+                            <input
+                              id={`pw-confirm-${u.id}`}
+                              type="password"
+                              autoComplete="new-password"
+                              value={pw.confirm}
+                              onChange={(e) => setPw((p) => ({ ...p, confirm: e.target.value }))}
+                              aria-invalid={pwMismatch}
+                              aria-describedby={pwMismatch ? `pw-mismatch-${u.id}` : undefined}
+                            />
+                            {pwMismatch && (
+                              <p id={`pw-mismatch-${u.id}`} role="alert" style={{ margin: '0.25rem 0 0', fontSize: '0.8rem', color: 'var(--color-danger, #c62828)' }}>
+                                Passwords don’t match.
+                              </p>
+                            )}
+                          </div>
+                          <div style={{ display: 'flex', gap: '0.5rem' }}>
+                            <button type="button" className="admin-btn admin-btn--ghost" onClick={() => setPwUserId(null)}>Cancel</button>
+                            <button type="submit" className="admin-btn admin-btn--primary" disabled={pwSaving || !pw.next || pw.next !== pw.confirm}>{pwSaving ? 'Changing…' : 'Change Password'}</button>
+                          </div>
+                          {pwError && <p role="alert" style={{ flexBasis: '100%', margin: 0, color: 'var(--color-danger, #c62828)' }}>{pwError}</p>}
+                        </form>
+                      </td>
+                    </tr>
+                  )}
+                </Fragment>
               ))}
             </tbody>
           </table>

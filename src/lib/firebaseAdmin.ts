@@ -87,3 +87,17 @@ export async function createFirebaseAuthAccount(email: string, password: string)
     await signOut(secondaryAuth);
   }
 }
+
+/** Changes an existing sign-in's password (Users & Roles → Change Password). The client SDK can only update a password as the signed-in user, so this signs in as `email` with `currentPassword` on the secondary app instance above — leaving the Super Admin's own session untouched — updates it, then signs that instance back out. Throws a Firebase auth error (e.g. auth/invalid-credential) if the current password is wrong. */
+export async function changeFirebaseAuthPassword(email: string, currentPassword: string, newPassword: string): Promise<void> {
+  const [{ signInWithEmailAndPassword, updatePassword, signOut }, secondaryAuth] = await Promise.all([
+    import('firebase/auth'),
+    getSecondaryAuth(),
+  ]);
+  try {
+    const { user } = await signInWithEmailAndPassword(secondaryAuth, email, currentPassword);
+    await updatePassword(user, newPassword);
+  } finally {
+    await signOut(secondaryAuth);
+  }
+}

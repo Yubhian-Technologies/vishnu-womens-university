@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
-import { Mail, ExternalLink, FileText, ChevronRight } from 'lucide-react';
+import { Mail, ExternalLink, FileText, ChevronRight, ArrowLeft } from 'lucide-react';
 import PageHero from '../../components/PageHero/PageHero';
 import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
@@ -94,6 +94,15 @@ export default function FacultyProfile() {
   const hodResearchProfiles = (dept?.hodResearchProfiles?.length ? dept.hodResearchProfiles : program?.hodResearchProfiles) || [];
   const hodMatches = isHod && !!hodName && hodName.trim() === (person.name || '').trim();
 
+  // "Back to … Faculty" goes to the exact page this profile was opened from
+  // (remembered by FacultyCarousel), else to this department's page.
+  let facultyReturnPath: string | null = null;
+  try {
+    const stored = sessionStorage.getItem(`vwu:faculty-return:${person.id}`);
+    if (stored && stored.startsWith('/')) facultyReturnPath = stored;
+  } catch { /* storage unavailable */ }
+  if (!facultyReturnPath && program) facultyReturnPath = `/academics/${program.slug}`;
+
   const activeCustom = usingCustomSections ? (customSections.find((s) => s.id === activeKey) ?? customSections[0]) : null;
   const activeLegacy = !usingCustomSections ? (legacySections.find((s) => s.title === activeKey) ?? legacySections[0]) : null;
 
@@ -136,6 +145,24 @@ export default function FacultyProfile() {
 
       <section className="section bg-white">
         <div className="container">
+          {/* Back to this faculty member's department page, landing on its
+              Faculty section (FacultyCarousel reads the state flag and
+              scrolls there once the page has loaded). */}
+          {facultyReturnPath && (
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <Link
+              to={facultyReturnPath}
+              state={{ vwuFacultyCarouselReturn: true }}
+              aria-label={`Back to ${dept?.title || person.department} Faculty`}
+              title={`Back to ${dept?.title || person.department} Faculty`}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', minHeight: 48, minWidth: 48, color: 'var(--color-text-light)', fontWeight: 600, textDecoration: 'none', marginBottom: 'var(--space-6)', transition: 'color 0.2s' }}
+              className="hover-color-primary"
+            >
+              <ArrowLeft size={16} strokeWidth={2.5} aria-hidden="true" />
+              Back
+            </Link>
+            </div>
+          )}
           <div style={{ display: 'flex', gap: 'var(--space-8)', flexWrap: 'wrap', marginBottom: 'var(--space-10)' }}>
             {person.imageUrl ? (
               <SmoothImage src={person.imageUrl} alt={person.name} style={{ width: 200, height: 240, objectFit: 'cover', objectPosition: 'center top', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-light-gray)', flexShrink: 0 }} />
