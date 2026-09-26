@@ -128,9 +128,15 @@ export default function FacultyProfile() {
       {/* Hero banner intentionally removed per request (2026-09-26) — the
           profile card immediately below already carries the name/designation,
           so this page no longer renders a PageHero at all. Applies to every
-          faculty member since this is the one shared profile page. */}
+          faculty member since this is the one shared profile page.
+          The section below still uses the shared `.section` class's normal
+          padding for its BOTTOM spacing (untouched) — only its top padding is
+          overridden here (2026-09-26), since `.section`'s default top padding
+          (var(--space-20)) was originally sized to sit below a tall hero
+          banner and left a large empty gap under the fixed nav once that
+          hero was removed. */}
 
-      <section className="section bg-white">
+      <section className="section bg-white" style={{ paddingTop: 'var(--space-6)' }}>
         <div className="container">
           <div style={{ display: 'flex', gap: 'var(--space-8)', flexWrap: 'wrap', marginBottom: 'var(--space-10)' }}>
             {person.imageUrl ? (
