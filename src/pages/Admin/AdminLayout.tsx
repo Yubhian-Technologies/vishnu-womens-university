@@ -62,7 +62,7 @@ export const SECTIONS: { id: string; icon: IconDefinition; label: string }[] = [
   { id: 'curriculum',     icon: faTableList, label: 'Course Curriculum Matrix' },
   { id: 'site-photos',    icon: faCamera, label: 'Website Photos' },
   { id: 'nav-links',      icon: faLink, label: 'Navigation Link Redirects' },
-  { id: 'footer-links',   icon: faLink, label: 'Footer Extra Links' },
+  { id: 'footer-links',   icon: faLink, label: 'Footer Columns & Links' },
   { id: 'governance-items', icon: faScaleBalanced, label: 'Governance / Committees / IQAC' },
   { id: 'annual-reports', icon: faFolderOpen, label: 'Annual Reports & Reforms' },
   { id: 'nirf-reports',   icon: faChartPie, label: 'NIRF Reports' },
