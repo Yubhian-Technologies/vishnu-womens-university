@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { Mail, ExternalLink, FileText, ChevronRight, ArrowLeft } from 'lucide-react';
-import PageHero from '../../components/PageHero/PageHero';
 import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import { useCollection, useOrderedCollection } from '../../hooks/useCollection';
@@ -135,15 +134,18 @@ export default function FacultyProfile() {
         ogImage={person.imageUrl}
         jsonLd={facultyJsonLd}
       />
-      <PageHero
-        page="faculty-profile"
-        defaultTitle={person.name}
-        defaultSubtitle={person.designation}
-        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Academics', to: '/academics' }, { label: 'Faculty', to: '/faculty' }, { label: person.name }]}
-        size="small"
-      />
+      {/* Hero banner intentionally removed per request (2026-09-26) — the
+          profile card immediately below already carries the name/designation,
+          so this page no longer renders a PageHero at all. Applies to every
+          faculty member since this is the one shared profile page.
+          The section below still uses the shared `.section` class's normal
+          padding for its BOTTOM spacing (untouched) — only its top padding is
+          overridden here (2026-09-26), since `.section`'s default top padding
+          (var(--space-20)) was originally sized to sit below a tall hero
+          banner and left a large empty gap under the fixed nav once that
+          hero was removed. */}
 
-      <section className="section bg-white">
+      <section className="section bg-white" style={{ paddingTop: 'var(--space-6)' }}>
         <div className="container">
           {/* Back to this faculty member's department page, landing on its
               Faculty section (FacultyCarousel reads the state flag and

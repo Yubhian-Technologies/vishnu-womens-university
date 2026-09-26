@@ -63,6 +63,7 @@ export const SECTIONS: { id: string; icon: IconDefinition; label: string }[] = [
   { id: 'site-photos',    icon: faCamera, label: 'Website Photos' },
   { id: 'header-menu',    icon: faBars, label: 'Header Menu' },
   { id: 'nav-links',      icon: faLink, label: 'Navigation Link Redirects' },
+  { id: 'footer-links',   icon: faLink, label: 'Footer Columns & Links' },
   { id: 'governance-items', icon: faScaleBalanced, label: 'Governance / Committees / IQAC' },
   { id: 'annual-reports', icon: faFolderOpen, label: 'Annual Reports & Reforms' },
   { id: 'nirf-reports',   icon: faChartPie, label: 'NIRF Reports' },
@@ -96,7 +97,7 @@ export const SECTIONS: { id: string; icon: IconDefinition; label: string }[] = [
 export const SECTION_GROUPS: { label: string; ids: string[] }[] = [
   { label: 'Overview', ids: ['overview'] },
   { label: 'Form Submissions & CRM', ids: ['crm', 'contact-messages', 'career-applications', 'admission-inquiries', 'campus-visit-requests', 'career-guidance-interest'] },
-  { label: 'Site Appearance', ids: ['theme', 'feature-popup', 'banners', 'landing-pages', 'honoured-guests', 'site-photos', 'header-menu', 'nav-links', 'content-blocks', 'compliance-docs'] },
+  { label: 'Site Appearance', ids: ['theme', 'feature-popup', 'banners', 'landing-pages', 'honoured-guests', 'site-photos', 'header-menu', 'nav-links', 'footer-links', 'content-blocks', 'compliance-docs'] },
   { label: 'About & Governance', ids: ['governing-body', 'governance-items', 'annual-reports', 'nirf-reports', 'nba-data', 'core-executives', 'sves-campuses', 'contacts', 'site-contact', 'policies'] },
   { label: 'Academics', ids: ['departments', 'programs', 'schools', 'faculty', 'curriculum', 'downloads'] },
   { label: 'Admissions & Campus Info', ids: ['information'] },

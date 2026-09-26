@@ -1,3 +1,8 @@
+.route-fallback__spacer {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
 .route-fallback {
   position: fixed;
   inset: 0;
