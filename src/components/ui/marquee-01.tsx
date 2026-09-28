@@ -10,13 +10,17 @@ export interface PlacementItem {
 interface PlacementMarqueeProps {
   records: PlacementItem[];
   year?: string;
+  /** Internships: the badge holds a duration ("One Month", "Two Months"),
+   *  not a salary, so don't append "LPA" to it. */
+  noLpaSuffix?: boolean;
 }
 
 export const PlacementRecordCard = ({
   name,
   company,
   package: pkg,
-}: PlacementItem) => {
+  noLpaSuffix = false,
+}: PlacementItem & { noLpaSuffix?: boolean }) => {
   return (
     <div className="placement-marquee-card">
       <div className="placement-card-header-row">
@@ -26,7 +30,7 @@ export const PlacementRecordCard = ({
         </span>
         {pkg && (
           <span className="placement-card-package-badge">
-            <span>{/lpa/i.test(pkg) ? pkg : `${pkg} LPA`}</span>
+            <span>{noLpaSuffix || /lpa/i.test(pkg) ? pkg : `${pkg} LPA`}</span>
           </span>
         )}
       </div>
@@ -46,7 +50,7 @@ const SECONDS_PER_CARD = 5;
 const MIN_DURATION_S = 45;
 const rowDuration = (cardCount: number) => `${Math.max(MIN_DURATION_S, cardCount * SECONDS_PER_CARD)}s`;
 
-export default function TestimonialMarquee({ records = [] }: PlacementMarqueeProps) {
+export default function TestimonialMarquee({ records = [], noLpaSuffix = false }: PlacementMarqueeProps) {
   if (!records || records.length === 0) return null;
 
   // Ensure enough items to create seamless infinite scrolling on wide screens
@@ -60,14 +64,14 @@ export default function TestimonialMarquee({ records = [] }: PlacementMarqueePro
       {/* Row 1: Left to Right / Normal */}
       <Marquee pauseOnHover style={{ ['--duration' as string]: rowDuration(firstRow.length) }}>
         {firstRow.map((rec, idx) => (
-          <PlacementRecordCard key={`row1-${idx}-${rec.name}`} {...rec} />
+          <PlacementRecordCard key={`row1-${idx}-${rec.name}`} {...rec} noLpaSuffix={noLpaSuffix} />
         ))}
       </Marquee>
 
       {/* Row 2: Reverse Direction */}
       <Marquee reverse pauseOnHover style={{ ['--duration' as string]: rowDuration(secondRow.length) }}>
         {secondRow.map((rec, idx) => (
-          <PlacementRecordCard key={`row2-${idx}-${rec.name}`} {...rec} />
+          <PlacementRecordCard key={`row2-${idx}-${rec.name}`} {...rec} noLpaSuffix={noLpaSuffix} />
         ))}
       </Marquee>
 
