@@ -1,5 +1,5 @@
-import { lazy } from 'react';
 import { PHOTO_NEEDED_PLACEHOLDER } from './photoPlaceholder';
+import { lazyWithRetry } from './lazyWithRetry';
 
 // A calmer, brand-toned placeholder (soft diagonal ink-to-green gradient,
 // no icon/caption) for image slots where an obvious "Photo Needed" card
@@ -51,14 +51,14 @@ export const LANDING_PAGE_REGISTRY: LandingPageRegistryEntry[] = [
     fallbackName: 'Landing Page 1 — Classic',
     fallbackDescription: 'The original VWU homepage.',
     fallbackPreviewImage: 'https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=800&q=80',
-    component: lazy(() => import('../pages/Home/Home')),
+    component: lazyWithRetry(() => import('../pages/Home/Home')),
   },
   {
     id: 'premium',
     fallbackName: 'Landing Page 2 — Premium',
     fallbackDescription: 'Modern, premium homepage inspired by LPU’s layout and interactions.',
     fallbackPreviewImage: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80',
-    component: lazy(() => import('../pages/LandingPremium/LandingPremium')),
+    component: lazyWithRetry(() => import('../pages/LandingPremium/LandingPremium')),
     imageSlots: [
       { key: 'hero', label: 'Hero Photo', defaultUrl: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1200&q=80', aspect: 3 / 4 },
       { key: 'highlights-main', label: 'Highlights — Main Story Photo', defaultUrl: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=1400&q=80', aspect: 16 / 9 },
@@ -83,7 +83,7 @@ export const LANDING_PAGE_REGISTRY: LandingPageRegistryEntry[] = [
     fallbackName: 'Landing Page 3 — Editorial',
     fallbackDescription: "Vishnu Women's University — Editorial University Experience",
     fallbackPreviewImage: PHOTO_NEEDED_PLACEHOLDER,
-    component: lazy(() => import('../pages/LandingEditorial/LandingEditorial')),
+    component: lazyWithRetry(() => import('../pages/LandingEditorial/LandingEditorial')),
     // Self-hosted "Photo Needed" placeholders (no external hotlinks) —
     // every image on this page is admin-uploaded from a clean slate rather
     // than shipping with unrelated stock photography standing in for VWU's
