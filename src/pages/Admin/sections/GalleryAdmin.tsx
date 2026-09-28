@@ -1,9 +1,11 @@
 import { useMemo, useRef, useState } from 'react';
 import * as XLSX from 'xlsx';
-import { addDoc, collection, deleteDoc, doc, serverTimestamp, writeBatch } from 'firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, serverTimestamp, updateDoc, writeBatch } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
 import { uploadImage } from '../../../lib/storage';
+import ImageUploader from '../../../components/ImageUploader/ImageUploader';
+import { sortAlbumsLatestFirst } from '../../../lib/galleryAlbums';
 import { galleryAlbums as STATIC_ALBUMS } from '../../NewsAwards/news-awards.data';
 
 interface GalleryImage {
@@ -188,11 +190,15 @@ export default function GalleryAdmin() {
   );
   const [activeYear, setActiveYear] = useState<number | null>(null);
   const year = activeYear ?? years[0] ?? CURRENT_YEAR;
-  const yearAlbums = useMemo(() => effectiveAlbums.filter((a) => a.year === year), [effectiveAlbums, year]);
+  // Latest event first, by each album's Date (see lib/galleryAlbums.ts) —
+  // the public Gallery page lists them in the same order.
+  const yearAlbums = useMemo(() => sortAlbumsLatestFirst(effectiveAlbums.filter((a) => a.year === year)), [effectiveAlbums, year]);
 
   const [newYear, setNewYear] = useState('');
   const [form, setForm] = useState({ title: '', imageUrl: '', link: '', date: '' });
   const [saving, setSaving] = useState(false);
+  // Id of the album loaded into the form above for editing; null = adding a new one.
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [bulkRows, setBulkRows] = useState<BulkRow[]>([]);
   const [bulkFileName, setBulkFileName] = useState('');
   const [bulkErr, setBulkErr] = useState('');
@@ -230,10 +236,38 @@ export default function GalleryAdmin() {
     setNewYear('');
   };
 
+  const startEdit = (a: GalleryAlbumDoc) => {
+    setEditingId(a.id);
+    setForm({ title: a.title || '', imageUrl: a.imageUrl || '', link: a.link || '', date: a.date || '' });
+    setActiveYear(a.year);
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setForm({ title: '', imageUrl: '', link: '', date: '' });
+  };
+
   const addOne = async () => {
     if (!form.title.trim()) return alert('Title is required.');
     setSaving(true);
     try {
+      if (editingId) {
+        // A changed Date with a different year moves the card to that
+        // year (same rule as the bulk import); otherwise it stays put.
+        const current = albums.find((a) => a.id === editingId);
+        const newYear = yearFromDateText(form.date) ?? current?.year ?? year;
+        await updateDoc(doc(db, 'galleryAlbums', editingId), {
+          year: newYear,
+          title: form.title.trim(),
+          imageUrl: form.imageUrl.trim(),
+          link: form.link.trim(),
+          date: form.date.trim(),
+        });
+        setEditingId(null);
+        setForm({ title: '', imageUrl: '', link: '', date: '' });
+        setActiveYear(newYear);
+        return;
+      }
       await addDoc(collection(db, 'galleryAlbums'), {
         year,
         title: form.title.trim(),
@@ -245,7 +279,7 @@ export default function GalleryAdmin() {
       });
       setForm({ title: '', imageUrl: '', link: '', date: '' });
     } catch (e) {
-      alert(`Couldn't add album: ${(e as Error).message}`);
+      alert(`Couldn't ${editingId ? 'update' : 'add'} album: ${(e as Error).message}`);
     } finally {
       setSaving(false);
     }
@@ -350,6 +384,7 @@ export default function GalleryAdmin() {
   const removeAlbum = async (id: string) => {
     if (!confirm('Delete this album card?')) return;
     await deleteDoc(doc(db, 'galleryAlbums', id));
+    if (id === editingId) cancelEdit();
   };
 
   const [deletingYearAlbums, setDeletingYearAlbums] = useState(false);
@@ -511,8 +546,19 @@ export default function GalleryAdmin() {
             <input id="album-title" value={form.title} onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))} placeholder="TECHNOVA 2025 – Valedictory" />
           </div>
           <div className="admin-field">
-            <label htmlFor="album-image">Image URL</label>
-            <input id="album-image" value={form.imageUrl} onChange={(e) => setForm((p) => ({ ...p, imageUrl: e.target.value }))} placeholder="https://…/poster.jpg" />
+            <label>Thumbnail Image</label>
+            <ImageUploader
+              folder="vwu/gallery/albums"
+              currentUrl={form.imageUrl || undefined}
+              onUploaded={(r) => setForm((p) => ({ ...p, imageUrl: r.url }))}
+              label="Upload Thumbnail"
+              aspect={4 / 3}
+            />
+            {form.imageUrl && (
+              <button type="button" className="admin-btn admin-btn--sm admin-btn--ghost" style={{ marginTop: '0.4rem' }} onClick={() => setForm((p) => ({ ...p, imageUrl: '' }))}>
+                Remove image
+              </button>
+            )}
           </div>
           <div className="admin-field">
             <label htmlFor="album-link">Google Photos Link</label>
@@ -522,10 +568,13 @@ export default function GalleryAdmin() {
             <label htmlFor="album-date">Date</label>
             <input id="album-date" value={form.date} onChange={(e) => setForm((p) => ({ ...p, date: e.target.value }))} placeholder="March 8, 2025" />
           </div>
-          <div className="admin-field">
+          <div className="admin-field" style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
             <button className="admin-btn admin-btn--primary" disabled={saving} onClick={addOne}>
-              {saving ? 'Saving…' : `Add to ${year}`}
+              {saving ? 'Saving…' : editingId ? 'Update Album' : `Add to ${year}`}
             </button>
+            {editingId && (
+              <button type="button" className="admin-btn admin-btn--ghost" disabled={saving} onClick={cancelEdit}>Cancel</button>
+            )}
           </div>
         </div>
 
@@ -603,6 +652,7 @@ export default function GalleryAdmin() {
                     : <span style={{ fontSize: '0.8rem', color: '#b45', marginTop: 4 }}>No VIEW link</span>}
                 </div>
                 <div className="admin-image-card__actions">
+                  <button className="admin-btn admin-btn--sm" onClick={() => { startEdit(a); document.getElementById('album-title')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }}>Edit</button>
                   <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeAlbum(a.id)}>Delete</button>
                 </div>
               </div>

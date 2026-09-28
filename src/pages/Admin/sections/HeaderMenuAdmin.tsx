@@ -4,6 +4,7 @@ import { db } from '../../../lib/firebase';
 import { useDocument } from '../../../hooks/useDocument';
 import { useOrderedCollection } from '../../../hooks/useCollection';
 import type { PlacementItemDoc } from './PlacementItemsAdmin';
+import { DIFFERENTIATOR_CATEGORIES, type DifferentiatorItemDoc } from './DifferentiatorsAdmin';
 import {
   DEFAULT_HEADER_MENU, AUTO_SOURCE_INFO, parseHeaderMenu,
   type HeaderMenuItem, type HeaderMenuLink, type HeaderMenuGroup,
@@ -174,6 +175,32 @@ export default function HeaderMenuAdmin() {
     }));
   }, [draft, placementsLoading, placementItems]);
 
+  // Same for Differentiators: opens pre-filled with the columns (one per
+  // category) and links (each differentiator page) the header shows today;
+  // the website keeps its automatic menu until the first save.
+  const { docs: differentiatorItems, loading: differentiatorsLoading } = useOrderedCollection<DifferentiatorItemDoc>('differentiatorItems', 'order');
+  useEffect(() => {
+    if (differentiatorsLoading || !draft.some((it) => it.auto === 'differentiators')) return;
+    setDraft((d) => d.map((it) => {
+      if (it.auto !== 'differentiators') return it;
+      const { auto: _auto, children: _children, ...rest } = it;
+      return {
+        ...rest,
+        groups: DIFFERENTIATOR_CATEGORIES.map((cat): HeaderMenuGroup => ({
+          groupLabel: cat.label,
+          groupPath: `/differentiators#${cat.id}`,
+          items: differentiatorItems
+            .filter((i) => i.category === cat.id)
+            .map((i): HeaderMenuLink =>
+              i.external && i.url
+                ? { label: i.title, path: i.url, external: true }
+                : { label: i.title, path: `/differentiators/${i.slug}` }
+            ),
+        })),
+      };
+    }));
+  }, [draft, differentiatorsLoading, differentiatorItems]);
+
   const update = (fn: (items: HeaderMenuItem[]) => void) => {
     setDraft((d) => { const c = clone(d); fn(c); return c; });
     setDirty(true);
@@ -291,6 +318,12 @@ export default function HeaderMenuAdmin() {
               </div>
 
               <h3 style={{ fontSize: '0.95rem', margin: '0.5rem 0' }}>Dropdown links</h3>
+              {item.key === 'differentiators' && (
+                <p className="admin-field__hint">
+                  A new page added in Admin → Differentiators won&apos;t appear here by itself — add a link to it
+                  below (e.g. <code>/differentiators/its-slug</code>).
+                </p>
+              )}
               {item.key === 'placements' && (
                 <p className="admin-field__hint">
                   A new page added in Admin → Placement Sub-pages won&apos;t appear here by itself — add a link to it
