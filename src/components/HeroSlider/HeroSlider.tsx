@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { usePageBanners } from '../../hooks/usePageBanners';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
-import { HERO_VIDEO_SRC, HERO_POSTER_SRC } from '../../lib/heroVideo';
+import { HOME_HERO_VIDEO_SRC, HOME_HERO_POSTER_SRC } from '../../lib/heroVideo';
 import './HeroSlider.css';
 
-// HERO_VIDEO_SRC lives in src/lib/heroVideo.ts so the Campus Visit page's
-// virtual tour can reuse the same source. The fetch is still deferred (see
+// HOME_HERO_VIDEO_SRC lives in src/lib/heroVideo.ts (the Campus Visit page's
+// virtual tour uses its own HERO_VIDEO_SRC there). The fetch is still deferred (see
 // the effect below) so it doesn't compete with the JS bundle on load.
 
 
@@ -202,8 +202,8 @@ export default function HeroSlider() {
       <video
         ref={videoRef}
         className="hero-video"
-        src={HERO_VIDEO_SRC}
-        poster={HERO_POSTER_SRC}
+        src={HOME_HERO_VIDEO_SRC}
+        poster={HOME_HERO_POSTER_SRC}
         preload="auto"
         autoPlay
         muted
