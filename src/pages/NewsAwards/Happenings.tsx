@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { CalendarDays } from 'lucide-react';
 import NewsCard, { type NewsArticle } from '../../components/NewsCard/NewsCard';
 import NewsArticleDialog from '../../components/NewsCard/NewsArticleDialog';
-import { useHashScroll } from '../../hooks/useHashScroll';
 import { useOrderedCollection } from '../../hooks/useCollection';
+import { smoothScrollTo } from '../../lib/smoothScroll';
 import { happeningToArticle, isUpcomingHappening, parseHappeningDate } from '../../lib/happenings';
 import type { HappeningDoc } from '../Admin/sections/NewsAwardsDataAdmin';
 import HappeningsPosterSlider from './HappeningsPosterSlider';
@@ -12,9 +12,50 @@ import { renderBold } from '../../lib/boldText';
 import './Happenings.css';
 
 export default function Happenings() {
-  useHashScroll();
-  const { docs: happenings } = useOrderedCollection<HappeningDoc>('happenings', 'order');
+  const location = useLocation();
+  const { docs: happenings, loading } = useOrderedCollection<HappeningDoc>('happenings', 'order');
   const [activeArticle, setActiveArticle] = useState<NewsArticle | null>(null);
+
+  // Header links like "Happenings → Upcoming Events" open this page with a
+  // #upcoming-events / #recent-events hash. The generic useHashScroll ran
+  // once at mount — before the happenings had loaded, so #upcoming-events
+  // (only rendered when there are upcoming events) didn't exist yet — and
+  // App.tsx's RouteScrollReset skips its scroll-to-top for hashed URLs, so
+  // the page kept the previous page's scroll position, which on this
+  // still-short page is the footer. Instead: start at the top, then once
+  // the happenings have loaded, scroll to the section and keep it in place
+  // (the poster slider above loads images and shifts the layout) for up to
+  // 4s, stopping the moment the visitor scrolls/taps/clicks/presses a key.
+  // No matching section (e.g. no upcoming events right now) → stay at top.
+  const hashTarget = location.hash.slice(1);
+  useEffect(() => {
+    if (hashTarget && !document.getElementById(hashTarget)) smoothScrollTo(0, { immediate: true });
+  }, [location.key, hashTarget]);
+  useEffect(() => {
+    if (!hashTarget || loading) return;
+    const target = document.getElementById(hashTarget);
+    if (!target) {
+      smoothScrollTo(0, { immediate: true });
+      return;
+    }
+    const interactionEvents = ['wheel', 'touchstart', 'keydown', 'mousedown'] as const;
+    let raf = 0;
+    const check = () => {
+      const margin = parseFloat(getComputedStyle(target).scrollMarginTop) || 0;
+      const offBy = target.getBoundingClientRect().top - margin;
+      if (Math.abs(offBy) > 2) smoothScrollTo(Math.max(0, window.scrollY + offBy), { immediate: true });
+      raf = requestAnimationFrame(check);
+    };
+    raf = requestAnimationFrame(check);
+    const cleanup = () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(timer);
+      interactionEvents.forEach((e) => window.removeEventListener(e, cleanup));
+    };
+    const timer = setTimeout(cleanup, 4000);
+    interactionEvents.forEach((e) => window.addEventListener(e, cleanup, { passive: true }));
+    return cleanup;
+  }, [location.key, hashTarget, loading]);
 
   useEffect(() => {
     document.title = "Happenings at VWU | Vishnu Women's University";

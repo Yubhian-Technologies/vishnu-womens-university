@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Image as ImageIcon, ExternalLink } from 'lucide-react';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import type { GalleryAlbumDoc } from '../Admin/sections/GalleryAdmin';
+import { sortAlbumsLatestFirst } from '../../lib/galleryAlbums';
 import { useHashScroll } from '../../hooks/useHashScroll';
 import PageHero from '../../components/PageHero/PageHero';
 import './Gallery.css';
@@ -60,7 +61,8 @@ export default function Gallery() {
     return () => observer.disconnect();
   }, [year]);
 
-  const filtered = year ? albums.filter((a) => a.year === year) : [];
+  // Latest event first within the year, by each album's Date (see lib/galleryAlbums.ts).
+  const filtered = year ? sortAlbumsLatestFirst(albums.filter((a) => a.year === year)) : [];
 
   return (
     <main className="page-wrapper">
