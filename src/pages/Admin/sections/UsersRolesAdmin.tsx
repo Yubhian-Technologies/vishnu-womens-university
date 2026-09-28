@@ -7,6 +7,7 @@ import {
   type AdminUserDoc, type AdminRole, type ModuleLevel,
 } from '../../../lib/rbac';
 import { changeFirebaseAuthPassword } from '../../../lib/firebaseAdmin';
+import type { DifferentiatorItemDoc } from './DifferentiatorsAdmin';
 
 const ROLE_LABELS: Record<AdminRole, string> = {
   superadmin: 'Super Admin',
@@ -36,7 +37,7 @@ function passwordErrorMessage(e: unknown): string {
 
 const EMPTY_PW = { current: '', next: '', confirm: '' };
 
-const EMPTY: Omit<AdminUserDoc, 'id'> ={ email: '', department: '', role: 'custom', roleName: '', active: true, modules: {}, resources: [] };
+const EMPTY: Omit<AdminUserDoc, 'id'> ={ email: '', department: '', role: 'custom', roleName: '', active: true, modules: {}, resources: [], differentiatorItems: [] };
 
 /**
  * Super Admin-only: manage who else can sign in to /admin and what they can
@@ -52,6 +53,15 @@ export default function UsersRolesAdmin() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<Omit<AdminUserDoc, 'id'>>(EMPTY);
   const [password, setPassword] = useState('');
+  // Differentiators module: 'all' pages (differentiatorItems left empty) or
+  // only the pages ticked below — lets different department users each
+  // manage their own differentiator pages instead of the whole module.
+  const { docs: differentiatorPages } = useOrderedCollection<DifferentiatorItemDoc>('differentiatorItems', 'order');
+  const [diffPagesMode, setDiffPagesMode] = useState<'all' | 'selected'>('all');
+  const toggleDiffPage = (pageId: string, on: boolean) => setForm((f) => ({
+    ...f,
+    differentiatorItems: on ? Array.from(new Set([...f.differentiatorItems, pageId])) : f.differentiatorItems.filter((x) => x !== pageId),
+  }));
   const [saving, setSaving] = useState(false);
 
   const load = () => {
@@ -83,7 +93,8 @@ export default function UsersRolesAdmin() {
 
   const edit = (u: AdminUserDoc) => {
     setEditingId(u.id);
-    setForm({ email: u.email, department: u.department, role: u.role, roleName: u.roleName || '', active: u.active, modules: u.modules, resources: u.resources });
+    setForm({ email: u.email, department: u.department, role: u.role, roleName: u.roleName || '', active: u.active, modules: u.modules, resources: u.resources, differentiatorItems: u.differentiatorItems || [] });
+    setDiffPagesMode((u.differentiatorItems || []).length > 0 ? 'selected' : 'all');
     setPassword('');
   };
 
@@ -91,17 +102,24 @@ export default function UsersRolesAdmin() {
     const email = form.email.trim().toLowerCase();
     if (!email) return alert('Email is required.');
     if (!editingId && password.length < 6) return alert('Set a password of at least 6 characters for this new login.');
+    // Empty list = all differentiator pages, so "selected" needs at least one.
+    const hasDiffModule = form.role !== 'admin' && !!form.modules['differentiators'];
+    if (hasDiffModule && diffPagesMode === 'selected' && form.differentiatorItems.length === 0) {
+      return alert('Tick at least one Differentiators page for this user, or choose "All pages".');
+    }
+    const differentiatorItems = hasDiffModule && diffPagesMode === 'selected' ? form.differentiatorItems : [];
     setSaving(true);
     try {
       if (editingId) {
-        await saveAdminUser(editingId, { ...form, email });
+        await saveAdminUser(editingId, { ...form, email, differentiatorItems });
       } else {
         // Creates the actual Firebase Auth sign-in too, not just the
         // permissions record — see createAdminLogin in lib/rbac.ts.
-        await createAdminLogin(email, password, { department: form.department, role: form.role, roleName: form.roleName, active: form.active, modules: form.modules, resources: form.resources });
+        await createAdminLogin(email, password, { department: form.department, role: form.role, roleName: form.roleName, active: form.active, modules: form.modules, resources: form.resources, differentiatorItems });
       }
       setEditingId(null);
       setForm(EMPTY);
+      setDiffPagesMode('all');
       setPassword('');
       load();
     } catch (e) {
@@ -224,7 +242,8 @@ export default function UsersRolesAdmin() {
                   if (!s || id === 'users-roles') return null;
                   const level = form.modules[id] ?? 'none';
                   return (
-                    <div key={id} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.2rem 0' }}>
+                    <Fragment key={id}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.2rem 0' }}>
                       <span style={{ flex: 1, fontSize: '0.85rem' }}><FontAwesomeIcon icon={s.icon} fixedWidth aria-hidden="true" /> {s.label}</span>
                       <select value={level} onChange={(e) => setModuleLevel(id, e.target.value as ModuleLevel | 'none')} style={{ width: 100 }}>
                         <option value="none">None</option>
@@ -232,6 +251,37 @@ export default function UsersRolesAdmin() {
                         <option value="write">Write</option>
                       </select>
                     </div>
+                    {id === 'differentiators' && !!form.modules[id] && (
+                      <div style={{ margin: '0.25rem 0 0.75rem 1.5rem', padding: '0.6rem 0.75rem', border: '1px solid var(--color-light-gray, #e5e7eb)', borderRadius: 8 }}>
+                        <div style={{ fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Differentiator pages this user can manage</div>
+                        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '0.4rem' }}>
+                          <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.85rem' }}>
+                            <input type="radio" name="diff-pages-mode" checked={diffPagesMode === 'all'} onChange={() => setDiffPagesMode('all')} />
+                            All pages
+                          </label>
+                          <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.85rem' }}>
+                            <input type="radio" name="diff-pages-mode" checked={diffPagesMode === 'selected'} onChange={() => setDiffPagesMode('selected')} />
+                            Only selected pages
+                          </label>
+                        </div>
+                        {diffPagesMode === 'selected' && (
+                          <>
+                            <p className="admin-field__hint" style={{ margin: '0 0 0.4rem' }}>
+                              {form.differentiatorItems.length} of {differentiatorPages.length} selected — this user sees and edits only these pages (no adding or deleting pages).
+                            </p>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '0.2rem 1rem', maxHeight: 280, overflowY: 'auto' }}>
+                              {differentiatorPages.map((p) => (
+                                <label key={p.id} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.35rem', fontSize: '0.83rem', padding: '0.15rem 0' }}>
+                                  <input type="checkbox" checked={form.differentiatorItems.includes(p.id)} onChange={(e) => toggleDiffPage(p.id, e.target.checked)} style={{ marginTop: 3 }} />
+                                  {p.title}
+                                </label>
+                              ))}
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    )}
+                    </Fragment>
                   );
                 })}
               </div>
@@ -240,7 +290,7 @@ export default function UsersRolesAdmin() {
         )}
 
         <div className="admin-form-actions">
-          {editingId && <button className="admin-btn admin-btn--ghost" onClick={() => { setEditingId(null); setForm(EMPTY); setPassword(''); }}>Cancel</button>}
+          {editingId && <button className="admin-btn admin-btn--ghost" onClick={() => { setEditingId(null); setForm(EMPTY); setPassword(''); setDiffPagesMode('all'); }}>Cancel</button>}
           <button className="admin-btn admin-btn--primary" onClick={save} disabled={saving}>{saving ? 'Saving…' : editingId ? 'Update' : 'Add User'}</button>
         </div>
       </div>
