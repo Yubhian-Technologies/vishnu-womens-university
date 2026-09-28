@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import SmoothImage from '../SmoothImage/SmoothImage';
+import { renderBold } from '../../lib/boldText';
 import './SuccessStoriesCarousel.css';
 
 export interface SuccessStoryCardData {
@@ -124,7 +125,7 @@ export default function SuccessStoriesCarousel({
         <div className="success-stories-header">
           <div>
             <h2 className="success-stories-title">{title}</h2>
-            {subtitle && <p className="success-stories-subtitle">{subtitle}</p>}
+            {subtitle && <p className="success-stories-subtitle">{renderBold(subtitle)}</p>}
           </div>
 
           {stories.length > 1 && (
@@ -174,7 +175,7 @@ export default function SuccessStoriesCarousel({
                   )}
                 </div>
                 <div className="success-story-body">
-                  {s.description && <p className="success-story-desc">{s.description}</p>}
+                  {s.description && <p className="success-story-desc">{renderBold(s.description)}</p>}
                   <p className="success-story-name">{s.name}</p>
                   {s.programme && <p className="success-story-programme">{s.programme}</p>}
                 </div>

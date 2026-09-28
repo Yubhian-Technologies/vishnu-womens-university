@@ -2,6 +2,7 @@ import { useOrderedCollection } from '../../hooks/useCollection';
 import { useScrollReveal } from '../../hooks/useScrollReveal';
 import SmoothImage from '../SmoothImage/SmoothImage';
 import type { AlumniEvent } from '../../pages/Admin/sections/AlumniEventsAdmin';
+import { renderBold } from '../../lib/boldText';
 import './AlumniEventsShowcase.css';
 
 // Each card gets its own IntersectionObserver instance via useScrollReveal
@@ -27,7 +28,7 @@ function AlumniEventCard({ event, index }: { event: AlumniEvent; index: number }
       <div className="alumni-event-card-body">
         {event.date && <span className="alumni-event-card-date">{event.date}</span>}
         <h3 className="alumni-event-card-title">{event.title}</h3>
-        {event.desc && <p className="alumni-event-card-desc">{event.desc}</p>}
+        {event.desc && <p className="alumni-event-card-desc">{renderBold(event.desc)}</p>}
       </div>
     </article>
   );

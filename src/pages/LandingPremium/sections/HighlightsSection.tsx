@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Play } from 'lucide-react';
 import SmoothImage from '../../../components/SmoothImage/SmoothImage';
+import { renderBold } from '../../../lib/boldText';
 
 interface Props {
   mainImage: string;
@@ -42,7 +43,7 @@ export default function HighlightsSection({ mainImage, mainAlt, cardImages }: Pr
               transition={{ duration: 0.5, delay: i * 0.1 }}
             >
               <SmoothImage src={c.img} alt={c.caption} />
-              <span>{c.caption}</span>
+              <span>{renderBold(c.caption)}</span>
             </motion.div>
           ))}
         </div>

@@ -301,12 +301,6 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.vwu.edu.in/campus</loc>
-    <lastmod>2026-09-24</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://www.vwu.edu.in/campus/central-library</loc>
     <lastmod>2026-09-24</lastmod>
     <changefreq>weekly</changefreq>
@@ -428,12 +422,6 @@
   </url>
   <url>
     <loc>https://www.vwu.edu.in/vishnu-tv-academy</loc>
-    <lastmod>2026-09-24</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://www.vwu.edu.in/student-clubs</loc>
     <lastmod>2026-09-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -566,12 +554,6 @@
   </url>
   <url>
     <loc>https://www.vwu.edu.in/news</loc>
-    <lastmod>2026-09-24</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://www.vwu.edu.in/events</loc>
     <lastmod>2026-09-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>

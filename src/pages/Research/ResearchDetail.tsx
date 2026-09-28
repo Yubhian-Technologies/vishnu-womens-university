@@ -23,6 +23,7 @@ import { DEFAULT_ABOUT_RD_TABLE_TEXT } from './aboutRdDefault';
 import { DEFAULT_RAC_INTRO, DEFAULT_RAC_ABOUT } from './researchAdvisoryCommitteeDefault';
 import { DEFAULT_REC_INTRO, DEFAULT_REC_ABOUT } from './researchEthicsCommitteeDefault';
 import { DEFAULT_IPR_INTRO, DEFAULT_IPR_ABOUT } from './iprCommitteeDefault';
+import { renderBold } from '../../lib/boldText';
 import '../detail-layout.css';
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -368,7 +369,7 @@ export default function ResearchDetail() {
               </div>
               <h1 className="dept-hero-title">{displayTitle}</h1>
               {item.intro && (
-                <p className="dept-hero-subtitle">{item.intro}</p>
+                <p className="dept-hero-subtitle">{renderBold(item.intro)}</p>
               )}
             </div>
           </div>
@@ -387,7 +388,7 @@ export default function ResearchDetail() {
                 if (block.type === 'heading') {
                   return (
                     <h3 key={bi} style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>
-                      {block.text}
+                      {renderBold(block.text)}
                     </h3>
                   );
                 }
@@ -415,7 +416,7 @@ export default function ResearchDetail() {
                 }
                 return (
                   <p key={bi} style={{ fontSize: 'var(--text-base)', color: 'var(--color-text-light)', lineHeight: 1.75, marginBottom: 'var(--space-4)' }}>
-                    {block.text}
+                    {renderBold(block.text)}
                   </p>
                 );
               })}
@@ -438,7 +439,7 @@ export default function ResearchDetail() {
                         <span style={{ width: 20, height: 20, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
                           <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                         </span>
-                        <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.5 }}>{h}</span>
+                        <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.5 }}>{renderBold(h)}</span>
                       </li>
                     ))}
                   </ul>
@@ -733,7 +734,7 @@ export default function ResearchDetail() {
                                     <div key={fi} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.5 }}>
                                       <strong style={{ color: 'var(--color-primary)' }}>{f.label}:</strong>{' '}
                                       {f.href ? (
-                                        <a href={f.href} download target="_blank" rel="noopener noreferrer" className="thrust-accordion-link">{f.value}</a>
+                                        <a href={f.href} download target="_blank" rel="noopener noreferrer" className="thrust-accordion-link">{renderBold(f.value)}</a>
                                       ) : (
                                         // A field like "Proof" is often a raw pasted URL (e.g. from the
                                         // Patents Excel import — see patentsImport.ts) rather than the
@@ -754,7 +755,7 @@ export default function ResearchDetail() {
                                     {project.outcomes.map((o, oi) => (
                                       <li key={oi} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2)' }}>
                                         <Check size={13} strokeWidth={2.5} style={{ color: 'var(--color-accent)', flexShrink: 0, marginTop: 3 }} />
-                                        <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.5 }}>{o}</span>
+                                        <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.5 }}>{renderBold(o)}</span>
                                       </li>
                                     ))}
                                   </ul>

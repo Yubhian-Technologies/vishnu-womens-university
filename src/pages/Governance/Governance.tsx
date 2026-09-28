@@ -10,6 +10,7 @@ import { useSitePhotos, useSectionHasPhotos } from '../../hooks/useSitePhotos';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import type { GovernanceItemDoc } from '../Admin/sections/GovernanceItemsAdmin';
+import { renderBold } from '../../lib/boldText';
 
 // Fixed top-level nav structure — not admin content, mirrors the site's
 // header menu. The items within each category are Firestore-backed.
@@ -87,7 +88,7 @@ export default function Governance() {
           <div className="about-facts-grid">
             {stats.map(s => (
               <div key={s.id} className="about-fact">
-                <div className="about-fact-num">{s.value}</div>
+                <div className="about-fact-num">{renderBold(s.value)}</div>
                 <div className="about-fact-label">{s.title}</div>
               </div>
             ))}
@@ -157,7 +158,7 @@ export default function Governance() {
             <div className="container">
               <div className="reveal" style={{ marginBottom: 'var(--space-10)' }}>
                 <h2 className="section-title" style={{ fontFamily: 'var(--font-serif)', letterSpacing: '-0.01em' }}>{cat.label}</h2>
-                <p style={{ color: 'var(--color-text-light)', maxWidth: 620, lineHeight: 1.75 }}>{cat.desc}</p>
+                <p style={{ color: 'var(--color-text-light)', maxWidth: 620, lineHeight: 1.75 }}>{renderBold(cat.desc)}</p>
               </div>
 
               <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(290px, 100%), 1fr))', gap: 'var(--space-6)' }}>
@@ -210,7 +211,7 @@ export default function Governance() {
                         {item.title}
                       </h3>
                       <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.65, flex: 1, marginBottom: 'var(--space-5)' }}>
-                        {item.desc}
+                        {renderBold(item.desc)}
                       </p>
                       <Link
                         to={`/governance/${item.slug}`}

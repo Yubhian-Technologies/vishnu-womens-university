@@ -73,6 +73,8 @@ function PlacementProfileMarquee3Layers({ records }: { records: PlacementItem[] 
     </div>
   );
 }
+import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore';
+import { db } from '../../lib/firebase';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { usePageBanner } from '../../hooks/usePageBanner';
 import { useEapcetCode } from '../../hooks/useContentBlocks';
@@ -89,6 +91,7 @@ import { hasCustomSectionContent, toQuickLinkItems } from '../../lib/customSecti
 import CustomSectionsRenderer from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import SEO from '../../components/SEO/SEO';
 import { getProgramSchema, getBreadcrumbSchema } from '../../lib/seo/schemas';
+import { renderBold } from '../../lib/boldText';
 import '../detail-layout.css';
 import '../Campus/tabbed-section.css';
 
@@ -149,8 +152,24 @@ function SingleProgramDetail() {
   const resolveDeptCode = (d: string) => (DEPT_CODE_ALIASES[d] || d || '').trim().toUpperCase();
   const deptCode = resolveDeptCode(program?.department || '');
 
-  const { docs: allFaculty } = useOrderedCollection<FacultyDoc>('faculty', 'order');
-  const faculty = program?.department ? allFaculty.filter((f) => resolveDeptCode(f.department) === deptCode) : [];
+  // Filtered server-side by department instead of reading the whole `faculty`
+  // collection (260+ docs site-wide) and filtering client-side — this page
+  // only ever needs the ~10-40 people in one department. Faculty and
+  // program department values already use the same raw prose spelling for
+  // every department (verified against live data, including "Civil" and
+  // "Mechanical" — the DEPT_CODE_ALIASES resolution above is only needed for
+  // matching against the separate `departments` collection's shortCode
+  // field, not for this comparison), so a plain equality filter is safe.
+  const [faculty, setFaculty] = useState<FacultyDoc[]>([]);
+  useEffect(() => {
+    const dept = program?.department;
+    if (!dept) { setFaculty([]); return; }
+    const q = query(collection(db, 'faculty'), where('department', '==', dept), orderBy('order'));
+    const unsub = onSnapshot(q, (snap) => {
+      setFaculty(snap.docs.map((d) => ({ id: d.id, ...d.data() } as FacultyDoc)));
+    });
+    return unsub;
+  }, [program?.department]);
   const { docs: deptNews } = useOrderedCollection<DepartmentNewsDoc>('departmentNews', 'date', 'desc');
   const hasDeptNews = deptNews.some((n) => n.program === slug);
   const { docs: allDepartments, loading: deptLoading } = useOrderedCollection<DepartmentDoc>('departments', 'order');
@@ -498,7 +517,7 @@ function SingleProgramDetail() {
               {program.outcomes.map((o) => (
                 <li key={o} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', padding: 'var(--space-2) 0', borderBottom: '1px solid var(--color-light-gray)', display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
                   <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--color-accent)', flexShrink: 0, display: 'inline-block' }} />
-                  {o}
+                  {renderBold(o)}
                 </li>
               ))}
             </ul>
@@ -701,7 +720,7 @@ function SingleProgramDetail() {
 
               <div className="dept-about-card">
                 <p className="dept-about-lead-text">
-                  {dept?.about}
+                  {renderBold(dept?.about)}
                 </p>
               </div>
 
@@ -718,7 +737,7 @@ function SingleProgramDetail() {
                         <div className="dept-highlight-check-circle">
                           <Check size={13} strokeWidth={3} />
                         </div>
-                        <p className="dept-highlight-text">{h}</p>
+                        <p className="dept-highlight-text">{renderBold(h)}</p>
                       </div>
                     ))}
                   </div>
@@ -765,7 +784,7 @@ function SingleProgramDetail() {
 
                 {shared.hodMessage && (
                   <div className="dept-hod-message-box">
-                    <p className="dept-hod-message-text">{shared.hodMessage}</p>
+                    <p className="dept-hod-message-text">{renderBold(shared.hodMessage)}</p>
                   </div>
                 )}
 
@@ -816,7 +835,7 @@ function SingleProgramDetail() {
                           <span className="dept-vm-bullet-circle">
                             <Check size={12} strokeWidth={3} />
                           </span>
-                          <span>{m}</span>
+                          <span>{renderBold(m)}</span>
                         </li>
                       ))}
                     </ul>
@@ -830,7 +849,7 @@ function SingleProgramDetail() {
                       {shared.coreValues.map((v) => (
                         <span key={v} className="dept-value-pill">
                           <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-block' }} />
-                          <span>{v}</span>
+                          <span>{renderBold(v)}</span>
                         </span>
                       ))}
                     </div>
@@ -860,7 +879,7 @@ function SingleProgramDetail() {
             faculty={faculty}
             departmentName={deptTitle || program.name}
             title="The People Behind Expertise"
-            viewMoreLink="/faculty"
+            viewMoreLink={`/faculty?dept=${encodeURIComponent(faculty[0]?.department ?? '')}`}
           />
         </div>
       )}
@@ -876,7 +895,7 @@ function SingleProgramDetail() {
             )}
             <div className="dept-about-card">
               <p className="dept-about-lead-text">
-                {program.about}
+                {renderBold(program.about)}
               </p>
             </div>
           </div>
@@ -954,7 +973,7 @@ function SingleProgramDetail() {
                       <span className="dept-outcome-code-badge">
                         {activeOutcome.key.slice(0, -1).toUpperCase()}{i + 1}
                       </span>
-                      <p className="dept-outcome-desc">{item}</p>
+                      <p className="dept-outcome-desc">{renderBold(item)}</p>
                     </li>
                   ))}
                 </ul>
@@ -1231,7 +1250,7 @@ function SingleProgramDetail() {
                             </div>
                           </div>
                           <div>
-                            <div className="dept-library-value">{item.value}</div>
+                            <div className="dept-library-value">{renderBold(item.value)}</div>
                             <div className="dept-library-label">{item.label}</div>
                           </div>
                         </div>

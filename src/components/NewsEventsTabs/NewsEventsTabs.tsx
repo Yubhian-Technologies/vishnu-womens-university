@@ -5,6 +5,7 @@ import SmoothCollapse from '../SmoothCollapse/SmoothCollapse';
 import { SectionSubtree } from '../CustomSectionsRenderer/CustomSectionsRenderer';
 import HorizontalEventsShowcase from '../HorizontalEventsShowcase/HorizontalEventsShowcase';
 import type { CustomSectionContentType, CustomSectionImageCard } from '../../lib/customSections';
+import { renderBold } from '../../lib/boldText';
 
 // Every content type this codebase actually renders as something other than
 // image cards — used below to tell a genuinely different kind of content
@@ -169,14 +170,14 @@ export default function NewsEventsTabs({ categories, navOffset, embedded, depart
                 )}
                 <div className="news-events-card-body">
                   {card.title && <h4 className="news-events-card-title">{card.title}</h4>}
-                  {card.description && <p className="news-events-card-desc">{card.description}</p>}
+                  {card.description && <p className="news-events-card-desc">{renderBold(card.description)}</p>}
                 </div>
               </div>
             ))}
           </div>
         )}
 
-        {showText && <p className="news-events-text-block">{yr.text}</p>}
+        {showText && <p className="news-events-text-block">{renderBold(yr.text)}</p>}
 
         {showSection && <SectionSubtree section={yr.section!} departmentSlug={departmentSlug} categorySlug={active.key} />}
 

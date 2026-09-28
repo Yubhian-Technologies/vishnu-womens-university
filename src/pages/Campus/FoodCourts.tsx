@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import {
-  Utensils, Users, Leaf, MapPin, Quote, ArrowUpRight, ShieldCheck, Sparkles,
+  Utensils, Users, Leaf, MapPin, Quote, ShieldCheck, Sparkles,
 } from 'lucide-react';
 import SEO from '../../components/SEO/SEO';
 import PageHero from '../../components/PageHero/PageHero';
@@ -9,6 +8,7 @@ import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import FoodCourtsGrid from '../../components/FoodCourtsCarousel/FoodCourtsGrid';
 import { useSitePhotos } from '../../hooks/useSitePhotos';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
+import { renderBold } from '../../lib/boldText';
 
 // Real value proposition points — matching WHY the campus has food courts,
 // not a claim about any specific location.
@@ -170,7 +170,7 @@ export default function FoodCourts() {
                   <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 800, color: 'var(--color-primary)', marginBottom: '0.3rem' }}>
                     {label}
                   </h3>
-                  <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6, margin: 0 }}>{desc}</p>
+                  <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6, margin: 0 }}>{renderBold(desc)}</p>
                 </div>
               </div>
             ))}
@@ -259,7 +259,7 @@ export default function FoodCourts() {
                 <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 800, color: 'var(--color-white)', marginBottom: '0.25rem' }}>
                   {label}
                 </h3>
-                <p style={{ fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.7)', margin: 0 }}>{desc}</p>
+                <p style={{ fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.7)', margin: 0 }}>{renderBold(desc)}</p>
               </div>
             ))}
           </div>
@@ -275,9 +275,6 @@ export default function FoodCourts() {
               Explore the facilities, spaces and experiences that make everyday life at Vishnu Women&rsquo;s
               University engaging and convenient.
             </p>
-            <Link to="/campus" className="btn btn-primary">
-              Explore Campus Life <ArrowUpRight size={16} style={{ marginLeft: 4 }} />
-            </Link>
           </div>
         </div>
       </section>

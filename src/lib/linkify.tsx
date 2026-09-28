@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { ExternalLink, Mail } from 'lucide-react';
+import { splitBold } from './boldText';
 
 const URL_RE = /(https?:\/\/[^\s"'<>)]+)/g;
 const EMAIL_RE = /([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,})/g;
@@ -67,6 +68,19 @@ function linkifyEmails(text: string, keyPrefix: string): ReactNode {
  *  a long Scopus/ORCID/Drive link shouldn't dump that whole URL onto the
  *  page as text. */
 export function linkify(text: string): ReactNode {
+  // **bold** markers are split out first so a bolded phrase can itself
+  // contain a URL/email and still be linkified.
+  if (!text.includes('**')) return linkifyPlain(text);
+  const segments = splitBold(text);
+  if (!segments.some((s) => s.bold)) return linkifyPlain(text);
+  return segments.map((s, i) =>
+    s.bold
+      ? <strong key={`b-${i}`}>{linkifyPlain(s.text)}</strong>
+      : <span key={`b-${i}`}>{linkifyPlain(s.text)}</span>
+  );
+}
+
+function linkifyPlain(text: string): ReactNode {
   // split() with a capturing group interleaves the URL matches themselves
   // into the result array — those are exactly the parts starting with
   // "http", so no separate (stateful, error-prone) regex test is needed.

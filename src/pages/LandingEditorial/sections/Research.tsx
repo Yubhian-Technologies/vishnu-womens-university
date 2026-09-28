@@ -6,6 +6,7 @@ import { RESEARCH_STATS } from '../landingEditorial.data';
 import SmoothImage from '../../../components/SmoothImage/SmoothImage';
 import ParallaxMedia from '../ParallaxMedia';
 import Reveal from '../Reveal';
+import { renderBold } from '../../../lib/boldText';
 
 interface ResearchItemDoc {
   id: string;
@@ -106,7 +107,7 @@ export default function Research({ featureImageUrl, featureImageAlt, spotlightVi
                     </div>
                     <div className="lpe-card__body">
                       <h3 className="lpe-card__title">{imageStory.title}</h3>
-                      <p className="lpe-card__desc">{imageStory.desc}</p>
+                      <p className="lpe-card__desc">{renderBold(imageStory.desc)}</p>
                     </div>
                   </Link>
                 </Reveal>
@@ -117,7 +118,7 @@ export default function Research({ featureImageUrl, featureImageAlt, spotlightVi
                 const body = (
                   <>
                     <h3 className="lpe-card__title">{item.title}</h3>
-                    <p className="lpe-card__desc">{item.desc}</p>
+                    <p className="lpe-card__desc">{renderBold(item.desc)}</p>
                   </>
                 );
                 return (

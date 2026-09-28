@@ -118,8 +118,6 @@ export const UNIVERSITY_STORIES = [
 export const CAMPUS_LIFE_FEATURED = {
   title: 'Life at Vishnu Women’s University',
   desc: 'Beyond lectures and labs, VWU is where friendships form in hostel corridors, ideas get debated in club meetings, and confidence is built on stage, on the field, and in every corner of campus.',
-  link: '/campus',
-  linkLabel: 'Explore Campus Life',
 };
 
 export const CAMPUS_LIFE_STORIES = [
@@ -149,7 +147,6 @@ export const CAMPUS_LIFE_STORIES = [
 export const QUICK_LINKS = [
   { label: 'Admissions', to: '/admissions' },
   { label: 'Programs', to: '/academics' },
-  { label: 'Campus Life', to: '/campus' },
   { label: 'Placements', to: '/placements' },
   { label: 'Research', to: '/research' },
   { label: 'Alumni & Giving', to: '/alumni-giving' },

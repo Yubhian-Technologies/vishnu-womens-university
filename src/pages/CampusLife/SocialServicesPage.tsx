@@ -58,7 +58,7 @@ export default function SocialServicesPage() {
   // flash it on every load/refresh before swapping to the real uploaded one
   // a moment later. Shares useSitePhotos' one subscription (not a separate
   // listener), so this resolves at the exact same moment the photos do.
-  const sitePhotosLoading = useSitePhotosLoading();
+  const sitePhotosLoading = useSitePhotosLoading('social-services');
   const photosLoading = heroBannersLoading || sitePhotosLoading;
   const introPhotos = useSitePhotos('social-services', 'main', INTRO_DEFAULT);
   const founderPhotos = useSitePhotos('social-services', 'founder-legacy', FOUNDER_DEFAULT);

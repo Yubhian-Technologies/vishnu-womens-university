@@ -24,6 +24,7 @@ import { dreamHouseConstructionLab } from './dreamHouseConstructionLab.data';
 import type { DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
 import type { CustomSection } from '../../lib/customSections';
 import { CustomSectionsGalleries } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
+import { renderBold } from '../../lib/boldText';
 import './DreamHouseLabPage.css';
 
 interface DreamHouseLabPageProps {
@@ -96,7 +97,7 @@ export default function DreamHouseLabPage({ sections }: DreamHouseLabPageProps) 
             <div className="dhcl-paragraphs">
               {dhcl.paragraphs.map((p, idx) => (
                 <p key={idx} className="dhcl-lead-paragraph">
-                  {p}
+                  {renderBold(p)}
                 </p>
               ))}
             </div>
@@ -194,7 +195,7 @@ export default function DreamHouseLabPage({ sections }: DreamHouseLabPageProps) 
                   <div className="dhcl-mission-badge">0{idx + 1}</div>
                   <div className="dhcl-mission-text-wrap">
                     <CheckCircle2 size={18} className="dhcl-check-icon" />
-                    <p className="dhcl-mission-text">{item}</p>
+                    <p className="dhcl-mission-text">{renderBold(item)}</p>
                   </div>
                 </div>
               ))}
@@ -211,7 +212,7 @@ export default function DreamHouseLabPage({ sections }: DreamHouseLabPageProps) 
                 {dhcl.objectives.map((obj, idx) => (
                   <div key={idx} className="dhcl-objective-item">
                     <span className="dhcl-obj-bullet">•</span>
-                    <p>{obj}</p>
+                    <p>{renderBold(obj)}</p>
                   </div>
                 ))}
               </div>
@@ -239,7 +240,7 @@ export default function DreamHouseLabPage({ sections }: DreamHouseLabPageProps) 
             {dhcl.outcomes.paragraphs.map((p, idx) => (
               <div key={idx} className="dhcl-outcome-alert">
                 <Sparkles size={20} className="dhcl-alert-sparkle" />
-                <p className="dhcl-alert-text">{p}</p>
+                <p className="dhcl-alert-text">{renderBold(p)}</p>
               </div>
             ))}
 
@@ -312,7 +313,7 @@ export default function DreamHouseLabPage({ sections }: DreamHouseLabPageProps) 
             <div className="dhcl-project-text-side">
               {dhcl.academicProject.paragraphs.map((para, i) => (
                 <p key={i} className="dhcl-project-paragraph">
-                  {para}
+                  {renderBold(para)}
                 </p>
               ))}
             </div>
@@ -415,7 +416,7 @@ export default function DreamHouseLabPage({ sections }: DreamHouseLabPageProps) 
                   <div className="dhcl-act-bullet">
                     <ChevronRight size={16} />
                   </div>
-                  <p className="dhcl-act-text">{act}</p>
+                  <p className="dhcl-act-text">{renderBold(act)}</p>
                 </div>
               ))}
             </div>

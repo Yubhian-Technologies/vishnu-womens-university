@@ -18,6 +18,7 @@ import { usePageBanners } from '../../hooks/usePageBanners';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import { smoothScrollTo } from '../../lib/smoothScroll';
+import { renderBold } from '../../lib/boldText';
 import './Wellness.css';
 
 // This is a separate page from WellnessCenter.tsx (/campus/wellness-center)
@@ -189,7 +190,7 @@ export default function Wellness() {
                   <s.icon size={34} weight="duotone" />
                 </span>
                 <h3 className="wellness-card-title">{s.title}</h3>
-                <p className="wellness-card-desc">{s.desc}</p>
+                <p className="wellness-card-desc">{renderBold(s.desc)}</p>
               </div>
             ))}
           </div>
@@ -217,7 +218,7 @@ export default function Wellness() {
               <h3 className="wellness-counsellor-name">{counsellorName}</h3>
               <p className="wellness-counsellor-role">{counsellorRole}</p>
               {counsellorBio.split('\n\n').map((para, i) => (
-                <p key={i} className="wellness-counsellor-bio">{para}</p>
+                <p key={i} className="wellness-counsellor-bio">{renderBold(para)}</p>
               ))}
               <blockquote className="wellness-counsellor-quote">
                 &ldquo;{counsellorQuote}&rdquo;
@@ -263,7 +264,7 @@ export default function Wellness() {
                   <s.icon size={26} weight="duotone" />
                 </span>
                 <h3 className="wellness-card-title">{s.title}</h3>
-                <p className="wellness-card-desc">{s.desc}</p>
+                <p className="wellness-card-desc">{renderBold(s.desc)}</p>
               </div>
             ))}
           </div>
@@ -286,7 +287,7 @@ export default function Wellness() {
               return (
                 <div key={s.id}>
                   <div className="wellness-impact-value">
-                    {s.value}
+                    {renderBold(s.value)}
                     {Icon && <Icon size={26} fill="currentColor" strokeWidth={0} />}
                   </div>
                   <div className="wellness-impact-label">{s.title}</div>

@@ -17,6 +17,7 @@ import {
 import { vsac, type VsacMember, type SimpleTable } from './vsac.data';
 import type { DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
 import type { CustomSection } from '../../lib/customSections';
+import { renderBold } from '../../lib/boldText';
 import './VsacPage.css';
 
 interface VsacPageProps {
@@ -135,7 +136,7 @@ export default function VsacPage({ sections }: VsacPageProps) {
 
           {vsac.paragraphs.map((para, idx) => (
             <p key={idx} className="vsac-overview-text">
-              {para}
+              {renderBold(para)}
             </p>
           ))}
         </div>
@@ -168,7 +169,7 @@ export default function VsacPage({ sections }: VsacPageProps) {
                   {vsac.mission.map((m, idx) => (
                     <li key={idx} className="vsac-orbit-item">
                       <span className="vsac-orbit-dot">✓</span>
-                      <span>{m}</span>
+                      <span>{renderBold(m)}</span>
                     </li>
                   ))}
                 </ul>
@@ -185,7 +186,7 @@ export default function VsacPage({ sections }: VsacPageProps) {
                       <span className="vsac-orbit-dot" style={{ background: '#FFB300', color: '#070F26' }}>
                         ✓
                       </span>
-                      <span>{obj}</span>
+                      <span>{renderBold(obj)}</span>
                     </li>
                   ))}
                 </ul>
@@ -286,7 +287,7 @@ export default function VsacPage({ sections }: VsacPageProps) {
                   </h3>
                   {vsac.trainingResearch[activeTab].paragraphs.map((p, pIdx) => (
                     <p key={pIdx} className="vsac-orbit-item" style={{ marginBottom: 'var(--space-2)', lineHeight: 1.6 }}>
-                      {p}
+                      {renderBold(p)}
                     </p>
                   ))}
 
@@ -321,7 +322,7 @@ export default function VsacPage({ sections }: VsacPageProps) {
           <div className="vsac-orbit-card" style={{ borderLeftColor: '#00E5FF', background: '#FFFFFF' }}>
             {vsac.industryCollaboration.paragraphs.map((p, idx) => (
               <p key={idx} className="vsac-orbit-item" style={{ color: '#334155', lineHeight: 1.65, marginBottom: idx < vsac.industryCollaboration.paragraphs.length - 1 ? '0.75rem' : 0 }}>
-                {p}
+                {renderBold(p)}
               </p>
             ))}
           </div>
@@ -340,7 +341,7 @@ export default function VsacPage({ sections }: VsacPageProps) {
             {vsac.socialImpacts.bullets.map((b, bIdx) => (
               <div key={bIdx} className="vsac-bullet-card">
                 <span className="vsac-bullet-lead">{b.lead}</span>
-                <span className="vsac-bullet-text">{b.text}</span>
+                <span className="vsac-bullet-text">{renderBold(b.text)}</span>
               </div>
             ))}
           </div>
@@ -359,7 +360,7 @@ export default function VsacPage({ sections }: VsacPageProps) {
             {vsac.learningOutcomes.bullets.map((b, bIdx) => (
               <div key={bIdx} className="vsac-bullet-card" style={{ borderLeft: '3px solid #FFB300' }}>
                 <span className="vsac-bullet-lead">{b.lead}</span>
-                <span className="vsac-bullet-text">{b.text}</span>
+                <span className="vsac-bullet-text">{renderBold(b.text)}</span>
               </div>
             ))}
           </div>
@@ -375,7 +376,7 @@ export default function VsacPage({ sections }: VsacPageProps) {
                 <ImageIcon size={18} style={{ color: '#00E5FF' }} /> {vsac.galleryTitle}
               </h2>
               <p style={{ color: '#94A3B8', fontSize: '0.85rem', margin: '0.2rem 0 0', fontWeight: 500 }}>
-                {vsac.galleryCaption}
+                {renderBold(vsac.galleryCaption)}
               </p>
             </div>
           </div>

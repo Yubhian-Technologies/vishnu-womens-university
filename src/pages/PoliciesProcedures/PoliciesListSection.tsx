@@ -1,6 +1,7 @@
 import { FileText, ExternalLink } from 'lucide-react';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { DEFAULT_POLICIES, type PolicyDoc } from '../Admin/sections/PoliciesAdmin';
+import { renderBold } from '../../lib/boldText';
 
 // The policy list rendering shared by the standalone /policies-procedures
 // page and the Governance > IQAC > Policies & Procedures sub-page — both
@@ -64,7 +65,7 @@ export default function PoliciesListSection() {
             </div>
             {p.description && (
               <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.65, margin: 0 }}>
-                {p.description}
+                {renderBold(p.description)}
               </p>
             )}
           </div>

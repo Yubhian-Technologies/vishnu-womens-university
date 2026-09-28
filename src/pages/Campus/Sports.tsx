@@ -10,6 +10,7 @@ import {
   type SportsCategoryDoc, type SportsTournamentDoc, type SportsAchievementDoc, type SportsFacilityDoc,
   type SportsPageSettingsDoc, type SportsPalette,
 } from '../../lib/sportsPage';
+import { renderBold } from '../../lib/boldText';
 import './Sports.css';
 
 type CategoryItem = WithId & SportsCategoryDoc;
@@ -103,7 +104,7 @@ function SportsCategorySlider({ sports }: { sports: CategoryItem[] }) {
 
                 <div className="sports-circle-card__overlay">
                   <h3 className="sports-circle-card__title">{s.title}</h3>
-                  {s.subtitle && <span className="sports-circle-card__subtitle">{s.subtitle}</span>}
+                  {s.subtitle && <span className="sports-circle-card__subtitle">{renderBold(s.subtitle)}</span>}
                 </div>
               </div>
             </Link>
@@ -436,7 +437,6 @@ export default function Sports() {
           <h2>Be Part of an Active Campus Community</h2>
           <p>From recreational participation to competitive sport, students have opportunities to stay active, build teamwork and pursue their sporting interests alongside academics.</p>
           <div className="sports-cta-actions">
-            <Link to="/campus" className="btn btn-accent">Explore Campus Life</Link>
             <Link to="/apply-now" className="btn btn-secondary">Apply to Vishnu Women’s University</Link>
           </div>
         </div>

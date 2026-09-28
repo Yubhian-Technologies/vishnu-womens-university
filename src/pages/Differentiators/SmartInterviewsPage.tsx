@@ -4,6 +4,7 @@ import { Users, ArrowRight, Award } from 'lucide-react';
 import type { DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
 import type { CustomSection } from '../../lib/customSections';
 import { smartInterviews } from './smartInterviews.data';
+import { renderBold } from '../../lib/boldText';
 import './smart-interviews.css';
 
 interface SmartInterviewsPageProps {
@@ -192,7 +193,7 @@ export default function SmartInterviewsPage({
               {activeSectionId === '02' && (
                 <div className="si-accordion-detail-card">
                   {smartInterviews.moreParagraphs.map((p, i) => (
-                    <p key={i} style={{ margin: i === smartInterviews.moreParagraphs.length - 1 ? 0 : '0 0 0.9rem' }}>{p}</p>
+                    <p key={i} style={{ margin: i === smartInterviews.moreParagraphs.length - 1 ? 0 : '0 0 0.9rem' }}>{renderBold(p)}</p>
                   ))}
                 </div>
               )}

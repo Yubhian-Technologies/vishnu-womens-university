@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Suspense, useEffect } from 'react';
 import { GraduationCap } from 'lucide-react';
 import Header from './components/Header/Header';
@@ -14,6 +14,7 @@ import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
 import PopupOverlay from './components/PopupOverlay/PopupOverlay';
 import { smoothScrollTo } from './lib/smoothScroll';
 import { lazyWithRetry } from './lib/lazyWithRetry';
+import { useRevealSafetyNet } from './hooks/useRevealSafetyNet';
 
 const Academics = lazyWithRetry(() => import('./pages/Academics/Academics'));
 const ProgramDetail = lazyWithRetry(() => import('./pages/Academics/ProgramDetail'));
@@ -32,7 +33,6 @@ const StudentLife = lazyWithRetry(() => import('./pages/StudentLife/StudentLife'
 const AlumniGiving = lazyWithRetry(() => import('./pages/AlumniGiving/AlumniGiving'));
 const About = lazyWithRetry(() => import('./pages/About/About'));
 const News = lazyWithRetry(() => import('./pages/News/News'));
-const Events = lazyWithRetry(() => import('./pages/Events/Events'));
 const VisionMission = lazyWithRetry(() => import('./pages/VisionMission/VisionMission'));
 const Governance = lazyWithRetry(() => import('./pages/Governance/Governance'));
 const GovernanceDetail = lazyWithRetry(() => import('./pages/Governance/GovernanceDetail'));
@@ -42,11 +42,11 @@ const ResearchDetail = lazyWithRetry(() => import('./pages/Research/ResearchDeta
 const ProfessionalBodyDetail = lazyWithRetry(() => import('./pages/Research/ProfessionalBodyDetail'));
 const MousGroupDetail = lazyWithRetry(() => import('./pages/Research/MousGroupDetail'));
 const AboutSVES = lazyWithRetry(() => import('./pages/AboutSVES/AboutSVES'));
-const Campus = lazyWithRetry(() => import('./pages/Campus/Campus'));
 const Sports = lazyWithRetry(() => import('./pages/Campus/Sports'));
 const SportsDetail = lazyWithRetry(() => import('./pages/Campus/SportsDetail'));
 const CampusLifeDetail = lazyWithRetry(() => import('./pages/CampusLife/CampusLifeDetail'));
 const SocialServicesPage = lazyWithRetry(() => import('./pages/CampusLife/SocialServicesPage'));
+const SewageTreatment = lazyWithRetry(() => import('./pages/Campus/SewageTreatment'));
 const WellnessCenter = lazyWithRetry(() => import('./pages/Campus/WellnessCenter'));
 const Wellness = lazyWithRetry(() => import('./pages/Campus/Wellness'));
 const Auditoriums = lazyWithRetry(() => import('./pages/Campus/Auditoriums'));
@@ -62,7 +62,6 @@ const ProgrammesFee = lazyWithRetry(() => import('./pages/Admissions/ProgrammesF
 const AdmissionProcedure = lazyWithRetry(() => import('./pages/Admissions/AdmissionProcedure'));
 const VWUNET = lazyWithRetry(() => import('./pages/Admissions/VWUNET'));
 const ResultAnalysis = lazyWithRetry(() => import('./pages/Admissions/ResultAnalysis'));
-const StudentClubs = lazyWithRetry(() => import('./pages/StudentActivities/StudentClubs'));
 const StudentClubDetail = lazyWithRetry(() => import('./pages/StudentActivities/StudentClubDetail'));
 const Differentiators = lazyWithRetry(() => import('./pages/Differentiators/Differentiators'));
 const DifferentiatorDetail = lazyWithRetry(() => import('./pages/Differentiators/DifferentiatorDetail'));
@@ -127,6 +126,7 @@ function RouteScrollReset() {
 
 function PublicApp() {
   const location = useLocation();
+  useRevealSafetyNet();
 
   return (
     <>
@@ -167,8 +167,14 @@ function PublicApp() {
             <Route path="/research/professional-bodies/:key" element={<ProfessionalBodyDetail />} />
             <Route path="/research/mous/:group" element={<MousGroupDetail />} />
             <Route path="/about-sves" element={<AboutSVES />} />
-            <Route path="/campus" element={<Campus />} />
             {/* Specialized bespoke pages with dedicated admin sections / content block schemas */}
+            <Route path="/campus/sewage-treatment-plants" element={<SewageTreatment />} />
+            <Route path="/campus/sewage-treatment" element={<SewageTreatment />} />
+            <Route path="/campus/sewage-treatment-plant" element={<SewageTreatment />} />
+            <Route path="/sewage-treatment-plants" element={<SewageTreatment />} />
+            <Route path="/sewage-treatment-plant" element={<SewageTreatment />} />
+            <Route path="/sewage-treatment" element={<SewageTreatment />} />
+            <Route path="/sewagetreatment" element={<SewageTreatment />} />
             <Route path="/campus/wellness-center" element={<WellnessCenter />} />
             <Route path="/campus/wellness" element={<Wellness />} />
             <Route path="/campus/television" element={<Television />} />
@@ -194,7 +200,7 @@ function PublicApp() {
             <Route path="/vwunet" element={<VWUNET />} />
             <Route path="/result-analysis" element={<ResultAnalysis />} />
             <Route path="/vishnu-tv-academy" element={<CampusLifeDetail slug="vishnu-tv-academy" />} />
-            <Route path="/student-clubs" element={<StudentClubs />} />
+            <Route path="/student-clubs" element={<Navigate to="/campus/clubs" replace />} />
             <Route path="/student-clubs/:slug" element={<StudentClubDetail />} />
             <Route path="/social-services" element={<SocialServicesPage />} />
             <Route path="/campus-magazines" element={<CampusLifeDetail slug="campus-magazines" />} />
@@ -213,7 +219,6 @@ function PublicApp() {
             <Route path="/placements" element={<Placements />} />
             <Route path="/placements/:slug" element={<PlacementDetail />} />
             <Route path="/news" element={<News />} />
-            <Route path="/events" element={<Events />} />
             <Route path="/news-awards" element={<NewsAwards />} />
             <Route path="/news-awards/happenings" element={<Happenings />} />
             <Route path="/news-awards/happenings/:id" element={<HappeningDetail />} />

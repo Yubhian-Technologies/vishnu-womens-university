@@ -24,6 +24,7 @@ import {
   FileText,
   Handshake
 } from 'lucide-react';
+import { renderBold } from '../../lib/boldText';
 import './UltraTechPage.css';
 
 interface InfoTabItem {
@@ -249,11 +250,11 @@ export default function UltraTechPage({
             {Array.isArray(overviewText) ? (
               overviewText.map((p, i) => (
                 <p key={i} className="utec-about-desc" style={{ marginBottom: i < overviewText.length - 1 ? '1rem' : 0 }}>
-                  {p}
+                  {renderBold(p)}
                 </p>
               ))
             ) : (
-              <p className="utec-about-desc">{overviewText}</p>
+              <p className="utec-about-desc">{renderBold(overviewText)}</p>
             )}
 
             {/* 4 FEATURE PILLARS INTEGRATED */}
@@ -272,7 +273,7 @@ export default function UltraTechPage({
                       </div>
                       <div className="utec-pillar-body">
                         <h4 className="utec-pillar-title">{domain.title}</h4>
-                        <p className="utec-pillar-desc">{domain.desc}</p>
+                        <p className="utec-pillar-desc">{renderBold(domain.desc)}</p>
                       </div>
                     </div>
                   );
@@ -310,7 +311,7 @@ export default function UltraTechPage({
 
                 <div className="utec-vision-quote-card">
                   <span className="utec-quote-mark">“</span>
-                  <p className="utec-vision-quote-text">{visionText}</p>
+                  <p className="utec-vision-quote-text">{renderBold(visionText)}</p>
                 </div>
               </div>
             )}
@@ -333,7 +334,7 @@ export default function UltraTechPage({
                     <div className="utec-mission-bullet-gold">
                       <CheckCircle2 size={15} />
                     </div>
-                    <span className="utec-mission-text">{itemText}</span>
+                    <span className="utec-mission-text">{renderBold(itemText)}</span>
                   </li>
                 ))}
               </ul>
@@ -369,7 +370,7 @@ export default function UltraTechPage({
 
           {objectivesText && (
             <div className="utec-focus-intro-box">
-              <p>{objectivesText}</p>
+              <p>{renderBold(objectivesText)}</p>
             </div>
           )}
 
@@ -389,7 +390,7 @@ export default function UltraTechPage({
                   <h4 style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: '#0F2547', margin: '0.6rem 0 0.3rem' }}>
                     {obj.title}
                   </h4>
-                  <p className="utec-obj-text">{obj.desc}</p>
+                  <p className="utec-obj-text">{renderBold(obj.desc)}</p>
                 </div>
               );
             })}
@@ -589,7 +590,7 @@ export default function UltraTechPage({
                               </span>
                             )}
                           </div>
-                          <p className="utec-timeline-desc">{act.desc}</p>
+                          <p className="utec-timeline-desc">{renderBold(act.desc)}</p>
                         </div>
                       </div>
                     ))}
@@ -605,7 +606,7 @@ export default function UltraTechPage({
                           <div className="utec-mission-bullet-gold">
                             <CheckCircle2 size={16} />
                           </div>
-                          <span className="utec-mission-text" style={{ fontSize: '0.95rem', fontWeight: 500, color: '#1E293B' }}>{itemText}</span>
+                          <span className="utec-mission-text" style={{ fontSize: '0.95rem', fontWeight: 500, color: '#1E293B' }}>{renderBold(itemText)}</span>
                         </li>
                       ))}
                     </ul>
@@ -621,7 +622,7 @@ export default function UltraTechPage({
                           <div className="utec-mission-bullet-gold">
                             <Award size={16} />
                           </div>
-                          <span className="utec-mission-text" style={{ fontSize: '0.95rem', fontWeight: 500, color: '#1E293B' }}>{itemText}</span>
+                          <span className="utec-mission-text" style={{ fontSize: '0.95rem', fontWeight: 500, color: '#1E293B' }}>{renderBold(itemText)}</span>
                         </li>
                       ))}
                     </ul>

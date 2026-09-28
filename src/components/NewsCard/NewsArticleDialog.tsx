@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { X } from 'lucide-react';
 import type { NewsArticle } from './NewsCard';
+import { renderBold } from '../../lib/boldText';
 import './NewsArticleDialog.css';
 
 interface Props {
@@ -39,7 +40,7 @@ export default function NewsArticleDialog({ article, onClose }: Props) {
         <div className="news-article-dialog-body">
           <time className="news-article-dialog-date">{article.date}</time>
           <h3 className="news-article-dialog-title">{article.title}</h3>
-          {article.excerpt && <p className="news-article-dialog-desc">{article.excerpt}</p>}
+          {article.excerpt && <p className="news-article-dialog-desc">{renderBold(article.excerpt)}</p>}
         </div>
       </div>
     </div>

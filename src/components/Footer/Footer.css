@@ -254,16 +254,25 @@
   outline-offset: 3px;
 }
 
-/* ── Navigation Columns ── */
+/* ── Navigation Columns — each is a full-width row stacked one below the
+   other (Quick Links, then a divider, then Feedback Facility, ...), with
+   its own links flowing into as many balanced sub-columns as fit — not a
+   fixed side-by-side grid, since a dynamic admin-managed column count and
+   wildly different link counts per column (2026-09-27: 14 vs 4) don't share
+   one column width well. ── */
 .vwu-footer-nav {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 2rem;
+  display: flex;
+  flex-direction: column;
 }
 
 .vwu-footer-col {
-  display: flex;
-  flex-direction: column;
+  padding: 1.75rem 0;
+  border-top: 1px solid var(--footer-border, rgba(255, 255, 255, 0.08));
+}
+
+.vwu-footer-col:first-child {
+  padding-top: 0;
+  border-top: none;
 }
 
 .vwu-footer-heading {
@@ -276,6 +285,7 @@
   margin: 0 0 1rem;
   padding-bottom: 0.55rem;
   border-bottom: 2px solid var(--footer-accent-dim);
+  width: fit-content;
 }
 
 .vwu-footer-list {
@@ -285,6 +295,19 @@
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
+}
+
+/* Only the desktop nav's lists flow into sub-columns — the mobile accordion
+   below reuses .vwu-footer-list too, and stays a plain single-column list. */
+.vwu-footer-nav .vwu-footer-list {
+  display: block;
+  columns: 4 190px;
+  column-gap: 2.5rem;
+}
+
+.vwu-footer-nav .vwu-footer-list li {
+  break-inside: avoid;
+  margin-bottom: 0.6rem;
 }
 
 /* ── Link styles ── */
@@ -499,9 +522,9 @@
     max-width: 600px;
   }
 
-  .vwu-footer-nav {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 2rem;
+  .vwu-footer-nav .vwu-footer-list {
+    columns: 2 160px;
+    column-gap: 1.75rem;
   }
 }
 
@@ -532,8 +555,8 @@
     max-width: 500px;
   }
 
-  .vwu-footer-nav {
-    gap: 3rem;
+  .vwu-footer-nav .vwu-footer-list {
+    columns: 5 190px;
   }
 }
 

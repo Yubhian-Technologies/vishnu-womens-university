@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { CustomSectionImageCard } from '../../lib/customSections';
+import { renderBold } from '../../lib/boldText';
 import './HorizontalEventsShowcase.css';
 
 interface Props {
@@ -63,7 +64,7 @@ export default function HorizontalEventsShowcase({ cards }: Props) {
                 <div className="events-showcase-overlay">
                   <div className="events-showcase-content">
                     {card.title && <h3 className="events-showcase-title">{card.title}</h3>}
-                    {card.description && <p className="events-showcase-desc">{card.description}</p>}
+                    {card.description && <p className="events-showcase-desc">{renderBold(card.description)}</p>}
                   </div>
                 </div>
               </div>

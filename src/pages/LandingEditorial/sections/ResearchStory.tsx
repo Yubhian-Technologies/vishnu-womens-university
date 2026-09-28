@@ -4,6 +4,7 @@ import { PHOTO_NEEDED_PLACEHOLDER } from '../../../lib/photoPlaceholder';
 import SmoothImage from '../../../components/SmoothImage/SmoothImage';
 import ParallaxMedia from '../ParallaxMedia';
 import Reveal from '../Reveal';
+import { renderBold } from '../../../lib/boldText';
 
 interface ResearchItemDoc {
   id: string;
@@ -69,7 +70,7 @@ export default function ResearchStory({ imageOverrides }: Props) {
               </Reveal>
               <Reveal index={1} className="lpe-feature__body">
                 <h3 className="lpe-h3">{story.title}</h3>
-                <p className="lpe-lede">{story.desc}</p>
+                <p className="lpe-lede">{renderBold(story.desc)}</p>
                 {story.slug && (
                   <Link to={`/research/${story.slug}`} className="lpe-btn lpe-btn--outline-light">Read More</Link>
                 )}

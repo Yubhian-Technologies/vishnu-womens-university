@@ -18,6 +18,7 @@ import {
   DEFAULT_SQ_FEATURES,
   DEFAULT_SQ_AMENITIES,
 } from '../Admin/sections/StaffQuartersAdmin';
+import { renderBold } from '../../lib/boldText';
 import './StaffQuarters.css';
 
 const ICON_MAP: Record<string, typeof Building2> = {
@@ -202,7 +203,7 @@ export default function StaffQuarters() {
                   <div className="sq-stat-icon-wrap">
                     <IconComponent size={24} />
                   </div>
-                  <div className="sq-stat-value">{stat.value}</div>
+                  <div className="sq-stat-value">{renderBold(stat.value)}</div>
                   <div className="sq-stat-label">{stat.label}</div>
                   <div className="sq-stat-sub">{stat.sub}</div>
                 </div>
@@ -245,19 +246,19 @@ export default function StaffQuarters() {
                   <div className="sq-card-tag">
                     <Building2 size={16} /> {aboutData.title}
                   </div>
-                  <h2 className="sq-visual-title">{aboutData.subtitle}</h2>
+                  <h2 className="sq-visual-title">{renderBold(aboutData.subtitle)}</h2>
                   
                   <div className="sq-text-highlight-box">
                     {aboutData.storyParagraphs.map((para, pIdx) => (
                       <p key={pIdx} className="sq-canonical-text">
-                        {para}
+                        {renderBold(para)}
                       </p>
                     ))}
                   </div>
 
                   <div className="sq-visual-metrics-pills">
                     {amenitiesList.slice(0, 3).map((am, aIdx) => (
-                      <span key={aIdx} className="sq-pill"><CheckCircle2 size={15} /> {am}</span>
+                      <span key={aIdx} className="sq-pill"><CheckCircle2 size={15} /> {renderBold(am)}</span>
                     ))}
                   </div>
                 </div>
@@ -279,7 +280,7 @@ export default function StaffQuarters() {
                       </div>
                       <div className="sq-photo-card-content">
                         <h3 className="sq-photo-card-title">{item.title}</h3>
-                        <p className="sq-photo-card-desc">{item.desc}</p>
+                        <p className="sq-photo-card-desc">{renderBold(item.desc)}</p>
                       </div>
                     </div>
                   ))}
@@ -315,7 +316,7 @@ export default function StaffQuarters() {
                   {amenitiesList.map((am, i) => (
                     <li key={i}>
                       <span className="fact-label">Amenity {i + 1}</span>
-                      <span className="fact-val">{am}</span>
+                      <span className="fact-val">{renderBold(am)}</span>
                     </li>
                   ))}
                 </ul>

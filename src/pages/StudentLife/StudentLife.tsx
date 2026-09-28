@@ -8,6 +8,7 @@ import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import { Radio, GraduationCap, Check } from 'lucide-react';
+import { renderBold } from '../../lib/boldText';
 
 const defaultStudentLifePhotos = [
   // Slots 0-4: "Campus Moments" PhotoGrid gallery
@@ -106,7 +107,7 @@ export default function StudentLife() {
                 <>
                   <div className="sl-club-icon"><Icon size={40} strokeWidth={1.75} /></div>
                   <h3>{club.title}</h3>
-                  <span>{club.value}</span>
+                  <span>{renderBold(club.value)}</span>
                 </>
               );
               // "slug" is repurposed here as a click-through link — an
@@ -156,7 +157,7 @@ export default function StudentLife() {
                 <div key={s.id} className="sl-service-card">
                   <div className="sl-service-icon"><Icon size={40} strokeWidth={1.75} /></div>
                   <h3>{s.title}</h3>
-                  <p>{s.desc}</p>
+                  <p>{renderBold(s.desc)}</p>
                   {s.slug?.startsWith('http') ? (
                     <a href={s.slug} target="_blank" rel="noopener noreferrer" className="sl-service-link">
                       Learn More →

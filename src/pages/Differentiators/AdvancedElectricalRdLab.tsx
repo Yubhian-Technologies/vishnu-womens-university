@@ -29,6 +29,7 @@ import { usePageBanners } from '../../hooks/usePageBanners';
 import { fetchPriorityAttr } from '../../lib/domAttrs';
 import { hasCustomSectionContent, type CustomSectionPhoto } from '../../lib/customSections';
 import { DIFFERENTIATOR_CATEGORIES, type DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
+import { renderBold } from '../../lib/boldText';
 import './AdvancedElectricalRdLab.css';
 
 const SLUG = 'advanced-electrical-rd-lab';
@@ -307,7 +308,7 @@ export default function AdvancedElectricalRdLab() {
                 <div className="elec-focus-icon">
                   <Zap size={18} />
                 </div>
-                <span className="elec-focus-title">{area}</span>
+                <span className="elec-focus-title">{renderBold(area)}</span>
               </div>
             ))}
           </div>
@@ -378,7 +379,7 @@ export default function AdvancedElectricalRdLab() {
                       </div>
                       <h3 className="elec-model-title">{model.title}</h3>
                     </div>
-                    <p className="elec-model-desc">{model.description}</p>
+                    <p className="elec-model-desc">{renderBold(model.description)}</p>
                   </div>
                   <span className="elec-model-tag">{model.tag}</span>
                 </div>
@@ -404,7 +405,7 @@ export default function AdvancedElectricalRdLab() {
                     <span className="elec-check-badge">
                       <Check size={12} strokeWidth={3} />
                     </span>
-                    <span>{item}</span>
+                    <span>{renderBold(item)}</span>
                   </li>
                 ))}
               </ul>
@@ -422,7 +423,7 @@ export default function AdvancedElectricalRdLab() {
                     <span className="elec-check-badge">
                       <Check size={12} strokeWidth={3} />
                     </span>
-                    <span>{item}</span>
+                    <span>{renderBold(item)}</span>
                   </li>
                 ))}
               </ul>
@@ -457,7 +458,7 @@ export default function AdvancedElectricalRdLab() {
                       <Maximize2 size={24} />
                     </div>
                   </div>
-                  {photo.caption && <div className="elec-gallery-caption">{photo.caption}</div>}
+                  {photo.caption && <div className="elec-gallery-caption">{renderBold(photo.caption)}</div>}
                 </button>
               ))}
             </div>

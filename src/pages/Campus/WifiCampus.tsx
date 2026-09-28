@@ -8,6 +8,7 @@ import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
 import { useSitePhotos } from '../../hooks/useSitePhotos';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
+import { renderBold } from '../../lib/boldText';
 import '../detail-layout.css';
 
 const INFRASTRUCTURE: { icon: typeof Wifi; title: string; desc: string }[] = [
@@ -91,7 +92,7 @@ export default function WifiCampus() {
                     <Icon size={18} strokeWidth={2.2} />
                   </span>
                   <strong style={{ display: 'block', fontSize: '1.15rem', marginBottom: '0.5rem', color: 'var(--color-heading)' }}>{title}</strong>
-                  <span style={{ color: 'var(--color-text-light)', lineHeight: 1.6, display: 'block' }}>{desc}</span>
+                  <span style={{ color: 'var(--color-text-light)', lineHeight: 1.6, display: 'block' }}>{renderBold(desc)}</span>
                 </div>
               ))}
             </div>
@@ -156,7 +157,6 @@ export default function WifiCampus() {
             Women&rsquo;s University.
           </p>
           <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link to="/campus" className="btn btn-accent">Explore Campus Life</Link>
             <Link to="/student-life" className="btn btn-secondary">Student Life</Link>
           </div>
         </div>

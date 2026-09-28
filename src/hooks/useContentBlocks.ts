@@ -1,60 +1,92 @@
 import { useEffect, useState } from 'react';
-import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
+import { collection, onSnapshot, orderBy, query, where } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { reportFirestoreError, clearFirestoreError } from './firestoreErrorStore';
 import type { ContentBlockDoc } from '../pages/Admin/sections/ContentBlocksAdmin';
 
-// Shared subscription for the whole `contentBlocks` collection — same fix,
-// same reason, as the one in useSitePhotos.ts. Nearly every public page
-// calls useContentBlocks() several times (once per content section on that
-// page — Home.tsx alone calls it 5 times), and each call used to open its
-// own onSnapshot listener fetching the *entire* collection independently.
-// Every call site now shares one listener, reference-counted so it tears
-// down once nothing on the page is using it.
-let cachedDocs: ContentBlockDoc[] = [];
-let cachedLoading = true;
-let unsubscribe: (() => void) | null = null;
-const subscribers = new Set<() => void>();
+// One shared, reference-counted listener *per page slug* — not one listener
+// for the whole `contentBlocks` collection. That used to mean every call
+// anywhere on the site (Home alone calls this 5+ times, and nearly every
+// other page pulls in at least one more via useEapcetCode) opened (or
+// shared) a single listener that read the *entire* collection — every
+// page's content blocks, not just the one being viewed. Filtering by
+// `page` server-side means a page only ever pays for its own blocks.
+// Multiple sections on the same page still share one listener (filtered
+// further by `section` in memory below), same sharing benefit as before,
+// just scoped to the page instead of the whole site.
+interface PageCache {
+  docs: ContentBlockDoc[];
+  loading: boolean;
+  unsubscribe: (() => void) | null;
+  subscribers: Set<() => void>;
+  teardownTimer: ReturnType<typeof setTimeout> | null;
+}
 
-function subscribe(listener: () => void) {
-  subscribers.add(listener);
-  if (!unsubscribe) {
-    cachedLoading = true;
-    const q = query(collection(db, 'contentBlocks'), orderBy('order'));
-    unsubscribe = onSnapshot(
+const pageCaches = new Map<string, PageCache>();
+
+// A client-side route change unmounts the old page's consumers and mounts
+// the new page's a moment later. If the new page reads the same `page` slug
+// (e.g. "admission-procedure", pulled in by useEapcetCode on almost every
+// page), tearing down the instant subscriber count hits zero would force an
+// immediate full re-read the next page's mount. Waiting a few seconds lets
+// that resubscribe reuse the still-open listener instead.
+const TEARDOWN_GRACE_MS = 4000;
+
+function subscribe(page: string, listener: () => void) {
+  let cache = pageCaches.get(page);
+  if (!cache) {
+    cache = { docs: [], loading: true, unsubscribe: null, subscribers: new Set(), teardownTimer: null };
+    pageCaches.set(page, cache);
+  }
+  cache.subscribers.add(listener);
+  if (cache.teardownTimer) {
+    clearTimeout(cache.teardownTimer);
+    cache.teardownTimer = null;
+  }
+  if (!cache.unsubscribe) {
+    cache.loading = true;
+    const errorKey = `contentBlocks/${page}`;
+    const q = query(collection(db, 'contentBlocks'), where('page', '==', page), orderBy('order'));
+    cache.unsubscribe = onSnapshot(
       q,
       (snap) => {
-        cachedDocs = snap.docs.map((d) => ({ id: d.id, ...d.data() } as ContentBlockDoc));
-        cachedLoading = false;
-        clearFirestoreError('contentBlocks');
-        subscribers.forEach((l) => l());
+        cache.docs = snap.docs.map((d) => ({ id: d.id, ...d.data() } as ContentBlockDoc));
+        cache.loading = false;
+        clearFirestoreError(errorKey);
+        cache.subscribers.forEach((l) => l());
       },
       (err) => {
-        cachedLoading = false;
-        reportFirestoreError('contentBlocks', err.message);
-        subscribers.forEach((l) => l());
+        cache.loading = false;
+        reportFirestoreError(errorKey, err.message);
+        cache.subscribers.forEach((l) => l());
       }
     );
   }
   return () => {
-    subscribers.delete(listener);
-    if (subscribers.size === 0 && unsubscribe) {
-      unsubscribe();
-      unsubscribe = null;
+    cache.subscribers.delete(listener);
+    if (cache.subscribers.size === 0 && cache.unsubscribe) {
+      cache.teardownTimer = setTimeout(() => {
+        if (cache.subscribers.size === 0 && cache.unsubscribe) {
+          cache.unsubscribe();
+          cache.unsubscribe = null;
+          pageCaches.delete(page);
+        }
+      }, TEARDOWN_GRACE_MS);
     }
   };
 }
 
-function useAllContentBlockDocs(): { docs: ContentBlockDoc[]; loading: boolean } {
+function usePageContentBlockDocs(page: string): { docs: ContentBlockDoc[]; loading: boolean } {
   const [, setTick] = useState(0);
-  useEffect(() => subscribe(() => setTick((t) => t + 1)), []);
-  return { docs: cachedDocs, loading: cachedLoading };
+  useEffect(() => subscribe(page, () => setTick((t) => t + 1)), [page]);
+  const cache = pageCaches.get(page);
+  return { docs: cache?.docs ?? [], loading: cache?.loading ?? true };
 }
 
 /** Live content blocks for one (page, section) pair, already filtered and ordered. */
 export function useContentBlocks(page: string, section: string): ContentBlockDoc[] {
-  const { docs } = useAllContentBlockDocs();
-  return docs.filter((b) => b.page === page && b.section === section);
+  const { docs } = usePageContentBlockDocs(page);
+  return docs.filter((b) => b.section === section);
 }
 
 const DEFAULT_EAPCET_CODE = 'VISW, VISWPU';

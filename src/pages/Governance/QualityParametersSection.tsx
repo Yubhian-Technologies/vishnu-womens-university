@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ChevronDown, Check } from 'lucide-react';
 import { QUALITY_PARAMETER_CATEGORIES } from './qualityParametersDefault';
+import { renderBold } from '../../lib/boldText';
 
 // A single-level accordion (A. Quality Education, B. Academic
 // Infrastructure, ...), each holding a flat checklist of parameters — reuses
@@ -39,7 +40,7 @@ export default function QualityParametersSection() {
                     {cat.items.map((it, ii) => (
                       <li key={ii}>
                         <Check size={13} strokeWidth={2.5} className="pb-bullet-icon" />
-                        <span>{it}</span>
+                        <span>{renderBold(it)}</span>
                       </li>
                     ))}
                   </ul>

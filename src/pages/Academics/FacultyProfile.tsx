@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
-import { Mail, ExternalLink, FileText, ChevronRight } from 'lucide-react';
-import PageHero from '../../components/PageHero/PageHero';
+import { Mail, ExternalLink, FileText, ChevronRight, ArrowLeft } from 'lucide-react';
 import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import { useCollection, useOrderedCollection } from '../../hooks/useCollection';
 import { linkify } from '../../lib/linkify';
+import { renderBold } from '../../lib/boldText';
 import { getSectionBlocks } from '../../lib/facultySections';
 import FacultySectionContent from '../../components/FacultySectionContent/FacultySectionContent';
 import { hasCustomSectionContent } from '../../lib/customSections';
@@ -93,6 +93,15 @@ export default function FacultyProfile() {
   const hodResearchProfiles = (dept?.hodResearchProfiles?.length ? dept.hodResearchProfiles : program?.hodResearchProfiles) || [];
   const hodMatches = isHod && !!hodName && hodName.trim() === (person.name || '').trim();
 
+  // "Back to … Faculty" goes to the exact page this profile was opened from
+  // (remembered by FacultyCarousel), else to this department's page.
+  let facultyReturnPath: string | null = null;
+  try {
+    const stored = sessionStorage.getItem(`vwu:faculty-return:${person.id}`);
+    if (stored && stored.startsWith('/')) facultyReturnPath = stored;
+  } catch { /* storage unavailable */ }
+  if (!facultyReturnPath && program) facultyReturnPath = `/academics/${program.slug}`;
+
   const activeCustom = usingCustomSections ? (customSections.find((s) => s.id === activeKey) ?? customSections[0]) : null;
   const activeLegacy = !usingCustomSections ? (legacySections.find((s) => s.title === activeKey) ?? legacySections[0]) : null;
 
@@ -125,16 +134,37 @@ export default function FacultyProfile() {
         ogImage={person.imageUrl}
         jsonLd={facultyJsonLd}
       />
-      <PageHero
-        page="faculty-profile"
-        defaultTitle={person.name}
-        defaultSubtitle={person.designation}
-        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Academics', to: '/academics' }, { label: 'Faculty', to: '/faculty' }, { label: person.name }]}
-        size="small"
-      />
+      {/* Hero banner intentionally removed per request (2026-09-26) — the
+          profile card immediately below already carries the name/designation,
+          so this page no longer renders a PageHero at all. Applies to every
+          faculty member since this is the one shared profile page.
+          The section below still uses the shared `.section` class's normal
+          padding for its BOTTOM spacing (untouched) — only its top padding is
+          overridden here (2026-09-26), since `.section`'s default top padding
+          (var(--space-20)) was originally sized to sit below a tall hero
+          banner and left a large empty gap under the fixed nav once that
+          hero was removed. */}
 
-      <section className="section bg-white">
+      <section className="section bg-white" style={{ paddingTop: 'var(--space-6)' }}>
         <div className="container">
+          {/* Back to this faculty member's department page, landing on its
+              Faculty section (FacultyCarousel reads the state flag and
+              scrolls there once the page has loaded). */}
+          {facultyReturnPath && (
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <Link
+              to={facultyReturnPath}
+              state={{ vwuFacultyCarouselReturn: true }}
+              aria-label={`Back to ${dept?.title || person.department} Faculty`}
+              title={`Back to ${dept?.title || person.department} Faculty`}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', minHeight: 48, minWidth: 48, color: 'var(--color-text-light)', fontWeight: 600, textDecoration: 'none', marginBottom: 'var(--space-6)', transition: 'color 0.2s' }}
+              className="hover-color-primary"
+            >
+              <ArrowLeft size={16} strokeWidth={2.5} aria-hidden="true" />
+              Back
+            </Link>
+            </div>
+          )}
           <div style={{ display: 'flex', gap: 'var(--space-8)', flexWrap: 'wrap', marginBottom: 'var(--space-10)' }}>
             {person.imageUrl ? (
               <SmoothImage src={person.imageUrl} alt={person.name} style={{ width: 200, height: 240, objectFit: 'cover', objectPosition: 'center top', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-light-gray)', flexShrink: 0 }} />
@@ -175,7 +205,7 @@ export default function FacultyProfile() {
 
               {hodMatches && hodMessage && (
                 <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.7, marginTop: 'var(--space-4)', paddingTop: 'var(--space-4)', borderTop: '1px solid var(--color-light-gray)' }}>
-                  {hodMessage}
+                  {renderBold(hodMessage)}
                 </p>
               )}
               {hodMatches && hodResearchProfiles.length > 0 && (

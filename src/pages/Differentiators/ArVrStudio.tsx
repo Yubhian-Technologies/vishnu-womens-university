@@ -13,6 +13,7 @@ import { fetchPriorityAttr } from '../../lib/domAttrs';
 import { hasCustomSectionContent, type CustomSectionPhoto } from '../../lib/customSections';
 import { type DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
 import { arVrStudio } from './arVrStudio.data';
+import { renderBold } from '../../lib/boldText';
 import './ArVrStudio.css';
 
 const SLUG = 'ar-vr-studio';
@@ -73,7 +74,7 @@ export default function ArVrStudio() {
             <Glasses size={14} strokeWidth={2.4} /> {arVrStudio.heroCategory}
           </span>
           <h1 className="arvr-hero__title">{arVrStudio.heroTitle}</h1>
-          <p className="arvr-hero__subtitle">{arVrStudio.heroSubtitle}</p>
+          <p className="arvr-hero__subtitle">{renderBold(arVrStudio.heroSubtitle)}</p>
         </div>
       </section>
 
@@ -86,7 +87,7 @@ export default function ArVrStudio() {
             <div className="arvr-prose">
               {arVrStudio.aboutParagraphs.map((para, i) => (
                 <p key={i} style={{ marginBottom: i < arVrStudio.aboutParagraphs.length - 1 ? '1rem' : 0 }}>
-                  {para}
+                  {renderBold(para)}
                 </p>
               ))}
             </div>
@@ -111,7 +112,7 @@ export default function ArVrStudio() {
             </span>
             <ul className="arvr-checklist">
               {arVrStudio.mission.map((itemText, i) => (
-                <li key={i}>{itemText}</li>
+                <li key={i}>{renderBold(itemText)}</li>
               ))}
             </ul>
           </div>
@@ -130,7 +131,7 @@ export default function ArVrStudio() {
                   <h3 style={{ margin: '0 0 0.35rem 0', fontSize: '1.05rem', fontWeight: 700, color: 'var(--avr-text)' }}>
                     {obj.title}
                   </h3>
-                  <p style={{ margin: 0, color: 'var(--avr-text-dim)', lineHeight: 1.6 }}>{obj.desc}</p>
+                  <p style={{ margin: 0, color: 'var(--avr-text-dim)', lineHeight: 1.6 }}>{renderBold(obj.desc)}</p>
                 </div>
               </div>
             ))}
@@ -143,7 +144,7 @@ export default function ArVrStudio() {
         <div className="arvr-container">
           <h2 className="arvr-section-title">{arVrStudio.conceptExperience.title}</h2>
           <p style={{ color: 'var(--avr-text-dim)', marginBottom: '1.5rem', marginTop: '-0.5rem', fontSize: '1.05rem' }}>
-            {arVrStudio.conceptExperience.intro}
+            {renderBold(arVrStudio.conceptExperience.intro)}
           </p>
           <div className="arvr-other-grid">
             {arVrStudio.conceptExperience.cards.map((card, i) => (
@@ -151,7 +152,7 @@ export default function ArVrStudio() {
                 <span className="arvr-card-eyebrow">
                   <Layers size={14} strokeWidth={2.4} /> {card.title}
                 </span>
-                <p style={{ margin: 0, color: 'var(--avr-text-dim)', lineHeight: 1.6 }}>{card.desc}</p>
+                <p style={{ margin: 0, color: 'var(--avr-text-dim)', lineHeight: 1.6 }}>{renderBold(card.desc)}</p>
               </div>
             ))}
           </div>
@@ -170,7 +171,7 @@ export default function ArVrStudio() {
                 </span>
                 <ul className="arvr-checklist">
                   {group.items.map((itemStr, idx) => (
-                    <li key={idx}>{itemStr}</li>
+                    <li key={idx}>{renderBold(itemStr)}</li>
                   ))}
                 </ul>
               </div>
@@ -186,7 +187,7 @@ export default function ArVrStudio() {
           <div className="arvr-glass" style={{ padding: 'var(--space-6)' }}>
             <ul className="arvr-checklist" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
               {arVrStudio.keyHighlights.map((hl, i) => (
-                <li key={i}>{hl}</li>
+                <li key={i}>{renderBold(hl)}</li>
               ))}
             </ul>
           </div>
@@ -198,7 +199,7 @@ export default function ArVrStudio() {
         <div className="arvr-container">
           <h2 className="arvr-section-title">{arVrStudio.galleryTitle}</h2>
           <p style={{ color: 'var(--avr-text-dim)', marginBottom: '1.5rem', marginTop: '-0.5rem', fontSize: '1.05rem' }}>
-            {arVrStudio.galleryCaption}
+            {renderBold(arVrStudio.galleryCaption)}
           </p>
           {galleryPhotos.length > 0 ? (
             <div className="arvr-gallery-grid">
@@ -211,14 +212,14 @@ export default function ArVrStudio() {
                   aria-label={`View photo ${i + 1}`}
                 >
                   <img src={p.imageUrl} alt={p.caption || ''} loading="lazy" />
-                  {p.caption && <span className="arvr-gallery-caption">{p.caption}</span>}
+                  {p.caption && <span className="arvr-gallery-caption">{renderBold(p.caption)}</span>}
                 </button>
               ))}
             </div>
           ) : (
             <div className="arvr-glass" style={{ padding: 'var(--space-6)', textAlign: 'center' }}>
               <p style={{ color: 'var(--avr-text-dim)', margin: 0 }}>
-                {arVrStudio.galleryCaption}
+                {renderBold(arVrStudio.galleryCaption)}
               </p>
             </div>
           )}
@@ -290,7 +291,7 @@ export default function ArVrStudio() {
       <section className="arvr-cta">
         <div className="arvr-container" style={{ textAlign: 'center' }}>
           <h2 className="arvr-cta__title">{arVrStudio.cta.title}</h2>
-          <p className="arvr-cta__text">{arVrStudio.cta.subtitle}</p>
+          <p className="arvr-cta__text">{renderBold(arVrStudio.cta.subtitle)}</p>
           <div className="arvr-cta__actions">
             <Link to="/differentiators" className="btn btn-accent">
               {arVrStudio.cta.btn1}

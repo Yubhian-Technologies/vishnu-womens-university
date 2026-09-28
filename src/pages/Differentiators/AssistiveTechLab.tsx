@@ -32,6 +32,7 @@ import { fetchPriorityAttr } from '../../lib/domAttrs';
 import { hasCustomSectionContent, type CustomSectionPhoto } from '../../lib/customSections';
 import { DIFFERENTIATOR_CATEGORIES, type DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
 import { assistiveTechLab } from './assistiveTechLab.data';
+import { renderBold } from '../../lib/boldText';
 import './AssistiveTechLab.css';
 
 const SLUG = 'assistive-tech-lab';
@@ -304,7 +305,7 @@ export default function AssistiveTechLab() {
             <HeartHandshake size={140} className="atl-overview-watermark" aria-hidden="true" />
             <div className="atl-prose">
               {assistiveTechLab.paragraphs.map((p, i) => (
-                <p key={i}>{p}</p>
+                <p key={i}>{renderBold(p)}</p>
               ))}
             </div>
           </div>
@@ -325,7 +326,7 @@ export default function AssistiveTechLab() {
                     <span className="atl-check-badge">
                       <Check size={12} strokeWidth={3} />
                     </span>
-                    <span>{item}</span>
+                    <span>{renderBold(item)}</span>
                   </li>
                 ))}
               </ul>
@@ -345,7 +346,7 @@ export default function AssistiveTechLab() {
                     <span className="atl-check-badge">
                       <Check size={12} strokeWidth={3} />
                     </span>
-                    <span>{item}</span>
+                    <span>{renderBold(item)}</span>
                   </li>
                 ))}
               </ul>
@@ -418,7 +419,7 @@ export default function AssistiveTechLab() {
                         <h3 className="atl-device-title">{device.title}</h3>
                       </div>
                     </div>
-                    <p className="atl-device-desc">{device.description}</p>
+                    <p className="atl-device-desc">{renderBold(device.description)}</p>
                   </div>
                   <span className="atl-device-tag">{device.tag}</span>
                 </div>
@@ -507,7 +508,7 @@ export default function AssistiveTechLab() {
                         {assistiveTechLab.trainingByYear[selectedYearIdx].projects.map((proj, pIdx) => (
                           <div key={pIdx} className="atl-project-mini-card">
                             <div className="atl-project-mini-title">{proj.title}</div>
-                            <p className="atl-project-mini-desc">{proj.description}</p>
+                            <p className="atl-project-mini-desc">{renderBold(proj.description)}</p>
                           </div>
                         ))}
                       </div>
@@ -539,7 +540,7 @@ export default function AssistiveTechLab() {
                 <div>
                   <span className="atl-event-badge">{evt.badge}</span>
                   <h3 className="atl-event-title">{evt.title}</h3>
-                  <p className="atl-event-desc">{evt.description}</p>
+                  <p className="atl-event-desc">{renderBold(evt.description)}</p>
                 </div>
                 <div style={{ marginTop: 'var(--space-4)', paddingTop: 'var(--space-2)', borderTop: '1px solid var(--color-light-gray)', fontSize: '0.75rem', fontWeight: 700, color: 'var(--color-text-light)' }}>
                   📅 {evt.date}
@@ -647,7 +648,7 @@ export default function AssistiveTechLab() {
                     <span className="atl-check-badge">
                       <Check size={12} strokeWidth={3} />
                     </span>
-                    <span>{item}</span>
+                    <span>{renderBold(item)}</span>
                   </li>
                 ))}
               </ul>
@@ -667,7 +668,7 @@ export default function AssistiveTechLab() {
                     <span className="atl-check-badge">
                       <Check size={12} strokeWidth={3} />
                     </span>
-                    <span>{item}</span>
+                    <span>{renderBold(item)}</span>
                   </li>
                 ))}
               </ul>
@@ -702,7 +703,7 @@ export default function AssistiveTechLab() {
                       <Maximize2 size={24} />
                     </div>
                   </div>
-                  {photo.caption && <div className="atl-gallery-caption">{photo.caption}</div>}
+                  {photo.caption && <div className="atl-gallery-caption">{renderBold(photo.caption)}</div>}
                 </button>
               ))}
             </div>

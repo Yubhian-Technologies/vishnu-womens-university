@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { MapPin, ChevronRight } from 'lucide-react';
 import MarqueeText from '../MarqueeText/MarqueeText';
+import { renderBold } from '../../lib/boldText';
 import '../../pages/detail-layout.css';
 
 export interface TabItem {
@@ -58,7 +59,7 @@ export default function CustomTabsPage({ tabs, defaultTabId }: { tabs: TabItem[]
             <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-5)' }}>
               {active.heading || active.label}
             </h2>
-            {active.content}
+            {renderBold(active.content)}
           </div>
 
           <div className="detail-sidebar">

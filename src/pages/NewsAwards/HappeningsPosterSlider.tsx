@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import type { HappeningsShowcaseDoc, HappeningDoc } from '../Admin/sections/NewsAwardsDataAdmin';
+import { renderBold } from '../../lib/boldText';
 import './HappeningsPosterSlider.css';
 
 interface ShowcaseSlide {
@@ -226,7 +227,7 @@ export default function HappeningsPosterSlider() {
                 {currentSlide.caption || currentSlide.title}
               </h2>
               {currentSlide.description && (
-                <p className="happenings-poster-desc">{currentSlide.description}</p>
+                <p className="happenings-poster-desc">{renderBold(currentSlide.description)}</p>
               )}
               {currentSlide.linkUrl && (
                 <div className="happenings-poster-action">

@@ -5,6 +5,7 @@ import {
   DEFAULT_HC_SERVICES,
   DEFAULT_HC_FACILITIES,
 } from '../Admin/sections/HealthCareAdmin';
+import { renderBold } from '../../lib/boldText';
 import './HealthCare.css';
 
 export default function HealthCareDetailsTable() {
@@ -45,7 +46,7 @@ export default function HealthCareDetailsTable() {
             {aboutData.title}
           </h2>
           <p className="hc-section-subtitle">
-            {aboutData.subtitle}
+            {renderBold(aboutData.subtitle)}
           </p>
         </div>
 
@@ -59,7 +60,7 @@ export default function HealthCareDetailsTable() {
               <div className="hc-check-icon">
                 <CheckCircle2 size={18} />
               </div>
-              <div className="hc-checklist-text">{serviceName}</div>
+              <div className="hc-checklist-text">{renderBold(serviceName)}</div>
             </div>
           ))}
         </div>

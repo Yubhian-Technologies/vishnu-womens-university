@@ -24,6 +24,7 @@ import PlacementAnnouncementsTicker from './PlacementAnnouncementsTicker';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import BodyBlocks, { parseBodyContent } from '../../components/BodyBlocks/BodyBlocks';
 import PhotoCarouselStrip from '../../components/PhotoCarousel/PhotoCarouselStrip';
+import { renderBold } from '../../lib/boldText';
 import '../detail-layout.css';
 import '../gsac-shared.css';
 
@@ -304,7 +305,7 @@ function EmployabilitySkillsGrid() {
         <>
           {tab.intro && (
             <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.7, marginBottom: 'var(--space-6)' }}>
-              {tab.intro}
+              {renderBold(tab.intro)}
             </p>
           )}
           <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-5)' }}>
@@ -319,7 +320,7 @@ function EmployabilitySkillsGrid() {
                       <span style={{ width: 20, height: 20, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
                         <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
                       </span>
-                      <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.5 }}>{point}</span>
+                      <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.5 }}>{renderBold(point)}</span>
                     </li>
                   ))}
                 </ul>
@@ -567,7 +568,7 @@ function PlacementGuidelinesSections({ intro }: { intro: string }) {
               {category.items.map((point, pi) => (
                 <li key={pi} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-3)', paddingLeft: 'calc(16px + var(--space-3))' }}>
                   <span style={{ width: 7, height: 7, marginTop: 8, borderRadius: '50%', background: color.heading, flexShrink: 0 }} />
-                  <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6 }}>{point}</span>
+                  <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6 }}>{renderBold(point)}</span>
                 </li>
               ))}
             </ul>
@@ -606,7 +607,7 @@ function CampusRecruitmentTrainingSections({ intro }: { intro: string }) {
             {category.items.map((point, pi) => (
               <li key={pi} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2)', paddingLeft: 'calc(22px + var(--space-3))' }}>
                 <span style={{ color: 'rgba(255,255,255,0.55)', lineHeight: 1.6 }}>–</span>
-                <span style={{ fontSize: 'var(--text-base)', color: 'rgba(255,255,255,0.9)', lineHeight: 1.6 }}>{point}</span>
+                <span style={{ fontSize: 'var(--text-base)', color: 'rgba(255,255,255,0.9)', lineHeight: 1.6 }}>{renderBold(point)}</span>
               </li>
             ))}
           </ul>
@@ -911,21 +912,21 @@ function TeamRosterRow({
               />
               <div style={{ flex: 1, minWidth: 260, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
                 {bio.paragraphs.map((para, pi) => (
-                  <p key={pi} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.7 }}>{para}</p>
+                  <p key={pi} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.7 }}>{renderBold(para)}</p>
                 ))}
               </div>
               {bio.accomplishments && bio.accomplishments.length > 0 && (
                 <div style={{ width: '100%', marginTop: 'var(--space-2)' }}>
                   {bio.accomplishmentsIntro && (
                     <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', marginBottom: 'var(--space-3)' }}>
-                      {bio.accomplishmentsIntro}
+                      {renderBold(bio.accomplishmentsIntro)}
                     </p>
                   )}
                   <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
                     {bio.accomplishments.map((point, ai) => (
                       <li key={ai} style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
                         <Trophy size={16} strokeWidth={1.75} style={{ color: 'var(--color-accent)', flexShrink: 0, marginTop: 2 }} />
-                        <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.7 }}>{point}</span>
+                        <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.7 }}>{renderBold(point)}</span>
                       </li>
                     ))}
                   </ul>
@@ -963,14 +964,14 @@ function TeamRosterRow({
                   <MapPin size={16} strokeWidth={2} /> Office Address:
                 </p>
                 {industryLiaisonOffices[row.name].address.map((line, li) => (
-                  <p key={li} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6 }}>{line}</p>
+                  <p key={li} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6 }}>{renderBold(line)}</p>
                 ))}
               </div>
               <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
                 {industryLiaisonOffices[row.name].bullets.map((point, bi) => (
                   <li key={bi} style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
                     <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--color-accent)', flexShrink: 0, marginTop: 8 }} />
-                    <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.7 }}>{point}</span>
+                    <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.7 }}>{renderBold(point)}</span>
                   </li>
                 ))}
               </ul>
@@ -993,7 +994,7 @@ function TeamRosterRow({
                 <strong style={{ color: 'var(--color-primary)' }}>Role: </strong>{row.role}
               </p>
               {row.notes && (
-                <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6 }}>{row.notes}</p>
+                <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6 }}>{renderBold(row.notes)}</p>
               )}
             </>
           )}
@@ -1433,7 +1434,7 @@ export default function PlacementDetail() {
             <div key={o}
               style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', minHeight: 110, display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
               <Trophy size={20} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-accent)' }} />
-              <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6 }}>{o}</span>
+              <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6 }}>{renderBold(o)}</span>
             </div>
           ))}
         </div>
@@ -1652,7 +1653,7 @@ export default function PlacementDetail() {
                 </div>
               ) : (
                 <p className={item.slug === 'gsac' ? 'gsac-body-card' : undefined} style={item.slug === 'gsac' ? undefined : { fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: 1.75 }}>
-                  {item.desc}
+                  {renderBold(item.desc)}
                 </p>
               )}
 
@@ -1749,7 +1750,7 @@ export default function PlacementDetail() {
                   <div className="gsac-globe-stats">
                     {displayGsacStats.map((s, i) => (
                       <div key={i} className="gsac-globe-stat">
-                        <strong>{s.value}</strong>
+                        <strong>{renderBold(s.value)}</strong>
                         {s.label && <span>{s.label}</span>}
                       </div>
                     ))}
@@ -1785,7 +1786,7 @@ export default function PlacementDetail() {
                         <span style={{ width: 20, height: 20, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
                           <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                         </span>
-                        <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.5 }}>{h}</span>
+                        <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.5 }}>{renderBold(h)}</span>
                       </li>
                     ))}
                   </ul>
@@ -1809,7 +1810,7 @@ export default function PlacementDetail() {
                   <span style={{ width: 22, height: 22, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
                     <svg width="11" height="11" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                   </span>
-                  <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.5 }}>{h}</span>
+                  <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.5 }}>{renderBold(h)}</span>
                 </div>
               ))}
             </div>
@@ -1927,7 +1928,7 @@ export default function PlacementDetail() {
               ].map((s) => (
                 <div key={s.title} style={{ padding: 'var(--space-6)', background: 'var(--color-off-white)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-light-gray)' }}>
                   <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>{s.title}</h3>
-                  <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6, margin: 0 }}>{s.desc}</p>
+                  <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6, margin: 0 }}>{renderBold(s.desc)}</p>
                 </div>
               ))}
             </div>
@@ -2169,7 +2170,7 @@ export default function PlacementDetail() {
                 </button>
                 <SmoothCollapse open={gsacOpenAccordion === 'highlights'}>
                   <ul className="gsac-accordion__list">
-                    {item.highlights.map((h) => <li key={h}>{h}</li>)}
+                    {item.highlights.map((h) => <li key={h}>{renderBold(h)}</li>)}
                   </ul>
                 </SmoothCollapse>
               </div>
@@ -2183,7 +2184,7 @@ export default function PlacementDetail() {
                 </button>
                 <SmoothCollapse open={gsacOpenAccordion === 'outcomes'}>
                   <ul className="gsac-accordion__list">
-                    {activeOutcomes.map((o) => <li key={o}>{o}</li>)}
+                    {activeOutcomes.map((o) => <li key={o}>{renderBold(o)}</li>)}
                   </ul>
                 </SmoothCollapse>
               </div>
@@ -2345,7 +2346,7 @@ export default function PlacementDetail() {
                           <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)' }}>{internPageClamped * internEntriesPerPage + i + 1}</td>
                           <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)', fontWeight: 600 }}>{row.name}</td>
                           <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)' }}>{row.role}</td>
-                          <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)' }}>{row.notes}</td>
+                          <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)' }}>{renderBold(row.notes)}</td>
                         </tr>
                       ))}
                     </tbody>

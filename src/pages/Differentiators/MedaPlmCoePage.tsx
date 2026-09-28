@@ -19,6 +19,7 @@ import {
 import { medaPlmCoe } from './medaPlmCoe.data';
 import type { DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
 import type { CustomSection } from '../../lib/customSections';
+import { renderBold } from '../../lib/boldText';
 import './MedaPlmCoePage.css';
 
 interface MedaPlmCoePageProps {
@@ -145,7 +146,7 @@ export default function MedaPlmCoePage({ sections }: MedaPlmCoePageProps) {
           <h2 className="meda-hero-title">{data.collaboration.title}</h2>
           <div className="meda-hero-paragraphs">
             {data.collaboration.paragraphs.map((p, idx) => (
-              <p key={idx} className="meda-hero-text">{p}</p>
+              <p key={idx} className="meda-hero-text">{renderBold(p)}</p>
             ))}
           </div>
         </div>
@@ -165,7 +166,7 @@ export default function MedaPlmCoePage({ sections }: MedaPlmCoePageProps) {
           <div className={`meda-glass-split ${hasPhotos ? 'has-photo' : 'no-photo'}`}>
             <div>
               <p className="meda-closing-note" style={{ marginTop: 0, paddingTop: 0, borderTop: 'none', fontStyle: 'normal', color: '#475569', fontSize: '0.975rem' }}>
-                {data.meda.intro}
+                {renderBold(data.meda.intro)}
               </p>
 
               {/* Software Platforms */}
@@ -181,7 +182,7 @@ export default function MedaPlmCoePage({ sections }: MedaPlmCoePageProps) {
                       {idx === 2 && <Wrench size={18} />}
                     </div>
                     <div className="meda-tool-desc">
-                      <span className="meda-tool-title">{tool.name}</span> – {tool.description}
+                      <span className="meda-tool-title">{tool.name}</span> – {renderBold(tool.description)}
                     </div>
                   </div>
                 ))}
@@ -196,7 +197,7 @@ export default function MedaPlmCoePage({ sections }: MedaPlmCoePageProps) {
                   {data.meda.learningAreas.map((concept, idx) => (
                     <li key={idx} className="meda-concept-row">
                       <span className="meda-concept-check">✓</span>
-                      <span>{concept}</span>
+                      <span>{renderBold(concept)}</span>
                     </li>
                   ))}
                 </ul>
@@ -227,7 +228,7 @@ export default function MedaPlmCoePage({ sections }: MedaPlmCoePageProps) {
 
             <div>
               <p className="meda-closing-note" style={{ marginTop: 0, paddingTop: 0, borderTop: 'none', fontStyle: 'normal', color: '#475569', fontSize: '0.975rem' }}>
-                {data.plm.intro}
+                {renderBold(data.plm.intro)}
               </p>
 
               {/* Training Modules */}
@@ -239,7 +240,7 @@ export default function MedaPlmCoePage({ sections }: MedaPlmCoePageProps) {
                   {data.plm.trainingItems.map((train, idx) => (
                     <li key={idx} className="meda-concept-row">
                       <span className="meda-concept-check" style={{ background: '#0070AD', color: '#FFFFFF' }}>✓</span>
-                      <span>{train}</span>
+                      <span>{renderBold(train)}</span>
                     </li>
                   ))}
                 </ul>
@@ -253,7 +254,7 @@ export default function MedaPlmCoePage({ sections }: MedaPlmCoePageProps) {
                 <div className="meda-tool-desc">
                   <span className="meda-tool-title">{data.plm.teamcenter.heading}</span>
                   <p style={{ margin: '0.2rem 0 0 0', color: '#475569', fontSize: '0.85rem' }}>
-                    {data.plm.teamcenter.description}
+                    {renderBold(data.plm.teamcenter.description)}
                   </p>
                 </div>
               </div>
@@ -277,7 +278,7 @@ export default function MedaPlmCoePage({ sections }: MedaPlmCoePageProps) {
           <div className={`meda-glass-split ${hasPhotos ? 'has-photo' : 'no-photo'}`}>
             <div>
               <p className="meda-closing-note" style={{ marginTop: 0, paddingTop: 0, borderTop: 'none', fontStyle: 'normal', color: '#475569', fontSize: '0.975rem' }}>
-                {data.outcomes.intro}
+                {renderBold(data.outcomes.intro)}
               </p>
 
               <div style={{ margin: '0.75rem 0 0.5rem 0', fontWeight: 800, fontSize: '0.85rem', color: '#0B1E42', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
@@ -290,7 +291,7 @@ export default function MedaPlmCoePage({ sections }: MedaPlmCoePageProps) {
                     <div className="meda-outcome-icon-wrap">
                       <CheckCircle2 size={16} color="#0B1E42" />
                     </div>
-                    <p className="meda-outcome-desc">{opp}</p>
+                    <p className="meda-outcome-desc">{renderBold(opp)}</p>
                   </div>
                 ))}
               </div>
@@ -317,7 +318,7 @@ export default function MedaPlmCoePage({ sections }: MedaPlmCoePageProps) {
                 {highlights.map((h, i) => (
                   <li key={i} className="meda-matrix-row">
                     <CheckCircle2 size={14} style={{ color: '#0070AD', flexShrink: 0, marginTop: 2 }} />
-                    <span>{h}</span>
+                    <span>{renderBold(h)}</span>
                   </li>
                 ))}
               </ul>
@@ -335,7 +336,7 @@ export default function MedaPlmCoePage({ sections }: MedaPlmCoePageProps) {
                 {outcomes.map((o, i) => (
                   <li key={i} className="meda-matrix-row">
                     <Award size={14} style={{ color: '#C9973A', flexShrink: 0, marginTop: 2 }} />
-                    <span>{o}</span>
+                    <span>{renderBold(o)}</span>
                   </li>
                 ))}
               </ul>
@@ -358,7 +359,7 @@ export default function MedaPlmCoePage({ sections }: MedaPlmCoePageProps) {
                 {facilities.map((f, i) => (
                   <li key={i} className="meda-matrix-row">
                     <Cpu size={14} style={{ color: '#0B1E42', flexShrink: 0, marginTop: 2 }} />
-                    <span style={{ fontWeight: 700 }}>{f}</span>
+                    <span style={{ fontWeight: 700 }}>{renderBold(f)}</span>
                   </li>
                 ))}
               </ul>
@@ -375,7 +376,7 @@ export default function MedaPlmCoePage({ sections }: MedaPlmCoePageProps) {
                 {partners.map((p, i) => (
                   <li key={i} className="meda-matrix-row" style={{ background: '#FFFDF5', borderColor: 'rgba(201, 151, 58, 0.3)' }}>
                     <Building2 size={14} style={{ color: '#C9973A', flexShrink: 0, marginTop: 2 }} />
-                    <span style={{ fontWeight: 800, color: '#0B1E42', fontSize: '0.95rem' }}>{p}</span>
+                    <span style={{ fontWeight: 800, color: '#0B1E42', fontSize: '0.95rem' }}>{renderBold(p)}</span>
                   </li>
                 ))}
               </ul>

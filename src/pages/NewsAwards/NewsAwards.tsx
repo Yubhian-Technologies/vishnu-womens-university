@@ -4,6 +4,7 @@ import { Calendar, Trophy, Image } from 'lucide-react';
 import PageHero from '../../components/PageHero/PageHero';
 import { useHashScroll } from '../../hooks/useHashScroll';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
+import { renderBold } from '../../lib/boldText';
 
 const sections = [
   {
@@ -68,7 +69,7 @@ export default function NewsAwards() {
           <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-14)', flexWrap: 'wrap' }}>
             {highlights.map((h) => (
               <div key={h.id} style={{ textAlign: 'center' }}>
-                <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', fontWeight: 900, color: 'var(--color-accent)' }}>{h.value}</div>
+                <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', fontWeight: 900, color: 'var(--color-accent)' }}>{renderBold(h.value)}</div>
                 <div style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)' }}>{h.title}</div>
               </div>
             ))}
@@ -101,7 +102,7 @@ export default function NewsAwards() {
                   {s.title}
                 </h3>
                 <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.65, flex: 1, marginBottom: 'var(--space-5)' }}>
-                  {s.desc}
+                  {renderBold(s.desc)}
                 </p>
                 <Link
                   to={`/news-awards/${s.slug}#${s.anchor}`}

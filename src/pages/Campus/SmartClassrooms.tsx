@@ -101,7 +101,6 @@ export default function SmartClassrooms() {
             Discover the facilities, academic spaces and student experiences that support learning beyond the classroom.
           </p>
           <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link to="/campus" className="btn btn-accent">Explore Campus Facilities</Link>
             <Link to="/student-life" className="btn btn-secondary">Discover Student Life</Link>
           </div>
         </div>

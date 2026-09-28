@@ -9,6 +9,7 @@ import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { useSitePhotos, useSectionHasPhotos } from '../../hooks/useSitePhotos';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import { resolveContentIcon } from '../../lib/contentIcons';
+import { renderBold } from '../../lib/boldText';
 
 const defaultInspirationPhotos = [
   // Slots 0-4: "Our Values in Action" PhotoGrid gallery
@@ -144,7 +145,7 @@ export default function VisionMission() {
                 <div key={v.id} className="vm-value-card">
                   <div className="vm-value-icon"><Icon size={24} strokeWidth={1.8} /></div>
                   <h3>{v.title}</h3>
-                  <p>{v.desc}</p>
+                  <p>{renderBold(v.desc)}</p>
                 </div>
               );
             })}
@@ -207,7 +208,7 @@ export default function VisionMission() {
                     <Check size={17} strokeWidth={2.5} style={{ color: 'var(--color-accent)', flexShrink: 0, marginTop: 4 }} />
                     <div>
                       <p style={{ color: 'var(--color-white)', fontSize: 'var(--text-sm)', fontWeight: 700, margin: 0 }}>{item.title}</p>
-                      <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 'var(--text-sm)', lineHeight: 1.65, margin: '2px 0 0' }}>{item.desc}</p>
+                      <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 'var(--text-sm)', lineHeight: 1.65, margin: '2px 0 0' }}>{renderBold(item.desc)}</p>
                     </div>
                   </li>
                 ))}

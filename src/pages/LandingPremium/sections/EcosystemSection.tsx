@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { motion, useMotionValueEvent, useScroll, useTransform, type MotionValue } from 'framer-motion';
 import { smoothScrollTo } from '../../../lib/smoothScroll';
 import { ECOSYSTEM_STORIES } from '../landingPremium.data';
+import { renderBold } from '../../../lib/boldText';
 
 interface Props {
   images: Record<string, string>;
@@ -50,7 +51,7 @@ function EcosystemTextItem({ scrollYProgress, index, story }: {
   return (
     <motion.div className="eco3-text__item" style={{ opacity, y }}>
       <h3>{story.title}</h3>
-      <p>{story.desc}</p>
+      <p>{renderBold(story.desc)}</p>
     </motion.div>
   );
 }
@@ -129,7 +130,7 @@ export default function EcosystemSection({ images }: Props) {
           <div key={story.title} className="eco3-mobile__item">
             <img src={images[story.imageSlot]} alt={story.title} loading="lazy" />
             <h3>{story.title}</h3>
-            <p>{story.desc}</p>
+            <p>{renderBold(story.desc)}</p>
           </div>
         ))}
       </section>

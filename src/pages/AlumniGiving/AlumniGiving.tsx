@@ -3,6 +3,7 @@ import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { useHashScroll } from '../../hooks/useHashScroll';
 import './AlumniGiving.css';
 import PageHero from '../../components/PageHero/PageHero';
+import { renderBold } from '../../lib/boldText';
 
 // Mirrors Home.tsx's defaultTestimonials fallback so this page shows the same
 // cards as the Home page carousel until an admin adds real entries to
@@ -44,10 +45,10 @@ export default function AlumniGiving() {
               <div key={t.id} className="ag-story-card">
                 {t.slug && <img loading="lazy" src={t.slug} alt={t.title} className="ag-story-img" />}
                 <div className="ag-story-body">
-                  <blockquote className="ag-story-quote">"{t.desc}"</blockquote>
+                  <blockquote className="ag-story-quote">"{renderBold(t.desc)}"</blockquote>
                   <div className="ag-story-author">
                     <strong>{t.title}</strong>
-                    <span className="ag-story-role">{t.value}</span>
+                    <span className="ag-story-role">{renderBold(t.value)}</span>
                   </div>
                 </div>
               </div>

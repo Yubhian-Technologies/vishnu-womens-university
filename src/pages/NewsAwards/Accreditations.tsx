@@ -5,6 +5,7 @@ import PageHero from '../../components/PageHero/PageHero';
 import { useHashScroll } from '../../hooks/useHashScroll';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import type { AwardDoc } from '../Admin/sections/NewsAwardsDataAdmin';
+import { renderBold } from '../../lib/boldText';
 
 const tabs = [
   { key: 'accreditation', label: 'Accreditations & Approvals' },
@@ -74,7 +75,7 @@ function AwardCard({ item }: { item: AwardDoc }) {
       </p>
       {item.details && (
         <p style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text)', lineHeight: 1.55, borderTop: '1px solid var(--color-light-gray)', paddingTop: 'var(--space-2)', marginTop: 'var(--space-1)' }}>
-          {item.details}
+          {renderBold(item.details)}
         </p>
       )}
     </div>

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TESTIMONIALS } from '../landingPremium.data';
+import { renderBold } from '../../../lib/boldText';
 
 // Mirrors lpu.in's "What our Alumni say" layout: a vertical, clickable list
 // of avatars on the left selecting which quote panel shows on the right —
@@ -35,7 +36,7 @@ export default function TestimonialsSection() {
               exit={{ opacity: 0, y: -16 }}
               transition={{ duration: 0.35 }}
             >
-              <p>{t.quote}</p>
+              <p>{renderBold(t.quote)}</p>
               <strong>{t.name}</strong>
               <span>{t.role}</span>
             </motion.div>

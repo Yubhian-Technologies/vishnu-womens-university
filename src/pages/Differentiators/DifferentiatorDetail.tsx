@@ -31,6 +31,7 @@ import IdeaLabPage from './IdeaLabPage';
 import IicPage from './IicPage';
 import RuralWomenTechParkPage from './RuralWomenTechParkPage';
 import SmartInterviewsPage from './SmartInterviewsPage';
+import { renderBold } from '../../lib/boldText';
 import '../detail-layout.css';
 import '../gsac-shared.css';
 import './foreign-languages.css';
@@ -82,7 +83,7 @@ function LanguageModuleAccordion({ lang, index }: { lang: typeof foreignLanguage
           </div>
           <div className="fl-module-title-wrap">
             <h3 className="fl-module-title">{lang.name}</h3>
-            <p className="fl-module-subtitle">{subtitle}</p>
+            <p className="fl-module-subtitle">{renderBold(subtitle)}</p>
           </div>
         </div>
         <div className={`fl-module-toggle-circle ${numColorClass}`}>
@@ -92,9 +93,9 @@ function LanguageModuleAccordion({ lang, index }: { lang: typeof foreignLanguage
 
       {isOpen && (
         <div className="fl-module-body animate-fade-in">
-          <p className="fl-module-quote">&quot;{lang.quote}&quot;</p>
+          <p className="fl-module-quote">&quot;{renderBold(lang.quote)}&quot;</p>
           <div className="fl-module-paragraphs">
-            {lang.paragraphs.map((p, i) => <p key={i}>{p}</p>)}
+            {lang.paragraphs.map((p, i) => <p key={i}>{renderBold(p)}</p>)}
           </div>
 
           {lang.table && lang.table.length > 0 && (
@@ -955,7 +956,7 @@ export default function DifferentiatorDetail() {
                       <div className="gsac-globe-stats">
                         {displayGsacStats.map((s, i) => (
                           <div key={i} className="gsac-globe-stat">
-                            <strong>{s.value}</strong>
+                            <strong>{renderBold(s.value)}</strong>
                             {s.label && <span>{s.label}</span>}
                           </div>
                         ))}

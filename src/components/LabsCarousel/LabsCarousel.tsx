@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import SmoothImage from '../SmoothImage/SmoothImage';
 import type { LabItem } from '../../pages/Admin/sections/ProgramsAdmin';
+import { renderBold } from '../../lib/boldText';
 
 function extractYouTubeId(url: string): string {
   const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/))([^&?#]+)/);
@@ -96,7 +97,7 @@ export default function LabsCarousel({
           <div className="dept-labs-title-wrap">
             <h2 className="section-title">{title}</h2>
             <p className="section-desc" style={{ margin: '0.5rem 0 0 0' }}>
-              {description}
+              {renderBold(description)}
             </p>
           </div>
         </div>
@@ -108,7 +109,7 @@ export default function LabsCarousel({
 <div className="dept-lab-slide-text">
                    <h3 className="dept-lab-slide-title">{lab.name}</h3>
                    {lab.description && (
-                     <p className="dept-lab-slide-desc">{lab.description}</p>
+                     <p className="dept-lab-slide-desc">{renderBold(lab.description)}</p>
                    )}
                    {lab.pdfUrl && (
                      <a href={lab.pdfUrl} target="_blank" rel="noopener noreferrer" className="dept-lab-slide-cta">

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { BranchOfferCount, PlacementRow } from './placementStats.data';
 import { usePlacementYears } from './usePlacementYears';
+import { renderBold } from '../../lib/boldText';
 import '../detail-layout.css';
 
 // A batch label like "2022–2026" -> "2026" for the snapshot heading — the
@@ -488,7 +489,7 @@ export default function PlacementYearAccordion({ years, onActiveYearChange }: Pr
 
                 {y.note && (
                   <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', fontStyle: 'italic', marginBottom: y.rows.length > 0 ? 'var(--space-4)' : 0 }}>
-                    {y.note}
+                    {renderBold(y.note)}
                   </p>
                 )}
 

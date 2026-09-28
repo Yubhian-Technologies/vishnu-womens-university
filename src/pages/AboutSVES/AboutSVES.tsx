@@ -14,6 +14,7 @@ import { useOrderedCollection } from '../../hooks/useCollection';
 import { useSitePhotos, useSectionHasPhotos } from '../../hooks/useSitePhotos';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import type { SvesCampusDoc } from '../Admin/sections/SvesCampusesAdmin';
+import { renderBold } from '../../lib/boldText';
 
 const STAT_ICONS = [Building2, GraduationCap, Users, Award, BookOpen, Sparkles, MapPin, Globe];
 
@@ -108,7 +109,7 @@ export default function AboutSVES() {
               return (
                 <div key={s.id} className="about-fact">
                   <IconComp size={20} className="about-fact-icon" strokeWidth={2} />
-                  <div className="about-fact-value">{s.value}</div>
+                  <div className="about-fact-value">{renderBold(s.value)}</div>
                   <div className="about-fact-label">{s.title}</div>
                 </div>
               );
@@ -186,7 +187,7 @@ export default function AboutSVES() {
               {legacyVisionBlocks.length > 0 ? (
                 legacyVisionBlocks.map((block) => (
                   <p key={block.id} style={{ lineHeight: 1.8, marginBottom: 'var(--space-4)', color: 'var(--color-text-light)' }}>
-                    {block.desc}
+                    {renderBold(block.desc)}
                   </p>
                 ))
               ) : (
@@ -219,7 +220,7 @@ export default function AboutSVES() {
               {leadershipCultureBlocks.length > 0 ? (
                 leadershipCultureBlocks.map((block) => (
                   <p key={block.id} style={{ lineHeight: 1.8, marginBottom: 'var(--space-4)', color: 'var(--color-text-light)' }}>
-                    {block.desc}
+                    {renderBold(block.desc)}
                   </p>
                 ))
               ) : (
@@ -330,7 +331,7 @@ export default function AboutSVES() {
                               <span className="sves-list-bullet">
                                 <Check size={12} strokeWidth={3} />
                               </span>
-                              <span className="sves-inst-text">{inst}</span>
+                              <span className="sves-inst-text">{renderBold(inst)}</span>
                             </li>
                           ))}
                         </ul>
@@ -387,7 +388,7 @@ export default function AboutSVES() {
               <div key={m.id} className="sves-milestone">
                 <div className="sves-milestone-year">{m.title}</div>
                 <div className="sves-milestone-dot" />
-                <div className="sves-milestone-text">{m.desc}</div>
+                <div className="sves-milestone-text">{renderBold(m.desc)}</div>
               </div>
             ))}
           </div>

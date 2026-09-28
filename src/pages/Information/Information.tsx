@@ -12,6 +12,7 @@ import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import { ICT_RESOURCE_GROUPS } from './ictResources.data';
 import { DEFAULT_OTHER_PRACTICES, EXPERIENTIAL_LEARNING_INTRO, type OtherPracticeItem } from './otherPractices.data';
+import { renderBold } from '../../lib/boldText';
 import './Information.css';
 
 const defaultPlacementsCareersPhotos = [
@@ -193,7 +194,7 @@ export default function Information() {
                     <li key={label} style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
                       <span style={{ flexShrink: 0, width: 8, height: 8, borderRadius: '50% 50% 50% 0', background: 'var(--color-accent)', marginTop: '0.5em' }} />
                       <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.7 }}>
-                        <strong style={{ color: 'var(--color-primary)' }}>{label}:</strong> {text}
+                        <strong style={{ color: 'var(--color-primary)' }}>{label}:</strong> {renderBold(text)}
                       </p>
                     </li>
                   ))}
@@ -224,7 +225,7 @@ export default function Information() {
                       <Icon size={32} strokeWidth={1.75} />
                       <div>
                         <h3 style={{ fontFamily: 'var(--font-sans)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>{p.title}</h3>
-                        <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6, marginBottom: 'var(--space-3)' }}>{p.desc}</p>
+                        <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6, marginBottom: 'var(--space-3)' }}>{renderBold(p.desc)}</p>
                         <a href={p.slug || '#'} target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ fontSize: 'var(--text-xs)', padding: '0.35rem 0.9rem' }}>Access Portal</a>
                       </div>
                     </div>
@@ -253,7 +254,7 @@ export default function Information() {
                               <span style={{ color: 'var(--color-text)' }}>{link.label}</span>
                             )}
                             {link.note && (
-                              <span style={{ display: 'block', color: 'var(--color-text-light)', fontSize: 'var(--text-xs)', marginTop: 2 }}>{link.note}</span>
+                              <span style={{ display: 'block', color: 'var(--color-text-light)', fontSize: 'var(--text-xs)', marginTop: 2 }}>{renderBold(link.note)}</span>
                             )}
                           </span>
                         </li>
@@ -284,12 +285,12 @@ export default function Information() {
                       <Icon size={32} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-primary)' }} />
                       <div>
                         <h3 style={{ fontFamily: 'var(--font-sans)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>{item.title}</h3>
-                        <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6, marginBottom: practiceBullets?.length ? 'var(--space-3)' : 0 }}>{item.desc}</p>
+                        <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6, marginBottom: practiceBullets?.length ? 'var(--space-3)' : 0 }}>{renderBold(item.desc)}</p>
                         {practiceBullets && practiceBullets.length > 0 && (
                           <ul style={{ paddingLeft: 'var(--space-4)', margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
                             {practiceBullets.map((bullet, idx) => (
                               <li key={idx} style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text)', lineHeight: 1.5 }}>
-                                {bullet}
+                                {renderBold(bullet)}
                               </li>
                             ))}
                           </ul>

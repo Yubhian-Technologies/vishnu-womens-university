@@ -3,6 +3,7 @@ import { CalendarDays } from 'lucide-react';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { formatDate } from '../../lib/formatDate';
 import SmoothImage from '../SmoothImage/SmoothImage';
+import { renderBold } from '../../lib/boldText';
 import './DepartmentNewsSection.css';
 
 const NAV_OFFSET = 'calc(var(--topbar-height) + var(--header-height) + 1rem)';
@@ -78,12 +79,12 @@ export default function DepartmentNewsSection({ programSlug, background = 'var(-
                     <CalendarDays size={13} strokeWidth={1.75} /> {formatDate(item.date)}
                   </span>
                   <h3 className="dept-news-card__title">{item.title}</h3>
-                  {item.summary && <p className="dept-news-card__summary">{item.summary}</p>}
+                  {item.summary && <p className="dept-news-card__summary">{renderBold(item.summary)}</p>}
                   {item.body && (
                     <>
                       <div className="dept-news-card__collapse" aria-hidden={!isOpen}>
                         <div className="dept-news-card__collapse-inner">
-                          <p className="dept-news-card__full">{item.body}</p>
+                          <p className="dept-news-card__full">{renderBold(item.body)}</p>
                         </div>
                       </div>
                       <button type="button" className="dept-news-card__more" onClick={() => toggle(item.id)}>

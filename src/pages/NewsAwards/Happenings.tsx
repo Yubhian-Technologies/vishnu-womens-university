@@ -8,6 +8,7 @@ import { useOrderedCollection } from '../../hooks/useCollection';
 import { happeningToArticle, isUpcomingHappening, parseHappeningDate } from '../../lib/happenings';
 import type { HappeningDoc } from '../Admin/sections/NewsAwardsDataAdmin';
 import HappeningsPosterSlider from './HappeningsPosterSlider';
+import { renderBold } from '../../lib/boldText';
 import './Happenings.css';
 
 export default function Happenings() {
@@ -86,7 +87,7 @@ export default function Happenings() {
                         <p style={{ fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.65)', lineHeight: 1.5, marginBottom: ev.description ? 'var(--space-2)' : 0 }}>{ev.dept}</p>
                       )}
                       {ev.description && (
-                        <p style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.85)', lineHeight: 1.6, whiteSpace: 'pre-line' }}>{ev.description}</p>
+                        <p style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.85)', lineHeight: 1.6, whiteSpace: 'pre-line' }}>{renderBold(ev.description)}</p>
                       )}
                     </div>
                   </div>

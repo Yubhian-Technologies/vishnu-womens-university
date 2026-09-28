@@ -1,6 +1,7 @@
 import { Target } from 'lucide-react';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { resolveContentIcon } from '../../lib/contentIcons';
+import { renderBold } from '../../lib/boldText';
 import '../../pages/StudentLife/StudentLife.css';
 
 /**
@@ -25,7 +26,7 @@ export default function VwuSportsSection() {
               <div key={s.id} className="sl-sport-card">
                 <span className="sl-sport-icon"><Icon size={32} strokeWidth={1.75} /></span>
                 <div className="sl-sport-name">{s.title}</div>
-                <span className="sl-sport-season">{s.value}</span>
+                <span className="sl-sport-season">{renderBold(s.value)}</span>
               </div>
             );
           })}

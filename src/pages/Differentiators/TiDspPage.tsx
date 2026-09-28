@@ -17,6 +17,7 @@ import {
   Sparkles,
   CheckCircle2,
 } from 'lucide-react';
+import { renderBold } from '../../lib/boldText';
 import './TiDspPage.css';
 
 interface TiDspPageProps {
@@ -59,7 +60,7 @@ export default function TiDspPage({ customSections = [] }: TiDspPageProps) {
           <h2 className="iic-card-title">{aboutTitle}</h2>
           {overview.map((p, i) => (
             <p key={i} className="iic-lead-text" style={{ marginBottom: i < overview.length - 1 ? '1rem' : 0 }}>
-              {p}
+              {renderBold(p)}
             </p>
           ))}
         </div>
@@ -121,7 +122,7 @@ export default function TiDspPage({ customSections = [] }: TiDspPageProps) {
               {mission.map((item, idx) => (
                 <li key={idx} className="ti-mission-item">
                   <span className="ti-mission-disc" />
-                  <span>{item}</span>
+                  <span>{renderBold(item)}</span>
                 </li>
               ))}
             </ul>
@@ -162,7 +163,7 @@ export default function TiDspPage({ customSections = [] }: TiDspPageProps) {
             <h3 className="iic-card-title">Lab Development & External Support</h3>
             {labDevelopment.map((p, i) => (
               <p key={i} className="iic-lead-text" style={{ marginBottom: i < labDevelopment.length - 1 ? '0.85rem' : 0, fontSize: '0.95rem' }}>
-                {p}
+                {renderBold(p)}
               </p>
             ))}
           </div>
@@ -175,7 +176,7 @@ export default function TiDspPage({ customSections = [] }: TiDspPageProps) {
             <h3 className="iic-card-title">Societal Impact Research</h3>
             {societalImpact.map((p, i) => (
               <p key={i} className="iic-lead-text" style={{ marginBottom: i < societalImpact.length - 1 ? '0.85rem' : 0, fontSize: '0.95rem' }}>
-                {p}
+                {renderBold(p)}
               </p>
             ))}
           </div>
@@ -190,13 +191,13 @@ export default function TiDspPage({ customSections = [] }: TiDspPageProps) {
           </div>
           <h3 className="iic-card-title">{researchOutputs.title}</h3>
           <p className="iic-lead-text" style={{ marginBottom: '1rem' }}>
-            {researchOutputs.intro}
+            {renderBold(researchOutputs.intro)}
           </p>
           <ul className="iic-checklist" style={{ marginBottom: '1.5rem' }}>
             {researchOutputs.areas.map((area, idx) => (
               <li key={idx}>
                 <CheckCircle2 size={16} className="iic-check-icon gold" />
-                <span>{area}</span>
+                <span>{renderBold(area)}</span>
               </li>
             ))}
           </ul>
@@ -206,7 +207,7 @@ export default function TiDspPage({ customSections = [] }: TiDspPageProps) {
           <ol style={{ paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', color: '#4A5568', fontSize: '0.925rem', lineHeight: 1.6 }}>
             {researchOutputs.publications.map((pub, idx) => (
               <li key={idx} style={{ paddingLeft: '0.25rem' }}>
-                {pub}
+                {renderBold(pub)}
               </li>
             ))}
           </ol>
@@ -242,7 +243,7 @@ export default function TiDspPage({ customSections = [] }: TiDspPageProps) {
               {keyHighlights.map((hl, idx) => (
                 <li key={idx}>
                   <CheckCircle2 size={16} className="iic-check-icon gold" />
-                  <span>{hl}</span>
+                  <span>{renderBold(hl)}</span>
                 </li>
               ))}
             </ul>
@@ -266,7 +267,7 @@ export default function TiDspPage({ customSections = [] }: TiDspPageProps) {
               {facilitiesEquipment.map((eq, idx) => (
                 <li key={idx}>
                   <CheckCircle2 size={16} className="iic-check-icon cyan" />
-                  <span>{eq}</span>
+                  <span>{renderBold(eq)}</span>
                 </li>
               ))}
             </ul>
@@ -283,7 +284,7 @@ export default function TiDspPage({ customSections = [] }: TiDspPageProps) {
                 {industryAssociation.partner}
               </h4>
               <p style={{ color: '#4A5568', fontSize: '0.925rem', lineHeight: 1.6, margin: 0 }}>
-                {industryAssociation.description}
+                {renderBold(industryAssociation.description)}
               </p>
             </div>
           </div>
@@ -299,7 +300,7 @@ export default function TiDspPage({ customSections = [] }: TiDspPageProps) {
           <h3 className="iic-card-title">{trainingResearch.title}</h3>
           {trainingResearch.paragraphs.map((p, i) => (
             <p key={i} className="iic-lead-text" style={{ marginBottom: i < trainingResearch.paragraphs.length - 1 ? '0.85rem' : '1.5rem' }}>
-              {p}
+              {renderBold(p)}
             </p>
           ))}
 
@@ -337,14 +338,14 @@ export default function TiDspPage({ customSections = [] }: TiDspPageProps) {
               if (block.type === 'paragraph') {
                 return (
                   <p key={idx} style={{ color: '#4A5568', fontSize: '0.925rem', lineHeight: 1.6, marginBottom: '0.75rem' }}>
-                    {block.text}
+                    {renderBold(block.text)}
                   </p>
                 );
               }
               if (block.type === 'heading') {
                 return (
                   <h5 key={idx} style={{ fontSize: '1rem', fontWeight: 700, color: '#0B1E42', marginTop: '1rem', marginBottom: '0.5rem' }}>
-                    {block.text}
+                    {renderBold(block.text)}
                   </h5>
                 );
               }
@@ -354,7 +355,7 @@ export default function TiDspPage({ customSections = [] }: TiDspPageProps) {
                     {block.items.map((item, i) => (
                       <li key={i}>
                         <CheckCircle2 size={16} className="iic-check-icon cyan" />
-                        <span>{item}</span>
+                        <span>{renderBold(item)}</span>
                       </li>
                     ))}
                   </ul>
@@ -364,7 +365,7 @@ export default function TiDspPage({ customSections = [] }: TiDspPageProps) {
                 return (
                   <ol key={idx} style={{ paddingLeft: '1.25rem', marginBottom: '1rem', color: '#4A5568', fontSize: '0.925rem', lineHeight: 1.6 }}>
                     {block.items.map((item, i) => (
-                      <li key={i}>{item}</li>
+                      <li key={i}>{renderBold(item)}</li>
                     ))}
                   </ol>
                 );

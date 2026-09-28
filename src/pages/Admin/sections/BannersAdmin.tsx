@@ -76,7 +76,6 @@ export const PAGES = [
   { value: 'alumni-giving',           label: 'Alumni & Giving' },
   { value: 'about',                   label: 'About VWU' },
   { value: 'about-sves',              label: 'About SVES' },
-  { value: 'campus',                  label: 'Campus Life (Overview)' },
   ...allCampusFacilities.map((f) => ({ value: `campus-${f.slug}`, label: `Campus Life: ${f.title}` })),
   { value: 'campus-wellness-center',  label: 'Campus Life: Wellness Center' },
   { value: 'campus-wellness',         label: 'Campus Life: Wellness (hero banner image only)' },
@@ -129,7 +128,7 @@ const PAGE_GROUPS: { label: string; values: string[] }[] = [
   { label: 'Student Life', values: ['student-clubs', 'student-club-detail', 'clubs', 'arts-culture', 'social-services', 'sports-games', 'vishnu-tv', 'campus-magazines'] },
   { label: 'Placements, Careers & Research', values: ['placement-detail', 'careers', 'differentiators', 'differentiators-detail', 'research', 'research-detail'] },
   { label: 'News & Awards', values: ['news', 'events', 'news-awards', 'news-awards-happenings', 'news-awards-accreditations', 'news-awards-gallery'] },
-  { label: 'Campus Life', values: ['campus', ...allCampusFacilities.map((f) => `campus-${f.slug}`), 'campus-wellness-center', 'campus-wellness', 'campus-sewage-treatment-plants', 'campus-events', 'campus-food-courts'] },
+  { label: 'Campus Life', values: [...allCampusFacilities.map((f) => `campus-${f.slug}`), 'campus-wellness-center', 'campus-wellness', 'campus-sewage-treatment-plants', 'campus-events', 'campus-food-courts'] },
   { label: 'Compliance & Contact', values: ['disclosures-ugc', 'anti-ragging', 'policies-procedures', 'contact'] },
 ];
 
@@ -184,7 +183,6 @@ const PAGE_TEXT_DEFAULTS: Record<string, { title: string; subtitle?: string }> =
   'news-awards-accreditations': { title: 'Accreditations & Awards', subtitle: "Endorsed by India's foremost regulatory and ranking bodies — a record of recognised quality and consistent academic achievement." },
   'information': { title: 'Information', subtitle: 'Academic calendar, holidays, how to reach us, counselling, ICT platforms, and more.' },
   'news-awards': { title: 'News & Awards', subtitle: "Celebrating VWU's achievements, events, and milestones — from national accreditations and rankings to campus happenings and visual memories." },
-  'campus': { title: 'Campus Life at VWU', subtitle: 'An 80-acre campus in Bhimavaram where learning, wellness, and community life come together.' },
   'news-awards-happenings': { title: 'Happenings at VWU', subtitle: 'Workshops, MoUs, competitions, achievements, and institutional milestones — a running record of life at VWU.' },
   'news-awards-gallery': { title: 'Gallery', subtitle: 'A visual archive of campus life at VWU — from national competitions and graduation days to cultural festivals and industry events.' },
   'news': { title: 'VWU News & Stories', subtitle: 'Stay up-to-date with the latest happenings, achievements, and stories from the VWU community.' },

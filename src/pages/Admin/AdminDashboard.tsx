@@ -38,6 +38,8 @@ import DownloadsAdmin from './sections/DownloadsAdmin';
 import CurriculumAdmin from './sections/CurriculumAdmin';
 import SitePhotosAdmin from './sections/SitePhotosAdmin';
 import NavLinkOverridesAdmin from './sections/NavLinkOverridesAdmin';
+import HeaderMenuAdmin from './sections/HeaderMenuAdmin';
+import FooterLinksAdmin from './sections/FooterLinksAdmin';
 import GovernanceItemsAdmin from './sections/GovernanceItemsAdmin';
 import AnnualReportsAdmin from './sections/AnnualReportsAdmin';
 import NirfReportsAdmin from './sections/NirfReportsAdmin';
@@ -132,7 +134,9 @@ const SECTION_MAP: Record<string, React.ReactNode> = {
   downloads: <DownloadsAdmin />,
   curriculum: <CurriculumAdmin />,
   'site-photos': <SitePhotosAdmin />,
+  'header-menu': <HeaderMenuAdmin />,
   'nav-links': <NavLinkOverridesAdmin />,
+  'footer-links': <FooterLinksAdmin />,
   'governance-items': <GovernanceItemsAdmin />,
   'annual-reports': <AnnualReportsAdmin />,
   'nirf-reports': <NirfReportsAdmin />,

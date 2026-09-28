@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Droplets, Recycle, FlaskConical, IndianRupee, CalendarDays,
-  ShieldCheck, Waves, Factory, ArrowRight
+  ShieldCheck, Waves, Factory
 } from 'lucide-react';
 import SEO from '../../components/SEO/SEO';
 import PageHero from '../../components/PageHero/PageHero';
@@ -12,6 +12,7 @@ import { useOrderedCollection } from '../../hooks/useCollection';
 import { useSitePhotos } from '../../hooks/useSitePhotos';
 import { hasCustomSectionContent } from '../../lib/customSections';
 import type { CampusLifeItemDoc } from '../Admin/sections/CampusLifeAdmin';
+import { renderBold } from '../../lib/boldText';
 import './SewageTreatment.css';
 
 // Campus & sewage-load figures quoted in the DST project write-up
@@ -116,7 +117,7 @@ export default function SewageTreatment() {
           <div className="stp-stats-grid">
             {CAMPUS_STATS.map((s) => (
               <div key={s.label} className="stp-stat-card">
-                <div className="stp-stat-val">{s.value}</div>
+                <div className="stp-stat-val">{renderBold(s.value)}</div>
                 <div className="stp-stat-lbl">{s.label}</div>
               </div>
             ))}
@@ -377,9 +378,6 @@ export default function SewageTreatment() {
           <h2>Explore More Campus Life Facilities</h2>
           <p>Discover our central library, hosteller amenities, health care, and sustainability initiatives across VWU.</p>
           <div className="stp-cta-btns">
-            <Link to="/campus" className="stp-btn stp-btn-emerald">
-              Back to Campus Life <ArrowRight size={18} style={{ marginLeft: 6 }} />
-            </Link>
             <Link to="/campus/other-facilities" className="stp-btn stp-btn-outline">
               Other Facilities
             </Link>

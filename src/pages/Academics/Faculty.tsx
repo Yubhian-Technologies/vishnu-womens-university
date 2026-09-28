@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Award, Briefcase, ChevronRight } from 'lucide-react';
 import './Faculty.css';
 import '../../components/FacultyCarousel/FacultyCarousel.css';
@@ -105,6 +105,7 @@ function getFacultySummary(f: FacultyDoc) {
 export default function Faculty() {
   const { docs: allFaculty, loading } = useOrderedCollection<FacultyDoc>('faculty', 'order');
   const [activeDept, setActiveDept] = useState<string | null>(null);
+  const [searchParams] = useSearchParams();
 
   const faculty = allFaculty;
 
@@ -136,14 +137,28 @@ export default function Faculty() {
   // Only a tab whose departments actually have at least one faculty member
   // renders — an empty tab (e.g. a department with no one added yet) would
   // just be a dead end. The order here is always DEPARTMENT_GROUPS' order.
-  const availableGroups = useMemo(
-    () => DEPARTMENT_GROUPS.filter((g) => faculty.some((f) => g.departments.includes(f.department))),
-    [faculty]
-  );
+  // Any department not covered by DEPARTMENT_GROUPS (e.g. one newly added
+  // via /admin → Faculty) gets its own tab after the fixed ones, labelled
+  // with its exact `department` text, alphabetically — so its faculty are
+  // never silently missing from this page.
+  const availableGroups = useMemo(() => {
+    const fixed = DEPARTMENT_GROUPS.filter((g) => faculty.some((f) => g.departments.includes(f.department)));
+    const known = new Set(DEPARTMENT_GROUPS.flatMap((g) => g.departments));
+    const extra = [...new Set(faculty.map((f) => f.department).filter((d) => d && d.trim() && !known.has(d)))]
+      .sort((a, b) => a.localeCompare(b))
+      .map((d) => ({ label: d, departments: [d] }));
+    return [...fixed, ...extra];
+  }, [faculty]);
 
   // Defaults to the first available tab once data loads, rather than
   // requiring the visitor to pick one — there's no "All" view anymore.
-  const activeGroup = availableGroups.find((g) => g.label === activeDept) ?? availableGroups[0] ?? null;
+  // "View more" on a department/program page links here as ?dept=<that
+  // department's faculty `department` value>, so that tab opens by default;
+  // a tab the visitor clicks afterwards still wins.
+  const deptParam = searchParams.get('dept');
+  const activeGroup = availableGroups.find((g) => g.label === activeDept)
+    ?? (deptParam ? availableGroups.find((g) => g.departments.includes(deptParam)) : undefined)
+    ?? availableGroups[0] ?? null;
 
   // NOTE: display order here is exactly /admin → Faculty's drag-to-reorder
   // order (the `order` field) — nothing on this page re-sorts it. `faculty`

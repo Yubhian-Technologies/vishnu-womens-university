@@ -10,6 +10,7 @@ import { useSiteContact } from '../../hooks/useSiteContact';
 import { uploadFile } from '../../lib/storage';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import type { JobOpeningDoc } from '../Admin/sections/JobOpeningsAdmin';
+import { renderBold } from '../../lib/boldText';
 
 type FormData = {
   name: string; email: string; phone: string; dept: string; position: string; experience: string; message: string;
@@ -195,7 +196,7 @@ export default function Careers() {
                   style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', borderLeft: '4px solid var(--color-accent)' }}>
                   <div style={{ marginBottom: 'var(--space-3)' }}><Icon size={32} strokeWidth={1.75} /></div>
                   <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 800, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>{p.title}</h3>
-                  <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6 }}>{p.desc}</p>
+                  <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6 }}>{renderBold(p.desc)}</p>
                 </div>
               );
             })}
