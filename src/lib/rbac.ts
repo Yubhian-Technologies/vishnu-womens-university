@@ -55,6 +55,11 @@ export interface AdminSession {
   // isAdmin sessions (they implicitly hold 'write' on every module) — only
   // consulted for scoped (department/placements/rnd/custom) sessions.
   modules: Record<string, ModuleLevel>;
+  // Differentiator pages (differentiatorItems doc ids) a scoped session may
+  // manage inside the Differentiators module. Empty = every page (the
+  // behaviour before per-page assignment existed, so older accounts keep
+  // full access). See allowedDifferentiatorItems below.
+  differentiatorItems: string[];
 }
 
 function superAdminSessionFor(user: User): AdminSession {
@@ -68,6 +73,7 @@ function superAdminSessionFor(user: User): AdminSession {
     permissions: {},
     resources: [],
     modules: {},
+    differentiatorItems: [],
   };
 }
 
@@ -99,6 +105,7 @@ export async function resolveAdminSession(user: User): Promise<AdminSession> {
       permissions: data.permissions ?? {},
       resources: Array.isArray(data.resources) ? data.resources : [],
       modules: data.modules ?? {},
+      differentiatorItems: Array.isArray(data.differentiatorItems) ? data.differentiatorItems : [],
     };
   } catch {
     // Firestore unreachable — fail closed to the unrestricted Super Admin
@@ -192,6 +199,15 @@ export function canReadModule(session: AdminSession | null | undefined, sectionI
   return !!session.modules[sectionId];
 }
 
+/** Differentiator pages (item ids) the session may manage in the
+ *  Differentiators module, or null when it may manage all of them — Admins
+ *  and Super Admins always, and scoped accounts with no specific pages
+ *  assigned in Users & Roles. */
+export function allowedDifferentiatorItems(session: AdminSession | null | undefined): string[] | null {
+  if (!session || session.isAdmin) return null;
+  return session.differentiatorItems.length > 0 ? session.differentiatorItems : null;
+}
+
 /** True if the session can edit the given admin section. */
 export function canWriteModule(session: AdminSession | null | undefined, sectionId: string): boolean {
   if (!session) return false;
@@ -213,6 +229,8 @@ export interface AdminUserDoc {
   active: boolean;
   modules: Record<string, ModuleLevel>;
   resources: string[];
+  /** Differentiator pages (item ids) this account may manage; empty = all pages. */
+  differentiatorItems: string[];
 }
 
 export async function listAdminUsers(): Promise<AdminUserDoc[]> {
@@ -228,6 +246,7 @@ export async function listAdminUsers(): Promise<AdminUserDoc[]> {
       active: data.active !== false,
       modules: data.modules ?? {},
       resources: Array.isArray(data.resources) ? data.resources : [],
+      differentiatorItems: Array.isArray(data.differentiatorItems) ? data.differentiatorItems : [],
     };
   });
 }
