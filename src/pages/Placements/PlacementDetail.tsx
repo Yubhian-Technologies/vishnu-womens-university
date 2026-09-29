@@ -902,6 +902,18 @@ function TeamRosterRow({
                 </p>
                 <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6 }}>{row.notes || row.role}</p>
               </div>
+              {((iloPhotoMap?.get(row.name)) || []).length > 0 && (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'var(--space-3)' }}>
+                  {((iloPhotoMap?.get(row.name)) || []).map((p, pi) => (
+                    <img loading="lazy"
+                      key={p.path || pi}
+                      src={p.url}
+                      alt={`${row.name} office ${pi + 1}`}
+                      style={{ width: '100%', height: 160, objectFit: 'cover', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-light-gray)' }}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           ) : bio ? (
             <div style={{ display: 'flex', gap: 'var(--space-5)', flexWrap: 'wrap' }}>

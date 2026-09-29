@@ -22,6 +22,10 @@ function getThumbnail(url: string): string {
   return id ? `https://img.youtube.com/vi/${id}/hqdefault.jpg` : '';
 }
 
+// Shown until an admin adds any items under Admin → Page Content Blocks →
+// "Home — VWU in Action Videos" (same "hardcoded default first, swap in
+// Firestore once there's anything to swap to" convention used site-wide),
+// so this section never goes blank and nothing changes here until an admin edits it.
 const DEFAULT_VIDEOS: VideoItem[] = [
   { id: '1', title: 'Likitha Naidu', youtubeUrl: 'https://youtu.be/P9TPB69kmWQ' },
   { id: '2', title: 'Rukmini V', youtubeUrl: 'https://youtu.be/1pD8nzSgoFk' },
