@@ -29,7 +29,6 @@ const DepartmentEventsPage = lazyWithRetry(() => import('./pages/Academics/Depar
 const Programs = lazyWithRetry(() => import('./pages/Academics/Programs'));
 const Admissions = lazyWithRetry(() => import('./pages/Admissions/Admissions'));
 const CampusVisit = lazyWithRetry(() => import('./pages/CampusVisit/CampusVisit'));
-const StudentLife = lazyWithRetry(() => import('./pages/StudentLife/StudentLife'));
 const AlumniGiving = lazyWithRetry(() => import('./pages/AlumniGiving/AlumniGiving'));
 const About = lazyWithRetry(() => import('./pages/About/About'));
 const News = lazyWithRetry(() => import('./pages/News/News'));
@@ -155,7 +154,6 @@ function PublicApp() {
             <Route path="/faculty/:id" element={<FacultyProfile />} />
             <Route path="/admissions" element={<Admissions />} />
             <Route path="/campus-visit" element={<CampusVisit />} />
-            <Route path="/student-life" element={<StudentLife />} />
             <Route path="/alumni-giving" element={<AlumniGiving />} />
             <Route path="/about" element={<About />} />
             <Route path="/vision-mission" element={<VisionMission />} />
@@ -204,7 +202,11 @@ function PublicApp() {
             <Route path="/student-clubs/:slug" element={<StudentClubDetail />} />
             <Route path="/social-services" element={<SocialServicesPage />} />
             <Route path="/campus-magazines" element={<CampusLifeDetail slug="campus-magazines" />} />
-            <Route path="/arts-culture" element={<CampusLifeDetail slug="arts-culture" />} />
+            {/* Page removed 2026-09-28 — redirected (not deleted outright) so
+                existing inbound links (Home's CampusLifeShowcase pillar, any
+                bookmarks) keep working; /campus/:slug (below) renders the
+                exact same content for the same "arts-culture" slug. */}
+            <Route path="/arts-culture" element={<Navigate to="/campus/arts-culture" replace />} />
             <Route path="/sports-games" element={<CampusLifeDetail slug="sports-games" />} />
             <Route path="/differentiators" element={<Differentiators />} />
             {/* Static segment declared alongside the /differentiators/:slug

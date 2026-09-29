@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import { Link } from "react-router-dom";
 import SEO from "../../components/SEO/SEO";
 import { usePageBanners } from "../../hooks/usePageBanners";
 import { useContentBlocks } from "../../hooks/useContentBlocks";
@@ -330,7 +329,6 @@ export default function Auditoriums() {
             Discover the spaces and facilities that support learning, collaboration and student life at Vishnu Women&rsquo;s University.
           </p>
           <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link to="/student-life" className="btn btn-secondary">Discover Student Life</Link>
           </div>
         </div>
       </section>

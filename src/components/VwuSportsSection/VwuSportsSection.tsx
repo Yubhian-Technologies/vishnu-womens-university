@@ -2,7 +2,7 @@ import { Target } from 'lucide-react';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import { renderBold } from '../../lib/boldText';
-import '../../pages/StudentLife/StudentLife.css';
+import './VwuSportsSection.css';
 
 /**
  * "Sports & Games at VWU" — the athletics cards (Content Blocks:

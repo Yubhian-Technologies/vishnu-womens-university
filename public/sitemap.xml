@@ -43,12 +43,6 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.vwu.edu.in/student-life</loc>
-    <lastmod>2026-09-24</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://www.vwu.edu.in/alumni-giving</loc>
     <lastmod>2026-09-24</lastmod>
     <changefreq>weekly</changefreq>
@@ -434,12 +428,6 @@
   </url>
   <url>
     <loc>https://www.vwu.edu.in/campus-magazines</loc>
-    <lastmod>2026-09-24</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://www.vwu.edu.in/arts-culture</loc>
     <lastmod>2026-09-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>

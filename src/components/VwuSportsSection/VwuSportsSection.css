@@ -1,0 +1,61 @@
+/* Split out of the (now-deleted) StudentLife.css when /student-life was
+   removed — these are the only rules that page's stylesheet had which this
+   component actually uses. See src/pages/StudentLife/StudentLife.tsx's
+   original comment: "Sports & Games at VWU" was relocated to the
+   /sports-games page (this component) while its CSS stayed behind. */
+
+.sl-sports-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--space-3);
+}
+
+.sl-sport-card {
+  background: var(--color-white);
+  border: 1.5px solid var(--color-light-gray);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  text-align: center;
+  transition: all var(--transition-base);
+}
+
+.sl-sport-card:hover {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-4px);
+}
+
+.sl-sport-icon {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: var(--space-2);
+}
+
+.sl-sport-name {
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: var(--space-1);
+}
+
+.sl-sport-season {
+  font-size: var(--text-xs);
+  color: var(--color-mid-gray);
+  background: var(--color-light-gray);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-family: var(--font-sans);
+}
+
+@media (max-width: 1024px) {
+  .sl-sports-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .sl-sports-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
