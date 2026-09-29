@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { usePageBanners } from '../../hooks/usePageBanners';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
-import { HERO_VIDEO_SRC, HERO_POSTER_SRC } from '../../lib/heroVideo';
+import { HOME_HERO_VIDEO_SRC, HOME_HERO_POSTER_SRC } from '../../lib/heroVideo';
 import './HeroSlider.css';
 
-// HERO_VIDEO_SRC lives in src/lib/heroVideo.ts so the Campus Visit page's
-// virtual tour can reuse the same source. The fetch is still deferred (see
+// HOME_HERO_VIDEO_SRC lives in src/lib/heroVideo.ts (the Campus Visit page's
+// virtual tour uses its own HERO_VIDEO_SRC there). The fetch is still deferred (see
 // the effect below) so it doesn't compete with the JS bundle on load.
 
 
@@ -48,7 +48,10 @@ function buildStaticSlides(btechCount: string): Slide[] {
       tag: 'Campus Life',
       heading: 'Learn, Grow\nand Excel',
       description: "VWU is more than a degree — it is a community where you build real skills, lasting connections, and the confidence to lead in your chosen field.",
-      primaryCta: { label: 'Campus Life', path: '/student-life' },
+      // Not currently rendered anywhere (see the "title/description card
+      // has been removed" note above) — path kept pointing at a real page
+      // regardless, so it can't silently 404 if that ever changes.
+      primaryCta: { label: 'Campus Life', path: '/campus/clubs' },
       secondaryCta: { label: 'Apply Now', path: '/apply-now' },
     },
     {
@@ -202,8 +205,8 @@ export default function HeroSlider() {
       <video
         ref={videoRef}
         className="hero-video"
-        src={HERO_VIDEO_SRC}
-        poster={HERO_POSTER_SRC}
+        src={HOME_HERO_VIDEO_SRC}
+        poster={HOME_HERO_POSTER_SRC}
         preload="auto"
         autoPlay
         muted

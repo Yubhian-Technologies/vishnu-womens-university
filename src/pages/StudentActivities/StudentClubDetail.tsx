@@ -71,8 +71,6 @@ export default function StudentClubDetail() {
               <div className="breadcrumb animate-fade-in" style={{ marginBottom: '0.8rem' }}>
                 <Link to="/" className="breadcrumb-item">Home</Link>
                 <span className="breadcrumb-sep">›</span>
-                <Link to="/student-life" className="breadcrumb-item">Student Life</Link>
-                <span className="breadcrumb-sep">›</span>
                 <Link to="/student-clubs" className="breadcrumb-item">Student Clubs</Link>
                 <span className="breadcrumb-sep">›</span>
                 <span className="breadcrumb-item active">{club.name}</span>

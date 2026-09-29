@@ -17,6 +17,8 @@ import IicDocumentsAdmin from './IicDocumentsAdmin';
 import VdlAchievementsAdmin from './VdlAchievementsAdmin';
 import VdlTeamAdmin from './VdlTeamAdmin';
 import RwtpReportsAdmin from './RwtpReportsAdmin';
+import { useAdminSession } from '../AdminSessionContext';
+import { allowedDifferentiatorItems } from '../../../lib/rbac';
 
 // Some differentiator items have extra editable content beyond the base
 // fields below (a team roster, photo galleries, placement cards, ...) —
@@ -310,7 +312,14 @@ function BlockEditor({ blockKey, label, hint, value, onChange, onPhotoUploaded, 
 }
 
 export default function DifferentiatorsAdmin() {
-  const { docs: items, loading } = useOrderedCollection<DifferentiatorItemDoc>('differentiatorItems', 'order');
+  const { docs: allItems, loading } = useOrderedCollection<DifferentiatorItemDoc>('differentiatorItems', 'order');
+  // Users & Roles can limit a user to specific differentiator pages (e.g. a
+  // department user who only manages their own lab's page). Such a user sees
+  // and edits only those pages — no adding, deleting, or whole-module
+  // migration. null = all pages (Admins, and users with no pages assigned).
+  const allowedPages = allowedDifferentiatorItems(useAdminSession());
+  const restricted = allowedPages !== null;
+  const items = useMemo(() => (allowedPages ? allItems.filter((it) => allowedPages.includes(it.id)) : allItems), [allItems, allowedPages]);
   const [form, setForm] = useState<Omit<DifferentiatorItemDoc, 'id'>>(EMPTY);
   // Snapshot of `form` taken when "Edit" was clicked (see startEdit) — save()
   // diffs against this so Update only writes fields actually changed in this
@@ -565,6 +574,7 @@ export default function DifferentiatorsAdmin() {
   };
 
   const save = async () => {
+    if (restricted && !(editing && allowedPages!.includes(editing))) return;
     if (!form.slug || !form.title) return alert('Slug and title are required.');
     setSaving(true);
     try {
@@ -664,6 +674,7 @@ export default function DifferentiatorsAdmin() {
 
   return (
     <div className="admin-section">
+      {!restricted && (
       <div className="admin-card">
         <h2 className="admin-card__title">Migrate to New Structure</h2>
         <p className="admin-field__hint" style={{ marginBottom: '1rem' }}>
@@ -682,7 +693,16 @@ export default function DifferentiatorsAdmin() {
           </button>
         )}
       </div>
+      )}
 
+      {restricted && !editing && (
+        <div className="admin-card">
+          <p className="admin-field__hint" style={{ margin: 0 }}>
+            You can edit the {items.length} differentiator page{items.length === 1 ? '' : 's'} assigned to you — click <strong>Edit</strong> on one below.
+          </p>
+        </div>
+      )}
+      {(!restricted || editing) && (
       <div className="admin-card">
         <h2 className="admin-card__title">{editing ? 'Edit Differentiator' : 'Add Differentiator'}</h2>
         <p className="admin-field__hint" style={{ background: '#eef6ff', border: '1px solid #bcdcfd', borderRadius: 6, padding: '0.6rem 0.9rem', marginBottom: '1rem' }}>
@@ -818,6 +838,7 @@ export default function DifferentiatorsAdmin() {
           <button className="admin-btn admin-btn--primary" onClick={save} disabled={saving}>{saving ? 'Saving…' : editing ? 'Update' : 'Add Item'}</button>
         </div>
       </div>
+      )}
 
       {editing && ITEM_SUB_SECTIONS[form.slug] && (() => {
         const subs = ITEM_SUB_SECTIONS[form.slug];
@@ -868,7 +889,7 @@ export default function DifferentiatorsAdmin() {
                     <td>{it.slug}</td>
                     <td>
                       <button className="admin-btn admin-btn--sm" onClick={() => startEdit(it)}>Edit</button>
-                      <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(it.id, it.heroStoragePath)}>Delete</button>
+                      {!restricted && <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(it.id, it.heroStoragePath)}>Delete</button>}
                     </td>
                   </tr>
                 ))}

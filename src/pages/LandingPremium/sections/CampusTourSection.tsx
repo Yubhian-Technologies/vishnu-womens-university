@@ -16,7 +16,6 @@ export default function CampusTourSection() {
           </p>
         </div>
         <div className="lph-tour__pills">
-          <Link to="/student-life" className="lph-tour__pill">Student Life</Link>
           <Link to="/admissions" className="lph-tour__pill">Schedule a Visit</Link>
         </div>
       </div>

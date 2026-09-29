@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useOrderedCollection } from '../../../hooks/useCollection';
 import { SECTION_GROUPS, SECTIONS } from '../AdminLayout';
@@ -6,6 +6,8 @@ import {
   listAdminUsers, saveAdminUser, createAdminLogin, deleteAdminUser, ROLE_PRESETS,
   type AdminUserDoc, type AdminRole, type ModuleLevel,
 } from '../../../lib/rbac';
+import { changeFirebaseAuthPassword } from '../../../lib/firebaseAdmin';
+import type { DifferentiatorItemDoc } from './DifferentiatorsAdmin';
 
 const ROLE_LABELS: Record<AdminRole, string> = {
   superadmin: 'Super Admin',
@@ -22,7 +24,20 @@ function roleLabelFor(u: Pick<AdminUserDoc, 'role' | 'roleName'>): string {
   return u.role === 'custom' && u.roleName?.trim() ? u.roleName : ROLE_LABELS[u.role];
 }
 
-const EMPTY: Omit<AdminUserDoc, 'id'> = { email: '', department: '', role: 'custom', roleName: '', active: true, modules: {}, resources: [] };
+/** Plain-language message for the Firebase auth errors Change Password can hit. */
+function passwordErrorMessage(e: unknown): string {
+  const code = (e as { code?: string })?.code || '';
+  if (code === 'auth/invalid-credential' || code === 'auth/wrong-password') return 'The current password is incorrect.';
+  if (code === 'auth/user-not-found') return 'No sign-in exists for this email.';
+  if (code === 'auth/weak-password') return 'The new password is too weak — use at least 6 characters.';
+  if (code === 'auth/too-many-requests') return 'Too many attempts — please wait a few minutes and try again.';
+  if (code === 'auth/user-disabled') return 'This sign-in has been disabled in Firebase.';
+  return (e as Error)?.message || 'Something went wrong.';
+}
+
+const EMPTY_PW = { current: '', next: '', confirm: '' };
+
+const EMPTY: Omit<AdminUserDoc, 'id'> ={ email: '', department: '', role: 'custom', roleName: '', active: true, modules: {}, resources: [], differentiatorItems: [] };
 
 /**
  * Super Admin-only: manage who else can sign in to /admin and what they can
@@ -38,6 +53,15 @@ export default function UsersRolesAdmin() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<Omit<AdminUserDoc, 'id'>>(EMPTY);
   const [password, setPassword] = useState('');
+  // Differentiators module: 'all' pages (differentiatorItems left empty) or
+  // only the pages ticked below — lets different department users each
+  // manage their own differentiator pages instead of the whole module.
+  const { docs: differentiatorPages } = useOrderedCollection<DifferentiatorItemDoc>('differentiatorItems', 'order');
+  const [diffPagesMode, setDiffPagesMode] = useState<'all' | 'selected'>('all');
+  const toggleDiffPage = (pageId: string, on: boolean) => setForm((f) => ({
+    ...f,
+    differentiatorItems: on ? Array.from(new Set([...f.differentiatorItems, pageId])) : f.differentiatorItems.filter((x) => x !== pageId),
+  }));
   const [saving, setSaving] = useState(false);
 
   const load = () => {
@@ -69,7 +93,8 @@ export default function UsersRolesAdmin() {
 
   const edit = (u: AdminUserDoc) => {
     setEditingId(u.id);
-    setForm({ email: u.email, department: u.department, role: u.role, roleName: u.roleName || '', active: u.active, modules: u.modules, resources: u.resources });
+    setForm({ email: u.email, department: u.department, role: u.role, roleName: u.roleName || '', active: u.active, modules: u.modules, resources: u.resources, differentiatorItems: u.differentiatorItems || [] });
+    setDiffPagesMode((u.differentiatorItems || []).length > 0 ? 'selected' : 'all');
     setPassword('');
   };
 
@@ -77,23 +102,63 @@ export default function UsersRolesAdmin() {
     const email = form.email.trim().toLowerCase();
     if (!email) return alert('Email is required.');
     if (!editingId && password.length < 6) return alert('Set a password of at least 6 characters for this new login.');
+    // Empty list = all differentiator pages, so "selected" needs at least one.
+    const hasDiffModule = form.role !== 'admin' && !!form.modules['differentiators'];
+    if (hasDiffModule && diffPagesMode === 'selected' && form.differentiatorItems.length === 0) {
+      return alert('Tick at least one Differentiators page for this user, or choose "All pages".');
+    }
+    const differentiatorItems = hasDiffModule && diffPagesMode === 'selected' ? form.differentiatorItems : [];
     setSaving(true);
     try {
       if (editingId) {
-        await saveAdminUser(editingId, { ...form, email });
+        await saveAdminUser(editingId, { ...form, email, differentiatorItems });
       } else {
         // Creates the actual Firebase Auth sign-in too, not just the
         // permissions record — see createAdminLogin in lib/rbac.ts.
-        await createAdminLogin(email, password, { department: form.department, role: form.role, roleName: form.roleName, active: form.active, modules: form.modules, resources: form.resources });
+        await createAdminLogin(email, password, { department: form.department, role: form.role, roleName: form.roleName, active: form.active, modules: form.modules, resources: form.resources, differentiatorItems });
       }
       setEditingId(null);
       setForm(EMPTY);
+      setDiffPagesMode('all');
       setPassword('');
       load();
     } catch (e) {
       alert(`Couldn't save: ${(e as Error).message}`);
     } finally {
       setSaving(false);
+    }
+  };
+
+  // Change Password — one row open at a time.
+  const [pwUserId, setPwUserId] = useState<string | null>(null);
+  const [pw, setPw] = useState(EMPTY_PW);
+  const [pwSaving, setPwSaving] = useState(false);
+  const [pwError, setPwError] = useState('');
+  // Live check, shown as soon as something is typed in Confirm New Password.
+  const pwMismatch = pw.confirm.length > 0 && pw.next !== pw.confirm;
+
+  const openChangePassword = (u: AdminUserDoc) => {
+    setPwUserId(pwUserId === u.id ? null : u.id);
+    setPw(EMPTY_PW);
+    setPwError('');
+  };
+
+  const changePassword = async (u: AdminUserDoc) => {
+    if (!pw.current) return setPwError('Enter the current password.');
+    if (pw.next.length < 6) return setPwError('The new password must be at least 6 characters.');
+    if (pw.next !== pw.confirm) return setPwError('The new passwords don’t match.');
+    if (pw.next === pw.current) return setPwError('The new password must be different from the current one.');
+    setPwSaving(true);
+    setPwError('');
+    try {
+      await changeFirebaseAuthPassword(u.email, pw.current, pw.next);
+      setPwUserId(null);
+      setPw(EMPTY_PW);
+      alert(`Password changed for ${u.email}. Share the new password with them.`);
+    } catch (e) {
+      setPwError(passwordErrorMessage(e));
+    } finally {
+      setPwSaving(false);
     }
   };
 
@@ -177,7 +242,8 @@ export default function UsersRolesAdmin() {
                   if (!s || id === 'users-roles') return null;
                   const level = form.modules[id] ?? 'none';
                   return (
-                    <div key={id} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.2rem 0' }}>
+                    <Fragment key={id}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.2rem 0' }}>
                       <span style={{ flex: 1, fontSize: '0.85rem' }}><FontAwesomeIcon icon={s.icon} fixedWidth aria-hidden="true" /> {s.label}</span>
                       <select value={level} onChange={(e) => setModuleLevel(id, e.target.value as ModuleLevel | 'none')} style={{ width: 100 }}>
                         <option value="none">None</option>
@@ -185,6 +251,37 @@ export default function UsersRolesAdmin() {
                         <option value="write">Write</option>
                       </select>
                     </div>
+                    {id === 'differentiators' && !!form.modules[id] && (
+                      <div style={{ margin: '0.25rem 0 0.75rem 1.5rem', padding: '0.6rem 0.75rem', border: '1px solid var(--color-light-gray, #e5e7eb)', borderRadius: 8 }}>
+                        <div style={{ fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Differentiator pages this user can manage</div>
+                        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '0.4rem' }}>
+                          <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.85rem' }}>
+                            <input type="radio" name="diff-pages-mode" checked={diffPagesMode === 'all'} onChange={() => setDiffPagesMode('all')} />
+                            All pages
+                          </label>
+                          <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.85rem' }}>
+                            <input type="radio" name="diff-pages-mode" checked={diffPagesMode === 'selected'} onChange={() => setDiffPagesMode('selected')} />
+                            Only selected pages
+                          </label>
+                        </div>
+                        {diffPagesMode === 'selected' && (
+                          <>
+                            <p className="admin-field__hint" style={{ margin: '0 0 0.4rem' }}>
+                              {form.differentiatorItems.length} of {differentiatorPages.length} selected — this user sees and edits only these pages (no adding or deleting pages).
+                            </p>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '0.2rem 1rem', maxHeight: 280, overflowY: 'auto' }}>
+                              {differentiatorPages.map((p) => (
+                                <label key={p.id} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.35rem', fontSize: '0.83rem', padding: '0.15rem 0' }}>
+                                  <input type="checkbox" checked={form.differentiatorItems.includes(p.id)} onChange={(e) => toggleDiffPage(p.id, e.target.checked)} style={{ marginTop: 3 }} />
+                                  {p.title}
+                                </label>
+                              ))}
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    )}
+                    </Fragment>
                   );
                 })}
               </div>
@@ -193,7 +290,7 @@ export default function UsersRolesAdmin() {
         )}
 
         <div className="admin-form-actions">
-          {editingId && <button className="admin-btn admin-btn--ghost" onClick={() => { setEditingId(null); setForm(EMPTY); setPassword(''); }}>Cancel</button>}
+          {editingId && <button className="admin-btn admin-btn--ghost" onClick={() => { setEditingId(null); setForm(EMPTY); setPassword(''); setDiffPagesMode('all'); }}>Cancel</button>}
           <button className="admin-btn admin-btn--primary" onClick={save} disabled={saving}>{saving ? 'Saving…' : editingId ? 'Update' : 'Add User'}</button>
         </div>
       </div>
@@ -207,17 +304,61 @@ export default function UsersRolesAdmin() {
             <thead><tr><th>Email</th><th>Role</th><th>Department</th><th>Modules</th><th>Status</th><th></th></tr></thead>
             <tbody>
               {users.map((u) => (
-                <tr key={u.id}>
-                  <td>{u.email}</td>
-                  <td>{roleLabelFor(u)}</td>
-                  <td>{u.department || '—'}</td>
-                  <td>{Object.keys(u.modules).length}</td>
-                  <td>{u.active ? 'Active' : 'Disabled'}</td>
-                  <td>
-                    <button className="admin-btn admin-btn--sm" onClick={() => edit(u)}>Edit</button>{' '}
-                    <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(u)}>Remove</button>
-                  </td>
-                </tr>
+                <Fragment key={u.id}>
+                  <tr>
+                    <td>{u.email}</td>
+                    <td>{roleLabelFor(u)}</td>
+                    <td>{u.department || '—'}</td>
+                    <td>{Object.keys(u.modules).length}</td>
+                    <td>{u.active ? 'Active' : 'Disabled'}</td>
+                    <td style={{ whiteSpace: 'nowrap' }}>
+                      <button className="admin-btn admin-btn--sm" onClick={() => edit(u)}>Edit</button>{' '}
+                      <button className="admin-btn admin-btn--sm" onClick={() => openChangePassword(u)} aria-expanded={pwUserId === u.id}>Change Password</button>{' '}
+                      <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(u)}>Remove</button>
+                    </td>
+                  </tr>
+                  {pwUserId === u.id && (
+                    <tr>
+                      <td colSpan={6}>
+                        <form
+                          onSubmit={(e) => { e.preventDefault(); changePassword(u); }}
+                          style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: '0.75rem', padding: '0.5rem 0' }}
+                        >
+                          <div className="admin-field" style={{ flex: '1 1 180px', margin: 0 }}>
+                            <label htmlFor={`pw-current-${u.id}`}>Current Password</label>
+                            <input id={`pw-current-${u.id}`} type="password" autoComplete="off" value={pw.current} onChange={(e) => setPw((p) => ({ ...p, current: e.target.value }))} />
+                          </div>
+                          <div className="admin-field" style={{ flex: '1 1 180px', margin: 0 }}>
+                            <label htmlFor={`pw-next-${u.id}`}>New Password (min. 6 characters)</label>
+                            <input id={`pw-next-${u.id}`} type="password" autoComplete="new-password" value={pw.next} onChange={(e) => setPw((p) => ({ ...p, next: e.target.value }))} />
+                          </div>
+                          <div className="admin-field" style={{ flex: '1 1 180px', margin: 0 }}>
+                            <label htmlFor={`pw-confirm-${u.id}`}>Confirm New Password</label>
+                            <input
+                              id={`pw-confirm-${u.id}`}
+                              type="password"
+                              autoComplete="new-password"
+                              value={pw.confirm}
+                              onChange={(e) => setPw((p) => ({ ...p, confirm: e.target.value }))}
+                              aria-invalid={pwMismatch}
+                              aria-describedby={pwMismatch ? `pw-mismatch-${u.id}` : undefined}
+                            />
+                            {pwMismatch && (
+                              <p id={`pw-mismatch-${u.id}`} role="alert" style={{ margin: '0.25rem 0 0', fontSize: '0.8rem', color: 'var(--color-danger, #c62828)' }}>
+                                Passwords don’t match.
+                              </p>
+                            )}
+                          </div>
+                          <div style={{ display: 'flex', gap: '0.5rem' }}>
+                            <button type="button" className="admin-btn admin-btn--ghost" onClick={() => setPwUserId(null)}>Cancel</button>
+                            <button type="submit" className="admin-btn admin-btn--primary" disabled={pwSaving || !pw.next || pw.next !== pw.confirm}>{pwSaving ? 'Changing…' : 'Change Password'}</button>
+                          </div>
+                          {pwError && <p role="alert" style={{ flexBasis: '100%', margin: 0, color: 'var(--color-danger, #c62828)' }}>{pwError}</p>}
+                        </form>
+                      </td>
+                    </tr>
+                  )}
+                </Fragment>
               ))}
             </tbody>
           </table>

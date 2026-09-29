@@ -55,15 +55,12 @@ export function truncate(text: string, max: number) {
   return text.length > max ? `${text.slice(0, max).trimEnd()}…` : text;
 }
 
+// Used to hardcode a couple of programs' seat counts here (VLSI → 18,
+// M.Tech CSE → 27) from before Admin → Programs had its own editable
+// "Intake (seats)" field — that override silently ignored whatever an
+// admin has since entered there, so it's gone; this now just reads the
+// admin-entered value directly, same as every other program.
 export function resolveProgramIntake(program: { name?: string; slug?: string; category?: string; intake?: number | string }): number | string {
-  const name = (program.name || '').toUpperCase();
-  const slug = (program.slug || '').toLowerCase();
-  if (/VLSI|VSLI/.test(name) || slug.includes('vlsi')) {
-    return 18;
-  }
-  if ((name.includes('COMPUTER SCIENCE') || slug.includes('cse')) && (program.category === 'mtech' || name.includes('M.TECH') || slug.startsWith('mtech'))) {
-    return 27;
-  }
   return program.intake ?? 0;
 }
 
@@ -419,8 +416,24 @@ export default function Academics() {
           <div className="activities-grid">
             {studentActivities.map((act) => {
               const Icon = resolveContentIcon(act.icon) || Radio;
-              const path = act.slug || '/student-life';
+              const path = act.slug || '';
               const external = /^https?:\/\//.test(path);
+              const cardInner = (
+                <>
+                  <div className="activity-item-icon"><Icon size={35} strokeWidth={1.75} /></div>
+                  <h3 className="activity-item-title">{act.title}</h3>
+                  <span style={{ marginTop: 'auto', fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'var(--font-sans)' }}>Explore →</span>
+                </>
+              );
+              // No slug set (the /student-life page it used to default to no
+              // longer exists) — a plain, unlinked card instead of a dead link.
+              if (!path) {
+                return (
+                  <div key={act.id} className="activity-item-card" style={{ textDecoration: 'none' }}>
+                    {cardInner}
+                  </div>
+                );
+              }
               return external ? (
                 <a
                   key={act.id}
@@ -430,9 +443,7 @@ export default function Academics() {
                   className="activity-item-card"
                   style={{ textDecoration: 'none' }}
                 >
-                  <div className="activity-item-icon"><Icon size={35} strokeWidth={1.75} /></div>
-                  <h3 className="activity-item-title">{act.title}</h3>
-                  <span style={{ marginTop: 'auto', fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'var(--font-sans)' }}>Explore →</span>
+                  {cardInner}
                 </a>
               ) : (
                 <Link
@@ -441,15 +452,12 @@ export default function Academics() {
                   className="activity-item-card"
                   style={{ textDecoration: 'none' }}
                 >
-                  <div className="activity-item-icon"><Icon size={35} strokeWidth={1.75} /></div>
-                  <h3 className="activity-item-title">{act.title}</h3>
-                  <span style={{ marginTop: 'auto', fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'var(--font-sans)' }}>Explore →</span>
+                  {cardInner}
                 </Link>
               );
             })}
           </div>
           <div style={{ textAlign: 'center', marginTop: 'var(--space-8)' }}>
-            <Link to="/student-life" className="btn btn-primary">Full Student Life Experience →</Link>
           </div>
         </div>
       </section>

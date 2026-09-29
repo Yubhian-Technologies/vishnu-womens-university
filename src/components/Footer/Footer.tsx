@@ -68,7 +68,6 @@ const ACADEMIC_LINKS: { label: string; href: string; external?: boolean }[] = [
 ];
 
 const STUDENT_SERVICE_LINKS: { label: string; href: string; external?: boolean }[] = [
-  { label: 'Student Life & Clubs', href: '/student-life' },
   { label: 'Hostels & Dining', href: '/campus/campus-hostels' },
   { label: 'Sports & Athletics', href: '/campus/sports' },
   { label: "Vishnu's Wellness Center", href: 'https://vishnuwellness.in/', external: true },

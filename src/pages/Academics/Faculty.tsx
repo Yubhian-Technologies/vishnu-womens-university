@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Award, Briefcase, ChevronRight } from 'lucide-react';
 import './Faculty.css';
@@ -6,8 +6,40 @@ import '../../components/FacultyCarousel/FacultyCarousel.css';
 import PageHero from '../../components/PageHero/PageHero';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import { useOrderedCollection } from '../../hooks/useCollection';
+import { smoothScrollTo } from '../../lib/smoothScroll';
 import type { FacultyFact, FacultySection } from '../../lib/facultySections';
 import type { CustomSection } from '../../lib/customSections';
+
+// Same technique as FacultyCarousel.tsx's own return-scroll (kept as a
+// separate, page-local copy rather than sharing that one, since this page
+// has no FacultyCarousel section to scroll *to* — it needs to restore the
+// exact Y position the visitor scrolled to on this page itself, not jump to
+// a landmark element). Stored directly on the history entry (not
+// sessionStorage) so it's naturally scoped to this one visit to /faculty.
+const LIST_RETURN_FLAG = 'vwuFacultyListReturn';
+
+function markListReturn() {
+  try {
+    window.history.replaceState({ ...(window.history.state ?? {}), [LIST_RETURN_FLAG]: true, listScrollY: window.scrollY }, '');
+  } catch { /* history unavailable — Back just behaves as before */ }
+}
+
+function readListReturnScrollY(): number | null {
+  const state = window.history.state;
+  if (!state?.[LIST_RETURN_FLAG]) return null;
+  return typeof state.listScrollY === 'number' ? state.listScrollY : 0;
+}
+
+function clearListReturn() {
+  try {
+    const state = window.history.state;
+    if (!state?.[LIST_RETURN_FLAG]) return;
+    const rest = { ...state };
+    delete rest[LIST_RETURN_FLAG];
+    delete rest.listScrollY;
+    window.history.replaceState(rest, '');
+  } catch { /* ignore */ }
+}
 
 // Fixed department tab order (per design decision, not derived from data) —
 // each tab's `departments` lists every raw `department` field value (as
@@ -105,13 +137,48 @@ function getFacultySummary(f: FacultyDoc) {
 export default function Faculty() {
   const { docs: allFaculty, loading } = useOrderedCollection<FacultyDoc>('faculty', 'order');
   const [activeDept, setActiveDept] = useState<string | null>(null);
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const faculty = allFaculty;
 
   useEffect(() => {
     document.title = "Faculty | Vishnu Women's University";
   }, []);
+
+  // Restore the exact scroll position a visitor was at when they clicked
+  // into a profile from here (markListReturn, below) — App.tsx's
+  // RouteScrollReset otherwise always lands Back at the top of the page.
+  // Re-applied every frame for up to 6s while the faculty grid/tabs above
+  // finish loading and shift the layout, and abandoned the moment the
+  // visitor scrolls, taps, clicks or presses a key themselves — same
+  // pattern as FacultyCarousel.tsx's own return-scroll.
+  const returningToYRef = useRef<number | null>(readListReturnScrollY());
+  useEffect(() => {
+    if (loading || returningToYRef.current === null) return;
+    clearListReturn();
+    const targetY = returningToYRef.current;
+
+    const interactionEvents = ['wheel', 'touchstart', 'keydown', 'mousedown'] as const;
+    let raf = 0;
+    const check = () => {
+      if (Math.abs(window.scrollY - targetY) > 2) smoothScrollTo(targetY, { immediate: true });
+      raf = requestAnimationFrame(check);
+    };
+    raf = requestAnimationFrame(check);
+
+    const cleanup = () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(timer);
+      interactionEvents.forEach((e) => window.removeEventListener(e, stop));
+    };
+    function stop() {
+      returningToYRef.current = null;
+      cleanup();
+    }
+    const timer = setTimeout(stop, 6000);
+    interactionEvents.forEach((e) => window.addEventListener(e, stop, { passive: true }));
+    return cleanup;
+  }, [loading]);
 
   // The intro heading above the department tabs uses .reveal (mount-only,
   // static content — not gated behind Firestore data, see the CLAUDE.md
@@ -218,7 +285,18 @@ export default function Faculty() {
               <button
                 key={g.label}
                 className={`faculty-tab${activeGroup?.label === g.label ? ' active' : ''}`}
-                onClick={() => setActiveDept(g.label)}
+                onClick={() => {
+                  setActiveDept(g.label);
+                  // Reflects the chosen tab in the URL (replacing, not
+                  // pushing, so clicking through tabs doesn't pile up
+                  // history entries) so that opening a faculty profile from
+                  // here and pressing Back returns to *this* department's
+                  // tab instead of always the first one — see deptParam
+                  // above, which this exact query value already round-trips
+                  // through. g.departments[0] (not g.label) since deptParam
+                  // is matched against the group's raw department values.
+                  setSearchParams({ dept: g.departments[0] }, { replace: true });
+                }}
               >
                 {g.label}
               </button>
@@ -238,7 +316,7 @@ export default function Faculty() {
                   return (
                     <div key={f.id} className="faculty-impact-card">
                       {/* Portrait Photo Frame */}
-                      <Link to={`/faculty/${f.id}`} className="faculty-impact-photo-frame" aria-label={`View ${f.name} profile`}>
+                      <Link to={`/faculty/${f.id}`} onClick={markListReturn} className="faculty-impact-photo-frame" aria-label={`View ${f.name} profile`}>
                         {f.imageUrl ? (
                           <SmoothImage
                             src={f.imageUrl}
@@ -256,7 +334,7 @@ export default function Faculty() {
                       <div className="faculty-impact-info">
                         <div className="faculty-impact-heading-group">
                           <h3 className="faculty-impact-name">
-                            <Link to={`/faculty/${f.id}`} className="faculty-impact-name-link">
+                            <Link to={`/faculty/${f.id}`} onClick={markListReturn} className="faculty-impact-name-link">
                               {f.name}
                             </Link>
                           </h3>
@@ -281,7 +359,7 @@ export default function Faculty() {
 
                         {/* View Full Profile Action Button */}
                         <div className="faculty-impact-footer">
-                          <Link to={`/faculty/${f.id}`} className="faculty-card-profile-btn">
+                          <Link to={`/faculty/${f.id}`} onClick={markListReturn} className="faculty-card-profile-btn">
                             <span>View Full Profile</span>
                             <span className="faculty-btn-arrow-circle">
                               <ChevronRight size={13} strokeWidth={2.4} />

@@ -22,7 +22,7 @@ import type { CustomSection } from '../../lib/customSections';
 import { useOrderedCollection, type WithId } from '../../hooks/useCollection';
 import type { AicteIdeaLabTeamMemberDoc } from '../Admin/sections/AicteIdeaLabTeamAdmin';
 import type { AicteIdeaLabAmbassadorDoc } from '../Admin/sections/AicteIdeaLabAmbassadorsAdmin';
-import { CustomSectionsPlain, CustomSectionsPills } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
+import { CustomSectionsPlain, CustomSectionsPills, CustomSectionsGalleries, CustomSectionsAccordion } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import { renderBold } from '../../lib/boldText';
 import './IdeaLabPage.css';
@@ -54,7 +54,7 @@ const DEFAULT_AMBASSADORS = [
   { id: 'a10', regNumber: '21B01A0314', name: 'D. H Pravallika Devi', year: 'II', branch: 'ME', order: 10 },
 ];
 
-export default function IdeaLabPage({ item }: IdeaLabPageProps) {
+export default function IdeaLabPage({ item, sections = [] }: IdeaLabPageProps) {
   const { docs: teamDocs } = useOrderedCollection<AicteIdeaLabTeamMemberDoc>('aicteIdeaLabTeam', 'order');
   const { docs: ambassadorDocs } = useOrderedCollection<AicteIdeaLabAmbassadorDoc>('aicteIdeaLabAmbassadors', 'order');
   const { docs: facilityPhotos } = useOrderedCollection<WithId & { imageUrl: string; caption?: string }>('aicteIdeaLabFacilityPhotos', 'order');
@@ -508,6 +508,18 @@ export default function IdeaLabPage({ item }: IdeaLabPageProps) {
           </div>
         </aside>
       </div>
+
+      {/* Photos/sections added via Admin → Differentiators → (this item's)
+          main "Photos"/Custom Sections editor — separate from the Quick
+          Navigation admin tabs above (item.tabs, rendered via adminTabs).
+          Previously this component only ever read item.tabs; the `sections`
+          prop (item.customSections, computed by DifferentiatorDetail.tsx)
+          was accepted but never rendered, so anything added there — photos
+          included — silently never showed up on this page. Always visible,
+          not tied to any one of the tabs above. Same pattern MicrochipPage.tsx
+          already uses for its own "Dynamic Custom Sections" block. */}
+      <CustomSectionsGalleries sections={sections} />
+      <CustomSectionsAccordion sections={sections} />
     </div>
   );
 }

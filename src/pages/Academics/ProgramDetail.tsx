@@ -1184,7 +1184,7 @@ function SingleProgramDetail() {
               </div>
 
               {internshipMarqueeItems.length > 0 ? (
-                <TestimonialMarquee records={internshipMarqueeItems} />
+                <TestimonialMarquee records={internshipMarqueeItems} noLpaSuffix />
               ) : (
                 <p style={{ color: 'var(--color-text-light)', fontStyle: 'italic', padding: '1.5rem 0' }}>
                   No internship records uploaded yet for {activeInternshipYear?.year}.

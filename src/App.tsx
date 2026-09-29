@@ -1,6 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { Suspense, lazy, useEffect } from 'react';
-import type { ComponentType } from 'react';
+import { Suspense, useEffect } from 'react';
 import { GraduationCap } from 'lucide-react';
 import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
@@ -14,46 +13,8 @@ import FirestoreErrorBanner from './components/FirestoreErrorBanner/FirestoreErr
 import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
 import PopupOverlay from './components/PopupOverlay/PopupOverlay';
 import { smoothScrollTo } from './lib/smoothScroll';
+import { lazyWithRetry } from './lib/lazyWithRetry';
 import { useRevealSafetyNet } from './hooks/useRevealSafetyNet';
-
-// A failed dynamic import() is almost always a stale chunk after a new deploy:
-// the previous build's hashed filenames 404, and React surfaces that inside
-// <Suspense> as a blank white page that only a manual refresh clears. Here we
-// do that refresh automatically — one hard reload pulls a fresh index.html
-// with current hashes.
-// Both attempts are also time-bounded: a chunk request that neither resolves
-// nor rejects (stalled network, stuck service worker) would otherwise leave
-// the route transition pending forever — the same "must hard-refresh" symptom.
-// A timeout turns that hang into an ordinary failure, flowing into the
-// retry → reload path below.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
-  return Promise.race([
-    promise,
-    new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error('Dynamic import timed out')), ms),
-    ),
-  ]);
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function lazyWithRetry<T extends ComponentType<any>>(factory: () => Promise<{ default: T }>) {
-  return lazy(async () => {
-    try {
-      return await withTimeout(factory(), 20000);
-    } catch (err) {
-      console.warn('Lazy chunk import failed or timed out, retrying...', err);
-      try {
-        await new Promise((r) => setTimeout(r, 200));
-        return await withTimeout(factory(), 20000);
-      } catch (retryErr) {
-        console.error('Lazy chunk import failed twice, auto-reloading page:', retryErr);
-        window.location.reload();
-        return new Promise<{ default: T }>(() => {});
-      }
-    }
-  });
-}
 
 const Academics = lazyWithRetry(() => import('./pages/Academics/Academics'));
 const ProgramDetail = lazyWithRetry(() => import('./pages/Academics/ProgramDetail'));
@@ -68,7 +29,6 @@ const DepartmentEventsPage = lazyWithRetry(() => import('./pages/Academics/Depar
 const Programs = lazyWithRetry(() => import('./pages/Academics/Programs'));
 const Admissions = lazyWithRetry(() => import('./pages/Admissions/Admissions'));
 const CampusVisit = lazyWithRetry(() => import('./pages/CampusVisit/CampusVisit'));
-const StudentLife = lazyWithRetry(() => import('./pages/StudentLife/StudentLife'));
 const AlumniGiving = lazyWithRetry(() => import('./pages/AlumniGiving/AlumniGiving'));
 const About = lazyWithRetry(() => import('./pages/About/About'));
 const News = lazyWithRetry(() => import('./pages/News/News'));
@@ -194,7 +154,6 @@ function PublicApp() {
             <Route path="/faculty/:id" element={<FacultyProfile />} />
             <Route path="/admissions" element={<Admissions />} />
             <Route path="/campus-visit" element={<CampusVisit />} />
-            <Route path="/student-life" element={<StudentLife />} />
             <Route path="/alumni-giving" element={<AlumniGiving />} />
             <Route path="/about" element={<About />} />
             <Route path="/vision-mission" element={<VisionMission />} />
@@ -243,7 +202,11 @@ function PublicApp() {
             <Route path="/student-clubs/:slug" element={<StudentClubDetail />} />
             <Route path="/social-services" element={<SocialServicesPage />} />
             <Route path="/campus-magazines" element={<CampusLifeDetail slug="campus-magazines" />} />
-            <Route path="/arts-culture" element={<CampusLifeDetail slug="arts-culture" />} />
+            {/* Page removed 2026-09-28 — redirected (not deleted outright) so
+                existing inbound links (Home's CampusLifeShowcase pillar, any
+                bookmarks) keep working; /campus/:slug (below) renders the
+                exact same content for the same "arts-culture" slug. */}
+            <Route path="/arts-culture" element={<Navigate to="/campus/arts-culture" replace />} />
             <Route path="/sports-games" element={<CampusLifeDetail slug="sports-games" />} />
             <Route path="/differentiators" element={<Differentiators />} />
             {/* Static segment declared alongside the /differentiators/:slug
