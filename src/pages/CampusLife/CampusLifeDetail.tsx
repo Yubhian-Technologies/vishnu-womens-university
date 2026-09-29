@@ -361,6 +361,7 @@ export default function CampusLifeDetail({ slug: slugProp }: { slug?: string }) 
       {!EVENTS_SHOWCASE_SLUGS.has(slug) && (
         <PageHero
           page={heroPage}
+          defaultImage={slug === 'vishnu-tv-academy' ? '/images/vishnu-tv-academy-hero.png' : undefined}
           defaultTitle={title}
           defaultSubtitle={subtitle}
           breadcrumb={isActivity
