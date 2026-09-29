@@ -455,7 +455,7 @@ export default function Contact() {
                   <div className="transit-info">
                     <p>
                       <strong>Vijayawada International Airport (VGA):</strong> ~92 km (2 hrs drive).<br />
-                      <strong>Rajahmundry Domestic Airport (RJA):</strong> ~78 km (1.8 hrs drive).
+                      <strong>Rajahmundry Domestic Airport (RJA):</strong> ~78 km (2 hrs drive).
                     </p>
                   </div>
                 )}
