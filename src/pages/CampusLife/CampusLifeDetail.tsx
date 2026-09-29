@@ -341,6 +341,13 @@ export default function CampusLifeDetail({ slug: slugProp }: { slug?: string }) 
     if (item) document.title = `${item.title} | VWU`;
   }, [item]);
 
+  // Page removed 2026-09-29 — its old content is retired in favour of the
+  // real Events showcase page (campusLifeItems doc slug "events", rendered
+  // via EVENTS_SHOWCASE_SLUGS below). Redirects rather than 404s so the old
+  // /arts-culture → /campus/arts-culture chain (see App.tsx) and any other
+  // existing link to this slug still land somewhere real.
+  if (slug === 'arts-culture') return <Navigate to="/campus/events" replace />;
+
   if (!loading && !item) return <Navigate to={isActivity ? '/student-life' : '/'} replace />;
   if (!item) return null;
 

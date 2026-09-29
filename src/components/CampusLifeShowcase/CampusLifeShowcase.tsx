@@ -47,7 +47,7 @@ export default function CampusLifeShowcase() {
           {/* 3 Pillars Clean Horizontal Underline Grid */}
           <div className="campus-showcase-pillars">
             {/* Pillar 1: Cultural & technical events */}
-            <Link to="/arts-culture" className="campus-showcase-pillar-item" aria-label="Explore Cultural festivals and technical hackathons">
+            <Link to="/campus/events" className="campus-showcase-pillar-item" aria-label="Explore Cultural festivals and technical hackathons">
               <div className="campus-showcase-pillar-icon" aria-hidden="true">
                 <svg width="44" height="44" viewBox="0 0 48 48" fill="none" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M6 14H42" />
