@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams, Navigate } from 'react-router-dom';
+import { Link, useParams, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { Mail, ExternalLink, FileText, ChevronRight, ArrowLeft } from 'lucide-react';
 import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
@@ -38,6 +38,8 @@ function getInitials(name: string) {
  */
 export default function FacultyProfile() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const location = useLocation();
   const { docs: allFaculty, loading } = useOrderedCollection<FacultyDoc>('faculty', 'order');
   const { docs: programs } = useCollection<ProgramDoc>('programs');
   const { docs: departments } = useCollection<DepartmentDoc>('departments');
@@ -93,14 +95,26 @@ export default function FacultyProfile() {
   const hodResearchProfiles = (dept?.hodResearchProfiles?.length ? dept.hodResearchProfiles : program?.hodResearchProfiles) || [];
   const hodMatches = isHod && !!hodName && hodName.trim() === (person.name || '').trim();
 
-  // "Back to … Faculty" goes to the exact page this profile was opened from
-  // (remembered by FacultyCarousel), else to this department's page.
-  let facultyReturnPath: string | null = null;
+  // "Back" behaviour, in priority order:
+  //  1. Opened from a department/program's Faculty carousel (FacultyCarousel
+  //     recorded the exact page) — go back to that page's Faculty section,
+  //     same as before.
+  //  2. Opened by clicking through from somewhere else in the site (e.g. the
+  //     /faculty directory) — go back to that actual previous page, exactly
+  //     like the browser's own Back button, instead of always assuming a
+  //     department page. `location.key` is React Router's own marker for
+  //     "this page was reached via in-app navigation, not a fresh/direct
+  //     load" — the standard way to tell those two apart.
+  //  3. No prior in-app page to return to at all (a direct/shared link,
+  //     freshly opened) — fall back to this person's department page, same
+  //     safety net as before, so the button still goes somewhere useful.
+  let facultyCarouselReturnPath: string | null = null;
   try {
     const stored = sessionStorage.getItem(`vwu:faculty-return:${person.id}`);
-    if (stored && stored.startsWith('/')) facultyReturnPath = stored;
+    if (stored && stored.startsWith('/')) facultyCarouselReturnPath = stored;
   } catch { /* storage unavailable */ }
-  if (!facultyReturnPath && program) facultyReturnPath = `/academics/${program.slug}`;
+  const canGoBackInHistory = location.key !== 'default';
+  const departmentFallbackPath = program ? `/academics/${program.slug}` : null;
 
   const activeCustom = usingCustomSections ? (customSections.find((s) => s.id === activeKey) ?? customSections[0]) : null;
   const activeLegacy = !usingCustomSections ? (legacySections.find((s) => s.title === activeKey) ?? legacySections[0]) : null;
@@ -147,22 +161,47 @@ export default function FacultyProfile() {
 
       <section className="section bg-white" style={{ paddingTop: 'var(--space-6)' }}>
         <div className="container">
-          {/* Back to this faculty member's department page, landing on its
-              Faculty section (FacultyCarousel reads the state flag and
-              scrolls there once the page has loaded). */}
-          {facultyReturnPath && (
+          {/* Back button — see the facultyCarouselReturnPath/canGoBackInHistory
+              comment above for which of these three cases applies. */}
+          {(facultyCarouselReturnPath || canGoBackInHistory || departmentFallbackPath) && (
             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <Link
-              to={facultyReturnPath}
-              state={{ vwuFacultyCarouselReturn: true }}
-              aria-label={`Back to ${dept?.title || person.department} Faculty`}
-              title={`Back to ${dept?.title || person.department} Faculty`}
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', minHeight: 48, minWidth: 48, color: 'var(--color-text-light)', fontWeight: 600, textDecoration: 'none', marginBottom: 'var(--space-6)', transition: 'color 0.2s' }}
-              className="hover-color-primary"
-            >
-              <ArrowLeft size={16} strokeWidth={2.5} aria-hidden="true" />
-              Back
-            </Link>
+            {facultyCarouselReturnPath ? (
+              <Link
+                to={facultyCarouselReturnPath}
+                state={{ vwuFacultyCarouselReturn: true }}
+                aria-label={`Back to ${dept?.title || person.department} Faculty`}
+                title={`Back to ${dept?.title || person.department} Faculty`}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', minHeight: 48, minWidth: 48, color: 'var(--color-text-light)', fontWeight: 600, textDecoration: 'none', marginBottom: 'var(--space-6)', transition: 'color 0.2s' }}
+                className="hover-color-primary"
+              >
+                <ArrowLeft size={16} strokeWidth={2.5} aria-hidden="true" />
+                Back
+              </Link>
+            ) : canGoBackInHistory ? (
+              <button
+                type="button"
+                onClick={() => navigate(-1)}
+                aria-label="Back"
+                title="Back"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', minHeight: 48, minWidth: 48, color: 'var(--color-text-light)', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', font: 'inherit', padding: 0, marginBottom: 'var(--space-6)', transition: 'color 0.2s' }}
+                className="hover-color-primary"
+              >
+                <ArrowLeft size={16} strokeWidth={2.5} aria-hidden="true" />
+                Back
+              </button>
+            ) : (
+              <Link
+                to={departmentFallbackPath!}
+                state={{ vwuFacultyCarouselReturn: true }}
+                aria-label={`Back to ${dept?.title || person.department} Faculty`}
+                title={`Back to ${dept?.title || person.department} Faculty`}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', minHeight: 48, minWidth: 48, color: 'var(--color-text-light)', fontWeight: 600, textDecoration: 'none', marginBottom: 'var(--space-6)', transition: 'color 0.2s' }}
+                className="hover-color-primary"
+              >
+                <ArrowLeft size={16} strokeWidth={2.5} aria-hidden="true" />
+                Back
+              </Link>
+            )}
             </div>
           )}
           <div style={{ display: 'flex', gap: 'var(--space-8)', flexWrap: 'wrap', marginBottom: 'var(--space-10)' }}>

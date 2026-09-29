@@ -29,7 +29,7 @@ import type { DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdm
 import { hasCustomSectionContent, type CustomSection } from '../../lib/customSections';
 import type { CustomTab } from '../../lib/customTabs';
 import { useOrderedCollection, type WithId } from '../../hooks/useCollection';
-import { CustomSectionsPlain, CustomSectionsPills } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
+import { CustomSectionsPlain, CustomSectionsPills, CustomSectionsGalleries, CustomSectionsAccordion } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import { renderBold } from '../../lib/boldText';
 import './IicPage.css';
@@ -127,7 +127,7 @@ function AdminTabExtraSections({ tab }: { tab?: CustomTab }) {
   );
 }
 
-export default function IicPage({ item }: IicPageProps) {
+export default function IicPage({ item, sections = [] }: IicPageProps) {
   const iic = institutionInnovationCell;
   const rawAdminTabs = item?.tabs || [];
   const adminTabs = rawAdminTabs.filter((tab) => {
@@ -723,6 +723,19 @@ export default function IicPage({ item }: IicPageProps) {
           </div>
         </aside>
       </div>
+
+      {/* Photos/sections added via Admin → Differentiators → (this item's)
+          main "Photos"/Custom Sections editor — separate from the Quick
+          Navigation admin tabs above (item.tabs, rendered via adminTabs).
+          Previously this component only ever read item.tabs and
+          item.description; the `sections` prop (item.customSections,
+          computed by DifferentiatorDetail.tsx) was accepted but never
+          rendered, so anything added there — photos included — silently
+          never showed up on this page. Always visible, not tied to any one
+          of the tabs above. Same pattern MicrochipPage.tsx already uses for
+          its own "Dynamic Custom Sections" block. */}
+      <CustomSectionsGalleries sections={sections} />
+      <CustomSectionsAccordion sections={sections} />
     </div>
   );
 }

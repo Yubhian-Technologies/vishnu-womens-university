@@ -105,7 +105,7 @@ function getFacultySummary(f: FacultyDoc) {
 export default function Faculty() {
   const { docs: allFaculty, loading } = useOrderedCollection<FacultyDoc>('faculty', 'order');
   const [activeDept, setActiveDept] = useState<string | null>(null);
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const faculty = allFaculty;
 
@@ -218,7 +218,18 @@ export default function Faculty() {
               <button
                 key={g.label}
                 className={`faculty-tab${activeGroup?.label === g.label ? ' active' : ''}`}
-                onClick={() => setActiveDept(g.label)}
+                onClick={() => {
+                  setActiveDept(g.label);
+                  // Reflects the chosen tab in the URL (replacing, not
+                  // pushing, so clicking through tabs doesn't pile up
+                  // history entries) so that opening a faculty profile from
+                  // here and pressing Back returns to *this* department's
+                  // tab instead of always the first one — see deptParam
+                  // above, which this exact query value already round-trips
+                  // through. g.departments[0] (not g.label) since deptParam
+                  // is matched against the group's raw department values.
+                  setSearchParams({ dept: g.departments[0] }, { replace: true });
+                }}
               >
                 {g.label}
               </button>

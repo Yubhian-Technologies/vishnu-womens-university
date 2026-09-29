@@ -212,9 +212,6 @@ export default function FitnessCentre() {
             <Link to="/campus/wellness" className="fc-explore-btn outline">
               Wellness Centre
             </Link>
-            <Link to="/student-life" className="fc-explore-btn outline">
-              Student Life
-            </Link>
           </div>
         </div>
       </section>

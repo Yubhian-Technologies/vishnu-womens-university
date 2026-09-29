@@ -357,7 +357,7 @@ export default function CampusLifeDetail({ slug: slugProp }: { slug?: string }) 
           defaultTitle={title}
           defaultSubtitle={subtitle}
           breadcrumb={isActivity
-            ? [{ label: 'Home', to: '/' }, { label: 'Student Life', to: '/student-life' }, { label: title }]
+            ? [{ label: 'Home', to: '/' }, { label: 'Student Life' }, { label: title }]
             : [{ label: 'Home', to: '/' }, { label: 'Campus Life' }, { label: title }]}
           hideCta={true}
         />
@@ -476,10 +476,8 @@ export default function CampusLifeDetail({ slug: slugProp }: { slug?: string }) 
                 </>
               ) : (
                 <>
-                  {slug === 'swimming-pool' ? (
+                  {slug === 'swimming-pool' && (
                     <Link to="/campus/sports" className="btn btn-secondary">Explore Fitness & Sports →</Link>
-                  ) : (
-                    <Link to="/student-life" className="btn btn-secondary">{slug === 'campus-book-stores' ? 'Discover Student Life' : 'Student Life'}</Link>
                   )}
                 </>
               )}

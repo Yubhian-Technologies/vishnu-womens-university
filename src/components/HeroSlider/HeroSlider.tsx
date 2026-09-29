@@ -48,7 +48,10 @@ function buildStaticSlides(btechCount: string): Slide[] {
       tag: 'Campus Life',
       heading: 'Learn, Grow\nand Excel',
       description: "VWU is more than a degree — it is a community where you build real skills, lasting connections, and the confidence to lead in your chosen field.",
-      primaryCta: { label: 'Campus Life', path: '/student-life' },
+      // Not currently rendered anywhere (see the "title/description card
+      // has been removed" note above) — path kept pointing at a real page
+      // regardless, so it can't silently 404 if that ever changes.
+      primaryCta: { label: 'Campus Life', path: '/campus/clubs' },
       secondaryCta: { label: 'Apply Now', path: '/apply-now' },
     },
     {

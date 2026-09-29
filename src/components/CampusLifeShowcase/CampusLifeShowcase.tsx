@@ -127,9 +127,6 @@ export default function CampusLifeShowcase() {
 
           {/* Primary CTA */}
           <div className="campus-showcase-action">
-            <Link to="/student-life" className="campus-showcase-cta">
-              Explore Life at VWU
-            </Link>
           </div>
         </div>
       </div>
