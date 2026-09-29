@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Play, X } from 'lucide-react';
+import { useContentBlocks } from '../../hooks/useContentBlocks';
 import './YouTubeShowcase.css';
 
 interface VideoItem {
@@ -18,7 +19,12 @@ function getThumbnail(url: string): string {
   return id ? `https://img.youtube.com/vi/${id}/hqdefault.jpg` : '';
 }
 
-const VIDEOS: VideoItem[] = [
+// Shown until an admin adds any items under Admin → Page Content Blocks →
+// "Home — VWU in Action Videos" (same "hardcoded default first, swap in
+// Firestore once there's anything to swap to" convention used site-wide —
+// see e.g. DEFAULT_CAMPUS_LIFE_QUICK_LINKS), so this section never goes
+// blank and nothing changes here until an admin actually edits it.
+const DEFAULT_VIDEOS: VideoItem[] = [
   { id: '1', title: 'Likitha Naidu', youtubeUrl: 'https://youtu.be/P9TPB69kmWQ' },
   { id: '2', title: 'Rukmini V', youtubeUrl: 'https://youtu.be/1pD8nzSgoFk' },
   { id: '3', title: 'Sreekari Tathvathi', youtubeUrl: 'https://www.youtube.com/watch?v=ORJgaunrM5k' },
@@ -27,6 +33,10 @@ const VIDEOS: VideoItem[] = [
 export default function YouTubeShowcase() {
   const [activeVideo, setActiveVideo] = useState<string | null>(null);
   const trackRef = useRef<HTMLDivElement>(null);
+  const blocks = useContentBlocks('home', 'vwuInAction');
+  const VIDEOS: VideoItem[] = blocks.length > 0
+    ? blocks.map((b) => ({ id: b.id, title: b.title, youtubeUrl: b.value }))
+    : DEFAULT_VIDEOS;
 
   const closeModal = useCallback(() => {
     setActiveVideo(null);
