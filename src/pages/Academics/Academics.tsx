@@ -233,7 +233,7 @@ export default function Academics() {
         defaultTitle="You Will Excel."
   defaultSubtitle="Rigorous, industry-aligned programs designed to build your technical expertise, sharpen your research instincts, and develop you as a professional."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Academics' }]}
-        scrollCtaTargetId="academics-content"
+        hideCta
       />
 
       {/* Quick Stats */}
