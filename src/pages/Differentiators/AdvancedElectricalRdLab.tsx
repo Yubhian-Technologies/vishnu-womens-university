@@ -26,9 +26,12 @@ import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { usePageBanners } from '../../hooks/usePageBanners';
+import { useDocument } from '../../hooks/useDocument';
 import { fetchPriorityAttr } from '../../lib/domAttrs';
 import { hasCustomSectionContent, type CustomSectionPhoto } from '../../lib/customSections';
+import { CustomSectionsIntro, CustomSectionsGalleries, CustomSectionsAccordion } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import { DIFFERENTIATOR_CATEGORIES, type DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
+import { defaultAdvancedElectrical, type AdvancedElectricalDoc } from '../Admin/sections/AdvancedElectricalContentAdmin';
 import { renderBold } from '../../lib/boldText';
 import './AdvancedElectricalRdLab.css';
 
@@ -37,6 +40,8 @@ const SLUG = 'advanced-electrical-rd-lab';
 export default function AdvancedElectricalRdLab() {
   const { docs: allItems, loading } = useOrderedCollection<DifferentiatorItemDoc>('differentiatorItems', 'order');
   const { slides: heroSlides } = usePageBanners('differentiators-detail');
+  const { data: remoteData } = useDocument<AdvancedElectricalDoc>('settings', 'advancedElectricalLab');
+  const labData = { ...defaultAdvancedElectrical, ...(remoteData || {}) };
   const item = allItems.find((i) => i.slug === SLUG) ?? null;
   const [lightbox, setLightbox] = useState<{ photos: { imageUrl: string; caption?: string }[]; index: number } | null>(null);
   const [activeNav, setActiveNav] = useState('overview');
@@ -92,122 +97,33 @@ export default function AdvancedElectricalRdLab() {
   const allGalleryPhotos = dynamicPhotos.length > 0 ? dynamicPhotos : defaultGalleryPhotos;
 
   // Patents data
-  const patents = [
-    {
-      title: 'Dental Dispenser',
-      status: 'Patent Granted',
-      inventor: 'Dr. J. Rohith Balaji',
-      domain: 'Biomedical & Precision Dispensing',
-      icon: Flame,
-    },
-    {
-      title: 'Braille-Character Printer',
-      status: 'Patent Granted',
-      inventor: 'Dr. J. Rohith Balaji',
-      domain: 'Assistive Electromechanical Technology',
-      icon: Printer,
-    },
-    {
-      title: 'EV Motor Drive Testing Apparatus',
-      status: 'Patent Granted',
-      inventor: 'Dr. J. Rohith Balaji',
-      domain: 'Electric Mobility & Motor Characterization',
-      icon: Zap,
-    },
-  ];
+  const patentIcons = [Flame, Printer, Zap];
+  const patents = labData.patents.map((p, idx) => ({
+    ...p,
+    icon: patentIcons[idx % patentIcons.length],
+  }));
 
   // 9 Operational Working Models
-  const workingModels = [
-    {
-      title: 'Smart Solar Aerator System',
-      description: 'Automated solar-powered aquaculture oxygenation system with smart monitoring.',
-      tag: 'Solar & Aquaculture',
-      icon: Sun,
-    },
-    {
-      title: 'PLC Automation Trainer Kit',
-      description: 'Industrial programmable logic controller test bench for process automation.',
-      tag: 'Industrial Automation',
-      icon: Cpu,
-    },
-    {
-      title: 'Hybrid EV Charging System',
-      description: 'Multi-source renewable energy charging infrastructure for electric vehicles.',
-      tag: 'EV Infrastructure',
-      icon: Zap,
-    },
-    {
-      title: 'FPGA & DSP-Based Motor Control Setup',
-      description: 'High-speed digital signal processing platforms for BLDC and PMSM electric motors.',
-      tag: 'Digital Motor Drives',
-      icon: Activity,
-    },
-    {
-      title: 'Multilevel Inverters & Battery Management (BMS)',
-      description: 'Advanced power conversion architecture with cell balancing and thermal management.',
-      tag: 'Power Electronics',
-      icon: Layers,
-    },
-    {
-      title: 'Solar PV MPPT & Wind Emulator',
-      description: 'Dynamic hardware emulator for maximum power point tracking and grid integration.',
-      tag: 'Renewable Systems',
-      icon: Sun,
-    },
-    {
-      title: 'Low-Cost Braille Character Printer',
-      description: 'Patented assistive electromechanical device designed for visually challenged learners.',
-      tag: 'Assistive Technology',
-      icon: HeartHandshake,
-    },
-    {
-      title: 'Automated Dental Dispenser Apparatus',
-      description: 'Patented electromechanical precision dispenser for clinical dental applications.',
-      tag: 'Biomedical Devices',
-      icon: Sparkles,
-    },
-    {
-      title: 'Cyber-Physical Energy Automation Testbed',
-      description: 'Connected microgrid test bench with adaptive PID, fuzzy logic, and neural control.',
-      tag: 'Smart Grids',
-      icon: Boxes,
-    },
-  ];
+  const modelIcons = [Sun, Cpu, Zap, Activity, Layers, Sun, HeartHandshake, Sparkles, Boxes];
+  const workingModels = labData.workingModels.map((m, idx) => ({
+    ...m,
+    icon: modelIcons[idx % modelIcons.length],
+  }));
 
   // Focus areas
-  const focusAreas = [
-    'Power Electronics & Drives',
-    'FPGA & DSP-based Motor Control',
-    'Control & Automation Systems',
-    'Green & Renewable Energy Systems',
-    'Electric Vehicle (EV) Controllers',
-    'Advanced Control Algorithms (PID, Adaptive, Fuzzy, Neural, ADRC)',
-    'Multilevel Inverters & Smart BMS',
-    'Solar PV MPPT Systems',
-    'Assistive Devices for Differently-Abled',
-  ];
+  const focusAreas = labData.focusAreas;
+  const highlightsList = labData.highlightsList;
+  const facilitiesList = labData.facilitiesList;
 
-  const highlightsList = [
-    'Vision of excellence in Power Electronics, Electric Drives, Embedded Control, and Renewable Technologies.',
-    '9 operational working models — spanning EV drive controllers, solar systems, and assistive medical devices.',
-    '3 Patents granted, including a Braille-character printer, dental dispenser, and EV motor drive testing apparatus.',
-    'Advanced focus areas: FPGA/DSP motor control, control & automation, inverters & converters, solar PV, and cyber-physical systems.',
-    'Continuous research projects successfully delivered annually from 2015-16 through 2021-22 and beyond.',
-    'Directly aligned with national Atmanirbhar Bharat and Make in India innovation missions.',
-  ];
-
-  const facilitiesList = [
-    '9 operational working models, including a Smart Solar Aerator System, PLC Automation Trainer Kit, and Hybrid EV Charging System.',
-    'FPGA and DSP-based high-performance motor control test benches with real-time feedback loops.',
-    'Solar PV MPPT testing array and wind turbine emulation hardware setup.',
-    'Precision digital storage oscilloscopes, power quality analyzers, and embedded microcontroller testbeds.',
-  ];
+  const dynamicTitle = item?.title || labData.heroTitle;
+  const dynamicSubtitle = item?.summary || item?.desc || labData.heroSubtitle;
+  const aboutText = item?.description?.textContent || item?.desc || labData.aboutText;
 
   return (
     <main className="page-wrapper elec-page">
       <SEO
-        title="Advanced Electrical R&D Lab | Vishnu Women's University"
-        description="Advancing innovation in Power Electronics, EV motor control, and renewable technologies through hands-on R&D, working prototypes, and patent-backed research."
+        title={`${dynamicTitle} | Vishnu Women's University`}
+        description={dynamicSubtitle}
         canonicalPath={`/differentiators/${SLUG}`}
       />
 
@@ -218,7 +134,7 @@ export default function AdvancedElectricalRdLab() {
             {heroImage && (
               <SmoothImage
                 src={heroImage}
-                alt="Advanced Electrical R&D Lab"
+                alt={dynamicTitle}
                 className="elec-hero-bg"
                 loading="eager"
                 decoding="sync"
@@ -233,18 +149,17 @@ export default function AdvancedElectricalRdLab() {
                 <span className="elec-breadcrumb-sep">›</span>
                 <Link to={`/differentiators#${category?.id || 'research'}`}>{category?.label || 'Research & Specialised Labs'}</Link>
                 <span className="elec-breadcrumb-sep">›</span>
-                <span className="elec-breadcrumb-current">Advanced Electrical R&D Lab</span>
+                <span className="elec-breadcrumb-current">{dynamicTitle}</span>
               </nav>
 
               <div className="elec-badge">
                 <Zap size={14} /> {category?.label || 'Research & Specialised Labs'}
               </div>
 
-              <h1 className="elec-hero-title">Advanced Electrical R&D Lab</h1>
+              <h1 className="elec-hero-title">{dynamicTitle}</h1>
 
               <p className="elec-hero-subtitle">
-                {item?.summary ||
-                  'Advancing innovation in Power Electronics, EV motor control, and renewable technologies through hands-on R&D, working prototypes, and patent-backed research.'}
+                {dynamicSubtitle}
               </p>
             </div>
           </div>
@@ -296,7 +211,7 @@ export default function AdvancedElectricalRdLab() {
             <Zap size={140} className="elec-overview-watermark" aria-hidden="true" />
             <div className="elec-prose">
               <p>
-                The lab's mission spans advancing research in Power Electronics & Drives, FPGA & DSP-based Motor Control, Control & Automation, and Green Energy Systems; providing hands-on experience through project-based learning; fostering innovation through industry partnerships and startup incubation; and developing socially impactful technologies. Focus areas include motor controllers and drives for EVs, advanced control algorithms (PID, Adaptive, Fuzzy Logic, Neural Networks, ADRC), FPGA/DSP-based high-performance motor control, multilevel inverters and battery management systems, solar PV MPPT systems, and low-cost assistive devices for differently-abled individuals.
+                {renderBold(aboutText)}
               </p>
             </div>
           </div>
@@ -462,6 +377,17 @@ export default function AdvancedElectricalRdLab() {
                 </button>
               ))}
             </div>
+          </div>
+        </section>
+      )}
+
+      {/* Dynamic Admin Custom Sections */}
+      {customSections.length > 0 && (
+        <section className="elec-section" style={{ background: '#f8fafc' }}>
+          <div className="container">
+            <CustomSectionsIntro sections={customSections} />
+            <CustomSectionsGalleries sections={customSections} />
+            <CustomSectionsAccordion sections={customSections} />
           </div>
         </section>
       )}

@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import type { CustomSection } from '../../lib/customSections';
-import { CustomSectionsGalleries, CustomSectionsAccordion } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
+import { hasCustomSectionContent } from '../../lib/customSections';
+import { CustomSectionsGalleries, CustomSectionsAccordion, CustomSectionsIntro } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import SmoothCollapse from '../../components/SmoothCollapse/SmoothCollapse';
+import type { DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
+import { useDocument } from '../../hooks/useDocument';
+import type { TiDspDoc } from '../Admin/sections/TiDspContentAdmin';
 import { tiDspCoe } from './tiDspCoe.data';
 import {
   Target,
@@ -21,32 +25,73 @@ import { renderBold } from '../../lib/boldText';
 import './TiDspPage.css';
 
 interface TiDspPageProps {
+  item?: DifferentiatorItemDoc;
+  descriptionSection?: CustomSection;
+  introBlocks?: CustomSection[];
   customSections?: CustomSection[];
 }
 
-export default function TiDspPage({ customSections = [] }: TiDspPageProps) {
-  const {
-    aboutTitle,
-    overview,
-    vision,
-    mission,
-    objectives,
-    keyHighlights,
-    facilitiesEquipment,
-    industryAssociation,
-    team,
-    labDevelopment,
-    societalImpact,
-    researchOutputs,
-    trainingActivities,
-    trainingResearch,
-  } = tiDspCoe;
-
+export default function TiDspPage({
+  item,
+  descriptionSection,
+  introBlocks = [],
+  customSections = [],
+}: TiDspPageProps) {
+  const { data: remoteData } = useDocument<TiDspDoc>('settings', 'tiDspCoe');
   const [isTeamOpen, setIsTeamOpen] = useState(false);
   const [activeProjectYear, setActiveProjectYear] = useState<number>(0);
 
+  const aboutTitle = remoteData?.aboutTitle || item?.title || tiDspCoe.aboutTitle;
+  const overview = remoteData?.overview && remoteData.overview.length > 0 ? remoteData.overview : tiDspCoe.overview;
+  const stats = remoteData?.stats || {
+    dskValue: 'TMS320C6713 DSKs',
+    dskLabel: 'DSP Development Platforms',
+    aicteValue: '₹10 Lakh',
+    aicteLabel: 'AICTE-MODROBS Lab Modernisation Funding',
+    dstValue: '₹53 Lakh',
+    dstLabel: 'DST-Funded Telephony Speech Enhancement Research',
+    matlabValue: 'MATLAB',
+    matlabLabel: 'Campus-Wide Academic Access',
+  };
+  const vision = remoteData?.vision || tiDspCoe.vision;
+  const mission = remoteData?.mission && remoteData.mission.length > 0 ? remoteData.mission : tiDspCoe.mission;
+  const objectives = remoteData?.objectives && remoteData.objectives.length > 0 ? remoteData.objectives : tiDspCoe.objectives;
+  const labDevelopment = remoteData?.labDevelopment && remoteData.labDevelopment.length > 0 ? remoteData.labDevelopment : tiDspCoe.labDevelopment;
+  const societalImpact = remoteData?.societalImpact && remoteData.societalImpact.length > 0 ? remoteData.societalImpact : tiDspCoe.societalImpact;
+  const researchOutputs = remoteData?.researchOutputs || tiDspCoe.researchOutputs;
+  const trainingActivities = remoteData?.trainingActivities || tiDspCoe.trainingActivities;
+  const keyHighlights = remoteData?.keyHighlights && remoteData.keyHighlights.length > 0 ? remoteData.keyHighlights : tiDspCoe.keyHighlights;
+  const facilitiesEquipment = remoteData?.facilitiesEquipment && remoteData.facilitiesEquipment.length > 0 ? remoteData.facilitiesEquipment : tiDspCoe.facilitiesEquipment;
+  const industryAssociation = remoteData?.industryAssociation || tiDspCoe.industryAssociation;
+  const trainingResearch = remoteData?.trainingResearch || tiDspCoe.trainingResearch;
+  const additionalSections = remoteData?.additionalSections || [];
+  const team = tiDspCoe.team;
+
+  const overviewParagraphs = item?.description?.textContent
+    ? [item.description.textContent]
+    : descriptionSection?.textContent
+    ? [descriptionSection.textContent]
+    : item?.desc
+    ? [item.desc]
+    : overview;
+
+  const visionText =
+    (item?.vision && hasCustomSectionContent(item.vision) && (item.vision.textContent || item.vision.listText)) ||
+    introBlocks.find((s) => s.id === 'vision')?.textContent?.trim() ||
+    vision;
+
+  const missionList =
+    (item?.mission && hasCustomSectionContent(item.mission) && (item.mission.listText?.split('\n').filter(Boolean) || [item.mission.textContent || ''])) ||
+    introBlocks.find((s) => s.id === 'mission')?.listText?.split('\n').filter(Boolean) ||
+    mission;
+
+  const objectivesList =
+    (item?.objectives && hasCustomSectionContent(item.objectives) && (item.objectives.listText?.split('\n').filter(Boolean) || [item.objectives.textContent || ''])) ||
+    introBlocks.find((s) => s.id === 'objectives')?.listText?.split('\n').filter(Boolean) ||
+    objectives;
+
   const accordionSections = customSections.filter(
-    (s) => s.id !== 'team' && !s.label.toLowerCase().includes('team')
+    (s) => s.id !== 'team' && !s.label.toLowerCase().includes('team') && s.placement !== 'intro'
   );
 
   return (
@@ -57,9 +102,9 @@ export default function TiDspPage({ customSections = [] }: TiDspPageProps) {
           <div className="iic-badge">
             <Sparkles size={14} /> Centre of Excellence
           </div>
-          <h2 className="iic-card-title">{aboutTitle}</h2>
-          {overview.map((p, i) => (
-            <p key={i} className="iic-lead-text" style={{ marginBottom: i < overview.length - 1 ? '1rem' : 0 }}>
+          <h2 className="iic-card-title">{item?.title || aboutTitle}</h2>
+          {overviewParagraphs.map((p, i) => (
+            <p key={i} className="iic-lead-text" style={{ marginBottom: i < overviewParagraphs.length - 1 ? '1rem' : 0 }}>
               {renderBold(p)}
             </p>
           ))}
@@ -70,29 +115,29 @@ export default function TiDspPage({ customSections = [] }: TiDspPageProps) {
           <div className="ti-stat-box">
             <div className="ti-stat-icon"><Cpu size={20} /></div>
             <div>
-              <div className="ti-stat-val">TMS320C6713 DSKs</div>
-              <div className="ti-stat-lbl">DSP Development Platforms</div>
+              <div className="ti-stat-val">{stats.dskValue}</div>
+              <div className="ti-stat-lbl">{stats.dskLabel}</div>
             </div>
           </div>
           <div className="ti-stat-box">
-            <div className="ti-stat-icon">₹10L</div>
+            <div className="ti-stat-icon"><Award size={20} /></div>
             <div>
-              <div className="ti-stat-val">₹10 Lakh</div>
-              <div className="ti-stat-lbl">AICTE-MODROBS Lab Modernisation Funding</div>
+              <div className="ti-stat-val">{stats.aicteValue}</div>
+              <div className="ti-stat-lbl">{stats.aicteLabel}</div>
             </div>
           </div>
           <div className="ti-stat-box">
-            <div className="ti-stat-icon">₹53L</div>
+            <div className="ti-stat-icon"><Sparkles size={20} /></div>
             <div>
-              <div className="ti-stat-val">₹53 Lakh</div>
-              <div className="ti-stat-lbl">DST-Funded Telephony Speech Enhancement Research</div>
+              <div className="ti-stat-val">{stats.dstValue}</div>
+              <div className="ti-stat-lbl">{stats.dstLabel}</div>
             </div>
           </div>
           <div className="ti-stat-box">
-            <div className="ti-stat-icon">MAT</div>
+            <div className="ti-stat-icon"><Layers size={20} /></div>
             <div>
-              <div className="ti-stat-val">MATLAB</div>
-              <div className="ti-stat-lbl">Campus-Wide Academic Access</div>
+              <div className="ti-stat-val">{stats.matlabValue}</div>
+              <div className="ti-stat-lbl">{stats.matlabLabel}</div>
             </div>
           </div>
         </div>
@@ -108,7 +153,7 @@ export default function TiDspPage({ customSections = [] }: TiDspPageProps) {
             </span>
             <h3 className="ti-vm-title">Our Vision</h3>
             <div className="ti-vision-text">
-              &quot;{vision}&quot;
+              &quot;{renderBold(visionText)}&quot;
             </div>
           </div>
 
@@ -119,7 +164,7 @@ export default function TiDspPage({ customSections = [] }: TiDspPageProps) {
             </span>
             <h3 className="ti-vm-title">Our Mission</h3>
             <ul className="ti-mission-list">
-              {mission.map((item, idx) => (
+              {missionList.map((item, idx) => (
                 <li key={idx} className="ti-mission-item">
                   <span className="ti-mission-disc" />
                   <span>{renderBold(item)}</span>
@@ -138,14 +183,14 @@ export default function TiDspPage({ customSections = [] }: TiDspPageProps) {
         </div>
 
         <div className="ti-objectives-grid">
-          {objectives.map((objStr, idx) => {
+          {objectivesList.map((objStr, idx) => {
             const [title, ...descParts] = objStr.split(':');
             const desc = descParts.join(':').trim();
             return (
               <div key={idx} className="ti-obj-card">
                 <div className="ti-obj-num">0{idx + 1}</div>
                 <h4>0{idx + 1}. {title}</h4>
-                <p>{desc || objStr}</p>
+                <p>{renderBold(desc || objStr)}</p>
               </div>
             );
           })}
@@ -194,7 +239,7 @@ export default function TiDspPage({ customSections = [] }: TiDspPageProps) {
             {renderBold(researchOutputs.intro)}
           </p>
           <ul className="iic-checklist" style={{ marginBottom: '1.5rem' }}>
-            {researchOutputs.areas.map((area, idx) => (
+            {(researchOutputs.areas || []).map((area, idx) => (
               <li key={idx}>
                 <CheckCircle2 size={16} className="iic-check-icon gold" />
                 <span>{renderBold(area)}</span>
@@ -205,7 +250,7 @@ export default function TiDspPage({ customSections = [] }: TiDspPageProps) {
             Selected Publications & Presentations
           </h4>
           <ol style={{ paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', color: '#4A5568', fontSize: '0.925rem', lineHeight: 1.6 }}>
-            {researchOutputs.publications.map((pub, idx) => (
+            {(researchOutputs.publications || []).map((pub, idx) => (
               <li key={idx} style={{ paddingLeft: '0.25rem' }}>
                 {renderBold(pub)}
               </li>
@@ -224,7 +269,7 @@ export default function TiDspPage({ customSections = [] }: TiDspPageProps) {
             </div>
             <h3 className="iic-card-title">{trainingActivities.title}</h3>
             <ul className="iic-checklist" style={{ marginTop: '1rem' }}>
-              {trainingActivities.activities.map((act, idx) => (
+              {(trainingActivities.activities || []).map((act, idx) => (
                 <li key={idx}>
                   <CheckCircle2 size={16} className="iic-check-icon cyan" />
                   <strong style={{ color: '#0B1E42' }}>{act.title}</strong>
@@ -298,8 +343,8 @@ export default function TiDspPage({ customSections = [] }: TiDspPageProps) {
             <BookOpen size={14} /> Project Work & Experimentation
           </div>
           <h3 className="iic-card-title">{trainingResearch.title}</h3>
-          {trainingResearch.paragraphs.map((p, i) => (
-            <p key={i} className="iic-lead-text" style={{ marginBottom: i < trainingResearch.paragraphs.length - 1 ? '0.85rem' : '1.5rem' }}>
+          {(trainingResearch.paragraphs || []).map((p, i) => (
+            <p key={i} className="iic-lead-text" style={{ marginBottom: i < (trainingResearch.paragraphs || []).length - 1 ? '0.85rem' : '1.5rem' }}>
               {renderBold(p)}
             </p>
           ))}
@@ -310,7 +355,7 @@ export default function TiDspPage({ customSections = [] }: TiDspPageProps) {
 
           {/* Year Tabs */}
           <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
-            {trainingResearch.years.map((yearTab, idx) => (
+            {(trainingResearch.years || []).map((yearTab, idx) => (
               <button
                 key={idx}
                 type="button"
@@ -334,7 +379,7 @@ export default function TiDspPage({ customSections = [] }: TiDspPageProps) {
 
           {/* Active Year Blocks */}
           <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '1.5rem' }}>
-            {trainingResearch.years[activeProjectYear]?.blocks.map((block, idx) => {
+            {trainingResearch.years?.[activeProjectYear]?.blocks?.map((block, idx) => {
               if (block.type === 'paragraph') {
                 return (
                   <p key={idx} style={{ color: '#4A5568', fontSize: '0.925rem', lineHeight: 1.6, marginBottom: '0.75rem' }}>
@@ -477,9 +522,47 @@ export default function TiDspPage({ customSections = [] }: TiDspPageProps) {
       </section>
 
       {/* 10. DYNAMIC CUSTOM SECTIONS ACCORDION (Starting at 02) */}
+      {customSections.some((s) => s.placement === 'intro') && (
+        <section className="ti-custom-sections" style={{ marginBottom: '1.5rem' }}>
+          <CustomSectionsIntro sections={customSections} />
+        </section>
+      )}
       {accordionSections.length > 0 && (
         <section className="ti-custom-sections">
           <CustomSectionsAccordion sections={accordionSections} startIndex={2} />
+        </section>
+      )}
+
+      {/* Dynamic Additional Sections from Admin */}
+      {additionalSections.length > 0 && (
+        <section className="ti-custom-sections" style={{ marginTop: '2rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            {additionalSections.map((sec) => (
+              <div key={sec.id} className="iic-card">
+                {sec.badge && (
+                  <div className="iic-badge gold">
+                    <Sparkles size={14} /> {sec.badge}
+                  </div>
+                )}
+                <h3 className="iic-card-title">{sec.title}</h3>
+                {(sec.paragraphs || []).map((p, pIdx) => (
+                  <p key={pIdx} className="iic-lead-text" style={{ marginBottom: '0.75rem' }}>
+                    {renderBold(p)}
+                  </p>
+                ))}
+                {(sec.bulletPoints || []).length > 0 && (
+                  <ul className="iic-checklist" style={{ marginTop: '0.5rem' }}>
+                    {sec.bulletPoints!.map((b, bIdx) => (
+                      <li key={bIdx}>
+                        <CheckCircle2 size={16} className="iic-check-icon cyan" />
+                        <span>{renderBold(b)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ))}
+          </div>
         </section>
       )}
 

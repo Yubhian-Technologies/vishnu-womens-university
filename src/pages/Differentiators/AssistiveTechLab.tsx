@@ -29,9 +29,12 @@ import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { usePageBanners } from '../../hooks/usePageBanners';
 import { fetchPriorityAttr } from '../../lib/domAttrs';
+import { CustomSectionsIntro, CustomSectionsGalleries, CustomSectionsAccordion } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import { hasCustomSectionContent, type CustomSectionPhoto } from '../../lib/customSections';
 import { DIFFERENTIATOR_CATEGORIES, type DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
 import { assistiveTechLab } from './assistiveTechLab.data';
+import { useDocument } from '../../hooks/useDocument';
+import type { AssistiveTechLabDoc } from '../Admin/sections/AssistiveTechContentAdmin';
 import { renderBold } from '../../lib/boldText';
 import './AssistiveTechLab.css';
 
@@ -44,10 +47,29 @@ export default function AssistiveTechLab() {
   const [lightbox, setLightbox] = useState<{ photos: { imageUrl: string; caption?: string }[]; index: number } | null>(null);
   const [activeNav, setActiveNav] = useState('overview');
   const [selectedYearIdx, setSelectedYearIdx] = useState(0);
+  const { data: remoteData } = useDocument<AssistiveTechLabDoc>('settings', 'assistiveTechLab');
+  const atl = { ...assistiveTechLab, ...(remoteData || {}) };
+
+  const dynamicTitle = item?.title || 'Assistive Technology Lab (ATL)';
+  const dynamicSubtitle = item?.summary || item?.desc || 'A visionary center established in collaboration with University of Massachusetts (UMass), Lowell, USA — applying multidisciplinary engineering to design life-changing devices for the differently-abled.';
+
+  const aboutParagraphs = (item?.description && hasCustomSectionContent(item.description) && item.description.textContent)
+    ? [item.description.textContent]
+    : item?.desc
+    ? [item.desc]
+    : atl.paragraphs;
+
+  const missionList = (item?.mission && hasCustomSectionContent(item.mission))
+    ? (item.mission.listText ? item.mission.listText.split('\n').filter(Boolean) : [item.mission.textContent || ''])
+    : atl.mission;
+
+  const objectivesList = (item?.objectives && hasCustomSectionContent(item.objectives))
+    ? (item.objectives.listText ? item.objectives.listText.split('\n').filter(Boolean) : [item.objectives.textContent || ''])
+    : atl.objectives;
 
   useEffect(() => {
-    document.title = "Assistive Technology Lab (ATL) | Vishnu Women's University";
-  }, []);
+    document.title = `${dynamicTitle} | Vishnu Women's University`;
+  }, [dynamicTitle]);
 
   // Update active nav link based on scroll position
   useEffect(() => {
@@ -231,11 +253,10 @@ export default function AssistiveTechLab() {
                 <HeartHandshake size={14} /> {category?.label || 'Research & Specialised Labs'}
               </div>
 
-              <h1 className="atl-hero-title">Assistive Technology Lab (ATL)</h1>
+              <h1 className="atl-hero-title">{dynamicTitle}</h1>
 
               <p className="atl-hero-subtitle">
-                {item?.summary ||
-                  'A visionary center established in collaboration with University of Massachusetts (UMass), Lowell, USA — applying multidisciplinary engineering to design life-changing devices for the differently-abled.'}
+                {renderBold(dynamicSubtitle)}
               </p>
 
               <div className="atl-hero-stats">
@@ -304,7 +325,7 @@ export default function AssistiveTechLab() {
           <div className="atl-overview-card">
             <HeartHandshake size={140} className="atl-overview-watermark" aria-hidden="true" />
             <div className="atl-prose">
-              {assistiveTechLab.paragraphs.map((p, i) => (
+              {aboutParagraphs.map((p, i) => (
                 <p key={i}>{renderBold(p)}</p>
               ))}
             </div>
@@ -321,7 +342,7 @@ export default function AssistiveTechLab() {
                 <h3 className="atl-vm-title">Our Mission</h3>
               </div>
               <ul className="atl-checklist">
-                {assistiveTechLab.mission.map((item, i) => (
+                {missionList.map((item, i) => (
                   <li key={i} className="atl-checklist-item">
                     <span className="atl-check-badge">
                       <Check size={12} strokeWidth={3} />
@@ -341,7 +362,7 @@ export default function AssistiveTechLab() {
                 <h3 className="atl-vm-title">Core Objectives</h3>
               </div>
               <ul className="atl-checklist">
-                {assistiveTechLab.objectives.map((item, i) => (
+                {objectivesList.map((item, i) => (
                   <li key={i} className="atl-checklist-item">
                     <span className="atl-check-badge">
                       <Check size={12} strokeWidth={3} />
@@ -707,6 +728,23 @@ export default function AssistiveTechLab() {
                 </button>
               ))}
             </div>
+          </div>
+        </section>
+      )}
+
+      {/* DYNAMIC CUSTOM SECTIONS */}
+      {customSections.some((s) => s.placement === 'intro') && (
+        <section className="atl-section">
+          <div className="container">
+            <CustomSectionsIntro sections={customSections} />
+          </div>
+        </section>
+      )}
+      {customSections.length > 0 && (
+        <section className="atl-section">
+          <div className="container">
+            <CustomSectionsGalleries sections={customSections} />
+            <CustomSectionsAccordion sections={customSections.filter((s) => s.placement !== 'intro' && s.contentType !== 'gallery')} />
           </div>
         </section>
       )}

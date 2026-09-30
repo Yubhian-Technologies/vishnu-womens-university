@@ -16,6 +16,10 @@ import {
   Layers,
   Handshake,
 } from 'lucide-react';
+import { CustomSectionsIntro, CustomSectionsGalleries, CustomSectionsAccordion } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
+import { hasCustomSectionContent } from '../../lib/customSections';
+import { useDocument } from '../../hooks/useDocument';
+import type { MedaPlmCoeDoc } from '../Admin/sections/MedaPlmCoeContentAdmin';
 import { medaPlmCoe } from './medaPlmCoe.data';
 import type { DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
 import type { CustomSection } from '../../lib/customSections';
@@ -27,8 +31,44 @@ interface MedaPlmCoePageProps {
   sections: CustomSection[];
 }
 
-export default function MedaPlmCoePage({ sections }: MedaPlmCoePageProps) {
+export default function MedaPlmCoePage({ item, sections }: MedaPlmCoePageProps) {
+  const { data: remoteData } = useDocument<MedaPlmCoeDoc>('settings', 'medaPlmCoe');
   const [lightboxImg, setLightboxImg] = useState<string | null>(null);
+
+  const data = {
+    hero: remoteData?.hero || medaPlmCoe.hero,
+    glance: remoteData?.glance && remoteData.glance.length > 0 ? remoteData.glance : medaPlmCoe.glance,
+    collaboration: {
+      title: remoteData?.collaboration?.title || medaPlmCoe.collaboration.title,
+      paragraphs: remoteData?.collaboration?.paragraphs && remoteData.collaboration.paragraphs.length > 0 ? remoteData.collaboration.paragraphs : medaPlmCoe.collaboration.paragraphs,
+    },
+    meda: {
+      heading: remoteData?.meda?.heading || medaPlmCoe.meda.heading,
+      intro: remoteData?.meda?.intro || medaPlmCoe.meda.intro,
+      softwarePlatformsHeading: remoteData?.meda?.softwarePlatformsHeading || medaPlmCoe.meda.softwarePlatformsHeading,
+      softwarePlatforms: remoteData?.meda?.softwarePlatforms && remoteData.meda.softwarePlatforms.length > 0 ? remoteData.meda.softwarePlatforms : medaPlmCoe.meda.softwarePlatforms,
+      learningAreasHeading: remoteData?.meda?.learningAreasHeading || medaPlmCoe.meda.learningAreasHeading,
+      learningAreas: remoteData?.meda?.learningAreas && remoteData.meda.learningAreas.length > 0 ? remoteData.meda.learningAreas : medaPlmCoe.meda.learningAreas,
+      closing: remoteData?.meda?.closing || medaPlmCoe.meda.closing,
+    },
+    plm: {
+      heading: remoteData?.plm?.heading || medaPlmCoe.plm.heading,
+      intro: remoteData?.plm?.intro || medaPlmCoe.plm.intro,
+      trainingHeading: remoteData?.plm?.trainingHeading || medaPlmCoe.plm.trainingHeading,
+      trainingItems: remoteData?.plm?.trainingItems && remoteData.plm.trainingItems.length > 0 ? remoteData.plm.trainingItems : medaPlmCoe.plm.trainingItems,
+      teamcenter: {
+        heading: remoteData?.plm?.teamcenter?.heading || medaPlmCoe.plm.teamcenter.heading,
+        description: remoteData?.plm?.teamcenter?.description || medaPlmCoe.plm.teamcenter.description,
+      },
+    },
+    outcomes: {
+      heading: remoteData?.outcomes?.heading || medaPlmCoe.outcomes.heading,
+      intro: remoteData?.outcomes?.intro || medaPlmCoe.outcomes.intro,
+      opportunitiesHeading: remoteData?.outcomes?.opportunitiesHeading || medaPlmCoe.outcomes.opportunitiesHeading,
+      opportunities: remoteData?.outcomes?.opportunities && remoteData.outcomes.opportunities.length > 0 ? remoteData.outcomes.opportunities : medaPlmCoe.outcomes.opportunities,
+      closing: remoteData?.outcomes?.closing || medaPlmCoe.outcomes.closing,
+    },
+  };
 
   // Extract existing photos from custom sections safely
   const gallerySection = sections.find(
@@ -88,7 +128,6 @@ export default function MedaPlmCoePage({ sections }: MedaPlmCoePageProps) {
   };
 
   const hasPhotos = galleryItems.length > 0;
-  const data = medaPlmCoe;
 
   return (
     <div className="meda-plm-container">
@@ -141,13 +180,21 @@ export default function MedaPlmCoePage({ sections }: MedaPlmCoePageProps) {
       <section className={`meda-hero-banner ${hasPhotos ? 'has-photo' : 'no-photo'}`}>
         <div>
           <div className="meda-hero-badge">
-            <Sparkles size={14} /> Capgemini Collaboration MoU
+            <Sparkles size={14} /> {item?.title || 'Capgemini Collaboration MoU'}
           </div>
-          <h2 className="meda-hero-title">{data.collaboration.title}</h2>
+          <h2 className="meda-hero-title">
+            {item?.title ? `Industry Collaboration & Excellence — ${item.title}` : data.collaboration.title}
+          </h2>
           <div className="meda-hero-paragraphs">
-            {data.collaboration.paragraphs.map((p, idx) => (
-              <p key={idx} className="meda-hero-text">{renderBold(p)}</p>
-            ))}
+            {(item?.description && hasCustomSectionContent(item.description) && item.description.textContent) ? (
+              <p className="meda-hero-text">{renderBold(item.description.textContent)}</p>
+            ) : item?.desc ? (
+              <p className="meda-hero-text">{renderBold(item.desc)}</p>
+            ) : (
+              data.collaboration.paragraphs.map((p, idx) => (
+                <p key={idx} className="meda-hero-text">{renderBold(p)}</p>
+              ))
+            )}
           </div>
         </div>
         {hasPhotos && <RenderPhotoFrame index={0} />}
@@ -384,6 +431,17 @@ export default function MedaPlmCoePage({ sections }: MedaPlmCoePageProps) {
           )}
         </div>
       )}
+
+      {/* DYNAMIC CUSTOM SECTIONS */}
+      {sections.some((s) => s.placement === 'intro') && (
+        <div style={{ marginTop: '2rem' }}>
+          <CustomSectionsIntro sections={sections} />
+        </div>
+      )}
+      <div style={{ marginTop: '2.5rem' }}>
+        <CustomSectionsGalleries sections={sections} />
+        <CustomSectionsAccordion sections={sections.filter((s) => s.placement !== 'intro' && s.contentType !== 'gallery' && s.id !== 'highlights' && s.id !== 'facilities' && s.id !== 'outcomes' && s.id !== 'partners')} />
+      </div>
 
       {/* Lightbox for Photos */}
       {lightboxImg && (

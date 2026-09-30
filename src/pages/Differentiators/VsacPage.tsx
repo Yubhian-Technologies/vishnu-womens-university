@@ -13,7 +13,12 @@ import {
   Sparkles,
   Maximize2,
   Award,
+  CheckCircle2,
 } from 'lucide-react';
+import { CustomSectionsIntro, CustomSectionsGalleries, CustomSectionsAccordion } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
+import { hasCustomSectionContent } from '../../lib/customSections';
+import { useDocument } from '../../hooks/useDocument';
+import type { VsacDoc } from '../Admin/sections/VsacContentAdmin';
 import { vsac, type VsacMember, type SimpleTable } from './vsac.data';
 import type { DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
 import type { CustomSection } from '../../lib/customSections';
@@ -25,9 +30,30 @@ interface VsacPageProps {
   sections: CustomSection[];
 }
 
-export default function VsacPage({ sections }: VsacPageProps) {
+export default function VsacPage({ item, sections }: VsacPageProps) {
+  const { data: remoteData } = useDocument<VsacDoc>('settings', 'vsac');
   const [activeTab, setActiveTab] = useState<number>(0);
   const [lightboxImg, setLightboxImg] = useState<string | null>(null);
+
+  const rawParagraphs = remoteData?.paragraphs && remoteData.paragraphs.length > 0 ? remoteData.paragraphs : vsac.paragraphs;
+  const rawVision = remoteData?.vision || vsac.vision;
+  const rawMission = remoteData?.mission && remoteData.mission.length > 0 ? remoteData.mission : vsac.mission;
+  const rawObjectives = remoteData?.objectives && remoteData.objectives.length > 0 ? remoteData.objectives : vsac.objectives;
+  const trainingResearch = remoteData?.trainingResearch && remoteData.trainingResearch.length > 0 ? remoteData.trainingResearch : vsac.trainingResearch;
+  const industryCollaboration = remoteData?.industryCollaboration || vsac.industryCollaboration;
+  const additionalSections = remoteData?.additionalSections || [];
+
+  const aboutParagraphs = (item?.description && hasCustomSectionContent(item.description) && item.description.textContent)
+    ? [item.description.textContent]
+    : item?.desc
+    ? [item.desc]
+    : rawParagraphs;
+
+  const visionText = (item?.vision && hasCustomSectionContent(item.vision) && (item.vision.textContent || item.vision.listText)) || rawVision;
+
+  const missionList = (item?.mission && hasCustomSectionContent(item.mission) && (item.mission.listText?.split('\n').filter(Boolean) || [item.mission.textContent || ''])) || rawMission;
+
+  const objectivesList = (item?.objectives && hasCustomSectionContent(item.objectives) && (item.objectives.listText?.split('\n').filter(Boolean) || [item.objectives.textContent || ''])) || rawObjectives;
 
   // Extract existing photos safely
   const gallerySection = sections.find(
@@ -131,10 +157,10 @@ export default function VsacPage({ sections }: VsacPageProps) {
           </div>
 
           <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#00E5FF', margin: '1rem 0 0.85rem', letterSpacing: '0.05em' }}>
-            {vsac.aboutTitle}
+            {item?.title || vsac.aboutTitle}
           </h2>
 
-          {vsac.paragraphs.map((para, idx) => (
+          {aboutParagraphs.map((para, idx) => (
             <p key={idx} className="vsac-overview-text">
               {renderBold(para)}
             </p>
@@ -159,14 +185,14 @@ export default function VsacPage({ sections }: VsacPageProps) {
                   <Compass size={16} style={{ color: '#00E5FF' }} /> {vsac.visionTitle}
                 </div>
                 <p className="vsac-orbit-item" style={{ fontStyle: 'italic', fontWeight: 500, lineHeight: 1.6, color: '#E2E8F0' }}>
-                  &ldquo;{vsac.vision}&rdquo;
+                  &ldquo;{renderBold(visionText)}&rdquo;
                 </p>
 
                 <div className="vsac-orbit-title" style={{ marginTop: '1.25rem' }}>
                   <Sparkles size={16} style={{ color: '#FFB300' }} /> {vsac.missionTitle}
                 </div>
                 <ul className="vsac-orbit-list">
-                  {vsac.mission.map((m, idx) => (
+                  {missionList.map((m, idx) => (
                     <li key={idx} className="vsac-orbit-item">
                       <span className="vsac-orbit-dot">✓</span>
                       <span>{renderBold(m)}</span>
@@ -181,7 +207,7 @@ export default function VsacPage({ sections }: VsacPageProps) {
                   <Target size={16} style={{ color: '#FFB300' }} /> {vsac.objectivesTitle}
                 </div>
                 <ul className="vsac-orbit-list">
-                  {vsac.objectives.map((obj, idx) => (
+                  {objectivesList.map((obj, idx) => (
                     <li key={idx} className="vsac-orbit-item">
                       <span className="vsac-orbit-dot" style={{ background: '#FFB300', color: '#070F26' }}>
                         ✓
@@ -268,7 +294,7 @@ export default function VsacPage({ sections }: VsacPageProps) {
             <div>
               {/* Tab Switcher */}
               <div className="vsac-tabs-bar">
-                {vsac.trainingResearch.map((item, idx) => (
+                {trainingResearch.map((item, idx) => (
                   <button
                     key={idx}
                     className={`vsac-tab-btn ${activeTab === idx ? 'active' : ''}`}
@@ -280,29 +306,29 @@ export default function VsacPage({ sections }: VsacPageProps) {
               </div>
 
               {/* Active Training Section Content */}
-              {vsac.trainingResearch[activeTab] && (
+              {trainingResearch[activeTab] && (
                 <div>
                   <h3 style={{ fontSize: '0.95rem', fontWeight: 800, color: '#070F26', marginBottom: 'var(--space-2)' }}>
-                    {vsac.trainingResearch[activeTab].title}
+                    {trainingResearch[activeTab].title}
                   </h3>
-                  {vsac.trainingResearch[activeTab].paragraphs.map((p, pIdx) => (
+                  {trainingResearch[activeTab].paragraphs.map((p, pIdx) => (
                     <p key={pIdx} className="vsac-orbit-item" style={{ marginBottom: 'var(--space-2)', lineHeight: 1.6 }}>
                       {renderBold(p)}
                     </p>
                   ))}
 
-                  {vsac.trainingResearch[activeTab].table && (
-                    <RenderTable table={vsac.trainingResearch[activeTab].table!} />
+                  {trainingResearch[activeTab].table && (
+                    <RenderTable table={trainingResearch[activeTab].table!} />
                   )}
 
-                  {vsac.trainingResearch[activeTab].secondParagraph && (
+                  {trainingResearch[activeTab].secondParagraph && (
                     <p className="vsac-orbit-item" style={{ marginTop: 'var(--space-3)', marginBottom: 'var(--space-2)', lineHeight: 1.6 }}>
-                      {vsac.trainingResearch[activeTab].secondParagraph}
+                      {trainingResearch[activeTab].secondParagraph}
                     </p>
                   )}
 
-                  {vsac.trainingResearch[activeTab].secondTable && (
-                    <RenderTable table={vsac.trainingResearch[activeTab].secondTable!} />
+                  {trainingResearch[activeTab].secondTable && (
+                    <RenderTable table={trainingResearch[activeTab].secondTable!} />
                   )}
                 </div>
               )}
@@ -315,13 +341,13 @@ export default function VsacPage({ sections }: VsacPageProps) {
       <div className="vsac-block">
         <div className="vsac-block-header">
           <h2 className="vsac-block-title">
-            <Building2 size={18} style={{ color: '#00E5FF' }} /> {vsac.industryCollaboration.title}
+            <Building2 size={18} style={{ color: '#00E5FF' }} /> {industryCollaboration.title}
           </h2>
         </div>
         <div className="vsac-block-body">
           <div className="vsac-orbit-card" style={{ borderLeftColor: '#00E5FF', background: '#FFFFFF' }}>
-            {vsac.industryCollaboration.paragraphs.map((p, idx) => (
-              <p key={idx} className="vsac-orbit-item" style={{ color: '#334155', lineHeight: 1.65, marginBottom: idx < vsac.industryCollaboration.paragraphs.length - 1 ? '0.75rem' : 0 }}>
+            {industryCollaboration.paragraphs.map((p, idx) => (
+              <p key={idx} className="vsac-orbit-item" style={{ color: '#334155', lineHeight: 1.65, marginBottom: idx < industryCollaboration.paragraphs.length - 1 ? '0.75rem' : 0 }}>
                 {renderBold(p)}
               </p>
             ))}
@@ -392,6 +418,50 @@ export default function VsacPage({ sections }: VsacPageProps) {
               ))}
             </div>
           </div>
+        </div>
+      )}
+
+      {/* DYNAMIC CUSTOM SECTIONS */}
+      {sections.some((s) => s.placement === 'intro') && (
+        <div style={{ marginTop: '2rem' }}>
+          <CustomSectionsIntro sections={sections} />
+        </div>
+      )}
+      <div style={{ marginTop: '2rem' }}>
+        <CustomSectionsGalleries sections={sections} />
+        <CustomSectionsAccordion sections={sections.filter((s) => s.placement !== 'intro' && s.contentType !== 'gallery' && s.id !== 'gallery')} />
+      </div>
+
+      {/* Dynamic Additional Sections from Admin */}
+      {additionalSections.length > 0 && (
+        <div style={{ marginTop: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          {additionalSections.map((sec) => (
+            <div key={sec.id} className="vsac-block">
+              <div className="vsac-block-header">
+                <h2 className="vsac-block-title">
+                  <Sparkles size={18} style={{ color: '#00E5FF' }} /> {sec.title}
+                </h2>
+                {sec.badge && <span className="vsac-block-tag">{sec.badge}</span>}
+              </div>
+              <div className="vsac-block-body">
+                {(sec.paragraphs || []).map((p, pIdx) => (
+                  <p key={pIdx} className="vsac-block-text" style={{ marginBottom: '0.75rem' }}>
+                    {renderBold(p)}
+                  </p>
+                ))}
+                {(sec.bulletPoints || []).length > 0 && (
+                  <ul className="vsac-mission-list" style={{ marginTop: '0.75rem' }}>
+                    {sec.bulletPoints!.map((b, bIdx) => (
+                      <li key={bIdx} className="vsac-mission-item">
+                        <CheckCircle2 size={16} style={{ color: '#00E5FF', flexShrink: 0, marginTop: 3 }} />
+                        <span>{renderBold(b)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
+          ))}
         </div>
       )}
 

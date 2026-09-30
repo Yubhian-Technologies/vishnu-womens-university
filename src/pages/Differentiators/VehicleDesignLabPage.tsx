@@ -19,12 +19,16 @@ import {
   Layers,
   Settings,
 } from 'lucide-react';
+import { CustomSectionsIntro, CustomSectionsGalleries, CustomSectionsAccordion } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
+import { hasCustomSectionContent } from '../../lib/customSections';
 import { vehicleDesignLab, type VdlObjective, type VdlProjectBullet, type VdlEndowment, type VdlOutcomeItem } from './vehicleDesignLab.data';
 import type { DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
 import type { VdlAchievementReportDoc } from '../Admin/sections/VdlAchievementsAdmin';
 import type { VdlTeamMemberDoc } from '../Admin/sections/VdlTeamAdmin';
 import type { CustomSection } from '../../lib/customSections';
 import { useOrderedCollection } from '../../hooks/useCollection';
+import { useDocument } from '../../hooks/useDocument';
+import type { VehicleDesignLabDoc } from '../Admin/sections/VehicleDesignLabContentAdmin';
 import { renderBold } from '../../lib/boldText';
 import './VehicleDesignLabPage.css';
 
@@ -33,10 +37,24 @@ interface VehicleDesignLabPageProps {
   sections: CustomSection[];
 }
 
-export default function VehicleDesignLabPage({ sections }: VehicleDesignLabPageProps) {
+export default function VehicleDesignLabPage({ item, sections }: VehicleDesignLabPageProps) {
   const [activePhaseTab, setActivePhaseTab] = useState<number>(0);
   const [lightboxImg, setLightboxImg] = useState<string | null>(null);
   const [isUtilityProjectsExpanded, setIsUtilityProjectsExpanded] = useState<boolean>(false);
+  const { data: remoteData } = useDocument<VehicleDesignLabDoc>('settings', 'vehicleDesignLab');
+  const vdl = { ...vehicleDesignLab, ...(remoteData || {}) };
+
+  const aboutParagraphs = (item?.description && hasCustomSectionContent(item.description) && item.description.textContent)
+    ? [item.description.textContent]
+    : item?.desc
+    ? [item.desc]
+    : vdl.paragraphs;
+
+  const visionText = (item?.vision && hasCustomSectionContent(item.vision) && (item.vision.textContent || item.vision.listText)) || vdl.vision;
+
+  const missionText = (item?.mission && hasCustomSectionContent(item.mission) && (item.mission.textContent || item.mission.listText)) || vdl.mission;
+
+  const objectivesList = (item?.objectives && hasCustomSectionContent(item.objectives) && (item.objectives.listText?.split('\n').filter(Boolean) || [item.objectives.textContent || ''])) || null;
 
   // Admin-managed achievement cards (Admin -> Vehicle Design Lab Achievements)
   const { docs: achievementCards } = useOrderedCollection<VdlAchievementReportDoc>('vdlAchievementReports', 'order');
@@ -103,7 +121,7 @@ export default function VehicleDesignLabPage({ sections }: VehicleDesignLabPageP
   };
 
   const PREVIEW_UTILITY_PROJECTS_COUNT = 4;
-  const utilityProjects = vehicleDesignLab.facilities.campusUtilityProjects;
+  const utilityProjects = (vdl.facilities as any)?.campusUtilityProjects || [];
   const isUtilityExpandable = utilityProjects.length > PREVIEW_UTILITY_PROJECTS_COUNT;
   const visibleUtilityProjects = isUtilityExpandable && !isUtilityProjectsExpanded
     ? utilityProjects.slice(0, PREVIEW_UTILITY_PROJECTS_COUNT)
@@ -130,7 +148,7 @@ export default function VehicleDesignLabPage({ sections }: VehicleDesignLabPageP
           </div>
 
           <div className="vdl-hero-text-block">
-            {vehicleDesignLab.paragraphs.map((para, idx) => (
+            {aboutParagraphs.map((para, idx) => (
               <p key={idx} className="vdl-overview-text">
                 {renderBold(para)}
               </p>
@@ -139,7 +157,7 @@ export default function VehicleDesignLabPage({ sections }: VehicleDesignLabPageP
 
           {/* Fundamentals Engine Specs Chips */}
           <div className="vdl-fundamentals-grid">
-            {vehicleDesignLab.fundamentals.map((fund, idx) => (
+            {vdl.fundamentals.map((fund, idx) => (
               <div key={idx} className="vdl-fund-chip">
                 <Gauge size={13} style={{ color: '#FF5722' }} />
                 <span>{renderBold(fund)}</span>
@@ -168,7 +186,7 @@ export default function VehicleDesignLabPage({ sections }: VehicleDesignLabPageP
                   <Compass size={16} style={{ color: '#FF5722' }} /> Vision
                 </div>
                 <p className="vdl-card-text" style={{ fontStyle: 'italic', fontWeight: 600 }}>
-                  {vehicleDesignLab.vision}
+                  {renderBold(visionText)}
                 </p>
               </div>
 
@@ -178,7 +196,7 @@ export default function VehicleDesignLabPage({ sections }: VehicleDesignLabPageP
                   <Flame size={16} style={{ color: '#FF9800' }} /> Mission
                 </div>
                 <p className="vdl-card-text">
-                  {vehicleDesignLab.mission}
+                  {renderBold(missionText)}
                 </p>
               </div>
             </div>
@@ -192,12 +210,19 @@ export default function VehicleDesignLabPage({ sections }: VehicleDesignLabPageP
               <Settings size={16} style={{ color: '#FF5722' }} /> Lab Objectives
             </h3>
             <div className="vdl-objectives-grid">
-              {vehicleDesignLab.objectives.map((obj: VdlObjective, idx: number) => (
-                <div key={idx} className="vdl-objective-card">
-                  <span className="vdl-obj-lead">{obj.lead}</span>
-                  <span className="vdl-obj-text">{renderBold(obj.text)}</span>
-                </div>
-              ))}
+              {objectivesList && objectivesList.length > 0
+                ? objectivesList.map((obj: string, idx: number) => (
+                    <div key={idx} className="vdl-objective-card">
+                      <span className="vdl-obj-lead">Objective {idx + 1}:</span>
+                      <span className="vdl-obj-text">{renderBold(obj)}</span>
+                    </div>
+                  ))
+                : vdl.objectives.map((obj: VdlObjective, idx: number) => (
+                    <div key={idx} className="vdl-objective-card">
+                      <span className="vdl-obj-lead">{obj.lead}</span>
+                      <span className="vdl-obj-text">{renderBold(obj.text)}</span>
+                    </div>
+                  ))}
             </div>
           </div>
         </div>
@@ -273,7 +298,7 @@ export default function VehicleDesignLabPage({ sections }: VehicleDesignLabPageP
         </div>
         <div className="vdl-block-body">
           <p className="vdl-overview-text" style={{ color: '#2D3748', marginBottom: 'var(--space-4)' }}>
-            {renderBold(vehicleDesignLab.facilities.overview)}
+            {renderBold(vdl.facilities.overview)}
           </p>
 
           <div className={`vdl-split ${hasPhotos ? 'has-photo reverse' : 'no-photo'}`}>
@@ -282,7 +307,7 @@ export default function VehicleDesignLabPage({ sections }: VehicleDesignLabPageP
             <div>
               {/* Phase Switcher Tabs */}
               <div className="vdl-tabs-bar">
-                {vehicleDesignLab.facilities.activitiesPrograms.map((phase, idx) => (
+                {vdl.facilities.activitiesPrograms.map((phase, idx) => (
                   <button
                     key={idx}
                     className={`vdl-tab-btn ${activePhaseTab === idx ? 'active' : ''}`}
@@ -294,13 +319,13 @@ export default function VehicleDesignLabPage({ sections }: VehicleDesignLabPageP
               </div>
 
               {/* Active Phase Content */}
-              {vehicleDesignLab.facilities.activitiesPrograms[activePhaseTab] && (
+              {vdl.facilities.activitiesPrograms[activePhaseTab] && (
                 <div className="vdl-phase-card">
                   <h3 className="vdl-phase-title">
-                    {vehicleDesignLab.facilities.activitiesPrograms[activePhaseTab].title}
+                    {vdl.facilities.activitiesPrograms[activePhaseTab].title}
                   </h3>
                   <p className="vdl-phase-text">
-                    {vehicleDesignLab.facilities.activitiesPrograms[activePhaseTab].paragraph}
+                    {vdl.facilities.activitiesPrograms[activePhaseTab].paragraph}
                   </p>
                 </div>
               )}
@@ -321,7 +346,7 @@ export default function VehicleDesignLabPage({ sections }: VehicleDesignLabPageP
           <div className={`vdl-split ${hasPhotos ? 'has-photo' : 'no-photo'}`} style={{ marginBottom: 'var(--space-4)' }}>
             <div>
               <p className="vdl-overview-text" style={{ color: '#2D3748', marginBottom: 'var(--space-4)' }}>
-                {renderBold(vehicleDesignLab.facilities.campusUtilityIntro)}
+                {renderBold((vdl.facilities as any)?.campusUtilityIntro || '')}
               </p>
 
               <div className="vdl-projects-grid">
@@ -368,12 +393,12 @@ export default function VehicleDesignLabPage({ sections }: VehicleDesignLabPageP
         </div>
         <div className="vdl-block-body">
           <p className="vdl-overview-text" style={{ color: '#2D3748', marginBottom: 'var(--space-4)' }}>
-            {renderBold(vehicleDesignLab.industryCollaborations.intro)}
+            {renderBold((vdl as any).industryCollaborations?.intro || '')}
           </p>
 
           <div className={`vdl-split ${hasPhotos ? 'has-photo' : 'no-photo'}`} style={{ marginBottom: 'var(--space-4)' }}>
             <div className="vdl-endowments-list">
-              {vehicleDesignLab.industryCollaborations.endowments.map((endow: VdlEndowment) => (
+              {((vdl as any).industryCollaborations?.endowments || []).map((endow: VdlEndowment) => (
                 <div key={endow.id} className="vdl-endowment-card">
                   <div className="vdl-endowment-top">
                     <h4 className="vdl-endowment-title">{endow.title}</h4>
@@ -388,7 +413,7 @@ export default function VehicleDesignLabPage({ sections }: VehicleDesignLabPageP
           </div>
 
           <p className="vdl-overview-text" style={{ color: '#4A5568', fontStyle: 'italic', background: '#F7FAFC', padding: 'var(--space-3)', borderRadius: '6px', borderLeft: '3px solid #FF5722' }}>
-            {vehicleDesignLab.industryCollaborations.closing}
+            {(vdl as any).industryCollaborations?.closing || ''}
           </p>
         </div>
       </div>
@@ -403,12 +428,12 @@ export default function VehicleDesignLabPage({ sections }: VehicleDesignLabPageP
         </div>
         <div className="vdl-block-body">
           <p className="vdl-overview-text" style={{ color: '#2D3748', marginBottom: 'var(--space-4)' }}>
-            {renderBold(vehicleDesignLab.studentsAchievements.intro)}
+            {renderBold((vdl as any).studentsAchievements?.intro || '')}
           </p>
 
           {/* Motorsport Competitions Grid */}
           <div className="vdl-competitions-grid" style={{ marginBottom: 'var(--space-4)' }}>
-            {vehicleDesignLab.studentsAchievements.competitions.map((comp, idx) => (
+            {((vdl as any).studentsAchievements?.competitions || []).map((comp: any, idx: number) => (
               <div key={idx} className="vdl-comp-card">
                 <div className="vdl-comp-title">
                   <Flame size={16} style={{ color: '#FF5722' }} /> {comp.title}
@@ -419,7 +444,7 @@ export default function VehicleDesignLabPage({ sections }: VehicleDesignLabPageP
           </div>
 
           <p className="vdl-overview-text" style={{ color: '#2D3748', marginBottom: 'var(--space-4)' }}>
-            {vehicleDesignLab.studentsAchievements.closing}
+            {(vdl as any).studentsAchievements?.closing || ''}
           </p>
 
           {/* Admin-managed achievement cards (photo + description, optional PDF report) */}
@@ -507,6 +532,19 @@ export default function VehicleDesignLabPage({ sections }: VehicleDesignLabPageP
               ))}
             </div>
           </div>
+        </div>
+      )}
+
+      {/* DYNAMIC CUSTOM SECTIONS */}
+      {sections.some((s) => s.placement === 'intro') && (
+        <div style={{ marginTop: '2rem' }}>
+          <CustomSectionsIntro sections={sections} />
+        </div>
+      )}
+      {sections.length > 0 && (
+        <div style={{ marginTop: '2.5rem' }}>
+          <CustomSectionsGalleries sections={sections} />
+          <CustomSectionsAccordion sections={sections.filter((s) => s.placement !== 'intro' && s.contentType !== 'gallery')} />
         </div>
       )}
 

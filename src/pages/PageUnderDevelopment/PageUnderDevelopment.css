@@ -78,28 +78,22 @@
   white-space: nowrap;
 }
 
-.pud-title {
+.pud-page-name {
   font-family: var(--font-serif);
-  font-size: clamp(1.6rem, 5.5vw, var(--text-h2));
+  font-size: clamp(1.8rem, 5.5vw, var(--text-h2));
   font-weight: 800;
   color: var(--color-primary);
   line-height: var(--leading-tight);
-  margin-bottom: var(--space-4);
+  margin-bottom: var(--space-3);
   text-wrap: balance;
 }
 
-.pud-subtitle {
-  font-size: clamp(0.95rem, 2.4vw, var(--text-lg));
+.pud-status-text {
+  font-size: clamp(1.05rem, 2.6vw, var(--text-xl));
+  font-weight: 600;
   color: var(--color-text-light);
-  line-height: var(--leading-relaxed);
-  max-width: 460px;
-  margin-bottom: var(--space-8);
-  word-break: break-word;
-}
-
-.pud-subtitle strong {
-  color: var(--color-primary);
-  font-weight: 700;
+  line-height: var(--leading-normal);
+  margin-bottom: var(--space-7);
 }
 
 .pud-progress {

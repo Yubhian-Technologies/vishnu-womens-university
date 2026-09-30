@@ -61,15 +61,11 @@ export default function PageUnderDevelopment(props: PageUnderDevelopmentProps) {
               Coming Soon
             </span>
 
-            <h1 className="pud-title">Page Under Development</h1>
+            {pageTitle && (
+              <h1 className="pud-page-name">{pageTitle}</h1>
+            )}
 
-            <p className="pud-subtitle">
-              {pageTitle ? (
-                <>We're putting the finishing touches on the <strong>{pageTitle}</strong> page. It isn't ready to view just yet, but we're working on it.</>
-              ) : (
-                <>We're putting the finishing touches on this page. It isn't ready to view just yet, but we're working on it.</>
-              )}
-            </p>
+            <p className="pud-status-text">Page Under Development</p>
 
             <div className="pud-progress" role="img" aria-label="Page in progress">
               <span className="pud-progress-fill" />
