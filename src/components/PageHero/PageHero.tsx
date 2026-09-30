@@ -41,6 +41,8 @@ interface PageHeroProps {
   className?: string;
   bottomSlot?: React.ReactNode;
   children?: React.ReactNode;
+  /** Opt-out of the dark scrim on the default full-bleed image hero. */
+  hideOverlay?: boolean;
 }
 
 const INTERVAL = 5000;
@@ -60,6 +62,7 @@ export default function PageHero({
   className,
   bottomSlot,
   children,
+  hideOverlay = false,
 }: PageHeroProps) {
   const { slides, loading } = usePageBanners(page);
   const [rawCurrent, setCurrent] = useState(0);
@@ -263,7 +266,7 @@ export default function PageHero({
           ) : (
             <>
               {slidesMarkup}
-              <div className="page-hero-overlay" />
+              {!hideOverlay && <div className="page-hero-overlay" />}
               <div className="page-hero-content">{textMarkup}</div>
               {bottomSlot && <div className="page-hero-bottom-slot">{bottomSlot}</div>}
               {navMarkup}
