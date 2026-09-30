@@ -51,7 +51,6 @@ interface FacultyCarouselProps {
   departmentName?: string;
   title?: string;
   viewMoreLink?: string;
-  autoScrollInterval?: number;
 }
 
 function getInitials(name: string) {
@@ -80,7 +79,6 @@ export default function FacultyCarousel({
   departmentName: _,
   title = 'Learn from our impactful faculty',
   viewMoreLink = '/faculty',
-  autoScrollInterval = 2000,
 }: FacultyCarouselProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isPaused, setIsPaused] = useState(false);
@@ -135,15 +133,29 @@ export default function FacultyCarousel({
     return [...faculty, ...faculty, ...faculty];
   }, [faculty]);
 
-  // Set initial scroll position to the start of the middle set
+  // NOTE (root cause of the "random direction / jumps back to start" bug):
+  // `faculty` is a NEW array reference on almost every parent re-render —
+  // DepartmentDetail.tsx rebuilds it with `.filter()` every render, and
+  // Firestore redelivers snapshots with new references even when the data is
+  // unchanged (see this repo's CLAUDE.md Firestore gotcha). The effects below
+  // used to depend on `[faculty]` directly, so any unrelated re-render of the
+  // page reset scrollLeft back to the start and tore down/recreated the
+  // autoscroll timer and scroll listener mid-flight, fighting whatever smooth
+  // scroll was already in progress. Depending on this stable id-based string
+  // instead (same content -> same string -> effects don't re-run) fixes it
+  // without changing anything outside this file.
+  const facultyKey = useMemo(() => faculty.map((f) => f.id).join('|'), [faculty]);
+
+  // Set initial scroll position to the start of the middle set. Instant —
+  // the track has no CSS scroll-behavior, so a plain assignment never animates.
   useEffect(() => {
     const el = scrollRef.current;
     if (!el || !faculty || faculty.length <= 1) return;
-    const initialPosition = el.scrollWidth / 3;
-    el.scrollLeft = initialPosition;
-  }, [faculty]);
+    el.scrollLeft = el.scrollWidth / 3;
+  }, [facultyKey]);
 
-  // Seamless circular array modulo scroll listener
+  // Seamless circular array modulo scroll listener: instantaneous shift
+  // (invisible to the user) when crossing set boundaries.
   useEffect(() => {
     const el = scrollRef.current;
     if (!el || !faculty || faculty.length <= 1) return;
@@ -152,7 +164,6 @@ export default function FacultyCarousel({
       const { scrollLeft, scrollWidth } = el;
       const singleSetWidth = scrollWidth / 3;
 
-      // Instantaneous modulo shift (invisible to user) when crossing set boundaries
       if (scrollLeft >= 2 * singleSetWidth - 10) {
         el.scrollLeft -= singleSetWidth;
       } else if (scrollLeft <= 10) {
@@ -162,7 +173,7 @@ export default function FacultyCarousel({
 
     el.addEventListener('scroll', handleScroll, { passive: true });
     return () => el.removeEventListener('scroll', handleScroll);
-  }, [faculty]);
+  }, [facultyKey]);
 
   const getCardStep = () => {
     if (!scrollRef.current) return 240;
@@ -173,18 +184,23 @@ export default function FacultyCarousel({
     return scrollRef.current.clientWidth / 5;
   };
 
-  // Continuous autoscroll loop
+  // Autoscroll: exactly one card slides forward, then a 3s pause, on repeat —
+  // never backward. Safe to animate with behavior: 'smooth' here (unlike the
+  // wraparound jump above) because it's a one-off scrollBy per tick, not a
+  // continuous position update, and the track has no mandatory scroll-snap
+  // fighting it anymore.
+  const AUTO_SCROLL_INTERVAL_MS = 3000;
+
   useEffect(() => {
     if (!faculty || faculty.length <= 1) return;
 
     const timer = setInterval(() => {
       if (isPaused || !scrollRef.current) return;
-      const step = getCardStep();
-      scrollRef.current.scrollBy({ left: step, behavior: 'smooth' });
-    }, autoScrollInterval);
+      scrollRef.current.scrollBy({ left: getCardStep(), behavior: 'smooth' });
+    }, AUTO_SCROLL_INTERVAL_MS);
 
     return () => clearInterval(timer);
-  }, [faculty, isPaused, autoScrollInterval]);
+  }, [facultyKey, isPaused]);
 
   const pauseTemporarily = () => {
     setIsPaused(true);
