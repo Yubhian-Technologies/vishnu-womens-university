@@ -130,6 +130,89 @@
   line-height: 1.85;
 }
 
+/* ---- Composition table ---- */
+.gb-composition {
+  background: var(--color-white);
+}
+
+.gb-table-wrap {
+  overflow-x: auto;
+  border-radius: 16px;
+  border: 1px solid rgba(11, 30, 66, 0.12);
+  box-shadow: var(--shadow-sm);
+}
+
+.gb-table {
+  width: 100%;
+  min-width: 720px;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+  background: var(--color-white);
+}
+
+.gb-table thead th {
+  background: var(--gb-primary);
+  color: #fff;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-align: center;
+  padding: var(--space-4);
+}
+
+.gb-table td,
+.gb-table tbody th {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid rgba(11, 30, 66, 0.08);
+  vertical-align: middle;
+  line-height: 1.5;
+  color: var(--color-text);
+}
+
+.gb-table tbody tr:hover td {
+  background: rgba(11, 30, 66, 0.04);
+}
+
+.gb-table td:first-child {
+  white-space: nowrap;
+  font-weight: 500;
+  text-align: center;
+}
+
+.gb-table__category {
+  background: rgba(201, 168, 76, 0.1);
+  color: var(--gb-primary);
+  font-weight: 700;
+  text-align: center;
+  border-left: 1px solid rgba(11, 30, 66, 0.08);
+  border-right: 1px solid rgba(11, 30, 66, 0.08);
+  width: 190px;
+}
+
+.gb-table__group-start td,
+.gb-table__group-start th {
+  border-top: 2px solid rgba(11, 30, 66, 0.15);
+}
+
+.gb-table__name {
+  text-align: center;
+}
+
+.gb-table__name strong {
+  display: block;
+  color: var(--gb-primary);
+  font-weight: 600;
+}
+
+.gb-table__org {
+  display: block;
+  font-size: var(--text-xs);
+  color: var(--color-text-light);
+}
+
+.gb-table__empty {
+  color: var(--color-text-light);
+}
+
 /* ---- Members / Tiles ---- */
 .gb-members {
   background: var(--color-off-white);

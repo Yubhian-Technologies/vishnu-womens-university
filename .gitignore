@@ -9,3 +9,4 @@ scripts/*service-account*.json
 scripts/downloads-url-map.json
 scripts/cloudinary-migration-downloads/
 scripts/cloudinary-migration-map.json
+scripts/backups/
