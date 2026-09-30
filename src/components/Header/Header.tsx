@@ -452,7 +452,14 @@ export default function Header() {
                             {group.items.map((child) => (
                               <li key={child.label} className="mega-sublink-item">
                                 {child.disabled ? (
-                                  <span className="mega-link-disabled">{child.label}</span>
+                                  <Link
+                                    to="/under-development"
+                                    state={{ pageTitle: child.label, parent: { label: activeItemData.label, path: group.groupPath || activeItemData.highlight?.linkPath || activeItemData.path || '/' } }}
+                                    className="mega-sublink"
+                                    onClick={() => setOpenItem(null)}
+                                  >
+                                    <span className="mega-link-text">{child.label}</span>
+                                  </Link>
                                 ) : (child.external || child.download) ? (
                                   <a
                                     href={child.path}
@@ -513,7 +520,14 @@ export default function Header() {
                           {colItems.map((child) => (
                             <li key={child.label} className="mega-sublink-item">
                               {child.disabled ? (
-                                <span className="mega-link-disabled">{child.label}</span>
+                                <Link
+                                  to="/under-development"
+                                  state={{ pageTitle: child.label, parent: { label: activeItemData.label, path: activeItemData.highlight?.linkPath || activeItemData.path || '/' } }}
+                                  className="mega-sublink"
+                                  onClick={() => setOpenItem(null)}
+                                >
+                                  <span className="mega-link-text">{child.label}</span>
+                                </Link>
                               ) : (child.external || child.download) ? (
                                 <a
                                   href={child.path}
@@ -607,7 +621,14 @@ export default function Header() {
                             {item.children.map((child) => (
                               <li key={child.label} className="mobile-sublink-entry">
                                 {child.disabled ? (
-                                  <span className="mobile-sublink is-disabled">{child.label}</span>
+                                  <Link
+                                    to="/under-development"
+                                    state={{ pageTitle: child.label, parent: { label: item.label, path: item.highlight?.linkPath || item.path || '/' } }}
+                                    className="mobile-sublink"
+                                    onClick={() => setMobileOpen(false)}
+                                  >
+                                    <span>{child.label}</span>
+                                  </Link>
                                 ) : (child.external || child.download) ? (
                                   <a
                                     href={child.path}
@@ -673,7 +694,14 @@ export default function Header() {
                                       {group.items.map((child) => (
                                         <li key={child.label} className="mobile-sublink-entry">
                                           {child.disabled ? (
-                                            <span className="mobile-sublink is-disabled">{child.label}</span>
+                                            <Link
+                                              to="/under-development"
+                                              state={{ pageTitle: child.label, parent: { label: item.label, path: group.groupPath || item.highlight?.linkPath || item.path || '/' } }}
+                                              className="mobile-sublink"
+                                              onClick={() => setMobileOpen(false)}
+                                            >
+                                              <span>{child.label}</span>
+                                            </Link>
                                           ) : (child.external || child.download) ? (
                                             <a
                                               href={child.path}

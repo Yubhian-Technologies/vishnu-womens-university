@@ -3,6 +3,13 @@
    Institutional · Prestigious · Trustworthy · Clean · Modern
    ========================================================================== */
 
+/* Set by PageUnderDevelopment while it's the content on screen (see its
+   useEffect) — that placeholder reads better without the full sitemap
+   footer trailing it. */
+body.hide-site-footer .vwu-footer {
+  display: none;
+}
+
 .vwu-footer {
   /* --footer-bg/-heading/-text/-accent are deliberately NOT redeclared here
      — those four are the ones Admin -> Theme -> Footer Colors can override

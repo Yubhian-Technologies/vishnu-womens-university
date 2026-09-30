@@ -85,6 +85,7 @@ const UGCDisclosure = lazyWithRetry(() => import('./pages/Disclosures/UGCDisclos
 const AicteFeedback = lazyWithRetry(() => import('./pages/AicteFeedback/AicteFeedback'));
 const AntiRagging = lazyWithRetry(() => import('./pages/AntiRagging/AntiRagging'));
 const PoliciesProcedures = lazyWithRetry(() => import('./pages/PoliciesProcedures/PoliciesProcedures'));
+const PageUnderDevelopment = lazyWithRetry(() => import('./pages/PageUnderDevelopment/PageUnderDevelopment'));
 // The admin shell alone pulls in 20+ section components — keeping it out of
 // the public bundle entirely is the single biggest win here, since the vast
 // majority of visitors never touch /admin.
@@ -239,6 +240,7 @@ function PublicApp() {
             <Route path="/aicte-feedback-facility" element={<AicteFeedback />} />
             <Route path="/anti-ragging" element={<AntiRagging />} />
             <Route path="/policies-procedures" element={<PoliciesProcedures />} />
+            <Route path="/under-development" element={<PageUnderDevelopment />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
