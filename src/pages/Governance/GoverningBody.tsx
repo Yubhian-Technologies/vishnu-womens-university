@@ -1,14 +1,6 @@
 import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { useOrderedCollection } from '../../hooks/useCollection';
-import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import PageHero from '../../components/PageHero/PageHero';
-import type { GovernanceItemDoc } from '../Admin/sections/GovernanceItemsAdmin';
-import { renderBold } from '../../lib/boldText';
 import './GoverningBody.css';
-
-const DEFAULT_OVERVIEW = "The Governing Body of Shri Vishnu Engineering College for Women serves as the apex decision-making authority responsible for guiding the institution's vision, strategic planning, academic excellence, and overall development. Comprising representatives from the management, distinguished academicians, industry experts, university nominees, government officials, faculty members, and the Principal, the Governing Body ensures transparent governance, quality education, innovation, and continuous institutional growth while upholding the values and mission of the college.";
 
 export interface GoverningBodyMember {
   id: string;
@@ -98,53 +90,7 @@ function GoverningBodyTable() {
   );
 }
 
-function getInitials(name: string) {
-  const cleaned = name.replace(/\b(Dr|Sri|Prof|Mr|Mrs|Ms)\.?\s*/gi, '');
-  const parts = cleaned.trim().split(/\s+/).filter(Boolean);
-  if (parts.length === 0) return '';
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-}
-
-function MembersTiles() {
-  const { docs, loading } = useOrderedCollection<GoverningBodyMember>('governingBody', 'order');
-  const members = !loading && docs.length > 0 ? docs : defaultMembers;
-
-  return (
-    <div className="gb-tiles">
-      {members.map((member, i) => (
-        <motion.div
-          className="gb-tile"
-          key={member.name}
-          initial={{ opacity: 0, y: 28, scale: 0.95 }}
-          whileInView={{ opacity: 1, y: 0, scale: 1 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.5, delay: (i % 12) * 0.06, ease: 'easeOut' }}
-          whileHover={{ y: -8, transition: { duration: 0.25 } }}
-        >
-          {member.photoUrl ? (
-            <SmoothImage src={member.photoUrl} alt={member.name} className="gb-tile__photo" />
-          ) : (
-            <div className="gb-tile__avatar">{getInitials(member.name)}</div>
-          )}
-          <h3 className="gb-tile__name">{member.name}</h3>
-          <p className="gb-tile__position">{member.position}</p>
-          <span className="gb-tile__category">{member.category}</span>
-        </motion.div>
-      ))}
-    </div>
-  );
-}
-
 export default function GoverningBody() {
-  // The "Governing Body" entry in the Governance/Committees/IQAC admin
-  // (slug "governing-body") only ever powers this Overview text — its
-  // Members Table field is unused, since the real member list below comes
-  // from the separate `governingBody` collection/admin (with photos).
-  const { docs: govItems } = useOrderedCollection<GovernanceItemDoc>('governanceItems', 'order');
-  const overviewItem = govItems.find((i) => i.slug === 'governing-body');
-  const overviewText = [overviewItem?.intro, overviewItem?.about].filter(Boolean).join(' ') || DEFAULT_OVERVIEW;
-
   useEffect(() => {
     document.title = "Governing Body | Vishnu Women's University";
     const observer = new IntersectionObserver(
@@ -173,28 +119,6 @@ export default function GoverningBody() {
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Governance', to: '/governance' }, { label: 'Governing Body' }]}
       />
 
-      {/* Overview */}
-      <section className="section gb-overview">
-        <div className="container">
-          <div className="gb-overview__grid reveal">
-            <div className="gb-overview__inner">
-              <h2 className="gb-overview__title">Institutional Overview</h2>
-              <p>{renderBold(overviewText)}</p>
-              {overviewItem?.highlights && overviewItem.highlights.length > 0 && (
-                <ul style={{ marginTop: 'var(--space-4)', paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-                  {overviewItem.highlights.map((h) => (
-                    <li key={h} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6 }}>{renderBold(h)}</li>
-                  ))}
-                </ul>
-              )}
-            </div>
-            <div className="gb-overview__photo-frame">
-              <SmoothImage src="/images/governing-body-founder.jpg" alt="Founder, Vishnu Women's University" className="gb-overview__photo" />
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Composition table */}
       <section className="section gb-composition">
         <div className="container">
@@ -202,34 +126,6 @@ export default function GoverningBody() {
             <h2 className="gb-overview__title">Governing Body at VWU</h2>
           </div>
           <GoverningBodyTable />
-        </div>
-      </section>
-
-      {/* Members */}
-      <section className="section gb-members">
-        <div className="container">
-          <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>
-            <h2 className="gb-overview__title">Governing Body Members</h2>
-            <p className="gb-members__subtitle">
-              Meet the distinguished leaders steering VWU's strategic vision and institutional governance.
-            </p>
-          </div>
-          <MembersTiles />
-        </div>
-      </section>
-
-      {/* Bottom CTA Banner */}
-      <section className="about-cta-banner">
-        <div className="container">
-          <div className="about-cta-inner">
-            <h2>Explore Institutional Governance</h2>
-            <p>Discover our statutory committees, academic councils, and quality assurance frameworks.</p>
-            <div className="about-cta-buttons">
-              <Link to="/governance" className="btn btn-accent">All Governance</Link>
-              <Link to="/vision-mission" className="btn btn-secondary">Vision & Mission</Link>
-              <Link to="/about" className="btn btn-secondary">About VWU</Link>
-            </div>
-          </div>
         </div>
       </section>
     </main>
