@@ -6,7 +6,7 @@ import NewsCard from '../../components/NewsCard/NewsCard';
 import SEO from '../../components/SEO/SEO';
 import { useDocument } from '../../hooks/useDocument';
 import { useOrderedCollection } from '../../hooks/useCollection';
-import { happeningToArticle } from '../../lib/happenings';
+import { happeningToArticle, isUpcomingHappening, parseHappeningDate } from '../../lib/happenings';
 import type { HappeningDoc } from '../Admin/sections/NewsAwardsDataAdmin';
 import { renderBold } from '../../lib/boldText';
 import './HappeningDetail.css';
@@ -42,7 +42,14 @@ export default function HappeningDetail() {
   };
 
   const otherRecent = allHappenings
-    .filter((h) => h.id !== id && h.type === 'recent')
+    .filter((h) => h.id !== id && (h.type === 'recent' || (h.type === 'upcoming' && !isUpcomingHappening(h))))
+    .sort((a, b) => {
+      const ta = parseHappeningDate(a.date).timestamp;
+      const tb = parseHappeningDate(b.date).timestamp;
+      if (ta === null) return tb === null ? 0 : 1;
+      if (tb === null) return -1;
+      return tb - ta;
+    })
     .slice(0, 3);
 
   if (loading) {
