@@ -93,7 +93,11 @@
   --topbar-height: 0px;
 }
 
-@media (max-width: 1199px) {
+/* Matches Header.css's own <1600px "tablet & mobile" pill breakpoint — the
+   navbar-pill is shorter (96px, not 104px) whenever the hamburger nav is
+   showing, so this needs to stay in lockstep with that threshold or content
+   pages get a stale, slightly-too-tall gap under the header. */
+@media (max-width: 1599px) {
   :root {
     --header-height: 130px;
   }
