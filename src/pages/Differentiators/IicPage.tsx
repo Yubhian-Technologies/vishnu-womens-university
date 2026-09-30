@@ -26,9 +26,11 @@ import {
 } from 'lucide-react';
 import { institutionInnovationCell } from './institutionInnovationCell.data';
 import type { DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
+import type { IicDoc } from '../Admin/sections/IicContentAdmin';
 import { hasCustomSectionContent, type CustomSection } from '../../lib/customSections';
 import type { CustomTab } from '../../lib/customTabs';
 import { useOrderedCollection, type WithId } from '../../hooks/useCollection';
+import { useDocument } from '../../hooks/useDocument';
 import { CustomSectionsPlain, CustomSectionsPills, CustomSectionsGalleries, CustomSectionsAccordion } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import { renderBold } from '../../lib/boldText';
@@ -128,7 +130,46 @@ function AdminTabExtraSections({ tab }: { tab?: CustomTab }) {
 }
 
 export default function IicPage({ item, sections = [] }: IicPageProps) {
-  const iic = institutionInnovationCell;
+  const { data: remoteData } = useDocument<IicDoc>('settings', 'iicContent');
+  const iic = {
+    ...institutionInnovationCell,
+    ...(remoteData || {}),
+    about: remoteData?.about || institutionInnovationCell.about,
+    vision: remoteData?.vision || institutionInnovationCell.vision,
+    mission: remoteData?.mission || institutionInnovationCell.mission,
+    journey: remoteData?.journey || institutionInnovationCell.journey,
+    constitution: {
+      ...institutionInnovationCell.constitution,
+      ...(remoteData?.constitution || {}),
+      leadership: remoteData?.constitution?.leadership || institutionInnovationCell.constitution.leadership,
+      coordinators: remoteData?.constitution?.coordinators || institutionInnovationCell.constitution.coordinators,
+    },
+    ambassadors: {
+      ...institutionInnovationCell.ambassadors,
+      ...(remoteData?.ambassadors || {}),
+      roles: remoteData?.ambassadors?.roles || institutionInnovationCell.ambassadors.roles,
+    },
+    activities: {
+      ...institutionInnovationCell.activities,
+      ...(remoteData?.activities || {}),
+      paragraphs: remoteData?.activities?.paragraphs || institutionInnovationCell.activities.paragraphs,
+    },
+    supportsInnovation: {
+      ...institutionInnovationCell.supportsInnovation,
+      ...(remoteData?.supportsInnovation || {}),
+      items: remoteData?.supportsInnovation?.items || institutionInnovationCell.supportsInnovation.items,
+    },
+    atalTinkeringSchools: {
+      ...institutionInnovationCell.atalTinkeringSchools,
+      ...(remoteData?.atalTinkeringSchools || {}),
+      paragraphs: remoteData?.atalTinkeringSchools?.paragraphs || institutionInnovationCell.atalTinkeringSchools.paragraphs,
+      schools: remoteData?.atalTinkeringSchools?.schools || institutionInnovationCell.atalTinkeringSchools.schools,
+    },
+    nisp: { ...institutionInnovationCell.nisp, ...(remoteData?.nisp || {}) },
+    rating: { ...institutionInnovationCell.rating, ...(remoteData?.rating || {}) },
+    annualReports: { ...institutionInnovationCell.annualReports, ...(remoteData?.annualReports || {}) },
+    sih: { ...institutionInnovationCell.sih, ...(remoteData?.sih || {}) },
+  };
   const rawAdminTabs = item?.tabs || [];
   const adminTabs = rawAdminTabs.filter((tab) => {
     return !Object.values(STATIC_TAB_ALIASES).some((aliases) => tabMatchesAliases(tab, aliases));
@@ -230,8 +271,12 @@ export default function IicPage({ item, sections = [] }: IicPageProps) {
                 <div className="iic-badge">
                   <Sparkles size={14} /> MoE Innovation Cell
                 </div>
-                <h2 className="iic-card-title">{iic.aboutTitle}</h2>
-                {iic.about.map((paragraph, i) => (
+                <h2 className="iic-card-title">{item?.title || iic.aboutTitle}</h2>
+                {((item?.description && hasCustomSectionContent(item.description) && item.description.textContent)
+                  ? [item.description.textContent]
+                  : item?.desc
+                  ? [item.desc]
+                  : iic.about).map((paragraph, i) => (
                   <p key={i} className="iic-lead-text" style={{ marginBottom: i < iic.about.length - 1 ? '1rem' : 0 }}>
                     {renderBold(paragraph)}
                   </p>
@@ -259,7 +304,9 @@ export default function IicPage({ item, sections = [] }: IicPageProps) {
                   </div>
                   <h3 className="iic-subcard-title">Vision</h3>
                   <ul className="iic-checklist">
-                    {iic.vision.map((v, i) => (
+                    {((item?.vision && hasCustomSectionContent(item.vision))
+                      ? (item.vision.listText ? item.vision.listText.split('\n').filter(Boolean) : [item.vision.textContent || ''])
+                      : iic.vision).map((v, i) => (
                       <li key={i}>
                         <CheckCircle2 size={16} className="iic-check-icon cyan" />
                         <span>{renderBold(v)}</span>
@@ -274,7 +321,9 @@ export default function IicPage({ item, sections = [] }: IicPageProps) {
                   </div>
                   <h3 className="iic-subcard-title">Mission</h3>
                   <ul className="iic-checklist">
-                    {iic.mission.map((m, i) => (
+                    {((item?.mission && hasCustomSectionContent(item.mission))
+                      ? (item.mission.listText ? item.mission.listText.split('\n').filter(Boolean) : [item.mission.textContent || ''])
+                      : iic.mission).map((m, i) => (
                       <li key={i}>
                         <CheckCircle2 size={16} className="iic-check-icon gold" />
                         <span>{renderBold(m)}</span>

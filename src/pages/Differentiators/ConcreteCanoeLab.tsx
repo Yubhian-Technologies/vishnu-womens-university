@@ -28,9 +28,12 @@ import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { usePageBanners } from '../../hooks/usePageBanners';
 import { fetchPriorityAttr } from '../../lib/domAttrs';
+import { CustomSectionsIntro, CustomSectionsGalleries, CustomSectionsAccordion } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import { hasCustomSectionContent, type CustomSectionPhoto } from '../../lib/customSections';
 import { DIFFERENTIATOR_CATEGORIES, type DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
 import { concreteCanoeLab } from './concreteCanoeLab.data';
+import { useDocument } from '../../hooks/useDocument';
+import type { ConcreteCanoeDoc } from '../Admin/sections/ConcreteCanoeContentAdmin';
 import { renderBold } from '../../lib/boldText';
 import './ConcreteCanoeLab.css';
 
@@ -42,10 +45,21 @@ export default function ConcreteCanoeLab() {
   const item = allItems.find((i) => i.slug === SLUG) ?? null;
   const [lightbox, setLightbox] = useState<{ photos: { imageUrl: string; caption?: string }[]; index: number } | null>(null);
   const [activeNav, setActiveNav] = useState('overview');
+  const { data: remoteData } = useDocument<ConcreteCanoeDoc>('settings', 'concreteCanoeLab');
+  const canoe = { ...concreteCanoeLab, ...(remoteData || {}) };
+
+  const dynamicTitle = item?.title || 'Concrete Canoe Laboratory';
+  const dynamicSubtitle = item?.summary || item?.desc || 'Equipping female civil engineers with hands-on skills in concrete canoe design, eco-friendly material research, and competitive boat engineering.';
+
+  const aboutParagraphs = (item?.description && hasCustomSectionContent(item.description) && item.description.textContent)
+    ? [item.description.textContent]
+    : item?.desc
+    ? [item.desc]
+    : canoe.paragraphs;
 
   useEffect(() => {
-    document.title = "Concrete Canoe Laboratory | Vishnu Women's University";
-  }, []);
+    document.title = `${dynamicTitle} | Vishnu Women's University`;
+  }, [dynamicTitle]);
 
   // Update active nav link based on scroll position
   useEffect(() => {
@@ -145,11 +159,10 @@ export default function ConcreteCanoeLab() {
                 <Microscope size={14} /> {category?.label || 'Research & Specialised Labs'}
               </div>
 
-              <h1 className="canoe-hero-title">Concrete Canoe Laboratory</h1>
+              <h1 className="canoe-hero-title">{dynamicTitle}</h1>
 
               <p className="canoe-hero-subtitle">
-                {item?.summary ||
-                  'Equipping female civil engineers with hands-on skills in concrete canoe design, eco-friendly material research, and competitive boat engineering.'}
+                {renderBold(dynamicSubtitle)}
               </p>
             </div>
           </div>
@@ -207,7 +220,7 @@ export default function ConcreteCanoeLab() {
           <div className="canoe-overview-card">
             <Anchor size={120} className="canoe-overview-quote-mark" aria-hidden="true" />
             <div className="canoe-prose">
-              {concreteCanoeLab.paragraphs.map((p, i) => (
+              {aboutParagraphs.map((p, i) => (
                 <p key={i}>{renderBold(p)}</p>
               ))}
             </div>
@@ -637,6 +650,23 @@ export default function ConcreteCanoeLab() {
           </div>
         </div>
       </section>
+
+      {/* DYNAMIC CUSTOM SECTIONS */}
+      {customSections.some((s) => s.placement === 'intro') && (
+        <section className="canoe-section">
+          <div className="container">
+            <CustomSectionsIntro sections={customSections} />
+          </div>
+        </section>
+      )}
+      {customSections.length > 0 && (
+        <section className="canoe-section">
+          <div className="container">
+            <CustomSectionsGalleries sections={customSections} />
+            <CustomSectionsAccordion sections={customSections.filter((s) => s.placement !== 'intro' && s.contentType !== 'gallery' && s.id !== 'highlights' && s.id !== 'facilities')} />
+          </div>
+        </section>
+      )}
 
       {/* 10. University Call to Action (CTA) */}
       <section className="canoe-cta-section">

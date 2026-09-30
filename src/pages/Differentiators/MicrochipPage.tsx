@@ -15,18 +15,83 @@ import {
   X,
 } from 'lucide-react';
 import { microchipEmbedded } from './microchipEmbedded.data';
-import type { CustomSection } from '../../lib/customSections';
-import { CustomSectionsAccordion } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
+import { useDocument } from '../../hooks/useDocument';
+import type { MicrochipDoc } from '../Admin/sections/MicrochipContentAdmin';
+import { hasCustomSectionContent, type CustomSection } from '../../lib/customSections';
+import { CustomSectionsAccordion, CustomSectionsIntro } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
+import type { DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
 import { renderBold } from '../../lib/boldText';
 import './MicrochipPage.css';
 
 interface MicrochipPageProps {
+  item?: DifferentiatorItemDoc;
+  descriptionSection?: CustomSection;
+  introBlocks?: CustomSection[];
   customSections?: CustomSection[];
 }
 
-export default function MicrochipPage({ customSections = [] }: MicrochipPageProps) {
+export default function MicrochipPage({
+  item,
+  descriptionSection,
+  introBlocks = [],
+  customSections = [],
+}: MicrochipPageProps) {
+  const { data: remoteData } = useDocument<MicrochipDoc>('settings', 'microchipEmbedded');
   const [lightboxImg, setLightboxImg] = useState<string | null>(null);
-  const data = microchipEmbedded;
+
+  const data = {
+    hero: remoteData?.hero || microchipEmbedded.hero,
+    about: {
+      title: remoteData?.about?.title || microchipEmbedded.about.title,
+      paragraphs: remoteData?.about?.paragraphs && remoteData.about.paragraphs.length > 0 ? remoteData.about.paragraphs : microchipEmbedded.about.paragraphs,
+    },
+    vision: {
+      title: remoteData?.vision?.title || microchipEmbedded.vision.title,
+      statement: remoteData?.vision?.statement || microchipEmbedded.vision.statement,
+    },
+    mission: {
+      title: remoteData?.mission?.title || microchipEmbedded.mission.title,
+      intro: remoteData?.mission?.intro || microchipEmbedded.mission.intro,
+      points: remoteData?.mission?.points && remoteData.mission.points.length > 0 ? remoteData.mission.points : microchipEmbedded.mission.points,
+    },
+    learningAreas: remoteData?.learningAreas && remoteData.learningAreas.length > 0 ? remoteData.learningAreas : microchipEmbedded.learningAreas,
+    trainingAndActivities: remoteData?.trainingAndActivities || microchipEmbedded.trainingAndActivities,
+    programmeOutcome: remoteData?.programmeOutcome || microchipEmbedded.programmeOutcome,
+    technicalHighlights: {
+      title: remoteData?.technicalHighlights?.title || microchipEmbedded.technicalHighlights.title,
+      items: remoteData?.technicalHighlights?.items && remoteData.technicalHighlights.items.length > 0 ? remoteData.technicalHighlights.items : microchipEmbedded.technicalHighlights.items,
+    },
+    facilities: {
+      title: remoteData?.facilities?.title || microchipEmbedded.facilities.title,
+      intro: remoteData?.facilities?.intro || microchipEmbedded.facilities.intro,
+      items: remoteData?.facilities?.items && remoteData.facilities.items.length > 0 ? remoteData.facilities.items : microchipEmbedded.facilities.items,
+    },
+    learningPartners: {
+      title: remoteData?.learningPartners?.title || microchipEmbedded.learningPartners.title,
+      partners: remoteData?.learningPartners?.partners && remoteData.learningPartners.partners.length > 0 ? remoteData.learningPartners.partners : microchipEmbedded.learningPartners.partners,
+    },
+    gallery: microchipEmbedded.gallery,
+    cta: microchipEmbedded.cta,
+  };
+  const additionalSections = remoteData?.additionalSections || [];
+
+  const aboutParagraphs = item?.description?.textContent
+    ? [item.description.textContent]
+    : descriptionSection?.textContent
+    ? [descriptionSection.textContent]
+    : item?.desc
+    ? [item.desc]
+    : data.about.paragraphs;
+
+  const visionText =
+    (item?.vision && hasCustomSectionContent(item.vision) && (item.vision.textContent || item.vision.listText)) ||
+    introBlocks.find((s) => s.id === 'vision')?.textContent?.trim() ||
+    data.vision.statement;
+
+  const missionList =
+    (item?.mission && hasCustomSectionContent(item.mission) && (item.mission.listText?.split('\n').filter(Boolean) || [item.mission.textContent || ''])) ||
+    introBlocks.find((s) => s.id === 'mission')?.listText?.split('\n').filter(Boolean) ||
+    data.mission.points;
 
   // Extract gallery photos from admin custom sections
   const gallerySection = customSections.find(
@@ -52,7 +117,7 @@ export default function MicrochipPage({ customSections = [] }: MicrochipPageProp
 
   // Filter out any custom sections handled specifically
   const accordionSections = customSections.filter(
-    (s) => s.id !== 'gallery' && s.contentType !== 'gallery'
+    (s) => s.id !== 'gallery' && s.contentType !== 'gallery' && s.placement !== 'intro'
   );
 
   return (
@@ -64,10 +129,10 @@ export default function MicrochipPage({ customSections = [] }: MicrochipPageProp
             <span className="mc-section-badge">
               <Cpu size={14} /> Centre Overview
             </span>
-            <h2 className="mc-about-title">{data.about.title}</h2>
+            <h2 className="mc-about-title">{item?.title || data.about.title}</h2>
           </div>
           <div className="mc-about-body">
-            {data.about.paragraphs.map((para, idx) => (
+            {aboutParagraphs.map((para, idx) => (
               <p key={idx} className="mc-about-text">{renderBold(para)}</p>
             ))}
           </div>
@@ -96,7 +161,7 @@ export default function MicrochipPage({ customSections = [] }: MicrochipPageProp
             </span>
             <h3 className="mc-vm-title">{data.vision.title}</h3>
             <div className="mc-vision-content">
-              <p>{data.vision.statement}</p>
+              <p>{renderBold(visionText)}</p>
             </div>
           </div>
 
@@ -108,7 +173,7 @@ export default function MicrochipPage({ customSections = [] }: MicrochipPageProp
             <h3 className="mc-vm-title">{data.mission.title}</h3>
             <p className="mc-mission-intro">{renderBold(data.mission.intro)}</p>
             <ul className="mc-mission-list">
-              {data.mission.points.map((point, idx) => (
+              {missionList.map((point: string, idx: number) => (
                 <li key={idx} className="mc-mission-item">
                   <CheckCircle2 size={16} className="mc-mission-check" />
                   <span>{renderBold(point)}</span>
@@ -265,9 +330,47 @@ export default function MicrochipPage({ customSections = [] }: MicrochipPageProp
       </section>
 
       {/* 8. DYNAMIC CUSTOM SECTIONS ACCORDION (If added via Admin) */}
+      {customSections.some((s) => s.placement === 'intro') && (
+        <section className="mc-custom-sections" style={{ marginTop: '2rem' }}>
+          <CustomSectionsIntro sections={customSections} />
+        </section>
+      )}
       {accordionSections.length > 0 && (
-        <section className="mc-custom-sections" style={{ marginTop: '3rem' }}>
+        <section className="mc-custom-sections" style={{ marginTop: '2rem' }}>
           <CustomSectionsAccordion sections={accordionSections} />
+        </section>
+      )}
+
+      {/* Dynamic Additional Sections from Admin */}
+      {additionalSections.length > 0 && (
+        <section className="mc-custom-sections" style={{ marginTop: '2rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            {additionalSections.map((sec) => (
+              <div key={sec.id} className="mc-details-card">
+                {sec.badge && (
+                  <div className="mc-feature-badge">
+                    <Sparkles size={14} /> {sec.badge}
+                  </div>
+                )}
+                <h3 className="mc-details-title">{sec.title}</h3>
+                {(sec.paragraphs || []).map((p, pIdx) => (
+                  <p key={pIdx} className="mc-facilities-intro" style={{ marginBottom: '0.75rem' }}>
+                    {renderBold(p)}
+                  </p>
+                ))}
+                {(sec.bulletPoints || []).length > 0 && (
+                  <ul className="mc-facilities-list" style={{ marginTop: '0.5rem' }}>
+                    {sec.bulletPoints!.map((b, bIdx) => (
+                      <li key={bIdx} className="mc-facility-item">
+                        <CheckCircle2 size={16} className="mc-facility-icon" />
+                        <span>{renderBold(b)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ))}
+          </div>
         </section>
       )}
 

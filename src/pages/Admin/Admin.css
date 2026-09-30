@@ -1051,3 +1051,109 @@
     grid-column: 1 / -1;
   }
 }
+
+/* ---- General Form & Button Helpers for Content Admins ---- */
+.admin-label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #374151;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.35rem;
+}
+
+.admin-input,
+.admin-textarea,
+.admin-select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.65rem 0.9rem;
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-family: inherit;
+  color: #111;
+  background: #fff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.admin-textarea {
+  min-height: 70px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.admin-input:focus,
+.admin-textarea:focus,
+.admin-select:focus {
+  outline: none;
+  border-color: #c8a03c;
+  box-shadow: 0 0 0 3px rgba(200, 160, 60, 0.15);
+}
+
+.admin-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1.1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid #081c15;
+  background: #081c15;
+  color: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+.admin-btn-primary:hover {
+  background: #1b4332;
+  border-color: #1b4332;
+}
+
+.admin-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1.1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1.5px solid #d1d5db;
+  background: #f9fafb;
+  color: #374151;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+.admin-btn-secondary:hover {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+  color: #111;
+}
+
+.admin-btn-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid #fca5a5;
+  background: #fee2e2;
+  color: #dc2626;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+.admin-btn-danger:hover {
+  background: #fecaca;
+  color: #b91c1c;
+}
+

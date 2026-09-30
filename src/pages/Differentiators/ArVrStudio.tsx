@@ -10,9 +10,12 @@ import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { usePageBanners } from '../../hooks/usePageBanners';
 import { fetchPriorityAttr } from '../../lib/domAttrs';
+import { CustomSectionsIntro, CustomSectionsGalleries, CustomSectionsAccordion } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import { hasCustomSectionContent, type CustomSectionPhoto } from '../../lib/customSections';
 import { type DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
 import { arVrStudio } from './arVrStudio.data';
+import { useDocument } from '../../hooks/useDocument';
+import type { ArVrStudioDoc } from '../Admin/sections/ArVrStudioContentAdmin';
 import { renderBold } from '../../lib/boldText';
 import './ArVrStudio.css';
 
@@ -23,10 +26,24 @@ export default function ArVrStudio() {
   const { slides: heroSlides } = usePageBanners('differentiators-detail');
   const item = allItems.find((i) => i.slug === SLUG) ?? null;
   const [lightbox, setLightbox] = useState<{ photos: CustomSectionPhoto[]; index: number } | null>(null);
+  const { data: remoteData } = useDocument<ArVrStudioDoc>('settings', 'arVrStudio');
+  const studio = { ...arVrStudio, ...(remoteData || {}) };
+
+  const dynamicTitle = item?.title || studio.heroTitle;
+  const dynamicSubtitle = item?.summary || item?.desc || studio.heroSubtitle;
+  const aboutParagraphs = (item?.description && hasCustomSectionContent(item.description) && item.description.textContent)
+    ? [item.description.textContent]
+    : item?.desc
+    ? [item.desc]
+    : studio.aboutParagraphs;
+
+  const visionText = (item?.vision && hasCustomSectionContent(item.vision) && (item.vision.textContent || item.vision.listText)) || studio.vision;
+
+  const missionList = (item?.mission && hasCustomSectionContent(item.mission) && (item.mission.listText?.split('\n').filter(Boolean) || [item.mission.textContent || ''])) || studio.mission;
 
   useEffect(() => {
-    document.title = `${arVrStudio.heroTitle} | Vishnu Women's University`;
-  }, []);
+    document.title = `${dynamicTitle} | Vishnu Women's University`;
+  }, [dynamicTitle]);
 
   if (!item && loading) {
     return <RouteFallback />;
@@ -42,8 +59,8 @@ export default function ArVrStudio() {
   return (
     <main className="page-wrapper arvr-page">
       <SEO
-        title={`${arVrStudio.heroTitle} | Vishnu Women's University`}
-        description={arVrStudio.heroSubtitle}
+        title={`${dynamicTitle} | Vishnu Women's University`}
+        description={dynamicSubtitle}
         canonicalPath={`/differentiators/${SLUG}`}
       />
 
@@ -52,7 +69,7 @@ export default function ArVrStudio() {
         {heroImage && (
           <SmoothImage
             src={heroImage}
-            alt={arVrStudio.heroTitle}
+            alt={dynamicTitle}
             className="arvr-hero__bg"
             loading="eager"
             decoding="sync"
@@ -68,25 +85,25 @@ export default function ArVrStudio() {
             <span>/</span>
             <Link to="/differentiators#research-specialised-labs">Research & Specialised Labs</Link>
             <span>/</span>
-            <span className="is-current">{arVrStudio.heroTitle}</span>
+            <span className="is-current">{dynamicTitle}</span>
           </div>
           <span className="arvr-eyebrow">
-            <Glasses size={14} strokeWidth={2.4} /> {arVrStudio.heroCategory}
+            <Glasses size={14} strokeWidth={2.4} /> {studio.heroCategory}
           </span>
-          <h1 className="arvr-hero__title">{arVrStudio.heroTitle}</h1>
-          <p className="arvr-hero__subtitle">{renderBold(arVrStudio.heroSubtitle)}</p>
+          <h1 className="arvr-hero__title">{dynamicTitle}</h1>
+          <p className="arvr-hero__subtitle">{renderBold(dynamicSubtitle)}</p>
         </div>
       </section>
 
       {/* About Section */}
       <section className="arvr-section">
         <div className="arvr-container">
-          <h2 className="arvr-section-title">{arVrStudio.aboutTitle}</h2>
+          <h2 className="arvr-section-title">{studio.aboutTitle}</h2>
           <div className="arvr-glass arvr-overview">
             <Quote size={28} strokeWidth={2} className="arvr-overview__mark" aria-hidden="true" />
             <div className="arvr-prose">
-              {arVrStudio.aboutParagraphs.map((para, i) => (
-                <p key={i} style={{ marginBottom: i < arVrStudio.aboutParagraphs.length - 1 ? '1rem' : 0 }}>
+              {aboutParagraphs.map((para, i) => (
+                <p key={i} style={{ marginBottom: i < aboutParagraphs.length - 1 ? '1rem' : 0 }}>
                   {renderBold(para)}
                 </p>
               ))}
@@ -100,18 +117,18 @@ export default function ArVrStudio() {
         <div className="arvr-container arvr-vm-grid">
           <div className="arvr-glass arvr-vm-card">
             <span className="arvr-card-eyebrow">
-              <Target size={14} strokeWidth={2.4} /> {arVrStudio.visionTitle}
+              <Target size={14} strokeWidth={2.4} /> {studio.visionTitle}
             </span>
             <div className="arvr-prose">
-              <p>{arVrStudio.vision}</p>
+              <p>{renderBold(visionText)}</p>
             </div>
           </div>
           <div className="arvr-glass arvr-vm-card">
             <span className="arvr-card-eyebrow">
-              <Sparkles size={14} strokeWidth={2.4} /> {arVrStudio.missionTitle}
+              <Sparkles size={14} strokeWidth={2.4} /> {studio.missionTitle}
             </span>
             <ul className="arvr-checklist">
-              {arVrStudio.mission.map((itemText, i) => (
+              {missionList.map((itemText, i) => (
                 <li key={i}>{renderBold(itemText)}</li>
               ))}
             </ul>
@@ -122,9 +139,9 @@ export default function ArVrStudio() {
       {/* Objectives Section */}
       <section className="arvr-section" style={{ paddingTop: 0 }}>
         <div className="arvr-container">
-          <h2 className="arvr-section-title">{arVrStudio.objectivesTitle}</h2>
+          <h2 className="arvr-section-title">{studio.objectivesTitle}</h2>
           <div className="arvr-objectives-grid">
-            {arVrStudio.objectivesFormatted.map((obj) => (
+            {studio.objectivesFormatted.map((obj) => (
               <div key={obj.code} className="arvr-glass arvr-objective-card">
                 <span className="arvr-objective-num">{obj.code}</span>
                 <div>
@@ -142,12 +159,12 @@ export default function ArVrStudio() {
       {/* From Concept to Immersive Experience Section */}
       <section className="arvr-section" style={{ paddingTop: 0 }}>
         <div className="arvr-container">
-          <h2 className="arvr-section-title">{arVrStudio.conceptExperience.title}</h2>
+          <h2 className="arvr-section-title">{studio.conceptExperience.title}</h2>
           <p style={{ color: 'var(--avr-text-dim)', marginBottom: '1.5rem', marginTop: '-0.5rem', fontSize: '1.05rem' }}>
-            {renderBold(arVrStudio.conceptExperience.intro)}
+            {renderBold(studio.conceptExperience.intro)}
           </p>
           <div className="arvr-other-grid">
-            {arVrStudio.conceptExperience.cards.map((card, i) => (
+            {studio.conceptExperience.cards.map((card, i) => (
               <div key={i} className="arvr-glass arvr-info-card">
                 <span className="arvr-card-eyebrow">
                   <Layers size={14} strokeWidth={2.4} /> {card.title}
@@ -162,9 +179,9 @@ export default function ArVrStudio() {
       {/* Technology & Infrastructure Section */}
       <section className="arvr-section" style={{ paddingTop: 0 }}>
         <div className="arvr-container">
-          <h2 className="arvr-section-title">{arVrStudio.techInfrastructure.title}</h2>
+          <h2 className="arvr-section-title">{studio.techInfrastructure.title}</h2>
           <div className="arvr-other-grid">
-            {arVrStudio.techInfrastructure.groups.map((group, i) => (
+            {studio.techInfrastructure.groups.map((group, i) => (
               <div key={i} className="arvr-glass arvr-info-card">
                 <span className="arvr-card-eyebrow">
                   <Cpu size={14} strokeWidth={2.4} /> {group.category}
@@ -186,7 +203,7 @@ export default function ArVrStudio() {
           <h2 className="arvr-section-title">Key Highlights</h2>
           <div className="arvr-glass" style={{ padding: 'var(--space-6)' }}>
             <ul className="arvr-checklist" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
-              {arVrStudio.keyHighlights.map((hl, i) => (
+              {studio.keyHighlights.map((hl, i) => (
                 <li key={i}>{renderBold(hl)}</li>
               ))}
             </ul>
@@ -197,9 +214,9 @@ export default function ArVrStudio() {
       {/* Gallery Section */}
       <section className="arvr-section" style={{ paddingTop: 0 }}>
         <div className="arvr-container">
-          <h2 className="arvr-section-title">{arVrStudio.galleryTitle}</h2>
+          <h2 className="arvr-section-title">{studio.galleryTitle}</h2>
           <p style={{ color: 'var(--avr-text-dim)', marginBottom: '1.5rem', marginTop: '-0.5rem', fontSize: '1.05rem' }}>
-            {renderBold(arVrStudio.galleryCaption)}
+            {renderBold(studio.galleryCaption)}
           </p>
           {galleryPhotos.length > 0 ? (
             <div className="arvr-gallery-grid">
@@ -219,7 +236,7 @@ export default function ArVrStudio() {
           ) : (
             <div className="arvr-glass" style={{ padding: 'var(--space-6)', textAlign: 'center' }}>
               <p style={{ color: 'var(--avr-text-dim)', margin: 0 }}>
-                {renderBold(arVrStudio.galleryCaption)}
+                {renderBold(studio.galleryCaption)}
               </p>
             </div>
           )}
@@ -232,26 +249,26 @@ export default function ArVrStudio() {
           {/* Contact Card */}
           <div className="arvr-glass arvr-info-card">
             <span className="arvr-card-eyebrow">
-              <Mail size={14} strokeWidth={2.4} /> {arVrStudio.contact.title}
+              <Mail size={14} strokeWidth={2.4} /> {studio.contact.title}
             </span>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '0.5rem' }}>
               <div>
-                <strong>{arVrStudio.contact.name}</strong>
+                <strong>{studio.contact.name}</strong>
               </div>
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', color: 'var(--avr-text-dim)' }}>
                 <MapPin size={16} style={{ flexShrink: 0, marginTop: '0.2rem', color: 'var(--avr-cyan)' }} />
-                <span>{arVrStudio.contact.address.join(', ')}</span>
+                <span>{studio.contact.address.join(', ')}</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--avr-text-dim)' }}>
                 <Mail size={16} style={{ flexShrink: 0, color: 'var(--avr-cyan)' }} />
-                <a href={`mailto:${arVrStudio.contact.email}`} style={{ color: 'var(--avr-cyan)' }}>
-                  {arVrStudio.contact.email}
+                <a href={`mailto:${studio.contact.email}`} style={{ color: 'var(--avr-cyan)' }}>
+                  {studio.contact.email}
                 </a>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--avr-text-dim)' }}>
                 <Phone size={16} style={{ flexShrink: 0, color: 'var(--avr-cyan)' }} />
-                <a href={`tel:${arVrStudio.contact.phone}`} style={{ color: 'var(--avr-cyan)' }}>
-                  {arVrStudio.contact.phone}
+                <a href={`tel:${studio.contact.phone}`} style={{ color: 'var(--avr-cyan)' }}>
+                  {studio.contact.phone}
                 </a>
               </div>
             </div>
@@ -264,43 +281,60 @@ export default function ArVrStudio() {
             </span>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.5rem' }}>
               <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--avr-text)' }}>
-                {arVrStudio.facultyInCharge.name}
+                {studio.facultyInCharge.name}
               </div>
               <div style={{ color: 'var(--avr-cyan)', fontWeight: 600, fontSize: '0.95rem' }}>
-                {arVrStudio.facultyInCharge.designation}
+                {studio.facultyInCharge.designation}
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--avr-text-dim)', fontSize: '0.9rem' }}>
                 <Mail size={15} style={{ color: 'var(--avr-cyan)' }} />
-                <a href={`mailto:${arVrStudio.facultyInCharge.email}`} style={{ color: 'var(--avr-cyan)' }}>
-                  {arVrStudio.facultyInCharge.email}
+                <a href={`mailto:${studio.facultyInCharge.email}`} style={{ color: 'var(--avr-cyan)' }}>
+                  {studio.facultyInCharge.email}
                 </a>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--avr-text-dim)', fontSize: '0.9rem' }}>
                 <Phone size={15} style={{ color: 'var(--avr-cyan)' }} />
-                <span>{arVrStudio.facultyInCharge.mobile}</span>
+                <span>{studio.facultyInCharge.mobile}</span>
               </div>
               <div style={{ color: 'var(--avr-text-dim)', fontSize: '0.9rem', marginTop: '0.25rem' }}>
-                <strong>Areas of Interest:</strong> {arVrStudio.facultyInCharge.interests}
+                <strong>Areas of Interest:</strong> {studio.facultyInCharge.interests}
               </div>
             </div>
           </div>
         </div>
       </section>
 
+      {/* DYNAMIC CUSTOM SECTIONS */}
+      {effectiveCustomSections.some((s) => s.placement === 'intro') && (
+        <section className="arvr-section" style={{ paddingTop: 0 }}>
+          <div className="arvr-container">
+            <CustomSectionsIntro sections={effectiveCustomSections} />
+          </div>
+        </section>
+      )}
+      {effectiveCustomSections.length > 0 && (
+        <section className="arvr-section" style={{ paddingTop: 0 }}>
+          <div className="arvr-container">
+            <CustomSectionsGalleries sections={effectiveCustomSections} />
+            <CustomSectionsAccordion sections={effectiveCustomSections.filter((s) => s.placement !== 'intro' && s.contentType !== 'gallery')} />
+          </div>
+        </section>
+      )}
+
       {/* CTA Section */}
       <section className="arvr-cta">
         <div className="arvr-container" style={{ textAlign: 'center' }}>
-          <h2 className="arvr-cta__title">{arVrStudio.cta.title}</h2>
-          <p className="arvr-cta__text">{renderBold(arVrStudio.cta.subtitle)}</p>
+          <h2 className="arvr-cta__title">{studio.cta.title}</h2>
+          <p className="arvr-cta__text">{renderBold(studio.cta.subtitle)}</p>
           <div className="arvr-cta__actions">
             <Link to="/differentiators" className="btn btn-accent">
-              {arVrStudio.cta.btn1}
+              {studio.cta.btn1}
             </Link>
             <Link to="/academics" className="btn btn-secondary">
-              {arVrStudio.cta.btn2}
+              {studio.cta.btn2}
             </Link>
             <Link to="/apply-now" className="btn btn-secondary">
-              {arVrStudio.cta.btn3}
+              {studio.cta.btn3}
             </Link>
           </div>
         </div>
