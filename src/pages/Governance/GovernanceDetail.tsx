@@ -1,8 +1,9 @@
 import { useEffect } from 'react';
-import { Link, useParams, Navigate } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { Trophy, Landmark } from 'lucide-react';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import RouteFallback from '../../components/RouteFallback/RouteFallback';
+import PageUnderDevelopment from '../PageUnderDevelopment/PageUnderDevelopment';
 import { usePageBanners } from '../../hooks/usePageBanners';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import { fetchPriorityAttr } from '../../lib/domAttrs';
@@ -120,7 +121,16 @@ export default function GovernanceDetail() {
         <RouteFallback />
       );
     }
-    return <Navigate to="/governance" replace />;
+    // No governanceItems doc for this slug yet (an admin hasn't filled it in)
+    // — show a proper placeholder instead of silently bouncing back to
+    // /governance, since the nav link that sent someone here is a real,
+    // clickable link now rather than a disabled one.
+    const niceTitle = (slug || '')
+      .split('-')
+      .filter(Boolean)
+      .map((w) => w[0].toUpperCase() + w.slice(1))
+      .join(' ');
+    return <PageUnderDevelopment pageTitle={niceTitle} parent={{ label: 'Governance', path: '/governance' }} />;
   }
 
   const intro = item.intro || DEFAULT_INTRO_BY_SLUG[item.slug] || '';
