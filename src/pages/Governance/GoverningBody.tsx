@@ -34,6 +34,70 @@ export const defaultMembers: Omit<GoverningBodyMember, 'id'>[] = [
   { name: 'Dr. G. Srinivasa Rao', position: "Principal, Vishnu Women's University", category: 'Principal (Ex-Officio)', order: 12 },
 ];
 
+// Statutory composition of the Governing Body (static — from the official GB table).
+const GB_TABLE: { category: string; rows: { nature: string; name?: string; org?: string }[] }[] = [
+  {
+    category: 'Category (A): Ex-Officio Members',
+    rows: [
+      { nature: 'Chancellor of the University', name: 'Sri K.V. Vishnu Raju' },
+      { nature: 'Vice-Chancellor of the University', name: 'Dr. K V N Sunitha' },
+      { nature: 'Chairman, APSCHE', name: 'Prof. S. Vijaya Bhaskara Rao' },
+      { nature: 'Secretary, Govt. of AP, HE Department' },
+      { nature: 'Registrar of the University', name: 'Dr. P Srinivasa Raju' },
+    ],
+  },
+  {
+    category: 'Category (B): Nominated Members',
+    rows: [
+      { nature: 'An eminent academician from the field of science/engineering & Technology/social sciences/Law/Management', name: 'Dr. Seema Varma', org: 'NITTR Bhopal' },
+      { nature: 'The director of National Laboratory or his/her nominee not below the rank of Scientist G', name: 'Dr Uma', org: 'ISRO Scientist G' },
+      { nature: 'Nominee of CII' },
+      { nature: 'A reputed Chartered Accountant' },
+      { nature: 'A Member from public life who has contributed significantly to societal/national development' },
+      { nature: 'A Member of the sponsoring body', name: 'Shri Ravi Chandran Rajagopal', org: 'Vice Chairman, SVES' },
+      { nature: 'Nominee by the sponsoring Body', name: 'Mr K Aditya Vissam', org: 'Secretary, SVES' },
+      { nature: 'Nominee by the Sponsoring Body', name: 'Dr G Srinivasa Rao', org: 'Pro Vice-Chancellor, VWU' },
+    ],
+  },
+];
+
+function GoverningBodyTable() {
+  let n = 0;
+  return (
+    <div className="gb-table-wrap">
+      <table className="gb-table">
+        <thead>
+          <tr>
+            <th scope="col">Number</th>
+            <th scope="col">Category</th>
+            <th scope="col">Nature</th>
+            <th scope="col">Name of the Member</th>
+          </tr>
+        </thead>
+        <tbody>
+          {GB_TABLE.map((group) =>
+            group.rows.map((row, i) => (
+              <tr key={`${group.category}-${i}`} className={i === 0 ? 'gb-table__group-start' : undefined}>
+                <td>Member {++n}</td>
+                {i === 0 && (
+                  <th scope="rowgroup" rowSpan={group.rows.length} className="gb-table__category">
+                    {group.category}
+                  </th>
+                )}
+                <td>{row.nature}</td>
+                <td className="gb-table__name">
+                  {row.name ? <strong>{row.name}</strong> : <span className="gb-table__empty">—</span>}
+                  {row.org && <span className="gb-table__org">{row.org}</span>}
+                </td>
+              </tr>
+            ))
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 function getInitials(name: string) {
   const cleaned = name.replace(/\b(Dr|Sri|Prof|Mr|Mrs|Ms)\.?\s*/gi, '');
   const parts = cleaned.trim().split(/\s+/).filter(Boolean);
@@ -128,6 +192,16 @@ export default function GoverningBody() {
               <SmoothImage src="/images/governing-body-founder.jpg" alt="Founder, Vishnu Women's University" className="gb-overview__photo" />
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Composition table */}
+      <section className="section gb-composition">
+        <div className="container">
+          <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-8)' }}>
+            <h2 className="gb-overview__title">Governing Body at VWU</h2>
+          </div>
+          <GoverningBodyTable />
         </div>
       </section>
 
