@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { addDoc, collection, doc, serverTimestamp, updateDoc } from 'firebase/firestore';
+import { collection, doc, serverTimestamp } from 'firebase/firestore';
+import { addDoc, updateDoc } from '../../../lib/auditLog';
 import { db } from '../../../lib/firebase';
 import { useCollection, useOrderedCollection, type WithId } from '../../../hooks/useCollection';
 import { useImageCropModal } from '../../../components/ImageUploader/useImageCropModal';

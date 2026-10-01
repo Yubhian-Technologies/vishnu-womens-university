@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { doc, setDoc, updateDoc, writeBatch, serverTimestamp } from 'firebase/firestore';
+import { doc, serverTimestamp } from 'firebase/firestore';
+import { setDoc, updateDoc, writeBatch } from '../../../lib/auditLog';
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
 import ImageUploader from '../../../components/ImageUploader/ImageUploader';

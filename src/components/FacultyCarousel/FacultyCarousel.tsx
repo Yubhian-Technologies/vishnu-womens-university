@@ -175,11 +175,57 @@ export default function FacultyCarousel({
     return () => el.removeEventListener('scroll', handleScroll);
   }, [facultyKey]);
 
+  // Mobile only (one card fills the track): once scrolling stops, settle on the
+  // nearest whole card. The wraparound jump above interrupts an in-flight smooth
+  // scroll, and finger swipes have no snapping, so the track could come to rest
+  // mid-card with two cards partly visible. Doesn't affect scrolling itself —
+  // it only acts after the track has been idle and a finger is up.
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el || !faculty || faculty.length <= 1) return;
+
+    let idleTimer: ReturnType<typeof setTimeout> | null = null;
+    let touching = false;
+
+    const settle = () => {
+      const card = el.querySelector('.faculty-impact-card-wrapper') as HTMLElement | null;
+      if (!card || touching) return;
+      if (card.offsetWidth < el.clientWidth - 1) return; // multi-card layout: leave alone
+      const gap = parseFloat(getComputedStyle(el).columnGap) || 0;
+      const step = card.offsetWidth + gap;
+      const target = Math.round(el.scrollLeft / step) * step;
+      if (Math.abs(target - el.scrollLeft) > 1) el.scrollTo({ left: target, behavior: 'smooth' });
+    };
+    const schedule = () => {
+      if (idleTimer) clearTimeout(idleTimer);
+      idleTimer = setTimeout(settle, 150);
+    };
+    const onTouchStart = () => { touching = true; };
+    const onTouchEnd = () => { touching = false; schedule(); };
+
+    el.addEventListener('scroll', schedule, { passive: true });
+    el.addEventListener('touchstart', onTouchStart, { passive: true });
+    el.addEventListener('touchend', onTouchEnd, { passive: true });
+    el.addEventListener('touchcancel', onTouchEnd, { passive: true });
+    schedule();
+    return () => {
+      if (idleTimer) clearTimeout(idleTimer);
+      el.removeEventListener('scroll', schedule);
+      el.removeEventListener('touchstart', onTouchStart);
+      el.removeEventListener('touchend', onTouchEnd);
+      el.removeEventListener('touchcancel', onTouchEnd);
+    };
+  }, [facultyKey]);
+
   const getCardStep = () => {
     if (!scrollRef.current) return 240;
     const firstCard = scrollRef.current.querySelector('.faculty-impact-card-wrapper') as HTMLElement | null;
     if (firstCard) {
-      return firstCard.offsetWidth + 14;
+      // Use the track's real gap (0 on mobile, where one card fills the width) —
+      // a hardcoded 14px made every step overshoot by 14px on mobile, so the
+      // cards drifted out of alignment and two were partly visible.
+      const gap = parseFloat(getComputedStyle(scrollRef.current).columnGap) || 0;
+      return firstCard.offsetWidth + gap;
     }
     return scrollRef.current.clientWidth / 5;
   };

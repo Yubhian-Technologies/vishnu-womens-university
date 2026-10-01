@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import {
-  collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp, writeBatch,
-} from 'firebase/firestore';
+import { collection, doc, serverTimestamp } from 'firebase/firestore';
+import { addDoc, deleteDoc, updateDoc, writeBatch } from '../../../lib/auditLog';
 import { Sparkles } from 'lucide-react';
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
