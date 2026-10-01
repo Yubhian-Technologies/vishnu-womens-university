@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import type { User } from 'firebase/auth';
 import { resolveAdminSession, type AdminSession } from '../../lib/rbac';
+import { setAuditActor } from '../../lib/auditLog';
 
 const AdminSessionContext = createContext<AdminSession | null>(null);
 
@@ -20,10 +21,19 @@ export default function AdminSessionProvider({ user, children }: { user: User; c
     let cancelled = false;
     setSession(null);
     resolveAdminSession(user).then((s) => {
-      if (!cancelled) setSession(s);
+      if (cancelled) return;
+      // Identifies who made each change in the Audit Log (see lib/auditLog.ts).
+      setAuditActor({
+        uid: s.uid,
+        email: s.email ?? user.email ?? 'unknown',
+        role: s.isSuperAdmin ? 'Super Admin' : s.role === 'custom' && s.roleName ? s.roleName : s.role,
+        department: s.department,
+      });
+      setSession(s);
     });
     return () => {
       cancelled = true;
+      setAuditActor(null);
     };
   }, [user]);
 

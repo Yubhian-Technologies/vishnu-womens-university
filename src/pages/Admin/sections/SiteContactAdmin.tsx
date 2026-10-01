@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc } from 'firebase/firestore';
+import { setDoc } from '../../../lib/auditLog';
 import { db } from '../../../lib/firebase';
 import { useDocument } from '../../../hooks/useDocument';
 

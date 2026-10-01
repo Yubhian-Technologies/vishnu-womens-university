@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import * as XLSX from 'xlsx';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc } from 'firebase/firestore';
+import { updateDoc } from '../../../lib/auditLog';
 import { db } from '../../../lib/firebase';
 import FileUploader from '../../../components/FileUploader/FileUploader';
 import type { UploadResult } from '../../../lib/storage';

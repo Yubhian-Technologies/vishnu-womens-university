@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import {
-  collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp,
-} from 'firebase/firestore';
+import { collection, doc, serverTimestamp } from 'firebase/firestore';
+import { addDoc, deleteDoc, updateDoc } from '../../../lib/auditLog';
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
 import { deleteFile, type UploadResult } from '../../../lib/storage';

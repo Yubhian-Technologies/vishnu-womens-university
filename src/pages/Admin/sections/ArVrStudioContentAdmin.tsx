@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
+import { setDoc } from '../../../lib/auditLog';
 import { db } from '../../../lib/firebase';
 import { arVrStudio, type TechInfrastructure, type ConceptExperience, type FormattedObjective } from '../../Differentiators/arVrStudio.data';
 import { Plus, Trash2, Save, RotateCcw, Sparkles, BookOpen, Layers, Lightbulb, UserCheck } from 'lucide-react';

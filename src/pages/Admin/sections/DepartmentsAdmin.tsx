@@ -1,6 +1,7 @@
 import { useState, type ChangeEvent } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
-import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, doc, serverTimestamp } from 'firebase/firestore';
+import { addDoc, deleteDoc, updateDoc } from '../../../lib/auditLog';
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection, useCollection, type WithId } from '../../../hooks/useCollection';
 import ImageUploader from '../../../components/ImageUploader/ImageUploader';

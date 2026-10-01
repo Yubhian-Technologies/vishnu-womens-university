@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import * as XLSX from 'xlsx';
-import { deleteDoc, doc, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
+import { doc, serverTimestamp } from 'firebase/firestore';
+import { deleteDoc, setDoc, updateDoc } from '../../../lib/auditLog';
 import { db } from '../../../lib/firebase';
 import { useCollection, type WithId } from '../../../hooks/useCollection';
 import {

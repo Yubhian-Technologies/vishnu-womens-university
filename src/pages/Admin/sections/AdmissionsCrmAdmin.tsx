@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { doc, deleteDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, serverTimestamp } from 'firebase/firestore';
+import { deleteDoc, updateDoc } from '../../../lib/auditLog';
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
 import { Phone, CheckCircle, Search, Edit3, UserCheck, Clock, XCircle, AlertCircle } from 'lucide-react';

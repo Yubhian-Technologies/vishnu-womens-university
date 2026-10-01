@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { doc, setDoc, deleteDoc, addDoc, updateDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { doc, collection, serverTimestamp } from 'firebase/firestore';
+import { setDoc, deleteDoc, addDoc, updateDoc } from '../../../lib/auditLog';
 import { db } from '../../../lib/firebase';
 import { useDocument } from '../../../hooks/useDocument';
 import { useOrderedCollection, type WithId } from '../../../hooks/useCollection';

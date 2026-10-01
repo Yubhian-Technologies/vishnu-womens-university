@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
+import { setDoc } from '../../../lib/auditLog';
 import { db } from '../../../lib/firebase';
 import { ultraTechCoe } from '../../Differentiators/ultraTechCoe.data';
 import { Plus, Trash2, Save, RotateCcw, Check } from 'lucide-react';
