@@ -23,8 +23,11 @@ import {
 import { dreamHouseConstructionLab } from './dreamHouseConstructionLab.data';
 import type { DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
 import type { CustomSection } from '../../lib/customSections';
-import { CustomSectionsGalleries } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
+import { hasCustomSectionContent } from '../../lib/customSections';
+import { CustomSectionsGalleries, CustomSectionsAccordion, CustomSectionsIntro } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import { renderBold } from '../../lib/boldText';
+import { useDocument } from '../../hooks/useDocument';
+import type { DreamHouseLabDoc } from '../Admin/sections/DreamHouseLabContentAdmin';
 import './DreamHouseLabPage.css';
 
 interface DreamHouseLabPageProps {
@@ -32,11 +35,18 @@ interface DreamHouseLabPageProps {
   sections: CustomSection[];
 }
 
-export default function DreamHouseLabPage({ sections }: DreamHouseLabPageProps) {
+export default function DreamHouseLabPage({ item, sections }: DreamHouseLabPageProps) {
   const [activeStudentCohort, setActiveStudentCohort] = useState<number>(0);
   const [isIticTeamExpanded, setIsIticTeamExpanded] = useState<boolean>(true);
   const [isProjectTeamExpanded, setIsProjectTeamExpanded] = useState<boolean>(true);
-  const dhcl = dreamHouseConstructionLab;
+  const { data: remoteData } = useDocument<DreamHouseLabDoc>('settings', 'dreamHouseLab');
+  const dhcl = { ...dreamHouseConstructionLab, ...(remoteData || {}) };
+
+  const aboutParagraphs = (item?.description && hasCustomSectionContent(item.description) && item.description.textContent)
+    ? [item.description.textContent]
+    : item?.desc
+    ? [item.desc]
+    : dhcl.paragraphs;
 
   return (
     <div className="dhcl-page-container">
@@ -93,9 +103,9 @@ export default function DreamHouseLabPage({ sections }: DreamHouseLabPageProps) 
             <div className="dhcl-card-badge">
               <Layers size={15} /> Overview & Purpose
             </div>
-            <h2 className="dhcl-section-heading">Dream House Construction Lab (DHCL)</h2>
+            <h2 className="dhcl-section-heading">{item?.title || 'Dream House Construction Lab (DHCL)'}</h2>
             <div className="dhcl-paragraphs">
-              {dhcl.paragraphs.map((p, idx) => (
+              {aboutParagraphs.map((p, idx) => (
                 <p key={idx} className="dhcl-lead-paragraph">
                   {renderBold(p)}
                 </p>
@@ -421,6 +431,19 @@ export default function DreamHouseLabPage({ sections }: DreamHouseLabPageProps) 
               ))}
             </div>
           </div>
+        </section>
+      )}
+
+      {/* DYNAMIC CUSTOM SECTIONS */}
+      {sections.some((s) => s.placement === 'intro') && (
+        <section className="dhcl-activities-section">
+          <CustomSectionsIntro sections={sections} />
+        </section>
+      )}
+      {sections.length > 0 && (
+        <section className="dhcl-activities-section">
+          <CustomSectionsGalleries sections={sections} />
+          <CustomSectionsAccordion sections={sections.filter((s) => s.placement !== 'intro' && s.contentType !== 'gallery')} />
         </section>
       )}
     </div>

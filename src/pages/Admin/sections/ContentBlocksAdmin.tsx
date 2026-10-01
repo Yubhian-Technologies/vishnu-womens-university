@@ -10,6 +10,7 @@ import { useAdminSession } from '../AdminSessionContext';
 import ReadOnlyGate from '../ReadOnlyGate';
 import { canEdit, RESOURCES } from '../../../lib/rbac';
 import { Search } from 'lucide-react';
+import AboutDifferentiatorsCustomAdmin from './AboutDifferentiatorsCustomAdmin';
 
 // A single flexible content type used across many pages for their small
 // repeating text blocks (stat bars, icon+title+desc feature lists, highlight
@@ -315,6 +316,13 @@ export default function ContentBlocksAdmin() {
           </div>
         )}
       </div>
+
+      {/* Differentiators (About page) has its own Custom Sections escape
+          hatch, same as Differentiator items/Programs/Departments — for
+          content that doesn't fit the fixed Value/Title/Icon list above.
+          Shown only while this section is selected, right where an admin
+          managing it would look for it. */}
+      {filterKey === 'about::differentiators' && <AboutDifferentiatorsCustomAdmin />}
     </div>
   );
 }

@@ -2,6 +2,8 @@ import { useState } from 'react';
 import type { CustomSection } from '../../lib/customSections';
 import { CustomSectionsGalleries, SectionSubtree } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import { ultraTechCoe } from './ultraTechCoe.data';
+import { useDocument } from '../../hooks/useDocument';
+import type { UltraTechDoc } from '../Admin/sections/UltraTechContentAdmin';
 import {
   Target,
   Compass,
@@ -27,6 +29,9 @@ import {
 import { renderBold } from '../../lib/boldText';
 import './UltraTechPage.css';
 
+import type { DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
+import { hasCustomSectionContent } from '../../lib/customSections';
+
 interface InfoTabItem {
   id: string;
   num: string;
@@ -37,15 +42,21 @@ interface InfoTabItem {
 }
 
 interface UltraTechPageProps {
+  item?: DifferentiatorItemDoc;
   customSections?: CustomSection[];
   descriptionSection?: CustomSection;
   introBlocks?: CustomSection[];
 }
 
 export default function UltraTechPage({
+  item,
   customSections = [],
+  descriptionSection,
   introBlocks = [],
 }: UltraTechPageProps) {
+  const { data: remoteData } = useDocument<UltraTechDoc>('settings', 'ultraTechCoe');
+  const source = { ...ultraTechCoe, ...(remoteData || {}) };
+
   const {
     overview,
     vision,
@@ -61,13 +72,28 @@ export default function UltraTechPage({
     taglineTitle,
     taglineDesc,
     aboutTitle,
-  } = ultraTechCoe;
+  } = source;
 
-  const overviewText = overview;
+  const overviewText =
+    item?.description?.textContent ||
+    descriptionSection?.textContent ||
+    item?.desc ||
+    overview;
 
-  const visionText = (typeof vision === 'string' ? vision : '') || introBlocks.find((s) => s.id === 'vision')?.textContent?.trim() || '';
-  const missionList = mission || introBlocks.find((s) => s.id === 'mission')?.listText?.split('\n').map((s) => s.trim()).filter(Boolean) || [];
-  const objectivesText = objectivesIntro || introBlocks.find((s) => s.id === 'objectives')?.textContent?.trim() || '';
+  const visionText =
+    (item?.vision && hasCustomSectionContent(item.vision) && (item.vision.textContent || item.vision.listText)) ||
+    introBlocks.find((s) => s.id === 'vision')?.textContent?.trim() ||
+    (typeof vision === 'string' ? vision : '');
+
+  const missionList =
+    (item?.mission && hasCustomSectionContent(item.mission) && (item.mission.listText?.split('\n').filter(Boolean) || [item.mission.textContent || ''])) ||
+    introBlocks.find((s) => s.id === 'mission')?.listText?.split('\n').map((s) => s.trim()).filter(Boolean) ||
+    mission;
+
+  const objectivesText =
+    (item?.objectives && hasCustomSectionContent(item.objectives) && (item.objectives.textContent || item.objectives.listText)) ||
+    introBlocks.find((s) => s.id === 'objectives')?.textContent?.trim() ||
+    objectivesIntro;
 
   // Total count of students
   const totalStudents = studentsBenefited.reduce((acc, curr) => acc + curr.students.length, 0);

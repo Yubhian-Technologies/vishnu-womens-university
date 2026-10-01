@@ -17,10 +17,12 @@ import {
   BrainCircuit,
   FileText,
 } from 'lucide-react';
-import { highPerformanceComputingLab } from './highPerformanceComputingLab.data';
+import { CustomSectionsGalleries, CustomSectionsAccordion, CustomSectionsIntro } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
+import { hasCustomSectionContent, type CustomSection } from '../../lib/customSections';
+import { useDocument } from '../../hooks/useDocument';
+import type { HpcLabDoc } from '../Admin/sections/HpcLabContentAdmin';
 import type { DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
-import type { CustomSection } from '../../lib/customSections';
-import { CustomSectionsGalleries } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
+import { highPerformanceComputingLab } from './highPerformanceComputingLab.data';
 import { renderBold } from '../../lib/boldText';
 import './HpcLabPage.css';
 
@@ -29,9 +31,34 @@ interface HpcLabPageProps {
   sections?: CustomSection[];
 }
 
-export default function HpcLabPage({ sections = [] }: HpcLabPageProps) {
+export default function HpcLabPage({ item, sections = [] }: HpcLabPageProps) {
+  const { data: remoteData } = useDocument<HpcLabDoc>('settings', 'hpcLab');
   const [activeTab, setActiveTab] = useState<'all' | 'overview' | 'research' | 'publications' | 'team' | 'activities'>('all');
-  const hpc = highPerformanceComputingLab;
+
+  const hpc = {
+    paragraphs: remoteData?.paragraphs && remoteData.paragraphs.length > 0 ? remoteData.paragraphs : highPerformanceComputingLab.paragraphs,
+    vision: remoteData?.vision || highPerformanceComputingLab.vision,
+    mission: remoteData?.mission && remoteData.mission.length > 0 ? remoteData.mission : highPerformanceComputingLab.mission,
+    objectives: remoteData?.objectives && remoteData.objectives.length > 0 ? remoteData.objectives : highPerformanceComputingLab.objectives,
+    team: highPerformanceComputingLab.team,
+    fundedProjects: remoteData?.fundedProjects && remoteData.fundedProjects.length > 0 ? remoteData.fundedProjects : highPerformanceComputingLab.fundedProjects,
+    facultyResearch: remoteData?.facultyResearch && remoteData.facultyResearch.length > 0 ? remoteData.facultyResearch : highPerformanceComputingLab.facultyResearch,
+    outcomes: remoteData?.outcomes && remoteData.outcomes.length > 0 ? remoteData.outcomes : highPerformanceComputingLab.outcomes,
+    activities: remoteData?.activities && remoteData.activities.length > 0 ? remoteData.activities : highPerformanceComputingLab.activities,
+  };
+  const additionalSections = remoteData?.additionalSections || [];
+
+  const aboutParagraphs = (item?.description && hasCustomSectionContent(item.description) && item.description.textContent)
+    ? [item.description.textContent]
+    : item?.desc
+    ? [item.desc]
+    : hpc.paragraphs;
+
+  const visionText = (item?.vision && hasCustomSectionContent(item.vision) && (item.vision.textContent || item.vision.listText)) || hpc.vision;
+
+  const missionList = (item?.mission && hasCustomSectionContent(item.mission) && (item.mission.listText?.split('\n').filter(Boolean) || [item.mission.textContent || ''])) || hpc.mission;
+
+  const objectivesList = (item?.objectives && hasCustomSectionContent(item.objectives) && (item.objectives.listText?.split('\n').filter(Boolean) || [item.objectives.textContent || ''])) || hpc.objectives;
 
   return (
     <div className="hpc-page-container">
@@ -133,9 +160,9 @@ export default function HpcLabPage({ sections = [] }: HpcLabPageProps) {
             <div className="hpc-card-badge">
               <Cpu size={14} /> Centre of Excellence
             </div>
-            <h2 className="hpc-section-heading">High Performance Computing (HPC) Lab</h2>
+            <h2 className="hpc-section-heading">{item?.title || 'High Performance Computing (HPC) Lab'}</h2>
             <div className="hpc-paragraphs">
-              {hpc.paragraphs.map((para, idx) => (
+              {aboutParagraphs.map((para: string, idx: number) => (
                 <p key={idx} className="hpc-lead-paragraph">
                   {renderBold(para)}
                 </p>
@@ -150,7 +177,7 @@ export default function HpcLabPage({ sections = [] }: HpcLabPageProps) {
                 <Compass size={14} /> Vision
               </div>
               <h3 className="hpc-subcard-title">Our Vision</h3>
-              <p className="hpc-vision-text">{hpc.vision}</p>
+              <p className="hpc-vision-text">{renderBold(visionText)}</p>
             </div>
 
             <div className="hpc-cyber-card hpc-mission-card">
@@ -159,7 +186,7 @@ export default function HpcLabPage({ sections = [] }: HpcLabPageProps) {
               </div>
               <h3 className="hpc-subcard-title">Our Mission</h3>
               <ul className="hpc-mission-list">
-                {hpc.mission.map((item, idx) => (
+                {missionList.map((item: string, idx: number) => (
                   <li key={idx} className="hpc-mission-item">
                     <CheckCircle2 className="hpc-bullet-icon cyan" size={18} />
                     <span>{renderBold(item)}</span>
@@ -176,7 +203,7 @@ export default function HpcLabPage({ sections = [] }: HpcLabPageProps) {
             </div>
             <h3 className="hpc-subcard-title">Strategic Objectives</h3>
             <div className="hpc-objectives-grid">
-              {hpc.objectives.map((obj, idx) => (
+              {objectivesList.map((obj: string, idx: number) => (
                 <div key={idx} className="hpc-objective-tile">
                   <span className="hpc-objective-num">0{idx + 1}</span>
                   <p className="hpc-objective-text">{renderBold(obj)}</p>
@@ -197,7 +224,7 @@ export default function HpcLabPage({ sections = [] }: HpcLabPageProps) {
             </div>
             <h2 className="hpc-section-heading">Funded Research Projects</h2>
             <div className="hpc-funded-project-content">
-              {hpc.fundedProjects.map((proj, idx) => (
+              {hpc.fundedProjects.map((proj: string, idx: number) => (
                 <div key={idx} className="hpc-funded-box">
                   <div className="hpc-funded-header">
                     <span className="hpc-badge-grant">DST Sponsored Project</span>
@@ -216,7 +243,7 @@ export default function HpcLabPage({ sections = [] }: HpcLabPageProps) {
             </div>
             <h2 className="hpc-section-heading">Faculty Research Initiatives</h2>
             <div className="hpc-research-list">
-              {hpc.facultyResearch.map((res, idx) => (
+              {hpc.facultyResearch.map((res: string, idx: number) => (
                 <div key={idx} className="hpc-research-item">
                   <div className="hpc-research-icon-wrapper">
                     <Database size={18} className="hpc-research-icon" />
@@ -248,7 +275,7 @@ export default function HpcLabPage({ sections = [] }: HpcLabPageProps) {
             </div>
 
             <div className="hpc-publications-grid">
-              {hpc.outcomes.map((paper, idx) => {
+              {hpc.outcomes.map((paper: string, idx: number) => {
                 const isIeee = paper.toLowerCase().includes('ieee');
                 const isJournal = paper.toLowerCase().includes('journal');
                 return (
@@ -281,7 +308,7 @@ export default function HpcLabPage({ sections = [] }: HpcLabPageProps) {
             <div className="hpc-team-group">
               <h3 className="hpc-team-group-title">Lab In-Charge</h3>
               <div className="hpc-team-grid">
-                {hpc.team.inCharge.map((member, idx) => (
+                {hpc.team.inCharge.map((member: typeof hpc.team.inCharge[0], idx: number) => (
                   <div key={idx} className="hpc-member-card in-charge">
                     <div className="hpc-member-header">
                       <div className="hpc-member-avatar-placeholder">
@@ -321,7 +348,7 @@ export default function HpcLabPage({ sections = [] }: HpcLabPageProps) {
             <div className="hpc-team-group">
               <h3 className="hpc-team-group-title">Faculty Members</h3>
               <div className="hpc-team-grid">
-                {hpc.team.facultyMembers.map((member, idx) => (
+                {hpc.team.facultyMembers.map((member: typeof hpc.team.facultyMembers[0], idx: number) => (
                   <div key={idx} className="hpc-member-card">
                     <div className="hpc-member-header">
                       <div className="hpc-member-avatar-placeholder">
@@ -369,7 +396,7 @@ export default function HpcLabPage({ sections = [] }: HpcLabPageProps) {
             </div>
             <h2 className="hpc-section-heading">Workshops & Training Activities</h2>
             <div className="hpc-activities-timeline">
-              {hpc.activities.map((act, idx) => (
+              {hpc.activities.map((act: string, idx: number) => (
                 <div key={idx} className="hpc-activity-timeline-item">
                   <div className="hpc-timeline-marker">
                     <span className="hpc-marker-dot" />
@@ -385,10 +412,49 @@ export default function HpcLabPage({ sections = [] }: HpcLabPageProps) {
         </section>
       )}
 
-      {/* Admin Custom Galleries (if any exist for hpc-lab) */}
+      {/* Admin Custom Sections */}
+      {sections.some((s) => s.placement === 'intro') && (
+        <section className="hpc-section">
+          <CustomSectionsIntro sections={sections} />
+        </section>
+      )}
       {sections.length > 0 && (
         <section className="hpc-section">
           <CustomSectionsGalleries sections={sections} />
+          <CustomSectionsAccordion sections={sections.filter((s) => s.placement !== 'intro' && s.contentType !== 'gallery')} />
+        </section>
+      )}
+
+      {/* Dynamic Additional Sections from Admin */}
+      {additionalSections.length > 0 && (
+        <section className="hpc-section">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            {additionalSections.map((sec) => (
+              <div key={sec.id} className="hpc-cyber-card">
+                {sec.badge && (
+                  <div className="hpc-card-badge cyan">
+                    <Sparkles size={14} /> {sec.badge}
+                  </div>
+                )}
+                <h2 className="hpc-section-heading">{sec.title}</h2>
+                {(sec.paragraphs || []).map((p, pIdx) => (
+                  <p key={pIdx} className="hpc-lead-paragraph" style={{ marginBottom: '0.75rem' }}>
+                    {renderBold(p)}
+                  </p>
+                ))}
+                {(sec.bulletPoints || []).length > 0 && (
+                  <ul className="hpc-mission-list" style={{ marginTop: '0.75rem' }}>
+                    {sec.bulletPoints!.map((b, bIdx) => (
+                      <li key={bIdx} className="hpc-mission-item">
+                        <CheckCircle2 size={16} className="hpc-bullet-icon cyan" />
+                        <span>{renderBold(b)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ))}
+          </div>
         </section>
       )}
     </div>

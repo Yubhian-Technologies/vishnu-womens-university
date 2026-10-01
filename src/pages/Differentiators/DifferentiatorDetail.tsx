@@ -4,6 +4,7 @@ import { Rocket, Factory, Microscope, Globe2, GraduationCap, ChevronRight, Users
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import { useOrderedCollection, type WithId } from '../../hooks/useCollection';
+import { useDocument } from '../../hooks/useDocument';
 import { usePageBanners } from '../../hooks/usePageBanners';
 import { fetchPriorityAttr } from '../../lib/domAttrs';
 import { CustomSectionsIntro, CustomSectionsGalleries, CustomSectionsAccordion, CustomSectionsPlain, CustomSectionsPills, SectionSubtree } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
@@ -13,11 +14,13 @@ import FacultyCarousel from '../../components/FacultyCarousel/FacultyCarousel';
 import { hasTabContent, type CustomTab } from '../../lib/customTabs';
 import { DIFFERENTIATOR_CATEGORIES, type BlockKey } from '../Admin/sections/DifferentiatorsAdmin';
 import type { DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
+import type { AicteIdeaLabDoc } from '../Admin/sections/AicteIdeaLabContentAdmin';
 import type { FacultyDoc } from '../Academics/Faculty';
 import { talentSprintWise } from './talentSprintWise.data';
 import { foreignLanguages } from './foreignLanguages.data';
 import { medaPlmCoe } from './medaPlmCoe.data';
 import { microchipEmbedded } from './microchipEmbedded.data';
+import { aicteIdeaLab } from './aicteIdeaLab.data';
 import MicrochipPage from './MicrochipPage';
 import TiDspPage from './TiDspPage';
 import UltraTechPage from './UltraTechPage';
@@ -121,7 +124,13 @@ function LanguageModuleAccordion({ lang, index }: { lang: typeof foreignLanguage
   );
 }
 
-function ForeignLanguagesPage({ data }: { data: typeof foreignLanguages }) {
+function ForeignLanguagesPage({ data: fallbackData }: { data: typeof foreignLanguages }) {
+  const { data: remoteData } = useDocument<typeof foreignLanguages>('settings', 'foreignLanguages');
+  const data = { ...fallbackData, ...(remoteData || {}) };
+  const quote = data.quote || fallbackData.quote;
+  const coordinator = data.coordinator || fallbackData.coordinator;
+  const languages = data.languages || fallbackData.languages;
+
   return (
     <div className="foreign-languages-theme">
       {/* 1. Top Quote Banner Card */}
@@ -131,9 +140,9 @@ function ForeignLanguagesPage({ data }: { data: typeof foreignLanguages }) {
           <div className="fl-quote-icon" aria-hidden="true">&ldquo;</div>
           <div className="fl-quote-content">
             <h2 className="fl-quote-title">
-              &ldquo;A different language is a different <span className="fl-text-orange">vision of life.</span>&rdquo;
+              &ldquo;{renderBold(quote.text)}&rdquo;
             </h2>
-            <p className="fl-quote-author">&mdash; Federico Fellini</p>
+            <p className="fl-quote-author">&mdash; {quote.author}</p>
           </div>
         </div>
         <div className="fl-quote-banner-right">
@@ -148,9 +157,13 @@ function ForeignLanguagesPage({ data }: { data: typeof foreignLanguages }) {
       </div>
 
       {/* 2. Intro Paragraph */}
-      <p className="fl-body-intro-text">
-        The importance of learning any foreign language transcends the acquisition of linguistic skills; it opens doorways to new cultures, perspectives and opportunities. In this modern world, proficiency in a foreign language fosters effective communication, breaking down barriers and promoting understanding among diverse communities.
-      </p>
+      <div className="fl-body-intro-text">
+        {(data.paragraphs || fallbackData.paragraphs).map((p, idx) => (
+          <p key={idx} style={{ marginBottom: idx < (data.paragraphs || []).length - 1 ? '0.75rem' : 0 }}>
+            {renderBold(p)}
+          </p>
+        ))}
+      </div>
 
       {/* 3. Three Cards Grid: Vision, Objectives, Coordinator */}
       <div className="fl-body-cards-grid">
@@ -168,7 +181,7 @@ function ForeignLanguagesPage({ data }: { data: typeof foreignLanguages }) {
             <h3 className="fl-info-card-title">VISION</h3>
           </div>
           <p className="fl-info-card-body">
-            Empower individuals to communicate basic language skills in different languages confidently through the foreign languages program.
+            {renderBold(data.vision || fallbackData.vision)}
           </p>
         </div>
 
@@ -186,11 +199,9 @@ function ForeignLanguagesPage({ data }: { data: typeof foreignLanguages }) {
             <h3 className="fl-info-card-title">OBJECTIVES</h3>
           </div>
           <ul className="fl-info-card-list">
-            <li>Enhance Communication Skills</li>
-            <li>Prepare for International Careers</li>
-            <li>Support Study Abroad Programs</li>
-            <li>Increase Employability</li>
-            <li>Enrich Personal and Professional Growth</li>
+            {(data.objectives || fallbackData.objectives).map((obj, idx) => (
+              <li key={idx}>{renderBold(obj)}</li>
+            ))}
           </ul>
         </div>
 
@@ -207,12 +218,16 @@ function ForeignLanguagesPage({ data }: { data: typeof foreignLanguages }) {
             <h3 className="fl-info-card-title">COORDINATOR</h3>
           </div>
           <div className="fl-coordinator-details">
-            <p className="fl-coordinator-name">Dr. G. J. V. Prasad</p>
-            <p className="fl-coordinator-role">Assistant Professor of English</p>
-            <p className="fl-coordinator-email">
-              <a href="mailto:Prasad_gjv@svce.edu.in">Prasad_gjv@svce.edu.in</a>
-            </p>
-            <p className="fl-coordinator-phone">9012992948</p>
+            <p className="fl-coordinator-name">{coordinator.name}</p>
+            <p className="fl-coordinator-role">{coordinator.designation}</p>
+            {coordinator.email && (
+              <p className="fl-coordinator-email">
+                <a href={`mailto:${coordinator.email}`}>{coordinator.email}</a>
+              </p>
+            )}
+            {coordinator.mobile && (
+              <p className="fl-coordinator-phone">{coordinator.mobile}</p>
+            )}
           </div>
         </div>
       </div>
@@ -228,7 +243,7 @@ function ForeignLanguagesPage({ data }: { data: typeof foreignLanguages }) {
         </div>
         <div className="fl-lang-banner-col2">
           <p>
-            SVECW always takes a step forward in fulfilling students&apos; needs. As a new step, foreign languages program was introduced in the year 2012 and has been continuing to date. The languages are French, German, Spanish, Japanese, and Korean. Trainers from Global Language Solutions, Chennai, conduct classes at the institution for certification.
+            {renderBold(data.languagesOffered || fallbackData.languagesOffered)}
           </p>
         </div>
         <div className="fl-lang-banner-col3">
@@ -261,7 +276,7 @@ function ForeignLanguagesPage({ data }: { data: typeof foreignLanguages }) {
         </div>
 
         <div className="fl-modules-grid">
-          {data.languages.map((lang, index) => (
+          {languages.map((lang, index) => (
             <LanguageModuleAccordion key={index} lang={lang} index={index} />
           ))}
         </div>
@@ -669,6 +684,7 @@ export default function DifferentiatorDetail() {
   const { slides: heroSlides } = usePageBanners('differentiators-detail');
   const { docs: rwtpReportLinkDocs } = useOrderedCollection<WithId & { label: string; fileUrl: string }>('rwtpReportLinks', 'order');
   const { docs: allFaculty } = useOrderedCollection<FacultyDoc>('faculty', 'order');
+  const { data: ideaDoc } = useDocument<AicteIdeaLabDoc>('settings', slug === 'aicte-idea-lab' ? 'aicteIdeaLab' : undefined);
   const item = allItems.find((i) => i.slug === slug) ?? null;
   const category = item ? DIFFERENTIATOR_CATEGORIES.find((c) => c.id === item.category) : null;
   // GSAC's "Moments from GSAC" gallery starts collapsed to 3 photos with a
@@ -834,22 +850,30 @@ export default function DifferentiatorDetail() {
                   <CategoryIcon size={14} /> {category.label}
                 </div>
                 <h1 className="dept-hero-title">
-                  {item.slug === 'institution-innovation-cell'
-                    ? "Institution's Innovation Council"
-                    : item.slug === 'ti-dsp-coe'
-                    ? 'TI-DSP Centre of Excellence'
-                    : item.slug === 'ultratech-coe'
-                    ? 'UltraTech Centre of Excellence'
-                    : item.slug === 'vsac'
-                    ? 'Vishnu Space Application Center (VSAC)'
-                    : item.title}
+                  {item.title || (
+                    item.slug === 'institution-innovation-cell'
+                      ? "Institution's Innovation Council"
+                      : item.slug === 'ti-dsp-coe'
+                      ? 'TI-DSP Centre of Excellence'
+                      : item.slug === 'ultratech-coe'
+                      ? 'UltraTech Centre of Excellence'
+                      : item.slug === 'vsac'
+                      ? 'Vishnu Space Application Center (VSAC)'
+                      : item.slug === 'aicte-idea-lab'
+                      ? (ideaDoc?.hero?.title || aicteIdeaLab.hero.title)
+                      : item.title
+                  )}
                 </h1>
                 {/* Its own "Hero Subtitle" admin field — deliberately not the
                     same as the Short Description (hub-card blurb) or the
                     Description block further down the page. */}
-                {(item.slug === 'institution-innovation-cell' || item.slug === 'ti-dsp-coe' || item.slug === 'ultratech-coe' || item.slug === 'vsac' || item.summary || (item.slug === 'meda-plm-coe' ? medaPlmCoe.hero.subtitle : item.slug === 'microchip-embedded' ? microchipEmbedded.hero.subtitle : null)) && (
+                {(item.summary || (item.slug === 'aicte-idea-lab' ? (ideaDoc?.hero?.tagline || aicteIdeaLab.hero.tagline) : null) || (item.slug === 'institution-innovation-cell' || item.slug === 'ti-dsp-coe' || item.slug === 'ultratech-coe' || item.slug === 'vsac' || (item.slug === 'meda-plm-coe' ? medaPlmCoe.hero.subtitle : item.slug === 'microchip-embedded' ? microchipEmbedded.hero.subtitle : null))) && (
                   <p className="dept-hero-subtitle">
-                    {item.slug === 'institution-innovation-cell'
+                    {item.summary
+                      ? item.summary
+                      : item.slug === 'aicte-idea-lab'
+                      ? (ideaDoc?.hero?.tagline || aicteIdeaLab.hero.tagline)
+                      : item.slug === 'institution-innovation-cell'
                       ? 'Fostering a campus ecosystem where students and faculty can explore ideas, develop innovations and advance entrepreneurship through mentoring, collaboration and institutional support.'
                       : item.slug === 'ti-dsp-coe'
                       ? 'Advancing digital signal processing, speech and image processing, and application-oriented research through specialised DSP platforms, MATLAB-enabled learning and hands-on technical training.'
@@ -857,7 +881,7 @@ export default function DifferentiatorDetail() {
                       ? 'Strengthening civil engineering education through industry-supported learning, sustainable construction practices and hands-on exposure to construction materials and technologies in collaboration with UltraTech Cement Ltd.'
                       : item.slug === 'vsac'
                       ? 'Connecting students with space technology through satellite tracking, CubeSat design, High-Altitude Balloon payload development, and hands-on ground-station operations.'
-                      : (item.summary || (item.slug === 'meda-plm-coe' ? medaPlmCoe.hero.subtitle : item.slug === 'microchip-embedded' ? microchipEmbedded.hero.subtitle : ''))}
+                      : (item.slug === 'meda-plm-coe' ? medaPlmCoe.hero.subtitle : item.slug === 'microchip-embedded' ? microchipEmbedded.hero.subtitle : '')}
                   </p>
                 )}
                 {item.slug === 'aicte-idea-lab' && (
@@ -872,7 +896,7 @@ export default function DifferentiatorDetail() {
                         document.getElementById('idealab-main')?.scrollIntoView({ behavior: 'smooth' });
                       }}
                     >
-                      Explore the IDEA Lab →
+                      {ideaDoc?.hero?.ctaPrimary || aicteIdeaLab.hero.ctaPrimary}
                     </a>
                     <a
                       href="#facilities"
@@ -884,7 +908,7 @@ export default function DifferentiatorDetail() {
                         document.getElementById('idealab-main')?.scrollIntoView({ behavior: 'smooth' });
                       }}
                     >
-                      View Facilities →
+                      {ideaDoc?.hero?.ctaSecondary || aicteIdeaLab.hero.ctaSecondary}
                     </a>
                   </div>
                 )}
@@ -1003,9 +1027,19 @@ export default function DifferentiatorDetail() {
         >
           <div className="container">
             {item.slug === 'microchip-embedded' ? (
-              <MicrochipPage customSections={effectiveCustomSections} />
+              <MicrochipPage
+                item={item}
+                descriptionSection={descriptionSection}
+                introBlocks={introBlocks}
+                customSections={effectiveCustomSections}
+              />
             ) : item.slug === 'ti-dsp-coe' ? (
-              <TiDspPage customSections={effectiveCustomSections} />
+              <TiDspPage
+                item={item}
+                descriptionSection={descriptionSection}
+                introBlocks={introBlocks}
+                customSections={effectiveCustomSections}
+              />
             ) : item.slug === 'ultratech-coe' ? (
               <UltraTechPage
                 customSections={effectiveCustomSections}
@@ -1092,7 +1126,7 @@ export default function DifferentiatorDetail() {
                   : item.slug === 'chips-to-startup'
                   ? 'Explore What Powers the Next Big Idea'
                   : item.slug === 'aicte-idea-lab'
-                  ? 'Explore Innovation at VWU'
+                  ? (ideaDoc?.cta?.title || aicteIdeaLab.cta.title)
                   : 'Explore More Differentiators'}
               </h2>
               <p style={{ color: 'rgba(255,255,255,0.75)', maxWidth: 620, margin: '0 auto var(--space-6)' }}>
@@ -1101,7 +1135,7 @@ export default function DifferentiatorDetail() {
                   : item.slug === 'chips-to-startup'
                   ? 'From advanced technology and research to innovation and entrepreneurship, discover the initiatives that turn learning into real-world possibilities.'
                   : item.slug === 'aicte-idea-lab'
-                  ? 'Discover the labs, centres and initiatives that extend learning beyond the classroom and support innovation, research and experiential education.'
+                  ? (ideaDoc?.cta?.description || aicteIdeaLab.cta.description)
                   : (item.slug === 'meda-plm-coe' || item.slug === 'microchip-embedded')
                   ? 'Discover the laboratories, centres and initiatives that strengthen experiential learning, industry engagement and innovation at VWU.'
                   : item.slug === 'institution-innovation-cell'

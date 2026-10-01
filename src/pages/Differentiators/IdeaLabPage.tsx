@@ -20,6 +20,8 @@ import { aicteIdeaLab } from './aicteIdeaLab.data';
 import type { DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
 import type { CustomSection } from '../../lib/customSections';
 import { useOrderedCollection, type WithId } from '../../hooks/useCollection';
+import { useDocument } from '../../hooks/useDocument';
+import type { AicteIdeaLabDoc } from '../Admin/sections/AicteIdeaLabContentAdmin';
 import type { AicteIdeaLabTeamMemberDoc } from '../Admin/sections/AicteIdeaLabTeamAdmin';
 import type { AicteIdeaLabAmbassadorDoc } from '../Admin/sections/AicteIdeaLabAmbassadorsAdmin';
 import { CustomSectionsPlain, CustomSectionsPills, CustomSectionsGalleries, CustomSectionsAccordion } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
@@ -54,7 +56,10 @@ const DEFAULT_AMBASSADORS = [
   { id: 'a10', regNumber: '21B01A0314', name: 'D. H Pravallika Devi', year: 'II', branch: 'ME', order: 10 },
 ];
 
+const TELEMETRY_ICONS = [Award, Lightbulb, Wrench, Leaf];
+
 export default function IdeaLabPage({ item, sections = [] }: IdeaLabPageProps) {
+  const { data: ideaDoc } = useDocument<AicteIdeaLabDoc>('settings', 'aicteIdeaLab');
   const { docs: teamDocs } = useOrderedCollection<AicteIdeaLabTeamMemberDoc>('aicteIdeaLabTeam', 'order');
   const { docs: ambassadorDocs } = useOrderedCollection<AicteIdeaLabAmbassadorDoc>('aicteIdeaLabAmbassadors', 'order');
   const { docs: facilityPhotos } = useOrderedCollection<WithId & { imageUrl: string; caption?: string }>('aicteIdeaLabFacilityPhotos', 'order');
@@ -62,11 +67,70 @@ export default function IdeaLabPage({ item, sections = [] }: IdeaLabPageProps) {
   const team = teamDocs.length > 0 ? teamDocs : DEFAULT_TEAM;
   const ambassadors = ambassadorDocs.length > 0 ? ambassadorDocs : DEFAULT_AMBASSADORS;
 
+  // Merged dynamic content from Firestore document with fallbacks to static dataset
+  const telemetry = ideaDoc?.telemetry && ideaDoc.telemetry.length > 0
+    ? ideaDoc.telemetry
+    : aicteIdeaLab.telemetry;
+
+  const overview = {
+    title: ideaDoc?.overview?.title || aicteIdeaLab.overview.title,
+    paragraphs: ideaDoc?.overview?.paragraphs && ideaDoc.overview.paragraphs.length > 0
+      ? ideaDoc.overview.paragraphs
+      : aicteIdeaLab.overview.paragraphs,
+  };
+
+  const process = {
+    title: ideaDoc?.process?.title || aicteIdeaLab.process.title,
+    intro: ideaDoc?.process?.intro || aicteIdeaLab.process.intro,
+    steps: ideaDoc?.process?.steps && ideaDoc.process.steps.length > 0
+      ? ideaDoc.process.steps
+      : aicteIdeaLab.process.steps,
+  };
+
+  const pillars = ideaDoc?.pillars && ideaDoc.pillars.length > 0
+    ? ideaDoc.pillars
+    : aicteIdeaLab.pillars;
+
+  const teamInfo = {
+    title: ideaDoc?.team?.title || aicteIdeaLab.team.title,
+    intro: ideaDoc?.team?.intro || aicteIdeaLab.team.intro,
+    contactNotice: ideaDoc?.team?.contactNotice || aicteIdeaLab.team.contactNotice,
+  };
+
+  const ambassadorsInfo = {
+    title: ideaDoc?.ambassadors?.title || aicteIdeaLab.ambassadors.title,
+    intro: ideaDoc?.ambassadors?.intro || aicteIdeaLab.ambassadors.intro,
+    contactNotice: ideaDoc?.ambassadors?.contactNotice || aicteIdeaLab.ambassadors.contactNotice,
+  };
+
+  const facilitiesInfo = {
+    title: ideaDoc?.facilities?.title || aicteIdeaLab.facilities.title,
+    paragraphs: ideaDoc?.facilities?.paragraphs && ideaDoc.facilities.paragraphs.length > 0
+      ? ideaDoc.facilities.paragraphs
+      : aicteIdeaLab.facilities.paragraphs,
+    defaultEquipment: ideaDoc?.facilities?.defaultEquipment && ideaDoc.facilities.defaultEquipment.length > 0
+      ? ideaDoc.facilities.defaultEquipment
+      : aicteIdeaLab.facilities.defaultEquipment,
+  };
+
+  const officialInfo = {
+    title: ideaDoc?.officialInfo?.title || aicteIdeaLab.officialInfo.title,
+    aqisId: ideaDoc?.officialInfo?.aqisId || aicteIdeaLab.officialInfo.aqisId,
+    institution: ideaDoc?.officialInfo?.institution || aicteIdeaLab.officialInfo.institution,
+    headOfInstitution: ideaDoc?.officialInfo?.headOfInstitution || aicteIdeaLab.officialInfo.headOfInstitution,
+    facultyCoordinators: ideaDoc?.officialInfo?.facultyCoordinators && ideaDoc.officialInfo.facultyCoordinators.length > 0
+      ? ideaDoc.officialInfo.facultyCoordinators
+      : aicteIdeaLab.officialInfo.facultyCoordinators,
+    email: ideaDoc?.officialInfo?.email || aicteIdeaLab.officialInfo.email,
+  };
+
+  const additionalSections = ideaDoc?.additionalSections || [];
   const adminTabs = item?.tabs || [];
+
   const [activeTabId, setActiveTabId] = useState<string>(() => {
     if (typeof window !== 'undefined') {
       const hash = window.location.hash.replace('#', '');
-      if (['facilities', 'overview', 'vision', 'team', 'ambassadors', 'official-info'].includes(hash)) {
+      if (hash) {
         return hash;
       }
     }
@@ -76,7 +140,7 @@ export default function IdeaLabPage({ item, sections = [] }: IdeaLabPageProps) {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '');
-      if (['facilities', 'overview', 'vision', 'team', 'ambassadors', 'official-info'].includes(hash)) {
+      if (hash) {
         setActiveTabId(hash);
       }
     };
@@ -89,52 +153,25 @@ export default function IdeaLabPage({ item, sections = [] }: IdeaLabPageProps) {
     window.location.hash = id;
   };
 
-  const idea = aicteIdeaLab;
-
   return (
     <div className="idealab-page-container" id="idealab-main">
       {/* IDEA Lab Telemetry Banner */}
       <section className="idealab-telemetry-strip">
         <div className="idealab-telemetry-grid">
-          <div className="idealab-telemetry-card">
-            <div className="idealab-telemetry-icon-box">
-              <Award className="idealab-telemetry-icon" />
-            </div>
-            <div className="idealab-telemetry-info">
-              <span className="idealab-telemetry-val">{idea.telemetry[0].value}</span>
-              <span className="idealab-telemetry-lbl">{idea.telemetry[0].label}</span>
-            </div>
-          </div>
-
-          <div className="idealab-telemetry-card">
-            <div className="idealab-telemetry-icon-box">
-              <Lightbulb className="idealab-telemetry-icon" />
-            </div>
-            <div className="idealab-telemetry-info">
-              <span className="idealab-telemetry-val">{idea.telemetry[1].value}</span>
-              <span className="idealab-telemetry-lbl">{idea.telemetry[1].label}</span>
-            </div>
-          </div>
-
-          <div className="idealab-telemetry-card">
-            <div className="idealab-telemetry-icon-box">
-              <Wrench className="idealab-telemetry-icon" />
-            </div>
-            <div className="idealab-telemetry-info">
-              <span className="idealab-telemetry-val">{idea.telemetry[2].value}</span>
-              <span className="idealab-telemetry-lbl">{idea.telemetry[2].label}</span>
-            </div>
-          </div>
-
-          <div className="idealab-telemetry-card">
-            <div className="idealab-telemetry-icon-box">
-              <Leaf className="idealab-telemetry-icon" />
-            </div>
-            <div className="idealab-telemetry-info">
-              <span className="idealab-telemetry-val">{idea.telemetry[3].value}</span>
-              <span className="idealab-telemetry-lbl">{idea.telemetry[3].label}</span>
-            </div>
-          </div>
+          {telemetry.map((stat, idx) => {
+            const Icon = TELEMETRY_ICONS[idx % TELEMETRY_ICONS.length] || Award;
+            return (
+              <div key={idx} className="idealab-telemetry-card">
+                <div className="idealab-telemetry-icon-box">
+                  <Icon className="idealab-telemetry-icon" />
+                </div>
+                <div className="idealab-telemetry-info">
+                  <span className="idealab-telemetry-val">{stat.value}</span>
+                  <span className="idealab-telemetry-lbl">{stat.label}</span>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </section>
 
@@ -149,9 +186,9 @@ export default function IdeaLabPage({ item, sections = [] }: IdeaLabPageProps) {
                 <div className="idealab-badge">
                   <Lightbulb size={14} /> AICTE IDEA Lab
                 </div>
-                <h2 className="idealab-card-title">{idea.overview.title}</h2>
+                <h2 className="idealab-card-title">{overview.title}</h2>
                 <div className="idealab-paragraphs">
-                  {idea.overview.paragraphs.map((p, idx) => (
+                  {overview.paragraphs.map((p, idx) => (
                     <p key={idx} className="idealab-lead-text">{renderBold(p)}</p>
                   ))}
                 </div>
@@ -161,13 +198,13 @@ export default function IdeaLabPage({ item, sections = [] }: IdeaLabPageProps) {
                   <div className="idealab-badge gold">
                     <Workflow size={14} /> Innovation Process
                   </div>
-                  <h3 className="idealab-subcard-title">{idea.process.title}</h3>
+                  <h3 className="idealab-subcard-title">{process.title}</h3>
                   <p className="idealab-lead-text" style={{ marginBottom: '0.75rem' }}>
-                    {renderBold(idea.process.intro)}
+                    {renderBold(process.intro)}
                   </p>
 
                   <div className="idealab-process-grid">
-                    {idea.process.steps.map((step) => (
+                    {process.steps.map((step) => (
                       <div key={step.number} className="idealab-process-card">
                         <div className="idealab-process-card-header">
                           <span className="idealab-process-num">{step.number}</span>
@@ -192,7 +229,7 @@ export default function IdeaLabPage({ item, sections = [] }: IdeaLabPageProps) {
                 </div>
                 <h2 className="idealab-card-title">Vision & Academic Pillars</h2>
                 <div className="idealab-vision-grid">
-                  {idea.pillars.map((pillar) => (
+                  {pillars.map((pillar) => (
                     <div key={pillar.number} className="idealab-vision-pillar-card">
                       <div className="idealab-pillar-header">
                         <span className="idealab-pillar-num">{pillar.number}</span>
@@ -214,9 +251,9 @@ export default function IdeaLabPage({ item, sections = [] }: IdeaLabPageProps) {
                 <div className="idealab-badge">
                   <Users size={14} /> Leadership & Mentorship
                 </div>
-                <h2 className="idealab-card-title">{idea.team.title}</h2>
+                <h2 className="idealab-card-title">{teamInfo.title}</h2>
                 <p className="idealab-lead-text" style={{ marginBottom: '1.25rem' }}>
-                  {renderBold(idea.team.intro)}
+                  {renderBold(teamInfo.intro)}
                 </p>
 
                 <div className="idealab-table-responsive">
@@ -245,7 +282,7 @@ export default function IdeaLabPage({ item, sections = [] }: IdeaLabPageProps) {
                 <div className="idealab-notice-card">
                   <Mail size={16} color="#C9973A" />
                   <span>
-                    Official Coordinator Contact: <a href={`mailto:${idea.officialInfo.email}`}>{idea.officialInfo.email}</a>
+                    Official Coordinator Contact: <a href={`mailto:${officialInfo.email}`}>{officialInfo.email}</a>
                   </span>
                 </div>
               </div>
@@ -259,9 +296,9 @@ export default function IdeaLabPage({ item, sections = [] }: IdeaLabPageProps) {
                 <div className="idealab-badge gold">
                   <GraduationCap size={14} /> Student Leadership
                 </div>
-                <h2 className="idealab-card-title">{idea.ambassadors.title}</h2>
+                <h2 className="idealab-card-title">{ambassadorsInfo.title}</h2>
                 <p className="idealab-lead-text" style={{ marginBottom: '1.25rem' }}>
-                  {renderBold(idea.ambassadors.intro)}
+                  {renderBold(ambassadorsInfo.intro)}
                 </p>
 
                 <div className="idealab-table-responsive">
@@ -290,7 +327,7 @@ export default function IdeaLabPage({ item, sections = [] }: IdeaLabPageProps) {
                 <div className="idealab-notice-card">
                   <ShieldCheck size={16} color="#C9973A" />
                   <span>
-                    {idea.ambassadors.contactNotice}
+                    {ambassadorsInfo.contactNotice}
                   </span>
                 </div>
               </div>
@@ -304,9 +341,9 @@ export default function IdeaLabPage({ item, sections = [] }: IdeaLabPageProps) {
                 <div className="idealab-badge">
                   <Building2 size={14} /> Infrastructure & Workstations
                 </div>
-                <h2 className="idealab-card-title">{idea.facilities.title}</h2>
+                <h2 className="idealab-card-title">{facilitiesInfo.title}</h2>
                 <div className="idealab-paragraphs">
-                  {idea.facilities.paragraphs.map((p, idx) => (
+                  {facilitiesInfo.paragraphs.map((p, idx) => (
                     <p key={idx} className="idealab-lead-text">{renderBold(p)}</p>
                   ))}
                 </div>
@@ -315,16 +352,16 @@ export default function IdeaLabPage({ item, sections = [] }: IdeaLabPageProps) {
                 <div className="idealab-facilities-grid">
                   {(facilityPhotos.length > 0
                     ? facilityPhotos
-                    : idea.facilities.defaultEquipment.map((eq) => ({
+                    : facilitiesInfo.defaultEquipment.map((eq) => ({
                         id: eq.id,
                         imageUrl: PHOTO_NEEDED_PLACEHOLDER,
                         caption: eq.title,
                         category: eq.category,
                       }))
                   ).map((photo, idx) => {
-                    const fallbackEq = idea.facilities.defaultEquipment[idx % idea.facilities.defaultEquipment.length];
+                    const fallbackEq = facilitiesInfo.defaultEquipment[idx % Math.max(1, facilitiesInfo.defaultEquipment.length)];
                     const label = photo.caption || fallbackEq?.title || 'Advanced Prototyping Equipment';
-                    const category = fallbackEq?.category || 'IDEA Lab Workstation';
+                    const category = ('category' in photo && typeof photo.category === 'string' ? photo.category : null) || fallbackEq?.category || 'IDEA Lab Workstation';
 
                     return (
                       <div key={photo.id} className="idealab-facility-card">
@@ -350,29 +387,29 @@ export default function IdeaLabPage({ item, sections = [] }: IdeaLabPageProps) {
                 <div className="idealab-badge gold">
                   <FileCheck size={14} /> Official Roster & Registry
                 </div>
-                <h2 className="idealab-card-title">{idea.officialInfo.title}</h2>
+                <h2 className="idealab-card-title">{officialInfo.title}</h2>
                 <div className="idealab-official-grid">
                   <div className="idealab-official-box">
                     <span className="idealab-official-label">AQIS Application ID</span>
                     <span className="idealab-official-val" style={{ fontFamily: 'monospace', fontSize: '1.05rem', color: '#C9973A' }}>
-                      {idea.officialInfo.aqisId}
+                      {officialInfo.aqisId}
                     </span>
                   </div>
 
                   <div className="idealab-official-box">
                     <span className="idealab-official-label">Head of Institution</span>
-                    <span className="idealab-official-val">{idea.officialInfo.headOfInstitution}</span>
+                    <span className="idealab-official-val">{officialInfo.headOfInstitution}</span>
                   </div>
 
                   <div className="idealab-official-box" style={{ gridColumn: '1 / -1' }}>
                     <span className="idealab-official-label">Institution</span>
-                    <span className="idealab-official-val">{idea.officialInfo.institution}</span>
+                    <span className="idealab-official-val">{officialInfo.institution}</span>
                   </div>
 
                   <div className="idealab-official-box" style={{ gridColumn: '1 / -1' }}>
                     <span className="idealab-official-label">Faculty Coordinators</span>
                     <div className="idealab-official-val-list">
-                      {idea.officialInfo.facultyCoordinators.map((coord, idx) => (
+                      {officialInfo.facultyCoordinators.map((coord, idx) => (
                         <span key={idx} className="idealab-official-val">• {renderBold(coord)}</span>
                       ))}
                     </div>
@@ -381,8 +418,8 @@ export default function IdeaLabPage({ item, sections = [] }: IdeaLabPageProps) {
                   <div className="idealab-official-box" style={{ gridColumn: '1 / -1' }}>
                     <span className="idealab-official-label">Official Contact Email</span>
                     <span className="idealab-official-val">
-                      <a href={`mailto:${idea.officialInfo.email}`} style={{ color: '#0B1E42', textDecoration: 'underline' }}>
-                        {idea.officialInfo.email}
+                      <a href={`mailto:${officialInfo.email}`} style={{ color: '#0B1E42', textDecoration: 'underline' }}>
+                        {officialInfo.email}
                       </a>
                     </span>
                   </div>
@@ -390,6 +427,43 @@ export default function IdeaLabPage({ item, sections = [] }: IdeaLabPageProps) {
               </div>
             </div>
           )}
+
+          {/* Render Additional Custom Sections from Content Admin */}
+          {additionalSections.map((sec) => {
+            if (activeTabId !== sec.id) return null;
+            return (
+              <div key={sec.id} className="idealab-tab-pane animate-fade-in">
+                <div className="idealab-card">
+                  {sec.badge && (
+                    <div className="idealab-badge gold">
+                      <Sparkles size={14} /> {sec.badge}
+                    </div>
+                  )}
+                  <h2 className="idealab-card-title">{sec.title}</h2>
+                  {sec.paragraphs && sec.paragraphs.length > 0 && (
+                    <div className="idealab-paragraphs">
+                      {sec.paragraphs.map((p, idx) => (
+                        <p key={idx} className="idealab-lead-text">{renderBold(p)}</p>
+                      ))}
+                    </div>
+                  )}
+                  {sec.bulletPoints && sec.bulletPoints.length > 0 && (
+                    <div className="idealab-vision-grid" style={{ marginTop: '1.25rem' }}>
+                      {sec.bulletPoints.map((pt, idx) => (
+                        <div key={idx} className="idealab-vision-pillar-card">
+                          <div className="idealab-pillar-header">
+                            <span className="idealab-pillar-num">{idx < 9 ? `0${idx + 1}` : `${idx + 1}`}</span>
+                            <Sparkles size={16} color="#0B1E42" />
+                          </div>
+                          <p className="idealab-pillar-text">{renderBold(pt)}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
 
           {/* Render Dynamic Admin Tabs (if selected) */}
           {adminTabs.map((tab) => {
@@ -419,7 +493,7 @@ export default function IdeaLabPage({ item, sections = [] }: IdeaLabPageProps) {
               <div>
                 <h3 className="idealab-quick-nav-title">Quick Navigation</h3>
                 <span className="idealab-quick-nav-subtitle">
-                  {6 + adminTabs.length} Sections Available
+                  {6 + additionalSections.length + adminTabs.length} Sections Available
                 </span>
               </div>
             </div>
@@ -431,7 +505,7 @@ export default function IdeaLabPage({ item, sections = [] }: IdeaLabPageProps) {
                   onClick={() => selectTab('overview')}
                   className={`idealab-quick-nav-btn ${activeTabId === 'overview' ? 'is-active' : ''}`}
                 >
-                  <span>From Idea to Prototype</span>
+                  <span>{overview.title}</span>
                   <ChevronRight size={14} className="idealab-quick-nav-arrow" />
                 </button>
               </li>
@@ -453,7 +527,7 @@ export default function IdeaLabPage({ item, sections = [] }: IdeaLabPageProps) {
                   onClick={() => selectTab('team')}
                   className={`idealab-quick-nav-btn ${activeTabId === 'team' ? 'is-active' : ''}`}
                 >
-                  <span>People Behind IDEA Lab</span>
+                  <span>{teamInfo.title}</span>
                   <ChevronRight size={14} className="idealab-quick-nav-arrow" />
                 </button>
               </li>
@@ -464,7 +538,7 @@ export default function IdeaLabPage({ item, sections = [] }: IdeaLabPageProps) {
                   onClick={() => selectTab('ambassadors')}
                   className={`idealab-quick-nav-btn ${activeTabId === 'ambassadors' ? 'is-active' : ''}`}
                 >
-                  <span>Student Ambassadors</span>
+                  <span>{ambassadorsInfo.title}</span>
                   <ChevronRight size={14} className="idealab-quick-nav-arrow" />
                 </button>
               </li>
@@ -475,7 +549,7 @@ export default function IdeaLabPage({ item, sections = [] }: IdeaLabPageProps) {
                   onClick={() => selectTab('facilities')}
                   className={`idealab-quick-nav-btn ${activeTabId === 'facilities' ? 'is-active' : ''}`}
                 >
-                  <span>Facilities for Prototyping</span>
+                  <span>{facilitiesInfo.title}</span>
                   <ChevronRight size={14} className="idealab-quick-nav-arrow" />
                 </button>
               </li>
@@ -486,10 +560,24 @@ export default function IdeaLabPage({ item, sections = [] }: IdeaLabPageProps) {
                   onClick={() => selectTab('official-info')}
                   className={`idealab-quick-nav-btn ${activeTabId === 'official-info' ? 'is-active' : ''}`}
                 >
-                  <span>Official Information</span>
+                  <span>{officialInfo.title}</span>
                   <ChevronRight size={14} className="idealab-quick-nav-arrow" />
                 </button>
               </li>
+
+              {/* Custom Additional Sections from Content Admin */}
+              {additionalSections.map((sec) => (
+                <li key={sec.id} className="idealab-quick-nav-item">
+                  <button
+                    type="button"
+                    onClick={() => selectTab(sec.id)}
+                    className={`idealab-quick-nav-btn ${activeTabId === sec.id ? 'is-active' : ''}`}
+                  >
+                    <span>{sec.title}</span>
+                    <ChevronRight size={14} className="idealab-quick-nav-arrow" />
+                  </button>
+                </li>
+              ))}
 
               {/* Dynamic Admin-Defined Tabs in Quick Navigation */}
               {adminTabs.map((tab) => (
@@ -509,15 +597,7 @@ export default function IdeaLabPage({ item, sections = [] }: IdeaLabPageProps) {
         </aside>
       </div>
 
-      {/* Photos/sections added via Admin → Differentiators → (this item's)
-          main "Photos"/Custom Sections editor — separate from the Quick
-          Navigation admin tabs above (item.tabs, rendered via adminTabs).
-          Previously this component only ever read item.tabs; the `sections`
-          prop (item.customSections, computed by DifferentiatorDetail.tsx)
-          was accepted but never rendered, so anything added there — photos
-          included — silently never showed up on this page. Always visible,
-          not tied to any one of the tabs above. Same pattern MicrochipPage.tsx
-          already uses for its own "Dynamic Custom Sections" block. */}
+      {/* Dynamic custom sections */}
       <CustomSectionsGalleries sections={sections} />
       <CustomSectionsAccordion sections={sections} />
     </div>

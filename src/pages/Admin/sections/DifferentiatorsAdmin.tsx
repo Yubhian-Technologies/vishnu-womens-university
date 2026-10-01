@@ -10,9 +10,27 @@ import CustomTabsEditor from './CustomTabsEditor';
 import { replaceAtPath, getAtPath, hasCustomSectionContent, type CustomSection } from '../../../lib/customSections';
 import { type CustomTab } from '../../../lib/customTabs';
 import { diffChangedFields } from '../../../lib/formDiff';
+import AicteIdeaLabContentAdmin from './AicteIdeaLabContentAdmin';
 import AicteIdeaLabTeamAdmin from './AicteIdeaLabTeamAdmin';
 import AicteIdeaLabAmbassadorsAdmin from './AicteIdeaLabAmbassadorsAdmin';
 import AicteIdeaLabFacilityPhotosAdmin from './AicteIdeaLabFacilityPhotosAdmin';
+import TiDspContentAdmin from './TiDspContentAdmin';
+import MicrochipContentAdmin from './MicrochipContentAdmin';
+import MedaPlmCoeContentAdmin from './MedaPlmCoeContentAdmin';
+import VsacContentAdmin from './VsacContentAdmin';
+import ChipsToStartupContentAdmin from './ChipsToStartupContentAdmin';
+import HpcLabContentAdmin from './HpcLabContentAdmin';
+import UltraTechContentAdmin from './UltraTechContentAdmin';
+import DreamHouseLabContentAdmin from './DreamHouseLabContentAdmin';
+import VehicleDesignLabContentAdmin from './VehicleDesignLabContentAdmin';
+import ArVrStudioContentAdmin from './ArVrStudioContentAdmin';
+import AssistiveTechContentAdmin from './AssistiveTechContentAdmin';
+import ConcreteCanoeContentAdmin from './ConcreteCanoeContentAdmin';
+import AdvancedElectricalContentAdmin from './AdvancedElectricalContentAdmin';
+import ForeignLanguagesContentAdmin from './ForeignLanguagesContentAdmin';
+import SmartInterviewsContentAdmin from './SmartInterviewsContentAdmin';
+import RuralWomenTechParkContentAdmin from './RuralWomenTechParkContentAdmin';
+import IicContentAdmin from './IicContentAdmin';
 import IicCouncilMembersAdmin from './IicCouncilMembersAdmin';
 import IicDocumentsAdmin from './IicDocumentsAdmin';
 import VdlAchievementsAdmin from './VdlAchievementsAdmin';
@@ -21,47 +39,71 @@ import RwtpReportsAdmin from './RwtpReportsAdmin';
 import { useAdminSession } from '../AdminSessionContext';
 import { allowedDifferentiatorItems } from '../../../lib/rbac';
 
-// Some differentiator items have extra editable content beyond the base
-// fields below (a team roster, photo galleries, placement cards, ...) —
-// keyed by the item's slug, shown inline while editing that specific item
-// (see the "Extra Content" card below) instead of as separate top-level
-// sidebar sections.
+// Differentiator items have dedicated rich content editors backed by Firestore settings
+// (matching AICTE IDEA Lab pattern), plus any legacy roster/report sub-panels:
 const ITEM_SUB_SECTIONS: Record<string, { key: string; label: string; Component: ComponentType }[]> = {
   'aicte-idea-lab': [
-    { key: 'team', label: 'Team', Component: AicteIdeaLabTeamAdmin },
-    { key: 'ambassadors', label: 'Student Ambassadors', Component: AicteIdeaLabAmbassadorsAdmin },
+    { key: 'page-content', label: 'All Page Content & Sections', Component: AicteIdeaLabContentAdmin },
+    { key: 'team', label: 'Team Members Roster', Component: AicteIdeaLabTeamAdmin },
+    { key: 'ambassadors', label: 'Student Ambassadors Roster', Component: AicteIdeaLabAmbassadorsAdmin },
     { key: 'facility-photos', label: 'Facility Photos', Component: AicteIdeaLabFacilityPhotosAdmin },
   ],
-  'institution-innovation-cell': [
-    { key: 'council-members', label: 'Council Members', Component: IicCouncilMembersAdmin },
-    { key: 'documents', label: 'Documents', Component: IicDocumentsAdmin },
+  'ti-dsp-coe': [
+    { key: 'page-content', label: 'All Page Content & Sections', Component: TiDspContentAdmin },
   ],
-  // TEDxSVECW's Photos, TI-DSP CoE's Gallery Photos, Chips to Startup's
-  // Activities/Outcomes photos, and VSAC's Gallery Photos all moved to
-  // generic "files"-type Custom Sections — their old dedicated panels have
-  // no live target to manage anymore.
-  // Facility-phase/campus-vehicle/industry-collab photos moved to generic
-  // "files"-type sections within the Tabs editor below —
-  // VdlFacilitiesPhotosAdmin's old fixed-slot photo panel has no live
-  // target to manage anymore. Achievement Reports stays: it's still
-  // rendered as-is on the public page.
+  'microchip-embedded': [
+    { key: 'page-content', label: 'All Page Content & Sections', Component: MicrochipContentAdmin },
+  ],
+  'meda-plm-coe': [
+    { key: 'page-content', label: 'All Page Content & Sections', Component: MedaPlmCoeContentAdmin },
+  ],
+  'vsac': [
+    { key: 'page-content', label: 'All Page Content & Sections', Component: VsacContentAdmin },
+  ],
+  'chips-to-startup': [
+    { key: 'page-content', label: 'All Page Content & Sections', Component: ChipsToStartupContentAdmin },
+  ],
+  'hpc-lab': [
+    { key: 'page-content', label: 'All Page Content & Sections', Component: HpcLabContentAdmin },
+  ],
+  'ultratech-coe': [
+    { key: 'page-content', label: 'All Page Content & Sections', Component: UltraTechContentAdmin },
+  ],
+  'dream-house-lab': [
+    { key: 'page-content', label: 'All Page Content & Sections', Component: DreamHouseLabContentAdmin },
+  ],
   'vehicle-design-lab': [
+    { key: 'page-content', label: 'All Page Content & Sections', Component: VehicleDesignLabContentAdmin },
     { key: 'team', label: 'Team', Component: VdlTeamAdmin },
     { key: 'achievement-reports', label: 'Achievement Reports', Component: VdlAchievementsAdmin },
   ],
-  'rural-women-tech-park': [{ key: 'report-links', label: 'Report Links', Component: RwtpReportsAdmin }],
-  // ATL's Photos and Activity PDFs moved to generic "files"-type Custom
-  // Sections — AssistiveTechLabPhotosAdmin/AtlActivityPdfsAdmin have no
-  // live target to manage anymore. Concrete Canoe Lab's 5 fixed photo
-  // groups were migrated into a "Photo Galleries" Custom Section the same
-  // way — ConcreteCanoePhotosAdmin's one-time migration tool has no live
-  // target to manage anymore either.
-  // WISE's old per-item photo panels (team/elite-project/testimonial/NSE
-  // clipping) had no live target anymore once every tab moved to generic
-  // "files"-type sections in the Tabs editor below — removed rather than
-  // left pointing at nothing. Nirvahana's Event Photos moved to generic
-  // photo-carrying sections the same way — NirvahanaEventPhotosAdmin has no
-  // live target to manage anymore either.
+  'ar-vr-studio': [
+    { key: 'page-content', label: 'All Page Content & Sections', Component: ArVrStudioContentAdmin },
+  ],
+  'assistive-tech-lab': [
+    { key: 'page-content', label: 'All Page Content & Sections', Component: AssistiveTechContentAdmin },
+  ],
+  'concrete-canoe-lab': [
+    { key: 'page-content', label: 'All Page Content & Sections', Component: ConcreteCanoeContentAdmin },
+  ],
+  'advanced-electrical-rd-lab': [
+    { key: 'page-content', label: 'All Page Content & Sections', Component: AdvancedElectricalContentAdmin },
+  ],
+  'foreign-languages': [
+    { key: 'page-content', label: 'All Page Content & Sections', Component: ForeignLanguagesContentAdmin },
+  ],
+  'smart-interviews': [
+    { key: 'page-content', label: 'All Page Content & Sections', Component: SmartInterviewsContentAdmin },
+  ],
+  'rural-women-tech-park': [
+    { key: 'page-content', label: 'All Page Content & Sections', Component: RuralWomenTechParkContentAdmin },
+    { key: 'report-links', label: 'Report Links', Component: RwtpReportsAdmin },
+  ],
+  'institution-innovation-cell': [
+    { key: 'page-content', label: 'All Page Content & Sections', Component: IicContentAdmin },
+    { key: 'council-members', label: 'Council Members', Component: IicCouncilMembersAdmin },
+    { key: 'documents', label: 'Documents', Component: IicDocumentsAdmin },
+  ],
 };
 
 export interface DifferentiatorItemDoc {
@@ -753,65 +795,69 @@ export default function DifferentiatorsAdmin() {
             <label htmlFor="field-hero-subtitle">Hero Subtitle (shown under the title on the detail page's hero banner, only when not an external link)</label>
             <textarea id="field-hero-subtitle" rows={2} value={form.summary || ''} onChange={(e) => set('summary', e.target.value)} />
           </div>
-          <BlockEditor
-            blockKey="description"
-            label="Description"
-            hint="Shown at the top of the detail page with no heading, only when not an external link."
-            value={form.description || emptyBlock('description')}
-            onChange={(next) => set('description', next)}
-            onPhotoUploaded={(r) => handleBlockPhotoUploaded('description', r)}
-            onPhotoRemoved={() => handleBlockPhotoRemoved('description')}
-          />
-          <div className="admin-field admin-field--full"><hr /></div>
-          <BlockEditor
-            blockKey="vision"
-            label="Vision"
-            value={form.vision || emptyBlock('vision')}
-            onChange={(next) => set('vision', next)}
-            onPhotoUploaded={(r) => handleBlockPhotoUploaded('vision', r)}
-            onPhotoRemoved={() => handleBlockPhotoRemoved('vision')}
-          />
-          <BlockEditor
-            blockKey="mission"
-            label="Mission"
-            value={form.mission || emptyBlock('mission')}
-            onChange={(next) => set('mission', next)}
-            onPhotoUploaded={(r) => handleBlockPhotoUploaded('mission', r)}
-            onPhotoRemoved={() => handleBlockPhotoRemoved('mission')}
-          />
-          <BlockEditor
-            blockKey="objectives"
-            label="Objectives"
-            value={form.objectives || emptyBlock('objectives')}
-            onChange={(next) => set('objectives', next)}
-            onPhotoUploaded={(r) => handleBlockPhotoUploaded('objectives', r)}
-            onPhotoRemoved={() => handleBlockPhotoRemoved('objectives')}
-          />
-          <div className="admin-field admin-field--full"><hr /><h3>Custom Sections</h3></div>
-          <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
-            Add any section this item needs beyond Description/Vision/Mission/Objectives above — Key Highlights,
-            Facilities, Outcomes, Partners, Contacts, or anything else — any name, any number of sub-sections, and
-            a choice of plain text, a checklist, a table, a list of links, uploaded files, or contacts
-            (role/name/phone/email) per section. Each one shows up on the public page once it has content. Use
-            the Placement dropdown per section to choose "In the intro area above" (shown inline near the
-            description, like Vision/Mission/Objectives) vs. "In the accordion below" (the default — everything
-            else, shown as a click-to-expand panel).
-          </p>
-          <div className="admin-field admin-field--full">
-            <CustomSectionEditor
-              sections={form.customSections || []}
-              onChange={(next) => set('customSections', next)}
-              rootSections={form.customSections || []}
-              parentPath={[]}
-              onFileUploaded={handleCustomSectionFileUploaded}
-              onFileRemoved={handleCustomSectionFileRemoved}
-              onPhotoUploaded={handleCustomSectionPhotoUploaded}
-              onPhotoRemoved={handleCustomSectionPhotoRemoved}
-              onGalleryPhotoUploaded={handleCustomSectionGalleryPhotoUploaded}
-              onGalleryPhotoRemoved={handleCustomSectionGalleryPhotoRemoved}
-              showPlacementToggle
-            />
-          </div>
+          {form.slug !== 'aicte-idea-lab' && (
+            <>
+              <BlockEditor
+                blockKey="description"
+                label="Description"
+                hint="Shown at the top of the detail page with no heading, only when not an external link."
+                value={form.description || emptyBlock('description')}
+                onChange={(next) => set('description', next)}
+                onPhotoUploaded={(r) => handleBlockPhotoUploaded('description', r)}
+                onPhotoRemoved={() => handleBlockPhotoRemoved('description')}
+              />
+              <div className="admin-field admin-field--full"><hr /></div>
+              <BlockEditor
+                blockKey="vision"
+                label="Vision"
+                value={form.vision || emptyBlock('vision')}
+                onChange={(next) => set('vision', next)}
+                onPhotoUploaded={(r) => handleBlockPhotoUploaded('vision', r)}
+                onPhotoRemoved={() => handleBlockPhotoRemoved('vision')}
+              />
+              <BlockEditor
+                blockKey="mission"
+                label="Mission"
+                value={form.mission || emptyBlock('mission')}
+                onChange={(next) => set('mission', next)}
+                onPhotoUploaded={(r) => handleBlockPhotoUploaded('mission', r)}
+                onPhotoRemoved={() => handleBlockPhotoRemoved('mission')}
+              />
+              <BlockEditor
+                blockKey="objectives"
+                label="Objectives"
+                value={form.objectives || emptyBlock('objectives')}
+                onChange={(next) => set('objectives', next)}
+                onPhotoUploaded={(r) => handleBlockPhotoUploaded('objectives', r)}
+                onPhotoRemoved={() => handleBlockPhotoRemoved('objectives')}
+              />
+              <div className="admin-field admin-field--full"><hr /><h3>Custom Sections</h3></div>
+              <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
+                Add any section this item needs beyond Description/Vision/Mission/Objectives above — Key Highlights,
+                Facilities, Outcomes, Partners, Contacts, or anything else — any name, any number of sub-sections, and
+                a choice of plain text, a checklist, a table, a list of links, uploaded files, or contacts
+                (role/name/phone/email) per section. Each one shows up on the public page once it has content. Use
+                the Placement dropdown per section to choose "In the intro area above" (shown inline near the
+                description, like Vision/Mission/Objectives) vs. "In the accordion below" (the default — everything
+                else, shown as a click-to-expand panel).
+              </p>
+              <div className="admin-field admin-field--full">
+                <CustomSectionEditor
+                  sections={form.customSections || []}
+                  onChange={(next) => set('customSections', next)}
+                  rootSections={form.customSections || []}
+                  parentPath={[]}
+                  onFileUploaded={handleCustomSectionFileUploaded}
+                  onFileRemoved={handleCustomSectionFileRemoved}
+                  onPhotoUploaded={handleCustomSectionPhotoUploaded}
+                  onPhotoRemoved={handleCustomSectionPhotoRemoved}
+                  onGalleryPhotoUploaded={handleCustomSectionGalleryPhotoUploaded}
+                  onGalleryPhotoRemoved={handleCustomSectionGalleryPhotoRemoved}
+                  showPlacementToggle
+                />
+              </div>
+            </>
+          )}
 
           {TABS_SLUGS.has(form.slug) && (
             <>

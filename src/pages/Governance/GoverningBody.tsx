@@ -1,14 +1,6 @@
 import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { useOrderedCollection } from '../../hooks/useCollection';
-import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import PageHero from '../../components/PageHero/PageHero';
-import type { GovernanceItemDoc } from '../Admin/sections/GovernanceItemsAdmin';
-import { renderBold } from '../../lib/boldText';
 import './GoverningBody.css';
-
-const DEFAULT_OVERVIEW = "The Governing Body of Shri Vishnu Engineering College for Women serves as the apex decision-making authority responsible for guiding the institution's vision, strategic planning, academic excellence, and overall development. Comprising representatives from the management, distinguished academicians, industry experts, university nominees, government officials, faculty members, and the Principal, the Governing Body ensures transparent governance, quality education, innovation, and continuous institutional growth while upholding the values and mission of the college.";
 
 export interface GoverningBodyMember {
   id: string;
@@ -34,53 +26,71 @@ export const defaultMembers: Omit<GoverningBodyMember, 'id'>[] = [
   { name: 'Dr. G. Srinivasa Rao', position: "Principal, Vishnu Women's University", category: 'Principal (Ex-Officio)', order: 12 },
 ];
 
-function getInitials(name: string) {
-  const cleaned = name.replace(/\b(Dr|Sri|Prof|Mr|Mrs|Ms)\.?\s*/gi, '');
-  const parts = cleaned.trim().split(/\s+/).filter(Boolean);
-  if (parts.length === 0) return '';
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-}
+// Statutory composition of the Governing Body (static — from the official GB table).
+const GB_TABLE: { category: string; rows: { nature: string; name?: string; org?: string }[] }[] = [
+  {
+    category: 'Category (A): Ex-Officio Members',
+    rows: [
+      { nature: 'Chancellor of the University', name: 'Sri K.V. Vishnu Raju' },
+      { nature: 'Vice-Chancellor of the University', name: 'Dr. K V N Sunitha' },
+      { nature: 'Chairman, APSCHE', name: 'Prof. S. Vijaya Bhaskara Rao' },
+      { nature: 'Secretary, Govt. of AP, HE Department' },
+      { nature: 'Registrar of the University', name: 'Dr. P Srinivasa Raju' },
+    ],
+  },
+  {
+    category: 'Category (B): Nominated Members',
+    rows: [
+      { nature: 'An eminent academician from the field of science/engineering & Technology/social sciences/Law/Management', name: 'Dr. Seema Varma', org: 'NITTR Bhopal' },
+      { nature: 'The director of National Laboratory or his/her nominee not below the rank of Scientist G', name: 'Dr Uma', org: 'ISRO Scientist G' },
+      { nature: 'Nominee of CII' },
+      { nature: 'A reputed Chartered Accountant' },
+      { nature: 'A Member from public life who has contributed significantly to societal/national development' },
+      { nature: 'A Member of the sponsoring body', name: 'Shri Ravi Chandran Rajagopal', org: 'Vice Chairman, SVES' },
+      { nature: 'Nominee by the sponsoring Body', name: 'Mr K Aditya Vissam', org: 'Secretary, SVES' },
+      { nature: 'Nominee by the Sponsoring Body', name: 'Dr G Srinivasa Rao', org: 'Pro Vice-Chancellor, VWU' },
+    ],
+  },
+];
 
-function MembersTiles() {
-  const { docs, loading } = useOrderedCollection<GoverningBodyMember>('governingBody', 'order');
-  const members = !loading && docs.length > 0 ? docs : defaultMembers;
-
+function GoverningBodyTable() {
+  let n = 0;
   return (
-    <div className="gb-tiles">
-      {members.map((member, i) => (
-        <motion.div
-          className="gb-tile"
-          key={member.name}
-          initial={{ opacity: 0, y: 28, scale: 0.95 }}
-          whileInView={{ opacity: 1, y: 0, scale: 1 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.5, delay: (i % 12) * 0.06, ease: 'easeOut' }}
-          whileHover={{ y: -8, transition: { duration: 0.25 } }}
-        >
-          {member.photoUrl ? (
-            <SmoothImage src={member.photoUrl} alt={member.name} className="gb-tile__photo" />
-          ) : (
-            <div className="gb-tile__avatar">{getInitials(member.name)}</div>
+    <div className="gb-table-wrap">
+      <table className="gb-table">
+        <thead>
+          <tr>
+            <th scope="col">Number</th>
+            <th scope="col">Category</th>
+            <th scope="col">Nature</th>
+            <th scope="col">Name of the Member</th>
+          </tr>
+        </thead>
+        <tbody>
+          {GB_TABLE.map((group) =>
+            group.rows.map((row, i) => (
+              <tr key={`${group.category}-${i}`} className={i === 0 ? 'gb-table__group-start' : undefined}>
+                <td>Member {++n}</td>
+                {i === 0 && (
+                  <th scope="rowgroup" rowSpan={group.rows.length} className="gb-table__category">
+                    {group.category}
+                  </th>
+                )}
+                <td>{row.nature}</td>
+                <td className="gb-table__name">
+                  {row.name ? <strong>{row.name}</strong> : <span className="gb-table__empty">—</span>}
+                  {row.org && <span className="gb-table__org">{row.org}</span>}
+                </td>
+              </tr>
+            ))
           )}
-          <h3 className="gb-tile__name">{member.name}</h3>
-          <p className="gb-tile__position">{member.position}</p>
-          <span className="gb-tile__category">{member.category}</span>
-        </motion.div>
-      ))}
+        </tbody>
+      </table>
     </div>
   );
 }
 
 export default function GoverningBody() {
-  // The "Governing Body" entry in the Governance/Committees/IQAC admin
-  // (slug "governing-body") only ever powers this Overview text — its
-  // Members Table field is unused, since the real member list below comes
-  // from the separate `governingBody` collection/admin (with photos).
-  const { docs: govItems } = useOrderedCollection<GovernanceItemDoc>('governanceItems', 'order');
-  const overviewItem = govItems.find((i) => i.slug === 'governing-body');
-  const overviewText = [overviewItem?.intro, overviewItem?.about].filter(Boolean).join(' ') || DEFAULT_OVERVIEW;
-
   useEffect(() => {
     document.title = "Governing Body | Vishnu Women's University";
     const observer = new IntersectionObserver(
@@ -109,53 +119,13 @@ export default function GoverningBody() {
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Governance', to: '/governance' }, { label: 'Governing Body' }]}
       />
 
-      {/* Overview */}
-      <section className="section gb-overview">
+      {/* Composition table */}
+      <section className="section gb-composition">
         <div className="container">
-          <div className="gb-overview__grid reveal">
-            <div className="gb-overview__inner">
-              <h2 className="gb-overview__title">Institutional Overview</h2>
-              <p>{renderBold(overviewText)}</p>
-              {overviewItem?.highlights && overviewItem.highlights.length > 0 && (
-                <ul style={{ marginTop: 'var(--space-4)', paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-                  {overviewItem.highlights.map((h) => (
-                    <li key={h} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6 }}>{renderBold(h)}</li>
-                  ))}
-                </ul>
-              )}
-            </div>
-            <div className="gb-overview__photo-frame">
-              <SmoothImage src="/images/governing-body-founder.jpg" alt="Founder, Vishnu Women's University" className="gb-overview__photo" />
-            </div>
+          <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-8)' }}>
+            <h2 className="gb-overview__title">Governing Body at VWU</h2>
           </div>
-        </div>
-      </section>
-
-      {/* Members */}
-      <section className="section gb-members">
-        <div className="container">
-          <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>
-            <h2 className="gb-overview__title">Governing Body Members</h2>
-            <p className="gb-members__subtitle">
-              Meet the distinguished leaders steering VWU's strategic vision and institutional governance.
-            </p>
-          </div>
-          <MembersTiles />
-        </div>
-      </section>
-
-      {/* Bottom CTA Banner */}
-      <section className="about-cta-banner">
-        <div className="container">
-          <div className="about-cta-inner">
-            <h2>Explore Institutional Governance</h2>
-            <p>Discover our statutory committees, academic councils, and quality assurance frameworks.</p>
-            <div className="about-cta-buttons">
-              <Link to="/governance" className="btn btn-accent">All Governance</Link>
-              <Link to="/vision-mission" className="btn btn-secondary">Vision & Mission</Link>
-              <Link to="/about" className="btn btn-secondary">About VWU</Link>
-            </div>
-          </div>
+          <GoverningBodyTable />
         </div>
       </section>
     </main>

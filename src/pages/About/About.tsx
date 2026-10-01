@@ -7,6 +7,9 @@ import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import { useHashScroll } from '../../hooks/useHashScroll';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
+import { useDocument } from '../../hooks/useDocument';
+import CustomSectionsRenderer from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
+import { ABOUT_DIFFERENTIATORS_CUSTOM_COLLECTION, ABOUT_DIFFERENTIATORS_CUSTOM_DOC_ID, type AboutDifferentiatorsCustomDoc } from '../Admin/sections/AboutDifferentiatorsCustomAdmin';
 import { useSitePhotos, useSectionHasPhotos } from '../../hooks/useSitePhotos';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import {
@@ -154,6 +157,10 @@ export default function About() {
   const academicSnapshotStats = useContentBlocks('about', 'academicSnapshotStats');
   const diffItems = useContentBlocks('about', 'differentiators');
   const discoverCards = useContentBlocks('about', 'discoverCards');
+  // Optional admin-added extra content for the Differentiators section below
+  // (see AboutDifferentiatorsCustomAdmin) — empty by default, so this adds
+  // nothing to the page until an admin adds a Custom Section.
+  const { data: diffCustomDoc } = useDocument<AboutDifferentiatorsCustomDoc>(ABOUT_DIFFERENTIATORS_CUSTOM_COLLECTION, ABOUT_DIFFERENTIATORS_CUSTOM_DOC_ID);
 
   const differentiators = useMemo(() => {
     const groups: { cat: string; icon: string; items: { id: string; title: string }[] }[] = [];
@@ -468,6 +475,10 @@ export default function About() {
           </div>
         </div>
       </section>
+
+      {/* Admin-added extra content for Differentiators, if any — see
+          AboutDifferentiatorsCustomAdmin. Renders nothing when empty. */}
+      <CustomSectionsRenderer sections={diffCustomDoc?.sections || []} />
 
       {/* Campus Photos */}
       <section className="section bg-white">

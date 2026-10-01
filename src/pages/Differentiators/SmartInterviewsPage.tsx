@@ -1,9 +1,13 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Users, ArrowRight, Award } from 'lucide-react';
+import { CustomSectionsIntro, CustomSectionsGalleries, CustomSectionsAccordion } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
+import { hasCustomSectionContent } from '../../lib/customSections';
 import type { DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
 import type { CustomSection } from '../../lib/customSections';
 import { smartInterviews } from './smartInterviews.data';
+import { useDocument } from '../../hooks/useDocument';
+import type { SmartInterviewsDoc } from '../Admin/sections/SmartInterviewsContentAdmin';
 import { renderBold } from '../../lib/boldText';
 import './smart-interviews.css';
 
@@ -14,10 +18,12 @@ interface SmartInterviewsPageProps {
 
 export default function SmartInterviewsPage({
   item,
-  customSections: _customSections,
+  customSections = [],
 }: SmartInterviewsPageProps) {
   // Navigation grid click state for details panel
   const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
+  const { data: remoteData } = useDocument<SmartInterviewsDoc>('settings', 'smartInterviews');
+  const siData = { ...smartInterviews, ...(remoteData || {}) };
 
   const toggleSection = (id: string) => {
     setActiveSectionId((prev) => (prev === id ? null : id));
@@ -28,12 +34,18 @@ export default function SmartInterviewsPage({
     ? (item.title.includes('–') || item.title.includes('-') ? item.title : `${item.title} – C&DS Programme`)
     : 'Smart Interviews – C&DS Programme';
 
+  const dynamicSubtitle = item?.summary || item?.desc || 'Intensive Data Structures and Algorithms training empowering students with advanced problem-solving skills to secure high-value tech placements at top global product companies.';
+
+  const dynamicAbout = (item?.description && hasCustomSectionContent(item.description) && item.description.textContent)
+    ? item.description.textContent
+    : item?.desc || 'The curriculum spans three phases across three semesters: Phase 1 covers programming fundamentals and complexity analysis; Phase 2 addresses sorting, hashing, and string operations; Phase 3 focuses on advanced data structures including trees, dynamic programming, and graph theory. Up to 400 students are selected annually via HackerRank coding contests, and students are mentored by previously placed graduates.';
+
   return (
     <div className="si-page">
       {/* TOP HERO BANNER */}
       <section className="si-top-hero-banner">
         {heroImg && (
-          <img src={heroImg} alt={item?.title || 'Smart Interviews'} className="si-top-hero-bg" loading="eager" />
+          <img src={heroImg} alt={pageTitle} className="si-top-hero-bg" loading="eager" />
         )}
         <div className="si-top-hero-overlay" />
         <div className="si-top-hero-container">
@@ -43,7 +55,7 @@ export default function SmartInterviewsPage({
           </div>
           <h1 className="si-top-hero-title">{pageTitle}</h1>
           <p className="si-top-hero-desc">
-            Intensive Data Structures and Algorithms training empowering students with advanced problem-solving skills to secure high-value tech placements at top global product companies.
+            {renderBold(dynamicSubtitle)}
           </p>
         </div>
       </section>
@@ -60,7 +72,7 @@ export default function SmartInterviewsPage({
                 <span className="si-hero-title-blue">Interviews</span>
               </h1>
               <p className="si-hero-desc">
-                The curriculum spans three phases across three semesters: Phase 1 covers programming fundamentals and complexity analysis; Phase 2 addresses sorting, hashing, and string operations; Phase 3 focuses on advanced data structures including trees, dynamic programming, and graph theory. Up to 400 students are selected annually via HackerRank coding contests, and students are mentored by previously placed graduates.
+                {renderBold(dynamicAbout)}
               </p>
               <div className="si-hero-keywords">
                 PRACTICE &nbsp;/&nbsp; PROBLEM SOLVE &nbsp;/&nbsp; GET PLACED
@@ -137,38 +149,17 @@ export default function SmartInterviewsPage({
         <div className="si-phases-timeline">
           <div className="si-phases-line" />
 
-          {/* Phase 1 */}
-          <div className="si-phase-card-item">
-            <div className="si-phase-badge-box active">01</div>
-            <div>
-              <h3 className="si-phase-name">Phase-1</h3>
-              <p className="si-phase-content-text">
-                Basics of Programming, Data types & operators, Complexity Analysis, Bit-Manipulation & Applications, Recursion / Backtracking.
-              </p>
+          {siData.phases.map((phase, idx) => (
+            <div key={idx} className="si-phase-card-item">
+              <div className={`si-phase-badge-box ${idx === 0 ? 'active' : 'inactive'}`}>0{idx + 1}</div>
+              <div>
+                <h3 className="si-phase-name">{phase.label}</h3>
+                <p className="si-phase-content-text">
+                  {renderBold(phase.content)}
+                </p>
+              </div>
             </div>
-          </div>
-
-          {/* Phase 2 */}
-          <div className="si-phase-card-item">
-            <div className="si-phase-badge-box inactive">02</div>
-            <div>
-              <h3 className="si-phase-name">Phase-2</h3>
-              <p className="si-phase-content-text">
-                Sorting / Searching Techniques & Applications, Hashing Implementation & Libraries, Subarrays & Subsequences, Strings & Rolling Hash, Mixed-bag Concepts.
-              </p>
-            </div>
-          </div>
-
-          {/* Phase 3 */}
-          <div className="si-phase-card-item">
-            <div className="si-phase-badge-box inactive">03</div>
-            <div>
-              <h3 className="si-phase-name">Phase-3</h3>
-              <p className="si-phase-content-text">
-                Stacks & Queues, Linked Lists, LRU Cache, Trees / Binary Tries / Binary Search Trees, Priority Queues, Trie DS & Applications, Dynamic Programming, Graph Theory.
-              </p>
-            </div>
-          </div>
+          ))}
         </div>
       </section>
 
@@ -192,8 +183,8 @@ export default function SmartInterviewsPage({
               </div>
               {activeSectionId === '02' && (
                 <div className="si-accordion-detail-card">
-                  {smartInterviews.moreParagraphs.map((p, i) => (
-                    <p key={i} style={{ margin: i === smartInterviews.moreParagraphs.length - 1 ? 0 : '0 0 0.9rem' }}>{renderBold(p)}</p>
+                  {siData.moreParagraphs.map((p, i) => (
+                    <p key={i} style={{ margin: i === siData.moreParagraphs.length - 1 ? 0 : '0 0 0.9rem' }}>{renderBold(p)}</p>
                   ))}
                 </div>
               )}
@@ -206,7 +197,7 @@ export default function SmartInterviewsPage({
                 <div className="si-nav-item-left">
                   <span className="si-nav-item-num">03</span>
                   <span className="si-nav-item-title">
-                    Training (3-Phases) Completed & Placed students Batch wise with high packages.
+                    {siData.batchesHeading || 'Training (3-Phases) Completed & Placed students Batch wise with high packages.'}
                   </span>
                 </div>
                 <ArrowRight size={16} className="si-nav-item-arrow" />
@@ -215,7 +206,7 @@ export default function SmartInterviewsPage({
                 <div className="si-accordion-detail-card">
                   <p style={{ margin: 0, fontWeight: 600 }}>Placements Batch Wise (10 LPA – 50 LPA):</p>
                   <div className="si-batch-grid">
-                    {smartInterviews.batches.map((b, i) => (
+                    {siData.batches.map((b, i) => (
                       <div key={i} className="si-batch-item">
                         <div className="si-batch-year">{b.years}</div>
                         <div className="si-batch-count">{b.count} Placed</div>
@@ -329,6 +320,23 @@ export default function SmartInterviewsPage({
           </div>
         </div>
       </section>
+
+      {/* DYNAMIC CUSTOM SECTIONS */}
+      {customSections.some((s) => s.placement === 'intro') && (
+        <section className="section bg-white" style={{ padding: '2rem 0' }}>
+          <div className="container">
+            <CustomSectionsIntro sections={customSections} />
+          </div>
+        </section>
+      )}
+      {customSections.length > 0 && (
+        <section className="section bg-white" style={{ padding: '2rem 0' }}>
+          <div className="container">
+            <CustomSectionsGalleries sections={customSections} />
+            <CustomSectionsAccordion sections={customSections.filter((s) => s.placement !== 'intro' && s.contentType !== 'gallery')} />
+          </div>
+        </section>
+      )}
 
       {/* SECTION 5: DARK CTA BANNER */}
       <section className="si-cta-section">
