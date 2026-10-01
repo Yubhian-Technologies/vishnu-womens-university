@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Save, RotateCcw, Plus, Trash2, CheckCircle, Sparkles, Users, School, Layers, BookOpen, Award } from 'lucide-react';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc } from 'firebase/firestore';
+import { setDoc } from '../../../lib/auditLog';
 import { db } from '../../../lib/firebase';
 import { useDocument } from '../../../hooks/useDocument';
 import { institutionInnovationCell } from '../../Differentiators/institutionInnovationCell.data';
