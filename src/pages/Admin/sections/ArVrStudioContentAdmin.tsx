@@ -616,6 +616,16 @@ export default function ArVrStudioContentAdmin() {
                       className="admin-input"
                     />
                   </div>
+                  <div className="admin-field" style={{ gridColumn: '1 / -1' }}>
+                    <label>Location / Address</label>
+                    <input
+                      type="text"
+                      value={(data.contact?.address || []).join(', ')}
+                      onChange={(e) => setData({ ...data, contact: { ...data.contact, address: e.target.value ? [e.target.value] : [] } })}
+                      className="admin-input"
+                      placeholder="e.g. Shri Vishnu Engineering College for Women, Vishnupur, Bhimavaram, Andhra Pradesh, India"
+                    />
+                  </div>
                 </div>
               </div>
             </div>

@@ -184,7 +184,7 @@ export default function VsacPage({ item, sections }: VsacPageProps) {
                 <div className="vsac-orbit-title">
                   <Compass size={16} style={{ color: '#00E5FF' }} /> {vsac.visionTitle}
                 </div>
-                <p className="vsac-orbit-item" style={{ fontStyle: 'italic', fontWeight: 500, lineHeight: 1.6, color: '#E2E8F0' }}>
+                <p className="vsac-orbit-item" style={{ fontStyle: 'italic', fontWeight: 500, lineHeight: 1.6, color: '#334155' }}>
                   &ldquo;{renderBold(visionText)}&rdquo;
                 </p>
 
