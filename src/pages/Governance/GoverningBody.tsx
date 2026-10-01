@@ -41,7 +41,7 @@ const GB_TABLE: { category: string; rows: { nature: string; name?: string; org?:
   {
     category: 'Category (B): Nominated Members',
     rows: [
-      { nature: 'An eminent academician from the field of science/engineering & Technology/social sciences/Law/Management', name: 'Dr. Seema Varma', org: 'NITTR Bhopal' },
+      { nature: 'An eminent academician from the field of science/engineering & Technology/social sciences/Law/Management', name: 'Dr. Seema Varma', org: 'NITTTR, Bhopal' },
       { nature: 'The director of National Laboratory or his/her nominee not below the rank of Scientist G', name: 'Dr Uma', org: 'ISRO Scientist G' },
       { nature: 'Nominee of CII' },
       { nature: 'A reputed Chartered Accountant' },
