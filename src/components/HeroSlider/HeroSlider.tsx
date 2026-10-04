@@ -1,116 +1,86 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { usePageBanners } from '../../hooks/usePageBanners';
-import { useContentBlocks } from '../../hooks/useContentBlocks';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { Link } from 'react-router-dom';
+import { useOrderedCollection } from '../../hooks/useCollection';
 import { HOME_HERO_VIDEO_SRC, HOME_HERO_POSTER_SRC } from '../../lib/heroVideo';
+import {
+  HOME_HERO_BANNERS_COLLECTION,
+  MAX_HOME_HERO_BANNERS,
+  type HomeHeroBannerDoc,
+} from '../../lib/heroBanners';
 import './HeroSlider.css';
 
 // HOME_HERO_VIDEO_SRC lives in src/lib/heroVideo.ts (the Campus Visit page's
-// virtual tour uses its own HERO_VIDEO_SRC there). The fetch is still deferred (see
-// the effect below) so it doesn't compete with the JS bundle on load.
-
-
-interface Slide {
-  id: number | string;
-  tag: string;
-  heading: string;
-  description?: string;
-  primaryCta: { label: string; path: string };
-  secondaryCta?: { label: string; path: string };
-  image?: string;
-}
-
-// The B.Tech program count in this heading is admin-editable, but not as
-// its own field — it reuses the "Departments" stat from About → Quick Stats
-// (page="about", section="quickStats"), since that's the number the admin
-// already maintains by hand for exactly this purpose. Falls back to the
-// last-known steady-state number if that stat is ever missing/renamed.
-const FALLBACK_BTECH_COUNT = '10';
-
-function buildStaticSlides(btechCount: string): Slide[] {
-  return [
-    {
-      id: 1,
-      tag: 'Welcome to VWU',
-      heading: 'Leading by Design.\nBeyond Every Expectation.\nRewriting Who Builds the World.',
-      primaryCta: { label: 'Schedule a Visit', path: '/contact' },
-      secondaryCta: { label: 'Apply Now', path: '/apply-now' },
-    },
-    {
-      id: 2,
-      tag: 'Academics',
-      heading: `${btechCount} B.Tech Programs\nBuilt for Your\nSuccess`,
-      description: 'From Computer Science to Civil Engineering — VWU offers undergraduate, postgraduate, and doctoral programs rooted in applied, industry-aligned learning.',
-      primaryCta: { label: 'Explore Programs', path: '/academics' },
-      secondaryCta: { label: 'Request Info', path: '/contact' },
-    },
-    {
-      id: 3,
-      tag: 'Campus Life',
-      heading: 'Learn, Grow\nand Excel',
-      description: "VWU is more than a degree — it is a community where you build real skills, lasting connections, and the confidence to lead in your chosen field.",
-      // Not currently rendered anywhere (see the "title/description card
-      // has been removed" note above) — path kept pointing at a real page
-      // regardless, so it can't silently 404 if that ever changes.
-      primaryCta: { label: 'Campus Life', path: '/campus/clubs' },
-      secondaryCta: { label: 'Apply Now', path: '/apply-now' },
-    },
-    {
-      id: 4,
-      tag: 'Outstanding Placements',
-      heading: '59.28 LPA\nHighest\nPlacement Package',
-      description: 'VWU recorded 1,100+ placements in 2025–26, with a highest offer of 59.28 LPA — graduates are now driving impact at companies across India and beyond.',
-      primaryCta: { label: 'Placement Records', path: '/placements' },
-      secondaryCta: { label: 'Our Story', path: '/about' },
-    },
-    {
-      id: 5,
-      tag: 'A Historic First',
-      heading: "The First Private\nWomen's University\nin the Telugu States",
-      description: 'Vishnu Women\'s University is the first private university exclusively for women across the Telugu states — built to give women a dedicated space to lead in engineering, technology, and research.',
-      primaryCta: { label: 'Explore VWU', path: '/about' },
-      secondaryCta: { label: 'Apply Now', path: '/apply-now' },
-    },
-  ];
-}
+// virtual tour uses its own HERO_VIDEO_SRC there).
+//
+// Flow: up to 3 admin-configured full-screen banners (each with a text
+// overlay in one of four corners) auto-advance once, then give way to the
+// hero video, which stays — the carousel never repeats. With no active
+// banners configured, the visitor goes straight to the hero video.
 
 const SLIDE_DURATION = 6000;
 
+type Phase = 'banners' | 'video';
+
 export default function HeroSlider() {
+  const { docs: bannerDocs, loading } = useOrderedCollection<HomeHeroBannerDoc>(
+    HOME_HERO_BANNERS_COLLECTION,
+    'order',
+  );
+  const banners = useMemo(
+    () =>
+      bannerDocs
+        .filter((b) => b.active !== false && b.imageUrl)
+        .slice(0, MAX_HOME_HERO_BANNERS),
+    [bannerDocs],
+  );
+
   const [current, setCurrent] = useState(0);
-  const [progressWidth, setProgressWidth] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(false);
+  // Once the carousel hands over to the video it never comes back.
+  const [videoReached, setVideoReached] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
-  // Only slides a visitor has actually reached get their photo downloaded —
-  // admin-uploaded banner slides append photos after the 4 static marketing
-  // slides, so without this every one of them would load on first paint
-  // even though the carousel only shows one at a time.
-  const [visited, setVisited] = useState<Set<number>>(new Set([0]));
   const videoRef = useRef<HTMLVideoElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
 
-  // The video element renders immediately now since Cloudinary handles
-  // fast CDN delivery and auto-optimization. We rely on the poster image
-  // for instant visual feedback.
+  const phase: Phase = videoReached || (!loading && banners.length === 0) ? 'video' : 'banners';
+  // While the banner list is still loading, hold the hero on its plain
+  // background so the video doesn't flash and then get replaced by a banner.
+  const ready = !loading;
+  const showVideo = ready && phase === 'video';
+  const bannerIndex = Math.min(current, Math.max(banners.length - 1, 0));
+
+  const goToVideo = useCallback(() => {
+    setVideoReached(true);
+    if (videoRef.current) videoRef.current.currentTime = 0;
+  }, []);
+
+  const next = useCallback(() => {
+    if (bannerIndex >= banners.length - 1) goToVideo();
+    else setCurrent(bannerIndex + 1);
+  }, [bannerIndex, banners.length, goToVideo]);
+
+  const prev = useCallback(() => {
+    setCurrent((c) => Math.max(0, c - 1));
+  }, []);
+
+  // Auto-advance: each banner shows once, then the video takes over.
+  useEffect(() => {
+    if (phase !== 'banners' || !ready || banners.length === 0) return;
+    const timer = setTimeout(next, SLIDE_DURATION);
+    return () => clearTimeout(timer);
+  }, [phase, ready, banners.length, bannerIndex, next]);
 
   // Force strict muted/autoplay state to bypass iOS Safari restrictive policies
   // that sometimes cause a giant play button to appear on top of background videos.
   useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.defaultMuted = true;
-      videoRef.current.muted = true;
-      const playPromise = videoRef.current.play();
-      if (playPromise !== undefined) {
-        playPromise.catch(() => {
-          // Autoplay prevented; fallback background continues to show silently
-        });
-      }
-    }
+    const video = videoRef.current;
+    if (!video) return;
+    video.defaultMuted = true;
+    video.muted = true;
   }, []);
 
-  // Pause the video (and its bandwidth/decode cost) once the hero scrolls
-  // out of view OR the tab is backgrounded, resume only when both the hero
-  // is on-screen and the tab is active — avoids paying to keep a looping
-  // video decoding/streaming while the visitor is elsewhere on the page or tab.
+  // Play the video only while it's the visible layer, the hero is on-screen
+  // and the tab is active — avoids paying to keep a looping video
+  // decoding/streaming behind banners or while the visitor is elsewhere.
   useEffect(() => {
     const section = sectionRef.current;
     const video = videoRef.current;
@@ -118,8 +88,10 @@ export default function HeroSlider() {
 
     let isIntersecting = false;
     const sync = () => {
-      if (isIntersecting && document.visibilityState === 'visible') {
-        video.play().catch(() => {});
+      if (showVideo && isIntersecting && document.visibilityState === 'visible') {
+        video.play().catch(() => {
+          // Autoplay prevented; the poster keeps showing silently
+        });
       } else {
         video.pause();
       }
@@ -134,149 +106,112 @@ export default function HeroSlider() {
     );
     observer.observe(section);
     document.addEventListener('visibilitychange', sync);
+    sync();
     return () => {
       observer.disconnect();
       document.removeEventListener('visibilitychange', sync);
     };
-  }, []);
-
-  // Admin-uploaded Hero Banners (page="home") are appended after the fixed
-  // marketing slides — the video keeps playing behind all of them, these
-  // just add their photo alongside the slide's own text/CTA.
-  const { slides: bannerSlides } = usePageBanners('home');
-  const aboutQuickStats = useContentBlocks('about', 'quickStats');
-  const departmentsStat = aboutQuickStats.find((s) => s.title === 'Departments');
-  const btechCount = departmentsStat?.value || FALLBACK_BTECH_COUNT;
-  const slides: Slide[] = [
-    ...buildStaticSlides(btechCount),
-    ...bannerSlides.map((b) => ({
-      id: b.id,
-      tag: 'Announcement',
-      heading: b.title,
-      description: b.subtitle,
-      primaryCta: { label: b.ctaLabel || 'Learn More', path: b.ctaLink || '/admissions' },
-      image: b.imageUrl,
-    })),
-  ];
-
-  const goTo = useCallback((index: number) => {
-    if (isAnimating) return;
-    setIsAnimating(true);
-    setCurrent(index);
-    setProgressWidth(0);
-    setTimeout(() => setIsAnimating(false), 1000);
-  }, [isAnimating]);
-
-  const next = useCallback(() => {
-    goTo((current + 1) % slides.length);
-  }, [current, goTo, slides.length]);
-
-  const prev = useCallback(() => {
-    goTo((current - 1 + slides.length) % slides.length);
-  }, [current, goTo, slides.length]);
-
-  useEffect(() => {
-    setProgressWidth(0);
-    const timer = setTimeout(() => setProgressWidth(100), 50);
-    return () => clearTimeout(timer);
-  }, [current]);
-
-  useEffect(() => {
-    setVisited((prev) => (prev.has(current) ? prev : new Set(prev).add(current)));
-  }, [current]);
-
-  useEffect(() => {
-    const interval = setInterval(next, SLIDE_DURATION);
-    return () => clearInterval(interval);
-  }, [next]);
+  }, [showVideo]);
 
   const toggleMute = () => {
     if (videoRef.current) {
       videoRef.current.muted = !isMuted;
-      setIsMuted(m => !m);
+      setIsMuted((m) => !m);
     }
   };
+
+  const inBanners = ready && phase === 'banners' && banners.length > 0;
 
   return (
     <section className="hero-slider" ref={sectionRef} aria-label="Featured content">
       <h1 className="sr-only">Vishnu Women&apos;s University — Leading by Design</h1>
 
-      {/* Background video — rendered immediately with a highly-optimized poster image */}
+      {/* Hero video — the final, permanent layer once the banners (if any) have played */}
       <video
         ref={videoRef}
-        className="hero-video"
+        className={`hero-video${showVideo ? ' hero-video--visible' : ''}`}
         src={HOME_HERO_VIDEO_SRC}
         poster={HOME_HERO_POSTER_SRC}
         preload="auto"
-        autoPlay
         muted
         loop
         playsInline
         aria-hidden="true"
       />
 
-      {/* Slide layer — carries only the optional admin-uploaded Hero Banner
-          photo now; the title/description card has been removed. */}
-      {slides.some(s => s.image) && slides.map((slide, i) => (
+      {/* Full-screen banner carousel with corner-positioned text overlay */}
+      {inBanners && banners.map((b, i) => (
         <div
-          key={slide.id}
-          className={`slide${i === current ? ' active' : ''}`}
-          aria-hidden={i !== current}
+          key={b.id}
+          className={`hero-banner${i === bannerIndex ? ' hero-banner--active' : ''}`}
+          aria-hidden={i !== bannerIndex}
         >
-          <div className="slide-content">
-            <div className={`slide-inner${slide.image ? ' slide-inner--with-image' : ''}`}>
-              {slide.image && (
-                <div className="slide-photo-wrap">
-                  {visited.has(i) && <img loading="lazy" src={slide.image} alt={slide.heading} className="slide-photo" />}
-                </div>
+          <img
+            className="hero-banner__img"
+            src={b.imageUrl}
+            alt={b.text || 'VWU banner'}
+            loading={i === 0 ? 'eager' : 'lazy'}
+            decoding="async"
+          />
+          <div className={`hero-banner__scrim hero-banner__scrim--${b.position || 'bottom-left'}`} />
+          {(b.text || b.subtext) && (
+            <div className={`hero-banner__text hero-banner__text--${b.position || 'bottom-left'}`}>
+              {b.text && <h2 className="hero-banner__title">{b.text}</h2>}
+              {b.subtext && <p className="hero-banner__subtext">{b.subtext}</p>}
+              {b.ctaLabel && b.ctaLink && (
+                /^https?:/.test(b.ctaLink)
+                  ? <a className="hero-banner__cta" href={b.ctaLink} target="_blank" rel="noreferrer" tabIndex={i === bannerIndex ? 0 : -1}>{b.ctaLabel}</a>
+                  : <Link className="hero-banner__cta" to={b.ctaLink} tabIndex={i === bannerIndex ? 0 : -1}>{b.ctaLabel}</Link>
               )}
             </div>
-          </div>
+          )}
         </div>
       ))}
 
-      {/* Mute / Unmute */}
-      <button
-        className="hero-mute-btn"
-        onClick={toggleMute}
-        aria-label={isMuted ? 'Unmute video' : 'Mute video'}
-        title={isMuted ? 'Unmute' : 'Mute'}
-      >
-        {isMuted ? (
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <path d="M11 5L6 9H2v6h4l5 4V5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <line x1="23" y1="9" x2="17" y2="15" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-            <line x1="17" y1="9" x2="23" y2="15" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-          </svg>
-        ) : (
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <path d="M11 5L6 9H2v6h4l5 4V5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-          </svg>
-        )}
-      </button>
+      {/* Mute / Unmute — only meaningful once the video is showing */}
+      {showVideo && (
+        <button
+          className="hero-mute-btn"
+          onClick={toggleMute}
+          aria-label={isMuted ? 'Unmute video' : 'Mute video'}
+          title={isMuted ? 'Unmute' : 'Mute'}
+        >
+          {isMuted ? (
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M11 5L6 9H2v6h4l5 4V5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <line x1="23" y1="9" x2="17" y2="15" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              <line x1="17" y1="9" x2="23" y2="15" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+          ) : (
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M11 5L6 9H2v6h4l5 4V5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+          )}
+        </button>
+      )}
 
       {/* Controls */}
-      {slides.some(s => s.image) && slides.length > 1 && (
+      {inBanners && (
         <div className="hero-controls">
-          <button className="hero-nav-btn" onClick={prev} aria-label="Previous slide">
+          <button className="hero-nav-btn" onClick={prev} disabled={bannerIndex === 0} aria-label="Previous banner">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
               <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </button>
-          <div className="hero-dots" role="tablist" aria-label="Slide navigation">
-            {slides.map((_, i) => (
+          <div className="hero-dots" role="tablist" aria-label="Banner navigation">
+            {banners.map((b, i) => (
               <button
-                key={i}
-                className={`hero-dot${i === current ? ' active' : ''}`}
-                onClick={() => goTo(i)}
+                key={b.id}
+                className={`hero-dot${i === bannerIndex ? ' active' : ''}`}
+                onClick={() => setCurrent(i)}
                 role="tab"
-                aria-selected={i === current}
-                aria-label={`Go to slide ${i + 1}`}
+                aria-selected={i === bannerIndex}
+                aria-label={`Go to banner ${i + 1}`}
               />
             ))}
           </div>
-          <button className="hero-nav-btn" onClick={next} aria-label="Next slide">
+          <button className="hero-nav-btn" onClick={next} aria-label={bannerIndex >= banners.length - 1 ? 'Continue to video' : 'Next banner'}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
               <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
@@ -284,18 +219,16 @@ export default function HeroSlider() {
         </div>
       )}
 
-      {/* Progress Bar */}
-      {slides.some(s => s.image) && slides.length > 1 && (
+      {/* Progress bar — restarts for each banner */}
+      {inBanners && (
         <div className="hero-progress" aria-hidden="true">
           <div
-            className="hero-progress-fill"
-            style={{ width: `${progressWidth}%` }}
+            key={bannerIndex}
+            className="hero-progress-fill hero-progress-fill--run"
+            style={{ animationDuration: `${SLIDE_DURATION}ms` }}
           />
         </div>
       )}
-
-
-
     </section>
   );
 }

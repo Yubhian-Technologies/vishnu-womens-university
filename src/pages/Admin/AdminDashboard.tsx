@@ -3,6 +3,7 @@ import { SECTIONS } from './AdminLayout';
 import Overview from './sections/Overview';
 import ThemeAdmin from './sections/ThemeAdmin';
 import FeaturePopupAdmin from './sections/FeaturePopupAdmin';
+import HomeHeroBannersAdmin from './sections/HomeHeroBannersAdmin';
 import BannersAdmin from './sections/BannersAdmin';
 import LandingPagesAdmin from './sections/LandingPagesAdmin';
 import NewsAdmin from './sections/NewsAdmin';
@@ -101,6 +102,7 @@ const SECTION_MAP: Record<string, React.ReactNode> = {
   overview: <Overview />,
   theme: <ThemeAdmin />,
   'feature-popup': <FeaturePopupAdmin />,
+  'home-hero-banners': <HomeHeroBannersAdmin />,
   banners: <BannersAdmin />,
   'landing-pages': <LandingPagesAdmin />,
   news: <NewsAdmin />,
