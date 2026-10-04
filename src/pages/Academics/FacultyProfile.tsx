@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams, useNavigate, useLocation, Navigate } from 'react-router-dom';
-import { Mail, ExternalLink, FileText, ChevronRight, ArrowLeft } from 'lucide-react';
+import { Mail, ExternalLink, FileText, ChevronRight, ChevronDown, ArrowLeft } from 'lucide-react';
 import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import { useCollection, useOrderedCollection } from '../../hooks/useCollection';
@@ -10,6 +10,7 @@ import { getSectionBlocks } from '../../lib/facultySections';
 import FacultySectionContent from '../../components/FacultySectionContent/FacultySectionContent';
 import { hasCustomSectionContent } from '../../lib/customSections';
 import { SectionSubtree } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
+import SmoothCollapse from '../../components/SmoothCollapse/SmoothCollapse';
 import MarqueeText from '../../components/MarqueeText/MarqueeText';
 import type { FacultyDoc } from './Faculty';
 import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
@@ -17,6 +18,26 @@ import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import SEO from '../../components/SEO/SEO';
 import { getFacultySchema, getBreadcrumbSchema } from '../../lib/seo/schemas';
 import '../detail-layout.css';
+
+const MOBILE_QUERY = '(max-width: 768px)';
+
+// Mobile gets a section-wise expand/collapse list instead of the side
+// navigation card; the desktop layout (nav card + content) is untouched.
+// Only one of the two is ever rendered so the section content isn't
+// mounted twice.
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia(MOBILE_QUERY).matches,
+  );
+  useEffect(() => {
+    const mq = window.matchMedia(MOBILE_QUERY);
+    const onChange = () => setIsMobile(mq.matches);
+    onChange();
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+  return isMobile;
+}
 
 function getInitials(name: string) {
   const cleaned = name.replace(/\b(Dr|Sri|Prof|Mr|Mrs|Ms)\.?\s*/gi, '');
@@ -44,6 +65,7 @@ export default function FacultyProfile() {
   const { docs: programs } = useCollection<ProgramDoc>('programs');
   const { docs: departments } = useCollection<DepartmentDoc>('departments');
   const [activeKey, setActiveKey] = useState<string | null>(null);
+  const isMobile = useIsMobile();
 
   const person = allFaculty.find((f) => f.id === id);
   // Profile Sections content lives in Firestore, edited via /admin → Faculty
@@ -264,7 +286,40 @@ export default function FacultyProfile() {
             </div>
           </div>
 
-          {navItems.length > 0 && (
+          {navItems.length > 0 && isMobile && (
+            <div className="faculty-accordion" role="list" aria-label="Profile Sections">
+              {navItems.map((item, idx) => {
+                const isOpen = activeKey === item.key;
+                const panelId = `faculty-acc-panel-${idx}`;
+                const section = usingCustomSections ? customSections.find((c) => c.id === item.key) : null;
+                const legacy = !usingCustomSections ? legacySections.find((l) => l.title === item.key) : null;
+                return (
+                  <div key={item.key} role="listitem" className={`faculty-accordion-item${isOpen ? ' is-open' : ''}`}>
+                    <h2 className="faculty-accordion-heading">
+                      <button
+                        type="button"
+                        className="faculty-accordion-trigger"
+                        aria-expanded={isOpen}
+                        aria-controls={panelId}
+                        onClick={() => setActiveKey(isOpen ? null : item.key)}
+                      >
+                        <span className="faculty-accordion-label">{item.label}</span>
+                        <ChevronDown size={18} strokeWidth={2.4} className="faculty-accordion-chevron" aria-hidden="true" />
+                      </button>
+                    </h2>
+                    <SmoothCollapse open={isOpen}>
+                      <div id={panelId} role="region" aria-label={item.label} className="faculty-accordion-panel">
+                        {isOpen && section && <SectionSubtree section={section} />}
+                        {isOpen && legacy && <FacultySectionContent blocks={getSectionBlocks(legacy)} />}
+                      </div>
+                    </SmoothCollapse>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {navItems.length > 0 && !isMobile && (
             <div className="faculty-sections-grid">
               <div className="faculty-sections-nav">
                 <div style={{ position: 'sticky', top: '110px' }}>
