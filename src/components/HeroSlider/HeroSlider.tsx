@@ -66,6 +66,10 @@ export default function HeroSlider() {
     if (videoRef.current) videoRef.current.currentTime = 0;
   }, []);
 
+  const prev = useCallback(() => {
+    setCurrent((c) => Math.max(0, c - 1));
+  }, []);
+
   const next = useCallback(() => {
     if (bannerIndex >= banners.length - 1) goToVideo();
     else setCurrent(bannerIndex + 1);
@@ -199,6 +203,34 @@ export default function HeroSlider() {
             </svg>
           )}
         </button>
+      )}
+
+      {/* Prev / next + dots — banner carousel only; gone once the video takes over */}
+      {inBanners && (
+        <div className="hero-controls">
+          <button className="hero-nav-btn" onClick={prev} disabled={bannerIndex === 0} aria-label="Previous banner">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+          <div className="hero-dots" role="tablist" aria-label="Banner navigation">
+            {banners.map((b, i) => (
+              <button
+                key={b.id}
+                className={`hero-dot${i === bannerIndex ? ' active' : ''}`}
+                onClick={() => setCurrent(i)}
+                role="tab"
+                aria-selected={i === bannerIndex}
+                aria-label={`Go to banner ${i + 1}`}
+              />
+            ))}
+          </div>
+          <button className="hero-nav-btn" onClick={next} aria-label={bannerIndex >= banners.length - 1 ? 'Continue to video' : 'Next banner'}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+        </div>
       )}
     </section>
   );

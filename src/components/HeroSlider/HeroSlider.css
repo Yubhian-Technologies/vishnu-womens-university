@@ -301,6 +301,76 @@
   .hero-banner__text--bottom-right { bottom: 150px; }
 }
 
+/* ===== Controls ===== */
+.hero-controls {
+  position: absolute;
+  bottom: calc(72px + var(--space-6) + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+}
+
+.hero-dots {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.hero-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: rgba(255,255,255,0.35);
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  padding: 0;
+  position: relative;
+}
+.hero-dot::before {
+  content: '';
+  position: absolute;
+  inset: -16px;
+}
+
+/* Decorative accent — green, inspired by the VWU mark, used only here */
+.hero-dot.active {
+  width: 28px;
+  background: var(--hero-green);
+}
+
+.hero-dot:hover:not(.active) {
+  background: rgba(255,255,255,0.6);
+}
+
+.hero-nav-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: var(--hero-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  flex-shrink: 0;
+}
+
+/* Decorative accent — violet, inspired by the VWU mark, used only here */
+.hero-nav-btn:hover {
+  background: var(--hero-violet);
+  border-color: var(--hero-violet);
+  color: var(--hero-white);
+  transform: scale(1.08);
+}
+
+.hero-nav-btn:disabled { opacity: 0.35; cursor: default; pointer-events: none; }
+
 /* ===== Scroll Indicator ===== */
 .scroll-indicator {
   position: absolute;
@@ -504,6 +574,9 @@
   }
   .scroll-indicator {
     display: none;
+  }
+  .hero-controls {
+    bottom: calc(var(--space-5) + env(safe-area-inset-bottom, 0px));
   }
 }
 
