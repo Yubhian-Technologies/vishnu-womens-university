@@ -5,6 +5,9 @@ import { HOME_HERO_VIDEO_SRC, HOME_HERO_POSTER_SRC } from '../../lib/heroVideo';
 import {
   HOME_HERO_BANNERS_COLLECTION,
   MAX_HOME_HERO_BANNERS,
+  optimizeBannerUrl,
+  readCachedBanners,
+  writeCachedBanners,
   type HomeHeroBannerDoc,
 } from '../../lib/heroBanners';
 import './HeroSlider.css';
@@ -26,13 +29,21 @@ export default function HeroSlider() {
     HOME_HERO_BANNERS_COLLECTION,
     'order',
   );
+  // Until Firestore's first snapshot arrives, fall back to the banner list
+  // from the previous visit so the hero doesn't wait on the network.
+  const [cachedDocs] = useState(readCachedBanners);
+  const liveReady = !loading;
+  const sourceDocs = liveReady ? bannerDocs : cachedDocs;
   const banners = useMemo(
     () =>
-      bannerDocs
+      sourceDocs
         .filter((b) => b.active !== false && b.imageUrl)
         .slice(0, MAX_HOME_HERO_BANNERS),
-    [bannerDocs],
+    [sourceDocs],
   );
+  useEffect(() => {
+    if (liveReady) writeCachedBanners(bannerDocs);
+  }, [liveReady, bannerDocs]);
 
   const [current, setCurrent] = useState(0);
   // Once the carousel hands over to the video it never comes back.
@@ -41,10 +52,12 @@ export default function HeroSlider() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
 
-  const phase: Phase = videoReached || (!loading && banners.length === 0) ? 'video' : 'banners';
-  // While the banner list is still loading, hold the hero on its plain
-  // background so the video doesn't flash and then get replaced by a banner.
-  const ready = !loading;
+  // "Decided" = we know whether banners exist (live snapshot or cached list).
+  // Until then the video's poster frame fills the hero — never a blank
+  // background — and a banner simply fades in over it if one turns out to exist.
+  const decided = liveReady || cachedDocs.length > 0;
+  const phase: Phase = videoReached || (decided && banners.length === 0) ? 'video' : 'banners';
+  const ready = decided;
   const showVideo = ready && phase === 'video';
   const bannerIndex = Math.min(current, Math.max(banners.length - 1, 0));
 
@@ -57,10 +70,6 @@ export default function HeroSlider() {
     if (bannerIndex >= banners.length - 1) goToVideo();
     else setCurrent(bannerIndex + 1);
   }, [bannerIndex, banners.length, goToVideo]);
-
-  const prev = useCallback(() => {
-    setCurrent((c) => Math.max(0, c - 1));
-  }, []);
 
   // Auto-advance: each banner shows once, then the video takes over.
   useEffect(() => {
@@ -129,10 +138,10 @@ export default function HeroSlider() {
       {/* Hero video — the final, permanent layer once the banners (if any) have played */}
       <video
         ref={videoRef}
-        className={`hero-video${showVideo ? ' hero-video--visible' : ''}`}
+        className="hero-video hero-video--visible"
         src={HOME_HERO_VIDEO_SRC}
         poster={HOME_HERO_POSTER_SRC}
-        preload="auto"
+        preload={showVideo ? 'auto' : 'metadata'}
         muted
         loop
         playsInline
@@ -148,10 +157,11 @@ export default function HeroSlider() {
         >
           <img
             className="hero-banner__img"
-            src={b.imageUrl}
+            src={optimizeBannerUrl(b.imageUrl)}
             alt={b.text || 'VWU banner'}
-            loading={i === 0 ? 'eager' : 'lazy'}
+            loading="eager"
             decoding="async"
+            {...(i === 0 ? { fetchPriority: 'high' as const } : {})}
           />
           <div className={`hero-banner__scrim hero-banner__scrim--${b.position || 'bottom-left'}`} />
           {(b.text || b.subtext) && (
@@ -189,45 +199,6 @@ export default function HeroSlider() {
             </svg>
           )}
         </button>
-      )}
-
-      {/* Controls */}
-      {inBanners && (
-        <div className="hero-controls">
-          <button className="hero-nav-btn" onClick={prev} disabled={bannerIndex === 0} aria-label="Previous banner">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-              <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </button>
-          <div className="hero-dots" role="tablist" aria-label="Banner navigation">
-            {banners.map((b, i) => (
-              <button
-                key={b.id}
-                className={`hero-dot${i === bannerIndex ? ' active' : ''}`}
-                onClick={() => setCurrent(i)}
-                role="tab"
-                aria-selected={i === bannerIndex}
-                aria-label={`Go to banner ${i + 1}`}
-              />
-            ))}
-          </div>
-          <button className="hero-nav-btn" onClick={next} aria-label={bannerIndex >= banners.length - 1 ? 'Continue to video' : 'Next banner'}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-              <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </button>
-        </div>
-      )}
-
-      {/* Progress bar — restarts for each banner */}
-      {inBanners && (
-        <div className="hero-progress" aria-hidden="true">
-          <div
-            key={bannerIndex}
-            className="hero-progress-fill hero-progress-fill--run"
-            style={{ animationDuration: `${SLIDE_DURATION}ms` }}
-          />
-        </div>
       )}
     </section>
   );

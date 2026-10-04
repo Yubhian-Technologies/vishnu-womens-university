@@ -296,100 +296,9 @@
 .hero-banner__cta:hover { background: var(--hero-orange-dark); transform: translateY(-1px); }
 .hero-banner__cta:focus-visible { outline: 3px solid var(--hero-white); outline-offset: 3px; }
 
-.hero-nav-btn:disabled { opacity: 0.35; cursor: default; pointer-events: none; }
-
-@keyframes hero-progress-run { from { width: 0; } to { width: 100%; } }
-.hero-progress-fill--run { animation: hero-progress-run linear forwards; }
-
 @media (max-width: 768px) {
   .hero-banner__text--bottom-left,
   .hero-banner__text--bottom-right { bottom: 150px; }
-}
-
-/* ===== Controls ===== */
-.hero-controls {
-  position: absolute;
-  bottom: calc(72px + var(--space-6) + env(safe-area-inset-bottom, 0px));
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  gap: var(--space-6);
-}
-
-.hero-dots {
-  display: flex;
-  gap: var(--space-2);
-  align-items: center;
-}
-
-.hero-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: var(--radius-full);
-  background: rgba(255,255,255,0.35);
-  border: none;
-  cursor: pointer;
-  transition: all var(--transition-base);
-  padding: 0;
-  position: relative;
-}
-.hero-dot::before {
-  content: '';
-  position: absolute;
-  inset: -16px;
-}
-
-/* Decorative accent — green, inspired by the VWU mark, used only here */
-.hero-dot.active {
-  width: 28px;
-  background: var(--hero-green);
-}
-
-.hero-dot:hover:not(.active) {
-  background: rgba(255,255,255,0.6);
-}
-
-.hero-nav-btn {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.12);
-  border: 1px solid rgba(255,255,255,0.2);
-  color: var(--hero-white);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all var(--transition-base);
-  flex-shrink: 0;
-}
-
-/* Decorative accent — violet, inspired by the VWU mark, used only here */
-.hero-nav-btn:hover {
-  background: var(--hero-violet);
-  border-color: var(--hero-violet);
-  color: var(--hero-white);
-  transform: scale(1.08);
-}
-
-/* ===== Progress Bar ===== */
-.hero-progress {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: rgba(255,255,255,0.15);
-  z-index: 10;
-}
-
-.hero-progress-fill {
-  height: 100%;
-  background: var(--hero-green);
-  transition: width 5s linear;
-  border-radius: 0 2px 2px 0;
 }
 
 /* ===== Scroll Indicator ===== */
@@ -596,9 +505,6 @@
   .scroll-indicator {
     display: none;
   }
-  .hero-controls {
-    bottom: calc(var(--space-5) + env(safe-area-inset-bottom, 0px));
-  }
 }
 
 @media (orientation: landscape) and (max-height: 500px) {
@@ -614,8 +520,7 @@
 @media (prefers-reduced-motion: reduce) {
   .hero-banner,
   .hero-banner__text,
-  .hero-center-tagline,
-  .hero-progress-fill {
+  .hero-center-tagline {
     transition: none !important;
     animation: none !important;
   }
