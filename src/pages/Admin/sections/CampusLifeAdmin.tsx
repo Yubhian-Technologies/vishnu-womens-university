@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { collection, doc, serverTimestamp } from 'firebase/firestore';
+import { collection, doc, getDoc, serverTimestamp, setDoc as setDocRaw } from 'firebase/firestore';
 import { addDoc, deleteDoc, setDoc, updateDoc, writeBatch } from '../../../lib/auditLog';
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
@@ -150,18 +150,36 @@ export default function CampusLifeAdmin() {
 
   // Campus Life menu — Other Links (Header.tsx's Campus Life dropdown, the
   // handful of entries with a fixed route rather than a generic /campus/:slug
-  // page). Auto-seeded from DEFAULT_CAMPUS_LIFE_QUICK_LINKS the first time
-  // this loads and finds the collection empty — same pattern as
+  // page). Auto-seeded from DEFAULT_CAMPUS_LIFE_QUICK_LINKS ONCE, the first
+  // time this loads and finds the collection empty — same pattern as
   // PlacementItemsAdmin.tsx's Navbar Menu Columns — so the public menu never
-  // changes just from this admin section existing.
+  // changes just from this admin section existing. A flag doc
+  // (settings/campusLifeQuickLinksSeeded) records that the seeding decision
+  // has been made, so deliberately deleting every link afterwards leaves the
+  // list empty instead of the defaults reappearing on the next visit.
   const { docs: quickLinks, loading: quickLinksLoading } = useOrderedCollection<CampusLifeQuickLinkDoc>('campusLifeQuickLinks', 'order');
   const [quickLinksSeeded, setQuickLinksSeeded] = useState(false);
   useEffect(() => {
-    if (quickLinksLoading || quickLinksSeeded || quickLinks.length > 0) return;
+    if (quickLinksLoading || quickLinksSeeded) return;
     setQuickLinksSeeded(true);
-    DEFAULT_CAMPUS_LIFE_QUICK_LINKS.forEach(({ id, ...rest }) => {
-      setDoc(doc(db, 'campusLifeQuickLinks', id), rest);
-    });
+    const flagRef = doc(db, 'settings', 'campusLifeQuickLinksSeeded');
+    (async () => {
+      try {
+        // Already decided on an earlier visit — never seed again.
+        if ((await getDoc(flagRef)).exists()) return;
+        if (quickLinks.length === 0) {
+          DEFAULT_CAMPUS_LIFE_QUICK_LINKS.forEach(({ id, ...rest }) => {
+            setDoc(doc(db, 'campusLifeQuickLinks', id), rest);
+          });
+        }
+        // Existing sites that already have links get the flag too, so a later
+        // "delete everything" is respected. Raw write: internal bookkeeping,
+        // not an admin edit worth an Audit Log entry.
+        await setDocRaw(flagRef, { seededAt: serverTimestamp() });
+      } catch (e) {
+        console.warn('Campus Life quick-link seed check failed:', e);
+      }
+    })();
   }, [quickLinksLoading, quickLinksSeeded, quickLinks]);
 
   const [qlForm, setQlForm] = useState<Omit<CampusLifeQuickLinkDoc, 'id'>>(EMPTY_QUICK_LINK);

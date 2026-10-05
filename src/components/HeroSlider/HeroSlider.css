@@ -12,10 +12,9 @@
 
   position: relative;
   width: 100%;
-  height: 100dvh;
-  height: 100vh;
-  min-height: clamp(520px, 90dvh, 700px);
-  max-height: 1100px;
+  height: calc(56.25vw + 135px);
+  min-height: clamp(360px, calc(56.25vw + 135px), 680px);
+  max-height: 900px;
   overflow: hidden;
   background: var(--hero-teal);
 }
@@ -24,10 +23,14 @@
 
 .hero-video {
   position: absolute;
-  inset: 0;
+  top: calc(var(--topbar-height, 0px) + 135px);
+  left: 0;
+  right: 0;
+  bottom: 0;
   width: 100%;
-  height: 100%;
+  height: calc(100% - (var(--topbar-height, 0px) + 135px));
   object-fit: cover;
+  object-position: top center;
   z-index: 0;
   pointer-events: none;
   opacity: 0;
@@ -224,10 +227,14 @@
 
 .hero-banner__img {
   position: absolute;
-  inset: 0;
+  top: calc(var(--topbar-height, 0px) + 135px);
+  left: 0;
+  right: 0;
+  bottom: 0;
   width: 100%;
-  height: 100%;
+  height: calc(100% - (var(--topbar-height, 0px) + 135px));
   object-fit: cover;
+  object-position: top center;
 }
 
 /* Corner scrim keeps the overlay text legible on any photo */
@@ -299,6 +306,30 @@
 @media (max-width: 768px) {
   .hero-banner__text--bottom-left,
   .hero-banner__text--bottom-right { bottom: 150px; }
+
+  /* These banner images are wide graphics designed for a desktop-width hero
+     (e.g. a placement-announcement poster) — object-fit: cover crops deep
+     into their sides on a narrow, tall mobile viewport, cutting off the
+     headline text and photos that made the banner worth showing. Below
+     768px, show the whole image instead (letterboxed on the slider's own
+     background) rather than cropping content away. Same reasoning for the
+     hero video right after it — a wide establishing shot, same crop problem. */
+  .hero-banner__img,
+  .hero-video {
+    top: calc(var(--topbar-height, 0px) + 125px);
+    height: calc(100% - (var(--topbar-height, 0px) + 125px));
+    object-fit: contain;
+    object-position: top center;
+  }
+
+  /* .hero-banner (the image's wrapper) already paints var(--hero-teal-deep)
+     behind its letterboxed image — the video has no such wrapper, so its
+     own letterbox gap fell back to the browser's default black. Same color
+     here makes the video's letterboxing match the banners' exactly. */
+  .hero-video {
+    background: var(--hero-teal-deep);
+    transform-origin: top center;
+  }
 }
 
 /* ===== Scroll Indicator ===== */
@@ -334,8 +365,8 @@
 
 .hero-mute-btn {
   position: absolute;
-  bottom: calc(72px + var(--space-8));
-  right: var(--space-8);
+  bottom: var(--space-6, 1.5rem);
+  right: var(--space-6, 1.5rem);
   z-index: 10;
   width: 48px;
   height: 48px;
@@ -500,7 +531,8 @@
 
 @media (max-width: 768px) {
   .hero-slider {
-    min-height: clamp(520px, 90dvh, 700px);
+    height: calc(56.25vw + 125px);
+    min-height: 0;
   }
   .scroll-indicator {
     display: none;

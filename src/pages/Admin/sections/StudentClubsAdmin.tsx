@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { collection, doc, serverTimestamp } from 'firebase/firestore';
+import { collection, doc, getDoc, serverTimestamp, setDoc as setDocRaw } from 'firebase/firestore';
 import { addDoc, deleteDoc, updateDoc, writeBatch } from '../../../lib/auditLog';
 import { Sparkles } from 'lucide-react';
 import { db } from '../../../lib/firebase';
@@ -112,13 +112,22 @@ export default function StudentClubsAdmin() {
   // docs the moment this section loads — a one-time seed guarded by a ref so
   // React.StrictMode's double-invoke of effects can't create duplicates — so
   // every category is immediately editable and deletable.
+  // Seeds only ONCE: settings/studentClubCategoriesSeeded records that the
+  // decision has been made, so deliberately deleting every category later
+  // leaves the list empty instead of the starters reappearing on next visit.
   const seedingRef = useRef(false);
   useEffect(() => {
-    if (catLoading || seeded || seedingRef.current) return;
+    if (catLoading || seedingRef.current) return;
     seedingRef.current = true;
     (async () => {
       try {
-        await Promise.all(DEFAULT_CLUB_CATEGORIES.map((d) => addDoc(collection(db, CLUB_CATEGORIES_COLLECTION), { ...d, createdAt: serverTimestamp() })));
+        const flagRef = doc(db, 'settings', 'studentClubCategoriesSeeded');
+        if ((await getDoc(flagRef)).exists()) return;
+        if (!seeded) {
+          await Promise.all(DEFAULT_CLUB_CATEGORIES.map((d) => addDoc(collection(db, CLUB_CATEGORIES_COLLECTION), { ...d, createdAt: serverTimestamp() })));
+        }
+        // Raw write: internal bookkeeping, not an admin edit for the Audit Log.
+        await setDocRaw(flagRef, { seededAt: serverTimestamp() });
       } catch {
         // A blocked write here isn't fatal — the fallback starter list still
         // shows, and the admin can retry via the restore / save handlers.
