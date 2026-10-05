@@ -7,8 +7,10 @@ import {
   type AtlMember,
   type AtlYearTraining,
   type AtlOutcomeEvent,
+  type AtlDevice,
+  type AtlCommunityEvent,
 } from '../../Differentiators/assistiveTechLab.data';
-import { Plus, Trash2, Save, RotateCcw, Sparkles, BookOpen, Users, Award, FileText } from 'lucide-react';
+import { Plus, Trash2, Save, RotateCcw, Sparkles, BookOpen, Users, Award, FileText, Cpu, Calendar, Wrench } from 'lucide-react';
 
 export type AssistiveTechLabDoc = typeof assistiveTechLab;
 
@@ -18,7 +20,7 @@ export default function AssistiveTechContentAdmin() {
   const [saving, setSaving] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [activeTab, setActiveTab] = useState<
-    'overview' | 'visionMission' | 'objectives' | 'team' | 'training' | 'outcomes' | 'publications'
+    'overview' | 'visionMission' | 'objectives' | 'devices' | 'events' | 'team' | 'training' | 'highlights' | 'facilities' | 'outcomes' | 'publications'
   >('overview');
 
   useEffect(() => {
@@ -33,6 +35,10 @@ export default function AssistiveTechContentAdmin() {
             paragraphs: remote.paragraphs || assistiveTechLab.paragraphs,
             mission: remote.mission || assistiveTechLab.mission,
             objectives: remote.objectives || assistiveTechLab.objectives,
+            assistiveDevices: remote.assistiveDevices || assistiveTechLab.assistiveDevices,
+            communityEvents: remote.communityEvents || assistiveTechLab.communityEvents,
+            equipmentList: remote.equipmentList || assistiveTechLab.equipmentList,
+            highlightsList: remote.highlightsList || assistiveTechLab.highlightsList,
             team: {
               dean: { ...assistiveTechLab.team.dean, ...(remote.team?.dean || {}) },
               inCharge: { ...assistiveTechLab.team.inCharge, ...(remote.team?.inCharge || {}) },
@@ -113,8 +119,12 @@ export default function AssistiveTechContentAdmin() {
             { id: 'overview', label: 'Overview Paragraphs', icon: BookOpen },
             { id: 'visionMission', label: 'Vision & Mission', icon: Sparkles },
             { id: 'objectives', label: 'Objectives', icon: Sparkles },
+            { id: 'devices', label: 'Assistive Devices', icon: Cpu },
+            { id: 'events', label: 'Community Events', icon: Calendar },
             { id: 'team', label: 'Faculty & Mentors', icon: Users },
             { id: 'training', label: 'Trainings & Projects', icon: Award },
+            { id: 'highlights', label: 'Key Highlights', icon: Sparkles },
+            { id: 'facilities', label: 'Facilities & Equipment', icon: Wrench },
             { id: 'outcomes', label: 'Outcomes & Makeathons', icon: Award },
             { id: 'publications', label: 'Publications', icon: FileText },
           ].map((tab) => {
@@ -259,6 +269,202 @@ export default function AssistiveTechContentAdmin() {
                     >
                       <Trash2 size={15} />
                     </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Assistive Devices & Technologies */}
+          {activeTab === 'devices' && (
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                <label className="admin-label" style={{ margin: 0 }}>Assistive Devices & Technologies</label>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setData({
+                      ...data,
+                      assistiveDevices: [
+                        ...data.assistiveDevices,
+                        { title: 'Device Title', category: 'Category', description: 'Device description', tag: 'Tag', icon: 'eye' } as AtlDevice,
+                      ],
+                    })
+                  }
+                  className="admin-btn admin-btn--sm admin-btn--secondary"
+                >
+                  <Plus size={14} /> Add Device
+                </button>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '0.85rem' }}>
+                {data.assistiveDevices.map((d, idx) => (
+                  <div key={idx} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '0.85rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem', gap: '0.5rem' }}>
+                      <input
+                        type="text"
+                        value={d.category}
+                        onChange={(e) => {
+                          const updated = [...data.assistiveDevices];
+                          updated[idx] = { ...updated[idx], category: e.target.value };
+                          setData({ ...data, assistiveDevices: updated });
+                        }}
+                        className="admin-input"
+                        style={{ fontWeight: 600, color: '#b45309' }}
+                        placeholder="Category"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setData({ ...data, assistiveDevices: data.assistiveDevices.filter((_, i) => i !== idx) })}
+                        className="admin-btn-danger"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                    <div className="admin-field" style={{ marginBottom: '0.5rem' }}>
+                      <input
+                        type="text"
+                        value={d.title}
+                        onChange={(e) => {
+                          const updated = [...data.assistiveDevices];
+                          updated[idx] = { ...updated[idx], title: e.target.value };
+                          setData({ ...data, assistiveDevices: updated });
+                        }}
+                        className="admin-input"
+                        style={{ fontWeight: 700 }}
+                        placeholder="Device Title"
+                      />
+                    </div>
+                    <div className="admin-field" style={{ marginBottom: '0.5rem' }}>
+                      <textarea
+                        rows={2}
+                        value={d.description}
+                        onChange={(e) => {
+                          const updated = [...data.assistiveDevices];
+                          updated[idx] = { ...updated[idx], description: e.target.value };
+                          setData({ ...data, assistiveDevices: updated });
+                        }}
+                        className="admin-textarea"
+                        placeholder="Device Description"
+                      />
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                      <input
+                        type="text"
+                        value={d.tag}
+                        onChange={(e) => {
+                          const updated = [...data.assistiveDevices];
+                          updated[idx] = { ...updated[idx], tag: e.target.value };
+                          setData({ ...data, assistiveDevices: updated });
+                        }}
+                        className="admin-input"
+                        placeholder="Tag (e.g. Visual Impairment)"
+                      />
+                      <select
+                        value={d.icon}
+                        onChange={(e) => {
+                          const updated = [...data.assistiveDevices];
+                          updated[idx] = { ...updated[idx], icon: e.target.value };
+                          setData({ ...data, assistiveDevices: updated });
+                        }}
+                        className="admin-input"
+                      >
+                        <option value="eye">Eye (Visual)</option>
+                        <option value="compass">Compass (Navigation)</option>
+                        <option value="message-square">Message (Communication)</option>
+                        <option value="activity">Activity (Mobility/Motor)</option>
+                        <option value="wrench">Wrench (Daily Living)</option>
+                        <option value="heart-handshake">Heart-Handshake (Community)</option>
+                      </select>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Community Events & Exhibitions */}
+          {activeTab === 'events' && (
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                <label className="admin-label" style={{ margin: 0 }}>Community Events & Exhibitions</label>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setData({
+                      ...data,
+                      communityEvents: [
+                        ...data.communityEvents,
+                        { title: 'Event Title', badge: 'Badge', description: 'Event description', date: 'Date' } as AtlCommunityEvent,
+                      ],
+                    })
+                  }
+                  className="admin-btn admin-btn--sm admin-btn--secondary"
+                >
+                  <Plus size={14} /> Add Event
+                </button>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                {data.communityEvents.map((ev, idx) => (
+                  <div key={idx} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '0.85rem' }}>
+                    <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                      <input
+                        type="text"
+                        value={ev.badge}
+                        onChange={(e) => {
+                          const updated = [...data.communityEvents];
+                          updated[idx] = { ...updated[idx], badge: e.target.value };
+                          setData({ ...data, communityEvents: updated });
+                        }}
+                        className="admin-input"
+                        style={{ fontWeight: 600, color: '#b45309' }}
+                        placeholder="Badge"
+                      />
+                      <input
+                        type="text"
+                        value={ev.date}
+                        onChange={(e) => {
+                          const updated = [...data.communityEvents];
+                          updated[idx] = { ...updated[idx], date: e.target.value };
+                          setData({ ...data, communityEvents: updated });
+                        }}
+                        className="admin-input"
+                        placeholder="Date"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setData({ ...data, communityEvents: data.communityEvents.filter((_, i) => i !== idx) })}
+                        className="admin-btn-danger"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                    <div className="admin-field" style={{ marginBottom: '0.5rem' }}>
+                      <input
+                        type="text"
+                        value={ev.title}
+                        onChange={(e) => {
+                          const updated = [...data.communityEvents];
+                          updated[idx] = { ...updated[idx], title: e.target.value };
+                          setData({ ...data, communityEvents: updated });
+                        }}
+                        className="admin-input"
+                        style={{ fontWeight: 700 }}
+                        placeholder="Event Title"
+                      />
+                    </div>
+                    <div className="admin-field">
+                      <textarea
+                        rows={2}
+                        value={ev.description}
+                        onChange={(e) => {
+                          const updated = [...data.communityEvents];
+                          updated[idx] = { ...updated[idx], description: e.target.value };
+                          setData({ ...data, communityEvents: updated });
+                        }}
+                        className="admin-textarea"
+                        placeholder="Event Description"
+                      />
+                    </div>
                   </div>
                 ))}
               </div>
@@ -523,6 +729,84 @@ export default function AssistiveTechContentAdmin() {
                     <p className="admin-field__hint" style={{ margin: 0 }}>
                       Courses configured: {prog.bridgeCourse.rows.length} | Projects: {prog.projects.length}
                     </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Key Highlights */}
+          {activeTab === 'highlights' && (
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                <label className="admin-label" style={{ margin: 0 }}>Key Highlights</label>
+                <button
+                  type="button"
+                  onClick={() => setData({ ...data, highlightsList: [...data.highlightsList, ''] })}
+                  className="admin-btn admin-btn--sm admin-btn--secondary"
+                >
+                  <Plus size={14} /> Add Highlight
+                </button>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                {data.highlightsList.map((hl, idx) => (
+                  <div key={idx} style={{ display: 'flex', gap: '0.5rem' }}>
+                    <input
+                      type="text"
+                      value={hl}
+                      onChange={(e) => {
+                        const updated = [...data.highlightsList];
+                        updated[idx] = e.target.value;
+                        setData({ ...data, highlightsList: updated });
+                      }}
+                      className="admin-input"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setData({ ...data, highlightsList: data.highlightsList.filter((_, i) => i !== idx) })}
+                      className="admin-btn-danger"
+                    >
+                      <Trash2 size={15} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Facilities & Equipment */}
+          {activeTab === 'facilities' && (
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                <label className="admin-label" style={{ margin: 0 }}>Facilities & Equipment</label>
+                <button
+                  type="button"
+                  onClick={() => setData({ ...data, equipmentList: [...data.equipmentList, ''] })}
+                  className="admin-btn admin-btn--sm admin-btn--secondary"
+                >
+                  <Plus size={14} /> Add Item
+                </button>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                {data.equipmentList.map((eq, idx) => (
+                  <div key={idx} style={{ display: 'flex', gap: '0.5rem' }}>
+                    <input
+                      type="text"
+                      value={eq}
+                      onChange={(e) => {
+                        const updated = [...data.equipmentList];
+                        updated[idx] = e.target.value;
+                        setData({ ...data, equipmentList: updated });
+                      }}
+                      className="admin-input"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setData({ ...data, equipmentList: data.equipmentList.filter((_, i) => i !== idx) })}
+                      className="admin-btn-danger"
+                    >
+                      <Trash2 size={15} />
+                    </button>
                   </div>
                 ))}
               </div>
