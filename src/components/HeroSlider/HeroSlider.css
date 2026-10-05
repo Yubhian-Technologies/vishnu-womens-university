@@ -330,6 +330,45 @@
   background: linear-gradient(to bottom, rgba(255,255,255,0.5), transparent);
 }
 
+/* ===== Dots (manual slide navigation) ===== */
+
+.hero-dots {
+  position: absolute;
+  /* The search bar pill (Home.css .home-search-float) overlaps the hero's
+     bottom edge at a higher z-index than this — space-6 alone sat right
+     behind it, invisible. Clear above it instead. */
+  bottom: 6rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  gap: 10px;
+}
+
+.hero-dot {
+  width: 9px;
+  height: 9px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease, width 0.2s ease;
+}
+
+.hero-dot:hover { background: rgba(255, 255, 255, 0.75); }
+
+.hero-dot--active {
+  width: 26px;
+  border-radius: var(--radius-full, 9999px);
+  background: var(--hero-orange);
+}
+
+.hero-dot:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.55);
+}
+
 /* ===== Mute Button ===== */
 
 .hero-mute-btn {

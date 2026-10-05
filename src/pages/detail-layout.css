@@ -5528,7 +5528,7 @@ td.pb-activities-num {
    ========================================================================== */
 .dept-horizontal-quicknav-section {
   position: sticky;
-  top: calc(var(--header-height) + 16px + env(safe-area-inset-top, 0px));
+  top: calc(var(--topbar-height, 0px) + 85px);
   z-index: 40;
   margin: 0.35rem 0 1.25rem 0;
   padding: 0.25rem 0;
@@ -5573,6 +5573,7 @@ td.pb-activities-num {
 /* Mobile: horizontally scrollable bar with auto-scroll active */
 @media (max-width: 768px) {
   .dept-horizontal-quicknav-section {
+    top: calc(var(--topbar-height, 0px) + 75px);
     margin: 0.25rem 0 1rem 0;
     padding: 0.15rem 0;
     /* Allow pill to bleed to safe-area edges */
@@ -6205,10 +6206,9 @@ td.pb-activities-num {
   border-radius: 20px;
   overflow: hidden;
   background: #1e293b;
-  height: 100%;
+  height: auto;
   display: flex;
   flex-direction: column;
-  aspect-ratio: 4 / 3; /* FIXED LAYOUT: Enforces a strict height regardless of caption length */
 }
 
 /* Arrow buttons — absolute top-right, same as reference image */
@@ -6264,10 +6264,10 @@ td.pb-activities-num {
 }
 
 .dept-research-slide-photo {
-  flex: 1;
+  width: 100%;
+  aspect-ratio: 16 / 9;
   overflow: hidden;
-  min-height: 0;
-  /* Removed aspect-ratio so it flexibly fills the remaining space above the caption */
+  flex-shrink: 0;
 }
 
 .dept-research-slide-img {
@@ -6297,7 +6297,8 @@ td.pb-activities-num {
   background: #0f172a;
   padding: 1.25rem 1.5rem 1.35rem;
   flex-shrink: 0;
-  height: 145px; /* FIXED HEIGHT: Ensures uniform image sizing above */
+  height: auto;
+  min-height: 145px;
 }
 
 .dept-research-slide-title {
@@ -6312,13 +6313,12 @@ td.pb-activities-num {
 .dept-research-slide-desc {
   font-family: var(--font-sans);
   font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.88);
   line-height: 1.6;
   margin: 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  display: block;
+  overflow: visible;
+  word-break: break-word;
 }
 
 /* Dot indicators */
@@ -6356,7 +6356,7 @@ td.pb-activities-num {
   }
 
   .dept-research-slider-wrap {
-    min-height: 420px;
+    height: auto;
   }
 }
 
