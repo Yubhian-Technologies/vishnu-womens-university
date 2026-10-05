@@ -10,9 +10,17 @@ export interface AtlMember {
   profileLink?: string;
 }
 
+// Firestore rejects a field that is an array directly containing another
+// array ("nested arrays are not supported") — every table row is wrapped in
+// a single-field object instead of being a bare string[], which keeps this
+// one level of nesting flat enough to save (see AssistiveTechContentAdmin.tsx).
+export interface AtlTableRow {
+  cells: string[];
+}
+
 export interface AtlSimpleTable {
   headers: string[];
-  rows: string[][];
+  rows: AtlTableRow[];
 }
 
 export interface AtlProject {
@@ -71,6 +79,25 @@ export interface AtlOutcomeEvent {
   simpleTable?: AtlSimpleTable;
 }
 
+// `icon` is a key into the fixed ICONS map in AssistiveTechLab.tsx (plain
+// data can't hold a component reference) — any value not in that map just
+// falls back to its default icon there, so this never errors loading older
+// admin-saved rows if a key is renamed later.
+export interface AtlDevice {
+  title: string;
+  category: string;
+  description: string;
+  tag: string;
+  icon: string;
+}
+
+export interface AtlCommunityEvent {
+  title: string;
+  badge: string;
+  description: string;
+  date: string;
+}
+
 export const assistiveTechLab = {
   paragraphs: [
     'The Assistive Technology Lab (ATL) in Shri Vishnu Engineering College for Women (SVECW), Bhimavaram, W. G. Dt, Andhra Pradesh is a vision of Sri K. V. Vishnu Raju, the Chairman of Sri Vishnu Educational Society, to utilize the skills of every engineering department of the college for the development of Assistive Technology. It was set up in 2009 and works in collaboration with University of Massachusetts (UMass), Lowell, USA.',
@@ -91,6 +118,96 @@ export const assistiveTechLab = {
     'Encourage students to collaborate across disciplines to tackle real-world societal issues.',
     'Foster the creation of innovative, impactful, and affordable products.',
     'Promote global participation in competitions and hackathons to showcase student talent.',
+  ],
+  assistiveDevices: [
+    {
+      title: 'Smart Braille Slate & Reader',
+      category: 'Visual & Tactile Aids',
+      description: 'An affordable electronic Braille writing and reading aid with real-time audio playback feedback for visually impaired students.',
+      icon: 'eye',
+      tag: 'Visual Impairment',
+    },
+    {
+      title: 'Haptic Obstacle Navigator',
+      category: 'Sensory Navigation',
+      description: 'Wearable ultrasonic sensor belt and smart cane that produces graduated vibrational alerts for obstacle avoidance.',
+      icon: 'compass',
+      tag: 'Mobility Assist',
+    },
+    {
+      title: 'Sign Language Translator Glove',
+      category: 'Communication Assist',
+      description: 'Flex-sensor embedded smart glove that translates hand gestures into synthesized speech and text on mobile screens.',
+      icon: 'message-square',
+      tag: 'Deaf & Mute Community',
+    },
+    {
+      title: 'Automated Smart Wheelchair',
+      category: 'Mobility & Motor Control',
+      description: 'Intelligent motorized wheelchair with head-tilt, joystick, and obstacle avoidance features for individuals with quadriplegia.',
+      icon: 'activity',
+      tag: 'Motor Disability',
+    },
+    {
+      title: 'Tremor-Stabilizing Smart Cutlery',
+      category: 'Daily Living Assist',
+      description: 'Active gyroscopic stabilizing spoon and fork enabling individuals with Parkinson’s or essential tremors to dine independently.',
+      icon: 'wrench',
+      tag: 'Elderly & Neurological',
+    },
+    {
+      title: 'Zion Special School Custom Aids',
+      category: 'Community Prototypes',
+      description: 'Custom therapeutic and educational interactive kits co-created with special educators at Zion Special School, Rajahmundry.',
+      icon: 'heart-handshake',
+      tag: 'Special Education',
+    },
+  ] as AtlDevice[],
+  communityEvents: [
+    {
+      title: 'Zion Special School, Rajahmundry Client Visits',
+      badge: 'Community Outreach',
+      description: 'SVECW student teams conduct on-site field visits to understand the daily physical and educational needs of differently-abled children, gathering real user requirements.',
+      date: 'Annual Engagement',
+    },
+    {
+      title: 'International Day of Persons with Disabilities',
+      badge: 'Annual Exhibition',
+      description: 'Annual flagship exhibition showcasing student-developed assistive prototypes, interactive demos for NGO representatives, and public awareness campaigns.',
+      date: 'Dec 3 (2023, 2024, 2025)',
+    },
+    {
+      title: 'IIC Regional Meet Vijayawada',
+      badge: 'Innovation Spotlight',
+      description: 'ATL student innovators presented patented assistive technology prototypes before national innovation council leaders and jury members.',
+      date: 'Regional Showcase',
+    },
+    {
+      title: 'Innovation Project Fair at JNTU Kakinada',
+      badge: 'University Level Honor',
+      description: 'Recognition and top accolades awarded to interdisciplinary assistive hardware rigs engineered by women engineering students.',
+      date: 'State-Level Fair',
+    },
+    {
+      title: 'AVISHKANDHRA RTIH & Trance 2K25',
+      badge: 'National Technical Fest',
+      description: 'Live field demonstrations of assistive robotic devices and smart sensor kits before academic and industry experts.',
+      date: 'National Fest',
+    },
+  ] as AtlCommunityEvent[],
+  equipmentList: [
+    'Complete electronic hardware prototyping and sensor characterization workstations.',
+    'Dedicated 3D printing and rapid mechanical prototyping rigs for custom ergonomic enclosures.',
+    'DSP, microcontroller, and FPGA embedded development boards (Arduino, STM32, Raspberry Pi, TI DSP).',
+    'Assistive software suite for audio synthesis, image processing, and gesture recognition algorithms.',
+    'Biomedical sensor kits (EMG, EEG, Flex sensors, load cells, ultrasonic arrays).',
+  ],
+  highlightsList: [
+    'Established in 2009 in global collaboration with University of Massachusetts (UMass), Lowell, USA.',
+    'Annual mentorship visits by Prof. Alan Rux, founder of Assistive Technology Program at UMass Lowell.',
+    'Interdisciplinary platform uniting students from ECE, EEE, CSE, IT, ME, and Basic Sciences for noble social engineering.',
+    'Real-world service learning directly impacting community special schools and people with disabilities.',
+    'Comprehensive multi-year bridge courses cultivating product design, budget management, and empathy-driven engineering.',
   ],
   team: {
     dean: {
@@ -179,16 +296,16 @@ export const assistiveTechLab = {
       bridgeCourse: {
         headers: ['S. No.', 'Course', 'Facilitator', 'Department', 'Date', 'Venue'],
         rows: [
-          ['1.', 'About ATL', 'Dr. K. Padma Vasavi', 'ECE', '29-07-2025', 'ATL LAB'],
-          ['2.', 'Design Thinking and Innovation', 'Dr. D. Ramesh Varma', 'ECE', '30-07-2025', 'ATL LAB'],
-          ['', 'Digital Electronics', 'Dr. G. Challaram', 'ECE', '31-07-2025', 'ATL LAB'],
-          ['3', 'Arduino Programming', 'Mrs. M. Hema Latha, M. Prashanth Kumar, Ch. Santhosh', 'ECE', '01-08-2025, 02-08-2025', 'ATL LAB'],
-          ['5.', 'Basics of Electronics', 'Mr. D. Girish Kumar', 'ECE', '04-08-2025', 'ATL LAB'],
-          ['6.', 'Actuators, Batteries and Power Management', 'Dr. A. Siva, Mr. B. Mahendra Chand', 'EEE', '05-08-2025, 06-08-2025', 'ATL LAB'],
-          ['7.', 'CAD for Packaging (2D CAD, 3D CAD)', 'Mrs. P. Lavanya, Mr. A.S.V. Prasad', 'CE, ME', '07-08-2025, 09-08-2025', 'ATL LAB'],
-          ['8.', 'Product Development', 'Dr. K. Padma Vasavi', 'ECE', '11-08-2025', 'ATL LAB'],
-          ['9.', 'Web Page Development', 'Mr. A. Nageswara Rao & Mr. T. Rajesh', 'CSE', '12-08-2025', 'ATL LAB'],
-          ['10.', 'Mobile App Development', 'Mrs G Kalyani, Mr K. Ram Kumar', 'AI, IT', '13-08-2025', 'ATL LAB'],
+          { cells: ['1.', 'About ATL', 'Dr. K. Padma Vasavi', 'ECE', '29-07-2025', 'ATL LAB'] },
+          { cells: ['2.', 'Design Thinking and Innovation', 'Dr. D. Ramesh Varma', 'ECE', '30-07-2025', 'ATL LAB'] },
+          { cells: ['', 'Digital Electronics', 'Dr. G. Challaram', 'ECE', '31-07-2025', 'ATL LAB'] },
+          { cells: ['3', 'Arduino Programming', 'Mrs. M. Hema Latha, M. Prashanth Kumar, Ch. Santhosh', 'ECE', '01-08-2025, 02-08-2025', 'ATL LAB'] },
+          { cells: ['5.', 'Basics of Electronics', 'Mr. D. Girish Kumar', 'ECE', '04-08-2025', 'ATL LAB'] },
+          { cells: ['6.', 'Actuators, Batteries and Power Management', 'Dr. A. Siva, Mr. B. Mahendra Chand', 'EEE', '05-08-2025, 06-08-2025', 'ATL LAB'] },
+          { cells: ['7.', 'CAD for Packaging (2D CAD, 3D CAD)', 'Mrs. P. Lavanya, Mr. A.S.V. Prasad', 'CE, ME', '07-08-2025, 09-08-2025', 'ATL LAB'] },
+          { cells: ['8.', 'Product Development', 'Dr. K. Padma Vasavi', 'ECE', '11-08-2025', 'ATL LAB'] },
+          { cells: ['9.', 'Web Page Development', 'Mr. A. Nageswara Rao & Mr. T. Rajesh', 'CSE', '12-08-2025', 'ATL LAB'] },
+          { cells: ['10.', 'Mobile App Development', 'Mrs G Kalyani, Mr K. Ram Kumar', 'AI, IT', '13-08-2025', 'ATL LAB'] },
         ],
       },
       projects: [
@@ -210,16 +327,16 @@ export const assistiveTechLab = {
       bridgeCourse: {
         headers: ['S. No.', 'Course', 'Facilitator', 'Department', 'Date', 'Venue'],
         rows: [
-          ['1.', 'About ATL', 'Dr. K. Padma Vasavi', 'ECE', '11-7-2024', 'B-203'],
-          ['2.', 'Design Thinking and Innovation', 'Dr. D. Ramesh Varma', 'ECE', '12-7-2024, 13-7-2024', 'B-203'],
-          ['3.', 'Basics of Electronics', 'Mr. D. Gireesh Kumar', 'ECE', '15-7-2024', 'B-203'],
-          ['4.', 'Digital Electronics', 'Mr. G. Challaram', 'ECE', '16-7-2024', 'B-203'],
-          ['5.', 'Arduino Programming', 'Mrs. M. Hema Latha, M. Prashanth Kumar, Ch. Santhosh', 'ECE/ATL', '18-7-2024, 19-7-2024, 20-7-2024', 'TI DSP Lab, Projects Lab'],
-          ['6.', 'Actuators, Batteries and Power Management', 'Mr. A. Siva, Mr. B. Mahendra CHand', 'EEE', '22-7-2024, 23-7-2024', ''],
-          ['7.', 'CAD for Packaging (2D CAD, 3D CAD)', 'Mrs. P. Lavanya, Mr. N. Rajasekhar', 'CE, ME', '24-7-2024, 25-7-2024', 'C-319'],
-          ['8.', 'Product Development', 'Dr. K. Padma Vasavi', 'ECE', '26-7-2024, 27-7-2024', 'B-203'],
-          ['9.', 'Web Page Development', 'Mr. A. Nageswara Rao', 'CSE', '29-7-2024', 'B-203'],
-          ['10.', 'Mobile App Development', 'Mr. T. Rajesh', 'CSE', '30-7-2024', 'B-203'],
+          { cells: ['1.', 'About ATL', 'Dr. K. Padma Vasavi', 'ECE', '11-7-2024', 'B-203'] },
+          { cells: ['2.', 'Design Thinking and Innovation', 'Dr. D. Ramesh Varma', 'ECE', '12-7-2024, 13-7-2024', 'B-203'] },
+          { cells: ['3.', 'Basics of Electronics', 'Mr. D. Gireesh Kumar', 'ECE', '15-7-2024', 'B-203'] },
+          { cells: ['4.', 'Digital Electronics', 'Mr. G. Challaram', 'ECE', '16-7-2024', 'B-203'] },
+          { cells: ['5.', 'Arduino Programming', 'Mrs. M. Hema Latha, M. Prashanth Kumar, Ch. Santhosh', 'ECE/ATL', '18-7-2024, 19-7-2024, 20-7-2024', 'TI DSP Lab, Projects Lab'] },
+          { cells: ['6.', 'Actuators, Batteries and Power Management', 'Mr. A. Siva, Mr. B. Mahendra CHand', 'EEE', '22-7-2024, 23-7-2024', ''] },
+          { cells: ['7.', 'CAD for Packaging (2D CAD, 3D CAD)', 'Mrs. P. Lavanya, Mr. N. Rajasekhar', 'CE, ME', '24-7-2024, 25-7-2024', 'C-319'] },
+          { cells: ['8.', 'Product Development', 'Dr. K. Padma Vasavi', 'ECE', '26-7-2024, 27-7-2024', 'B-203'] },
+          { cells: ['9.', 'Web Page Development', 'Mr. A. Nageswara Rao', 'CSE', '29-7-2024', 'B-203'] },
+          { cells: ['10.', 'Mobile App Development', 'Mr. T. Rajesh', 'CSE', '30-7-2024', 'B-203'] },
         ],
       },
       projects: [
@@ -241,24 +358,24 @@ export const assistiveTechLab = {
       bridgeCourse: {
         headers: ['S. No', 'Course', 'Facilitator', 'Department', 'Date'],
         rows: [
-          ['1', 'Project Development & Design Thinking', 'Dr. K. Padma Vasavi', 'ECE', '20-07-2023'],
-          ['2', 'Project Development & Design Thinking', 'Dr. K. Padma Vasavi', 'ECE', '21-07-2023'],
-          ['3', 'Project Development & Design Thinking', 'Dr. K. Padma Vasavi', 'ECE', '22-07-2023'],
-          ['4', 'Digital Electronics', 'Mr. G. Challa Ram', 'ECE', '24-07-2023'],
-          ['5', 'Digital Electronics', 'Mr. D. Ramesh Varma', 'ECE', '25-07-2023'],
-          ['6', 'Analog Electronics', 'Mr. D. Girish Kumar', 'ECE', '26-07-2023'],
-          ['7', 'Analog Electronics', 'Mr. D. Girish Kumar', 'ECE', '27-07-2023'],
-          ['8', 'Arduino', 'Ms. M. Hemalatha & Mr. Santosh', 'ECE', '28-07-2023'],
-          ['9', 'Arduino', 'Ms. M. Hemalatha & Mr. Santosh', 'ECE', '31-07-2023'],
-          ['10', 'Webpage development', 'Mr. VV. Rama Rao & Mr. Anuj', 'CSE', '01-08-2023'],
-          ['11', 'Webpage development', 'Mr. VV. Rama Rao & Mr. R Anuj', 'CSE', '02-08-2023'],
-          ['12', 'Mobile App development', 'Dr. A. Senthil', 'AI & DS', '03-08-2023'],
-          ['13', 'Mobile App development', 'Dr. A. Senthil', 'AI & DS', '04-08-2023'],
-          ['14', '2D CAD', 'Mrs. A Tripura', 'CIVIL', '05-08-2023'],
-          ['15', '3D CAD', 'Mr. N. Raja Sekhar', 'MECH', '07-08-2023'],
-          ['16', 'Power Management & Actuators', 'Mr. Mahendra', 'EEE', '08-08-2023'],
-          ['17', 'Battery and Drivers', 'Mr. A. Siva', 'EEE', '09-08-2023'],
-          ['18', 'Entrepreneurship', 'Mr. K. Ashwin', 'TBI', '10-08-2023'],
+          { cells: ['1', 'Project Development & Design Thinking', 'Dr. K. Padma Vasavi', 'ECE', '20-07-2023'] },
+          { cells: ['2', 'Project Development & Design Thinking', 'Dr. K. Padma Vasavi', 'ECE', '21-07-2023'] },
+          { cells: ['3', 'Project Development & Design Thinking', 'Dr. K. Padma Vasavi', 'ECE', '22-07-2023'] },
+          { cells: ['4', 'Digital Electronics', 'Mr. G. Challa Ram', 'ECE', '24-07-2023'] },
+          { cells: ['5', 'Digital Electronics', 'Mr. D. Ramesh Varma', 'ECE', '25-07-2023'] },
+          { cells: ['6', 'Analog Electronics', 'Mr. D. Girish Kumar', 'ECE', '26-07-2023'] },
+          { cells: ['7', 'Analog Electronics', 'Mr. D. Girish Kumar', 'ECE', '27-07-2023'] },
+          { cells: ['8', 'Arduino', 'Ms. M. Hemalatha & Mr. Santosh', 'ECE', '28-07-2023'] },
+          { cells: ['9', 'Arduino', 'Ms. M. Hemalatha & Mr. Santosh', 'ECE', '31-07-2023'] },
+          { cells: ['10', 'Webpage development', 'Mr. VV. Rama Rao & Mr. Anuj', 'CSE', '01-08-2023'] },
+          { cells: ['11', 'Webpage development', 'Mr. VV. Rama Rao & Mr. R Anuj', 'CSE', '02-08-2023'] },
+          { cells: ['12', 'Mobile App development', 'Dr. A. Senthil', 'AI & DS', '03-08-2023'] },
+          { cells: ['13', 'Mobile App development', 'Dr. A. Senthil', 'AI & DS', '04-08-2023'] },
+          { cells: ['14', '2D CAD', 'Mrs. A Tripura', 'CIVIL', '05-08-2023'] },
+          { cells: ['15', '3D CAD', 'Mr. N. Raja Sekhar', 'MECH', '07-08-2023'] },
+          { cells: ['16', 'Power Management & Actuators', 'Mr. Mahendra', 'EEE', '08-08-2023'] },
+          { cells: ['17', 'Battery and Drivers', 'Mr. A. Siva', 'EEE', '09-08-2023'] },
+          { cells: ['18', 'Entrepreneurship', 'Mr. K. Ashwin', 'TBI', '10-08-2023'] },
         ],
       },
       projects: [
@@ -418,49 +535,49 @@ export const assistiveTechLab = {
   selectedStudents2025: {
     headers: ['S. No', 'Roll No', 'Branch', 'Student Name'],
     rows: [
-      ['1', '23B01A0424', 'ECE', 'Chitrada Rupasri Valli Sai Deepthi'],
-      ['2', '23B01A0458', 'ECE', 'Kola Naga Sushma Sri'],
-      ['3', '23B01A04B0', 'ECE', 'Venkata Sujitha Singaraju'],
-      ['4', '23B01A04C0', 'ECE', 'Valluri Sravya Lakshmi Tulasi'],
-      ['5', '23B01A0404', 'ECE', 'Alluri Varshitha Varma'],
-      ['6', '23B01A0426', 'ECE', 'Davala Manasa'],
-      ['7', '23B01A0446', 'ECE', 'Kambhampati Sohana N P L Sri Lalitha'],
-      ['8', '23B01A0480', 'ECE', 'Nelakurthi Navya'],
-      ['9', '23B01A0487', 'ECE', 'P. Jaya Lakshmi Kala'],
-      ['10', '24B05A0409', 'ECE', 'Pragada Likhitha Bhavani'],
-      ['11', '23B01A0432', 'ECE', 'Garikipati Bhavadharani'],
-      ['12', '23B01A0439', 'ECE', 'I Supraja'],
-      ['13', '23B01A0473', 'ECE', 'Masina Padmini Chowdary'],
-      ['14', '23B01A04C3', 'ECE', 'V Damini Siri'],
-      ['15', '23B01A0431', 'ECE', 'G. Geetha Sri'],
-      ['16', '23B01A0455', 'ECE', 'Satya Gayathri Kaveti'],
-      ['17', '23B01A0479', 'ECE', 'Neelima Tammineni'],
-      ['18', '23B01A0493', 'ECE', 'Penumatsa Aasritha Ramani'],
-      ['19', '23B01A0447', 'ECE', 'Kancharala Yamini Satya Ganga Bhavani'],
-      ['20', '24B05A0412', 'ECE', 'Verramalla Anitha'],
-      ['21', '23B01A0148', 'CE', 'Uttaragiri Bhavani Venkata Naga Lakshmi'],
-      ['22', '23B01A0317', 'MECH', 'J. Eekshitha Sai'],
-      ['23', '23B01A12A4', 'IT', 'Chaturya Maragani'],
-      ['24', '24B05A1211', 'IT', 'Oruganti Jhansi'],
-      ['25', '23B01A1295', 'IT', 'Machavarapu Devi Nagatulasi'],
-      ['26', '23B01A0204', 'EEE', 'Bade Devi Latha'],
-      ['27', '23B01A0208', 'EEE', 'Chavakula Divya Surya Teja Sri'],
-      ['28', '23B01A0215', 'EEE', 'Sivani Eepuri'],
-      ['29', '23B01A0220', 'EEE', 'Sowjanya Kadali'],
-      ['30', '23B01A0238', 'EEE', 'Penmetsa Amruthavarshini'],
-      ['31', '23B01A0207', 'EEE', 'Challa Sri Bharathi Amulya'],
-      ['32', '23B01A4528', 'AI&DS-A', 'Eeli Udaya Lakshmi'],
-      ['33', '23B01A4524', 'AI&DS-A', 'Dekka Jahnvavi'],
-      ['34', '24B05A4504', 'AI&DS-A', 'Chavvakula Jyothi Sri'],
-      ['35', '23B01A4245', 'AI&ML-A', 'Gudivaka Veda Bhavishya'],
-      ['36', '23B01A42B9', 'AI&ML-B', 'Sirvisetti D L T S S Samhita'],
-      ['37', '23B01A4269', 'AI&ML-B', 'Malapati Thanushka'],
-      ['38', '23B01A0554', 'CSE', 'Gangavarapu Jaya Sri Durga'],
-      ['39', '23B01A0562', 'CSE', 'Gundemeda Bindu'],
-      ['40', '23B01A0549', 'CSE', 'Evali Harshitha'],
-      ['41', '24B05A4601', 'CSE-CS', 'Chaitanya Mani Buddigina'],
-      ['42', '23B01A4631', 'CSE-CS', 'Kondapalli. Amrutha Valli'],
-      ['43', '23B01A4651', 'CSE-CS', 'Sade Madhurima'],
+      { cells: ['1', '23B01A0424', 'ECE', 'Chitrada Rupasri Valli Sai Deepthi'] },
+      { cells: ['2', '23B01A0458', 'ECE', 'Kola Naga Sushma Sri'] },
+      { cells: ['3', '23B01A04B0', 'ECE', 'Venkata Sujitha Singaraju'] },
+      { cells: ['4', '23B01A04C0', 'ECE', 'Valluri Sravya Lakshmi Tulasi'] },
+      { cells: ['5', '23B01A0404', 'ECE', 'Alluri Varshitha Varma'] },
+      { cells: ['6', '23B01A0426', 'ECE', 'Davala Manasa'] },
+      { cells: ['7', '23B01A0446', 'ECE', 'Kambhampati Sohana N P L Sri Lalitha'] },
+      { cells: ['8', '23B01A0480', 'ECE', 'Nelakurthi Navya'] },
+      { cells: ['9', '23B01A0487', 'ECE', 'P. Jaya Lakshmi Kala'] },
+      { cells: ['10', '24B05A0409', 'ECE', 'Pragada Likhitha Bhavani'] },
+      { cells: ['11', '23B01A0432', 'ECE', 'Garikipati Bhavadharani'] },
+      { cells: ['12', '23B01A0439', 'ECE', 'I Supraja'] },
+      { cells: ['13', '23B01A0473', 'ECE', 'Masina Padmini Chowdary'] },
+      { cells: ['14', '23B01A04C3', 'ECE', 'V Damini Siri'] },
+      { cells: ['15', '23B01A0431', 'ECE', 'G. Geetha Sri'] },
+      { cells: ['16', '23B01A0455', 'ECE', 'Satya Gayathri Kaveti'] },
+      { cells: ['17', '23B01A0479', 'ECE', 'Neelima Tammineni'] },
+      { cells: ['18', '23B01A0493', 'ECE', 'Penumatsa Aasritha Ramani'] },
+      { cells: ['19', '23B01A0447', 'ECE', 'Kancharala Yamini Satya Ganga Bhavani'] },
+      { cells: ['20', '24B05A0412', 'ECE', 'Verramalla Anitha'] },
+      { cells: ['21', '23B01A0148', 'CE', 'Uttaragiri Bhavani Venkata Naga Lakshmi'] },
+      { cells: ['22', '23B01A0317', 'MECH', 'J. Eekshitha Sai'] },
+      { cells: ['23', '23B01A12A4', 'IT', 'Chaturya Maragani'] },
+      { cells: ['24', '24B05A1211', 'IT', 'Oruganti Jhansi'] },
+      { cells: ['25', '23B01A1295', 'IT', 'Machavarapu Devi Nagatulasi'] },
+      { cells: ['26', '23B01A0204', 'EEE', 'Bade Devi Latha'] },
+      { cells: ['27', '23B01A0208', 'EEE', 'Chavakula Divya Surya Teja Sri'] },
+      { cells: ['28', '23B01A0215', 'EEE', 'Sivani Eepuri'] },
+      { cells: ['29', '23B01A0220', 'EEE', 'Sowjanya Kadali'] },
+      { cells: ['30', '23B01A0238', 'EEE', 'Penmetsa Amruthavarshini'] },
+      { cells: ['31', '23B01A0207', 'EEE', 'Challa Sri Bharathi Amulya'] },
+      { cells: ['32', '23B01A4528', 'AI&DS-A', 'Eeli Udaya Lakshmi'] },
+      { cells: ['33', '23B01A4524', 'AI&DS-A', 'Dekka Jahnvavi'] },
+      { cells: ['34', '24B05A4504', 'AI&DS-A', 'Chavvakula Jyothi Sri'] },
+      { cells: ['35', '23B01A4245', 'AI&ML-A', 'Gudivaka Veda Bhavishya'] },
+      { cells: ['36', '23B01A42B9', 'AI&ML-B', 'Sirvisetti D L T S S Samhita'] },
+      { cells: ['37', '23B01A4269', 'AI&ML-B', 'Malapati Thanushka'] },
+      { cells: ['38', '23B01A0554', 'CSE', 'Gangavarapu Jaya Sri Durga'] },
+      { cells: ['39', '23B01A0562', 'CSE', 'Gundemeda Bindu'] },
+      { cells: ['40', '23B01A0549', 'CSE', 'Evali Harshitha'] },
+      { cells: ['41', '24B05A4601', 'CSE-CS', 'Chaitanya Mani Buddigina'] },
+      { cells: ['42', '23B01A4631', 'CSE-CS', 'Kondapalli. Amrutha Valli'] },
+      { cells: ['43', '23B01A4651', 'CSE-CS', 'Sade Madhurima'] },
     ],
   } as AtlSimpleTable,
   collaborations: 'Established in 2009, the Assistive Technology Lab collaborates with the University of Massachusetts (UMass), Lowell, USA. It focuses on empowering SVECW students to design projects benefiting the differently-abled, aiming to integrate them into mainstream society.',
@@ -558,12 +675,12 @@ export const assistiveTechLab = {
         { type: 'table', title: 'ATL Day Distribution Projects', table: {
           headers: ['S.No', 'Name of the Project', 'Qty', 'Beneficiary'],
           rows: [
-            ['1', 'Talking Box', '2', 'Sri Venkateswara Deaf & Dumb School'],
-            ['2', 'Blind Stick', '5', 'U.V. Ramana Raju Blind School'],
-            ['3', 'Braille Tutor', '2', 'U.V. Ramana Raju Blind School'],
-            ['4', 'India Map', '2', 'U.V. Ramana Raju Blind School'],
-            ['5', 'Medicine Reminder', '1', 'U.V. Ramana Raju Blind School'],
-            ['6', 'Currency Note Identifier', '1', 'U.V. Ramana Raju Blind School'],
+            { cells: ['1', 'Talking Box', '2', 'Sri Venkateswara Deaf & Dumb School'] },
+            { cells: ['2', 'Blind Stick', '5', 'U.V. Ramana Raju Blind School'] },
+            { cells: ['3', 'Braille Tutor', '2', 'U.V. Ramana Raju Blind School'] },
+            { cells: ['4', 'India Map', '2', 'U.V. Ramana Raju Blind School'] },
+            { cells: ['5', 'Medicine Reminder', '1', 'U.V. Ramana Raju Blind School'] },
+            { cells: ['6', 'Currency Note Identifier', '1', 'U.V. Ramana Raju Blind School'] },
           ],
         } },
       ],
@@ -587,10 +704,10 @@ export const assistiveTechLab = {
         { type: 'table', title: 'ATL Product Distribution', table: {
           headers: ['S.No', 'Project Name', 'Remarks'],
           rows: [
-            ['1', 'Trike (Scooter)', 'Directly Distributed to an Individual Client'],
-            ['2', 'Datura Flower (Tactile Botany Model)', 'Distributed to U.V. Ramana Raju Blind School'],
-            ['3', 'E-Sticks (Smart Walking Sticks)', 'Distributed to U.V. Ramana Raju Blind School'],
-            ['4', 'Human Heart (3D Printed Model)', 'Distributed to U.V. Ramana Raju Blind School'],
+            { cells: ['1', 'Trike (Scooter)', 'Directly Distributed to an Individual Client'] },
+            { cells: ['2', 'Datura Flower (Tactile Botany Model)', 'Distributed to U.V. Ramana Raju Blind School'] },
+            { cells: ['3', 'E-Sticks (Smart Walking Sticks)', 'Distributed to U.V. Ramana Raju Blind School'] },
+            { cells: ['4', 'Human Heart (3D Printed Model)', 'Distributed to U.V. Ramana Raju Blind School'] },
           ],
         } },
         { type: 'paragraph', text: 'The program ended with a vote of thanks from the ATL Coordinator, appreciating the involvement of 40 students, 12 mentors, and the support from college management. The event exemplified how engineering education can be transformed into a socially impactful journey, creating a strong foundation for empathetic and inclusive innovations.' },
@@ -805,13 +922,13 @@ export const assistiveTechLab = {
     title: 'Projects Exhibiting at Telangana Assistive Technology Summit 4.0 at T-Hub on 4th Jan 2024',
     headers: ['S.No', 'Regd. No.', 'Student Name', 'Branch', 'Project', 'YouTube Video Link'],
     rows: [
-      ['1', '21B01A0457', 'Megapu Siva Renjani', 'ECE-A', 'SHE SHIELD', ''],
-      ['2', '22B05A0406', 'K Sai Vardhini', 'ECE-A', '', ''],
-      ['3', '21B05A0484', 'Vennemsetty Vaili Suvarna', 'ECE-B', '', ''],
-      ['4', '22B05A0413', 'Simhadri Likitha Sai Durga', 'ECE-B', '', ''],
-      ['5', '22B05A0204', 'Nandem Sravani', 'EEE', '', ''],
-      ['6', '22B05A0302', 'Kekarie Charitha', 'Mechanical', '', ''],
+      { cells: ['1', '21B01A0457', 'Megapu Siva Renjani', 'ECE-A', 'SHE SHIELD', ''] },
+      { cells: ['2', '22B05A0406', 'K Sai Vardhini', 'ECE-A', '', ''] },
+      { cells: ['3', '21B05A0484', 'Vennemsetty Vaili Suvarna', 'ECE-B', '', ''] },
+      { cells: ['4', '22B05A0413', 'Simhadri Likitha Sai Durga', 'ECE-B', '', ''] },
+      { cells: ['5', '22B05A0204', 'Nandem Sravani', 'EEE', '', ''] },
+      { cells: ['6', '22B05A0302', 'Kekarie Charitha', 'Mechanical', '', ''] },
     ],
-  } as { title: string; headers: string[]; rows: string[][] },
+  } as { title: string; headers: string[]; rows: AtlTableRow[] },
   atlInNewsCaption: 'Students at Telangana Assistive Technology Summit 4.0 at T-Hub, telecasted in ETV YUVA programme on 4th Jan 2024.',
 };
