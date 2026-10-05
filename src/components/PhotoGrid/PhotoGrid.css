@@ -492,6 +492,14 @@
   .photo-side-images .photo-grid-collage-2 {
     grid-auto-rows: 130px;
   }
+  /* Rows are 130px here but .photo-grid-item has min-height: 160px, so every
+     tile overflowed its row by 30px and the tiles overlapped the row below.
+     Let the tiles fit their rows instead. */
+  .photo-grid-collage-3 .photo-grid-item,
+  .photo-grid-collage-4 .photo-grid-item,
+  .photo-grid-collage-2 .photo-grid-item {
+    min-height: 0;
+  }
   .photo-grid-collage-3 .photo-grid-item--featured,
   .photo-grid-collage-4 .photo-grid-item--featured,
   .photo-grid-collage-2 .photo-grid-item--featured {
