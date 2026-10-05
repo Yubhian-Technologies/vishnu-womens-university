@@ -66,6 +66,13 @@ export default function HeroSlider() {
     if (videoRef.current) videoRef.current.currentTime = 0;
   }, []);
 
+  // Manual dot navigation — jumps to any banner (even back from the video,
+  // unlike auto-advance above, which only ever moves forward once).
+  const goToBanner = useCallback((i: number) => {
+    setVideoReached(false);
+    setCurrent(i);
+  }, []);
+
   const next = useCallback(() => {
     if (bannerIndex >= banners.length - 1) goToVideo();
     else setCurrent(bannerIndex + 1);
@@ -177,6 +184,34 @@ export default function HeroSlider() {
           )}
         </div>
       ))}
+
+      {/* Dots — one per banner, plus one for the video. Lets a visitor move
+          backward/forward through the carousel by hand, including back from
+          the video to an earlier banner. Pointless with no banners to pick
+          between (ready-but-video-only), so hidden then. */}
+      {ready && banners.length > 0 && (
+        <div className="hero-dots" role="tablist" aria-label="Hero slides">
+          {banners.map((b, i) => (
+            <button
+              key={b.id}
+              type="button"
+              role="tab"
+              className={`hero-dot${phase === 'banners' && i === bannerIndex ? ' hero-dot--active' : ''}`}
+              aria-label={`Go to slide ${i + 1}`}
+              aria-selected={phase === 'banners' && i === bannerIndex}
+              onClick={() => goToBanner(i)}
+            />
+          ))}
+          <button
+            type="button"
+            role="tab"
+            className={`hero-dot${phase === 'video' ? ' hero-dot--active' : ''}`}
+            aria-label="Go to video"
+            aria-selected={phase === 'video'}
+            onClick={goToVideo}
+          />
+        </div>
+      )}
 
       {/* Mute / Unmute — only meaningful once the video is showing */}
       {showVideo && (
