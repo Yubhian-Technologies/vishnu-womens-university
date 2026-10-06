@@ -28,6 +28,7 @@ export const SECTIONS: { id: string; icon: IconDefinition; label: string }[] = [
   { id: 'theme',          icon: faPalette, label: 'Color Theme' },
   { id: 'feature-popup',  icon: faImage, label: 'Feature Popup' },
   { id: 'home-hero-banners', icon: faImages, label: 'Home Hero Banners' },
+  { id: 'home-content', icon: faHouse, label: 'Home Page — Copy' },
   { id: 'banners',        icon: faImage, label: 'Hero Banners' },
   { id: 'landing-pages',  icon: faHouse, label: 'Landing Pages' },
   { id: 'news',           icon: faNewspaper, label: 'News & Events' },
@@ -108,7 +109,7 @@ export const SECTIONS: { id: string; icon: IconDefinition; label: string }[] = [
 export const SECTION_GROUPS: { label: string; ids: string[] }[] = [
   { label: 'Overview', ids: ['overview'] },
   { label: 'Form Submissions & CRM', ids: ['crm', 'contact-messages', 'career-applications', 'admission-inquiries', 'campus-visit-requests', 'career-guidance-interest'] },
-  { label: 'Site Appearance', ids: ['theme', 'feature-popup', 'home-hero-banners', 'banners', 'landing-pages', 'honoured-guests', 'site-photos', 'header-menu', 'nav-links', 'footer-links', 'content-blocks', 'compliance-docs'] },
+  { label: 'Site Appearance', ids: ['theme', 'feature-popup', 'home-hero-banners', 'home-content', 'banners', 'landing-pages', 'honoured-guests', 'site-photos', 'header-menu', 'nav-links', 'footer-links', 'content-blocks', 'compliance-docs'] },
   { label: 'About & Governance', ids: ['governing-body', 'governance-items', 'quality-parameters', 'internal-qa-cell', 'annual-reports', 'nirf-reports', 'nba-data', 'core-executives', 'sves-campuses', 'contacts', 'site-contact', 'contact-extras', 'policies'] },
   { label: 'Academics', ids: ['departments', 'programs', 'schools', 'faculty', 'curriculum', 'downloads'] },
   { label: 'Admissions & Campus Info', ids: ['information', 'programmes-fee', 'admission-procedure', 'admissions-ranks', 'result-analysis'] },
