@@ -16,6 +16,7 @@ import { hasCustomSectionContent, toQuickLinkItems } from '../../lib/customSecti
 import CustomSectionsRenderer from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import { getDepartmentTagline } from '../../lib/departmentTaglines';
 import { renderBold } from '../../lib/boldText';
+import { hodTitle } from '../../lib/hod';
 import '../detail-layout.css';
 
 const NAV_OFFSET = 'calc(var(--topbar-height) + var(--header-height) + 1rem)';
@@ -292,12 +293,12 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
               {dept.hodImage && (
                 <div className="dept-hod-media-col">
                   <div className="dept-hod-media-frame">
-                    <SmoothImage src={dept.hodImage} alt={dept.hod || 'Head of Department'} className="dept-hod-photo" />
+                    <SmoothImage src={dept.hodImage} alt={dept.hod || hodTitle(group.deptShortCode || dept.title)} className="dept-hod-photo" />
                   </div>
                   {dept.hod && (
                     <div className="dept-hod-media-caption">
                       <h3 className="dept-hod-name">{dept.hod}</h3>
-                      <div className="dept-hod-meta">Head of the Department</div>
+                      <div className="dept-hod-meta">{hodTitle(group.deptShortCode || dept.title)}</div>
                     </div>
                   )}
                 </div>

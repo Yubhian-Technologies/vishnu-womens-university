@@ -27,6 +27,7 @@ import { resolveRndYears, rndYearHasContent } from '../../components/RndSection/
 import { sortPlacementRows, computePlacementStats, findPackageColumnIndex, findCompanyColumnIndex, formatPackageCell } from '../../lib/placementRecords';
 import { computeInternshipStats, findPeriodColumnIndex } from '../../lib/internshipRecords';
 import { getDeptBatchStats, findDeptBatchStatsForYearLabel } from '../../lib/departmentPlacementBridge';
+import { hodTitle } from '../../lib/hod';
 import { usePlacementYears } from '../Placements/usePlacementYears';
 import { hasCustomSectionContent } from '../../lib/customSections';
 import CustomSectionsRenderer from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
@@ -2016,7 +2017,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
         <section id="hod" className="dept-hod-section" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
             <div style={{ textAlign: 'center', maxWidth: 600, margin: '0 auto var(--space-8)' }}>
-              <h2 className="section-title">Head of the Department</h2>
+              <h2 className="section-title">{hodTitle(group.deptShortCode || dept?.title)}</h2>
             </div>
             <div className="dept-hod-editorial-card">
               {shared.hodImage && (
@@ -2024,14 +2025,14 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                   <div className="dept-hod-media-frame">
                     <SmoothImage
                       src={shared.hodImage}
-                      alt={shared.hod || 'Head of Department'}
+                      alt={shared.hod || hodTitle(group.deptShortCode || dept?.title)}
                       className="dept-hod-photo"
                     />
                   </div>
                   {shared.hod && (
                     <div className="dept-hod-media-caption">
                       <h3 className="dept-hod-name">{shared.hod}</h3>
-                      <div className="dept-hod-meta">Head of the Department</div>
+                      <div className="dept-hod-meta">{hodTitle(group.deptShortCode || dept?.title)}</div>
                     </div>
                   )}
                 </div>
