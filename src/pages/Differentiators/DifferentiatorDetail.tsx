@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { Rocket, Factory, Microscope, Globe2, GraduationCap, ChevronRight, Users, BarChart3, ArrowRight, Plane, ChevronLeft } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
@@ -35,6 +35,7 @@ import IicPage from './IicPage';
 import RuralWomenTechParkPage from './RuralWomenTechParkPage';
 import SmartInterviewsPage from './SmartInterviewsPage';
 import { renderBold } from '../../lib/boldText';
+import { DEFAULT_GSAC_HERO_CONTENT, GSAC_HERO_CONTENT_COLLECTION, GSAC_HERO_CONTENT_DOC_ID, type GsacHeroContentDoc } from '../Admin/sections/GsacHeroContentAdmin';
 import '../detail-layout.css';
 import '../gsac-shared.css';
 import './foreign-languages.css';
@@ -341,6 +342,12 @@ function resolveBlock(item: DifferentiatorItemDoc, key: Exclude<BlockKey, 'descr
 }
 
 function GsacHero({ heroImage }: { heroImage?: string }) {
+  const { data: remoteGsacHero } = useDocument<GsacHeroContentDoc>(GSAC_HERO_CONTENT_COLLECTION, GSAC_HERO_CONTENT_DOC_ID);
+  const gsacHero = {
+    subtitle: remoteGsacHero?.subtitle || DEFAULT_GSAC_HERO_CONTENT.subtitle,
+    features: remoteGsacHero?.features?.length === 4 ? remoteGsacHero.features : DEFAULT_GSAC_HERO_CONTENT.features,
+    statPills: remoteGsacHero?.statPills?.length === 3 ? remoteGsacHero.statPills : DEFAULT_GSAC_HERO_CONTENT.statPills,
+  };
   return (
     <section className="gsac-hero-section">
       <div className="gsac-hero-card">
@@ -370,47 +377,33 @@ function GsacHero({ heroImage }: { heroImage?: string }) {
               <span className="text-accent">GSAC</span>
             </h1>
             <p className="gsac-hero-subtitle">
-              Empowering students to pursue international higher education across 7 global destinations through expert counselling, test preparation, loan support, and pre-departure guidance.
+              {gsacHero.subtitle}
             </p>
 
             <div className="gsac-hero-features">
-              <div className="gsac-hero-feature">
-                <div className="gsac-hero-line" style={{ width: '20px', marginBottom: '8px' }}></div>
-                <div className="gsac-hero-feature-title">EXPLORE</div>
-                <div className="gsac-hero-feature-subtitle">GLOBAL<br/>OPPORTUNITIES</div>
-              </div>
-              <div className="gsac-hero-feature">
-                <div className="gsac-hero-line" style={{ width: '20px', marginBottom: '8px' }}></div>
-                <div className="gsac-hero-feature-title">LEARN</div>
-                <div className="gsac-hero-feature-subtitle">FROM<br/>EXPERTS</div>
-              </div>
-              <div className="gsac-hero-feature">
-                <div className="gsac-hero-line" style={{ width: '20px', marginBottom: '8px' }}></div>
-                <div className="gsac-hero-feature-title">CONNECT</div>
-                <div className="gsac-hero-feature-subtitle">WITH A<br/>GLOBAL NETWORK</div>
-              </div>
-              <div className="gsac-hero-feature">
-                <div className="gsac-hero-line" style={{ width: '20px', marginBottom: '8px' }}></div>
-                <div className="gsac-hero-feature-title">GO BEYOND</div>
-                <div className="gsac-hero-feature-subtitle">A BRIGHTER<br/>TOMORROW</div>
-              </div>
+              {gsacHero.features.map((f, i) => (
+                <div key={i} className="gsac-hero-feature">
+                  <div className="gsac-hero-line" style={{ width: '20px', marginBottom: '8px' }}></div>
+                  <div className="gsac-hero-feature-title">{f.title}</div>
+                  <div className="gsac-hero-feature-subtitle">
+                    {f.subtitle.split('\n').map((line, li) => (
+                      <span key={li}>{li > 0 && <br />}{line}</span>
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
 
             <div className="gsac-hero-stats-pill">
-              <div className="gsac-stats-item">
-                <strong>7+</strong>
-                <span>Global Destinations</span>
-              </div>
-              <div className="gsac-stats-divider"></div>
-              <div className="gsac-stats-item">
-                <strong>Expert</strong>
-                <span>End-to-End Guidance</span>
-              </div>
-              <div className="gsac-stats-divider"></div>
-              <div className="gsac-stats-item">
-                <strong>A Brighter</strong>
-                <span>Global Future</span>
-              </div>
+              {gsacHero.statPills.map((s, i) => (
+                <Fragment key={i}>
+                  {i > 0 && <div className="gsac-stats-divider"></div>}
+                  <div className="gsac-stats-item">
+                    <strong>{s.value}</strong>
+                    <span>{s.label}</span>
+                  </div>
+                </Fragment>
+              ))}
             </div>
           </div>
 
