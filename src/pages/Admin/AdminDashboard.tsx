@@ -50,6 +50,7 @@ import SitePhotosAdmin from './sections/SitePhotosAdmin';
 import NavLinkOverridesAdmin from './sections/NavLinkOverridesAdmin';
 import HeaderMenuAdmin from './sections/HeaderMenuAdmin';
 import FooterLinksAdmin from './sections/FooterLinksAdmin';
+import SocialHandlesAdmin from './sections/SocialHandlesAdmin';
 import GovernanceItemsAdmin from './sections/GovernanceItemsAdmin';
 import QualityParametersAdmin from './sections/QualityParametersAdmin';
 import InternalQACellAdmin from './sections/InternalQACellAdmin';
@@ -160,6 +161,7 @@ const SECTION_MAP: Record<string, React.ReactNode> = {
   'header-menu': <HeaderMenuAdmin />,
   'nav-links': <NavLinkOverridesAdmin />,
   'footer-links': <FooterLinksAdmin />,
+  'social-handles': <SocialHandlesAdmin />,
   'governance-items': <GovernanceItemsAdmin />,
   'quality-parameters': <QualityParametersAdmin />,
   'internal-qa-cell': <InternalQACellAdmin />,
