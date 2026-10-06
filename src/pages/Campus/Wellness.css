@@ -28,9 +28,7 @@
 }
 
 .wellness-hero-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(100deg, rgba(7, 14, 32, 0.94) 0%, rgba(7, 14, 32, 0.8) 45%, rgba(7, 14, 32, 0.45) 78%, rgba(7, 14, 32, 0.2) 100%);
+  display: none;
 }
 
 .wellness-hero-content {

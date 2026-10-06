@@ -316,21 +316,12 @@
   height: 100%;
   object-fit: cover;
   z-index: 0;
-  opacity: 0.85; /* Bright image, but the overlay will darken the left side */
+  opacity: 1;
 }
 
 /* Dark gradients from the left, bottom-left, and bottom-right */
 .gsac-hero-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: 
-    linear-gradient(90deg, rgba(11,30,66,0.95) 0%, rgba(11,30,66,0.8) 35%, transparent 65%),
-    linear-gradient(45deg, rgba(11,30,66,0.95) 0%, transparent 40%),
-    linear-gradient(-45deg, rgba(11,30,66,0.9) 0%, transparent 35%);
-  z-index: 1;
+  display: none;
 }
 
 /* The dotted doodle curve */
