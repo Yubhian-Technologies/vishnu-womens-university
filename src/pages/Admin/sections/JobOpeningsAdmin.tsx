@@ -3,6 +3,7 @@ import { collection, doc, serverTimestamp } from 'firebase/firestore';
 import { addDoc, deleteDoc, updateDoc } from '../../../lib/auditLog';
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
+import { uploadFile } from '../../../lib/storage';
 
 export interface JobOpeningDoc {
   id: string;
@@ -10,10 +11,13 @@ export interface JobOpeningDoc {
   title: string;
   type: string;
   qualification: string;
+  description?: string;
+  templateUrl?: string;
+  templateName?: string;
   order: number;
 }
 
-const EMPTY: Omit<JobOpeningDoc, 'id'> = { department: '', title: '', type: 'Teaching', qualification: '', order: 0 };
+const EMPTY: Omit<JobOpeningDoc, 'id'> = { department: '', title: '', type: 'Teaching', qualification: '', description: '', templateUrl: '', templateName: '', order: 0 };
 
 const TYPES = ['Teaching', 'Technical', 'Administrative'];
 
@@ -40,7 +44,19 @@ export default function JobOpeningsAdmin() {
     } finally { setSaving(false); }
   };
 
-  const startEdit = (o: JobOpeningDoc) => { setEditing(o.id); setForm({ department: o.department, title: o.title, type: o.type, qualification: o.qualification, order: o.order }); };
+  const startEdit = (o: JobOpeningDoc) => { setEditing(o.id); setForm({ ...EMPTY, department: o.department, title: o.title, type: o.type, qualification: o.qualification, description: o.description || '', templateUrl: o.templateUrl || '', templateName: o.templateName || '', order: o.order }); };
+
+  const uploadTemplate = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    if (!f.name.toLowerCase().endsWith('.docx')) return alert('Template must be a .docx file.');
+    try {
+      const { url } = await uploadFile(f, 'vwu/career-templates');
+      setForm((p) => ({ ...p, templateUrl: url, templateName: f.name }));
+    } catch (err) {
+      alert(`Couldn't upload: ${(err as Error).message}`);
+    }
+  };
 
   const remove = async (id: string) => {
     if (!confirm('Delete this opening?')) return;
@@ -77,6 +93,15 @@ export default function JobOpeningsAdmin() {
           <div className="admin-field admin-field--full">
             <label htmlFor="field-qualification">Qualification</label>
             <input id="field-qualification" value={form.qualification} onChange={(e) => set('qualification', e.target.value)} placeholder="M.Tech. in CSE / IT / AI (Ph.D. pursuing preferred)" />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label htmlFor="field-description">Description</label>
+            <textarea id="field-description" rows={4} value={form.description} onChange={(e) => set('description', e.target.value)} placeholder="Responsibilities, requirements, how to apply…" />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label htmlFor="field-template">Data format template (.docx)</label>
+            <input id="field-template" type="file" accept=".docx" onChange={uploadTemplate} />
+            {form.templateUrl && <small>Current: <a href={form.templateUrl} target="_blank" rel="noopener noreferrer">{form.templateName || 'template.docx'}</a></small>}
           </div>
         </div>
         <div className="admin-form-actions">

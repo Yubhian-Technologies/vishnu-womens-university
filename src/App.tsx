@@ -80,6 +80,7 @@ const VWUInsightsSection = lazyWithRetry(() => import('./pages/NewsAwards/VWUIns
 const GalleryPage = lazyWithRetry(() => import('./pages/NewsAwards/Gallery'));
 const SocialMedia = lazyWithRetry(() => import('./pages/NewsAwards/SocialMedia'));
 const Careers = lazyWithRetry(() => import('./pages/Careers/Careers'));
+const CareerDetail = lazyWithRetry(() => import('./pages/Careers/CareerDetail'));
 const Contact = lazyWithRetry(() => import('./pages/Contact/Contact'));
 const ApplyNow = lazyWithRetry(() => import('./pages/ApplyNow/ApplyNow'));
 const UGCDisclosure = lazyWithRetry(() => import('./pages/Disclosures/UGCDisclosure'));
@@ -236,6 +237,7 @@ function PublicApp() {
             <Route path="/news-awards/gallery" element={<GalleryPage />} />
             <Route path="/news-awards/social-media-handles" element={<SocialMedia />} />
             <Route path="/careers" element={<Careers />} />
+            <Route path="/careers/:id" element={<CareerDetail />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/apply-now" element={<ApplyNow />} />
             <Route path="/disclosures/ugc" element={<UGCDisclosure />} />
