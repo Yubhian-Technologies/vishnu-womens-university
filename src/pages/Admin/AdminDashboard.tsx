@@ -47,6 +47,8 @@ import NavLinkOverridesAdmin from './sections/NavLinkOverridesAdmin';
 import HeaderMenuAdmin from './sections/HeaderMenuAdmin';
 import FooterLinksAdmin from './sections/FooterLinksAdmin';
 import GovernanceItemsAdmin from './sections/GovernanceItemsAdmin';
+import QualityParametersAdmin from './sections/QualityParametersAdmin';
+import InternalQACellAdmin from './sections/InternalQACellAdmin';
 import AnnualReportsAdmin from './sections/AnnualReportsAdmin';
 import NirfReportsAdmin from './sections/NirfReportsAdmin';
 import NbaDataAdmin from './sections/NbaDataAdmin';
@@ -151,6 +153,8 @@ const SECTION_MAP: Record<string, React.ReactNode> = {
   'nav-links': <NavLinkOverridesAdmin />,
   'footer-links': <FooterLinksAdmin />,
   'governance-items': <GovernanceItemsAdmin />,
+  'quality-parameters': <QualityParametersAdmin />,
+  'internal-qa-cell': <InternalQACellAdmin />,
   'annual-reports': <AnnualReportsAdmin />,
   'nirf-reports': <NirfReportsAdmin />,
   'nba-data': <NbaDataAdmin />,

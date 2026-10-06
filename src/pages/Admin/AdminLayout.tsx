@@ -11,6 +11,7 @@ import {
   faChartPie, faChartBar, faStar, faArrowTrendUp, faIdCard, faCalendarCheck, faPortrait, faBuilding, faTag,
   faPlane, faTrophy, faFlask, faFileCircleCheck, faBook, faUserShield, faRightFromBracket, faPhone,
   faPalette, faMedal, faAward, faLightbulb, faFutbol, faGear, faBars, faClockRotateLeft,
+  faListCheck, faUsersGear,
 } from '@fortawesome/free-solid-svg-icons';
 import { getFirebaseAuth } from '../../lib/firebaseAdmin';
 import { resolveAdminSession, canReadModule } from '../../lib/rbac';
@@ -71,6 +72,8 @@ export const SECTIONS: { id: string; icon: IconDefinition; label: string }[] = [
   { id: 'nav-links',      icon: faLink, label: 'Navigation Link Redirects' },
   { id: 'footer-links',   icon: faLink, label: 'Footer Columns & Links' },
   { id: 'governance-items', icon: faScaleBalanced, label: 'Governance / Committees / IQAC' },
+  { id: 'quality-parameters', icon: faListCheck, label: 'Quality Parameters Checklist' },
+  { id: 'internal-qa-cell', icon: faUsersGear, label: 'Internal Quality Assurance Cell' },
   { id: 'annual-reports', icon: faFolderOpen, label: 'Annual Reports & Reforms' },
   { id: 'nirf-reports',   icon: faChartPie, label: 'NIRF Reports' },
   { id: 'nba-data',       icon: faChartBar, label: 'NBA Data Capturing Points' },
@@ -106,7 +109,7 @@ export const SECTION_GROUPS: { label: string; ids: string[] }[] = [
   { label: 'Overview', ids: ['overview'] },
   { label: 'Form Submissions & CRM', ids: ['crm', 'contact-messages', 'career-applications', 'admission-inquiries', 'campus-visit-requests', 'career-guidance-interest'] },
   { label: 'Site Appearance', ids: ['theme', 'feature-popup', 'home-hero-banners', 'banners', 'landing-pages', 'honoured-guests', 'site-photos', 'header-menu', 'nav-links', 'footer-links', 'content-blocks', 'compliance-docs'] },
-  { label: 'About & Governance', ids: ['governing-body', 'governance-items', 'annual-reports', 'nirf-reports', 'nba-data', 'core-executives', 'sves-campuses', 'contacts', 'site-contact', 'contact-extras', 'policies'] },
+  { label: 'About & Governance', ids: ['governing-body', 'governance-items', 'quality-parameters', 'internal-qa-cell', 'annual-reports', 'nirf-reports', 'nba-data', 'core-executives', 'sves-campuses', 'contacts', 'site-contact', 'contact-extras', 'policies'] },
   { label: 'Academics', ids: ['departments', 'programs', 'schools', 'faculty', 'curriculum', 'downloads'] },
   { label: 'Admissions & Campus Info', ids: ['information', 'programmes-fee', 'admission-procedure', 'admissions-ranks', 'result-analysis'] },
   { label: 'Student Life', ids: ['student-clubs', 'campus-life', 'sports', 'faqs', 'job-openings', 'events'] },
