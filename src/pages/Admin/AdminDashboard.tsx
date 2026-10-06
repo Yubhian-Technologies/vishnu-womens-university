@@ -15,6 +15,7 @@ import SchoolsAdmin from './sections/SchoolsAdmin';
 import FacultyAdmin from './sections/FacultyAdmin';
 import AboutContentAdmin from './sections/AboutContentAdmin';
 import VisionMissionContentAdmin from './sections/VisionMissionContentAdmin';
+import AboutSvesContentAdmin from './sections/AboutSvesContentAdmin';
 import GoverningBodyAdmin from './sections/GoverningBodyAdmin';
 import CoreExecutivesAdmin from './sections/CoreExecutivesAdmin';
 import PlacementYearsAdmin from './sections/PlacementYearsAdmin';
@@ -124,6 +125,7 @@ const SECTION_MAP: Record<string, React.ReactNode> = {
   faculty: <FacultyAdmin />,
   'about-content': <AboutContentAdmin />,
   'vision-mission-content': <VisionMissionContentAdmin />,
+  'about-sves-content': <AboutSvesContentAdmin />,
   'governing-body': <GoverningBodyAdmin />,
   'core-executives': <CoreExecutivesAdmin />,
   placements: <PlacementYearsAdmin />,
