@@ -62,6 +62,7 @@ import PlacementItemsAdmin from './sections/PlacementItemsAdmin';
 import PlacementCrtDocsAdmin from './sections/PlacementCrtDocsAdmin';
 import NewsAwardsDataAdmin from './sections/NewsAwardsDataAdmin';
 import NewsAwardsContentAdmin from './sections/NewsAwardsContentAdmin';
+import ApplyNowContentAdmin from './sections/ApplyNowContentAdmin';
 import InsightsAdmin from './sections/InsightsAdmin';
 import CareerGuidanceInterestAdmin from './sections/CareerGuidanceInterestAdmin';
 import ResearchItemsAdmin from './sections/ResearchItemsAdmin';
@@ -179,6 +180,7 @@ const SECTION_MAP: Record<string, React.ReactNode> = {
   'gsac-photos': <GsacPhotosAdmin />,
   'news-awards-data': <NewsAwardsDataAdmin />,
   'news-awards-content': <NewsAwardsContentAdmin />,
+  'apply-now-content': <ApplyNowContentAdmin />,
   insights: <InsightsAdmin />,
   'career-guidance-interest': <CareerGuidanceInterestAdmin />,
   'research-items': <ResearchItemsAdmin />,

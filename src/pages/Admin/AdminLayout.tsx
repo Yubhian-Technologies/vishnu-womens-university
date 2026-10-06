@@ -11,7 +11,7 @@ import {
   faChartPie, faChartBar, faStar, faArrowTrendUp, faIdCard, faCalendarCheck, faPortrait, faBuilding, faTag,
   faPlane, faTrophy, faFlask, faFileCircleCheck, faBook, faUserShield, faRightFromBracket, faPhone,
   faPalette, faMedal, faAward, faLightbulb, faFutbol, faGear, faBars, faClockRotateLeft,
-  faListCheck, faUsersGear, faShareNodes,
+  faListCheck, faUsersGear, faShareNodes, faFileSignature,
 } from '@fortawesome/free-solid-svg-icons';
 import { getFirebaseAuth } from '../../lib/firebaseAdmin';
 import { resolveAdminSession, canReadModule } from '../../lib/rbac';
@@ -66,6 +66,7 @@ export const SECTIONS: { id: string; icon: IconDefinition; label: string }[] = [
   { id: 'sves-campuses',  icon: faCity, label: 'SVES Campuses' },
   { id: 'programmes-fee', icon: faGraduationCap, label: 'Programmes & Fee Structure' },
   { id: 'admission-procedure', icon: faClipboardList, label: 'Admission Procedure' },
+  { id: 'apply-now-content', icon: faFileSignature, label: 'Apply Now Page — Copy' },
   { id: 'admissions-ranks', icon: faChartBar, label: 'AP EAPCET Rank Analysis' },
   { id: 'result-analysis', icon: faChartLine, label: 'Results Analysis — Batch Pass Rates' },
   { id: 'contact-extras', icon: faPhone, label: 'Contact Page — Helplines & Travel Guide' },
@@ -117,7 +118,7 @@ export const SECTION_GROUPS: { label: string; ids: string[] }[] = [
   { label: 'Site Appearance', ids: ['theme', 'feature-popup', 'home-hero-banners', 'home-content', 'banners', 'landing-pages', 'honoured-guests', 'site-photos', 'header-menu', 'nav-links', 'footer-links', 'social-handles', 'content-blocks', 'compliance-docs'] },
   { label: 'About & Governance', ids: ['about-content', 'vision-mission-content', 'about-sves-content', 'governing-body', 'governance-items', 'quality-parameters', 'internal-qa-cell', 'annual-reports', 'nirf-reports', 'nba-data', 'core-executives', 'sves-campuses', 'contacts', 'site-contact', 'contact-extras', 'policies'] },
   { label: 'Academics', ids: ['departments', 'programs', 'schools', 'faculty', 'curriculum', 'downloads'] },
-  { label: 'Admissions & Campus Info', ids: ['information', 'programmes-fee', 'admission-procedure', 'admissions-ranks', 'result-analysis'] },
+  { label: 'Admissions & Campus Info', ids: ['information', 'programmes-fee', 'admission-procedure', 'apply-now-content', 'admissions-ranks', 'result-analysis'] },
   { label: 'Student Life', ids: ['student-clubs', 'campus-life', 'sports', 'faqs', 'job-openings', 'events'] },
   { label: 'Placements & Careers', ids: ['placements', 'placement-highlights', 'placement-items', 'tpo-team-info', 'placement-crt-docs', 'tpo-team-photos', 'ilo-office-photos', 'recruiter-logos', 'gsac-photos'] },
   { label: 'Differentiators', ids: ['differentiators'] },
