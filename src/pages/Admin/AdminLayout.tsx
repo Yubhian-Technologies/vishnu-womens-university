@@ -10,7 +10,7 @@ import {
   faClipboardList, faBus, faCity, faDownload, faTableList, faCamera, faLink, faScaleBalanced, faFolderOpen,
   faChartPie, faChartBar, faStar, faArrowTrendUp, faIdCard, faCalendarCheck, faPortrait, faBuilding, faTag,
   faPlane, faTrophy, faFlask, faFileCircleCheck, faBook, faUserShield, faRightFromBracket, faPhone,
-  faPalette, faMedal, faAward, faLightbulb, faFutbol, faGear, faBars,
+  faPalette, faMedal, faAward, faLightbulb, faFutbol, faGear, faBars, faClockRotateLeft,
 } from '@fortawesome/free-solid-svg-icons';
 import { getFirebaseAuth } from '../../lib/firebaseAdmin';
 import { resolveAdminSession, canReadModule } from '../../lib/rbac';
@@ -26,6 +26,7 @@ export const SECTIONS: { id: string; icon: IconDefinition; label: string }[] = [
   { id: 'overview',       icon: faChartLine, label: 'Overview' },
   { id: 'theme',          icon: faPalette, label: 'Color Theme' },
   { id: 'feature-popup',  icon: faImage, label: 'Feature Popup' },
+  { id: 'home-hero-banners', icon: faImages, label: 'Home Hero Banners' },
   { id: 'banners',        icon: faImage, label: 'Hero Banners' },
   { id: 'landing-pages',  icon: faHouse, label: 'Landing Pages' },
   { id: 'news',           icon: faNewspaper, label: 'News & Events' },
@@ -83,6 +84,8 @@ export const SECTIONS: { id: string; icon: IconDefinition; label: string }[] = [
   { id: 'policies', icon: faBook, label: 'Institutional Policies' },
   // Super Admin only — see canSeeUsersRoles below and UsersRolesAdmin.tsx.
   { id: 'users-roles', icon: faUserShield, label: 'Users & Roles' },
+  // Admin / Super Admin only — see AUDIT_LOG_ID checks below and AuditLogAdmin.tsx.
+  { id: 'audit-log', icon: faClockRotateLeft, label: 'Audit Log' },
   { id: 'settings', icon: faGear, label: 'Settings' },
 ];
 
@@ -97,7 +100,7 @@ export const SECTIONS: { id: string; icon: IconDefinition; label: string }[] = [
 export const SECTION_GROUPS: { label: string; ids: string[] }[] = [
   { label: 'Overview', ids: ['overview'] },
   { label: 'Form Submissions & CRM', ids: ['crm', 'contact-messages', 'career-applications', 'admission-inquiries', 'campus-visit-requests', 'career-guidance-interest'] },
-  { label: 'Site Appearance', ids: ['theme', 'feature-popup', 'banners', 'landing-pages', 'honoured-guests', 'site-photos', 'header-menu', 'nav-links', 'footer-links', 'content-blocks', 'compliance-docs'] },
+  { label: 'Site Appearance', ids: ['theme', 'feature-popup', 'home-hero-banners', 'banners', 'landing-pages', 'honoured-guests', 'site-photos', 'header-menu', 'nav-links', 'footer-links', 'content-blocks', 'compliance-docs'] },
   { label: 'About & Governance', ids: ['governing-body', 'governance-items', 'annual-reports', 'nirf-reports', 'nba-data', 'core-executives', 'sves-campuses', 'contacts', 'site-contact', 'policies'] },
   { label: 'Academics', ids: ['departments', 'programs', 'schools', 'faculty', 'curriculum', 'downloads'] },
   { label: 'Admissions & Campus Info', ids: ['information'] },
@@ -107,7 +110,7 @@ export const SECTION_GROUPS: { label: string; ids: string[] }[] = [
   { label: 'Research', ids: ['research-items'] },
   { label: 'News & Awards', ids: ['news', 'gallery', 'news-awards-data', 'insights', 'announcements'] },
   { label: 'Alumni & Giving', ids: ['alumni'] },
-  { label: 'Administration', ids: ['users-roles'] },
+  { label: 'Administration', ids: ['users-roles', 'audit-log'] },
 ];
 
 export default function AdminLayout() {
@@ -190,7 +193,7 @@ function AdminShell({ email }: { email: string | null }) {
   // 'users-roles' is Super Admin only; every other section is visible if the
   // session can at least read it (isAdmin sessions read everything).
   const visibleSectionIds = new Set(
-    SECTIONS.filter((s) => (s.id === 'users-roles' ? session?.isSuperAdmin : canReadModule(session, s.id))).map((s) => s.id)
+    SECTIONS.filter((s) => (s.id === 'users-roles' ? session?.isSuperAdmin : s.id === 'audit-log' ? session?.isAdmin : canReadModule(session, s.id))).map((s) => s.id)
   );
   // If the active section (e.g. from a bookmarked/shared URL) isn't
   // actually visible to this session, fall back to Overview rather than

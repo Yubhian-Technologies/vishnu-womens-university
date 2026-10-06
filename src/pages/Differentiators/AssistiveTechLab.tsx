@@ -29,13 +29,29 @@ import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { usePageBanners } from '../../hooks/usePageBanners';
 import { fetchPriorityAttr } from '../../lib/domAttrs';
+import { CustomSectionsIntro, CustomSectionsGalleries, CustomSectionsAccordion } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import { hasCustomSectionContent, type CustomSectionPhoto } from '../../lib/customSections';
 import { DIFFERENTIATOR_CATEGORIES, type DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
 import { assistiveTechLab } from './assistiveTechLab.data';
+import { useDocument } from '../../hooks/useDocument';
+import type { AssistiveTechLabDoc } from '../Admin/sections/AssistiveTechContentAdmin';
 import { renderBold } from '../../lib/boldText';
 import './AssistiveTechLab.css';
 
 const SLUG = 'assistive-tech-lab';
+
+// Resolves an AtlDevice's `icon` key (plain data — see assistiveTechLab.data.ts)
+// to its lucide component. An unrecognized key (e.g. an older admin-saved
+// row) falls back to Eye at the call site, same as every other admin-picked
+// icon elsewhere on the site.
+const DEVICE_ICONS: Record<string, typeof Eye> = {
+  eye: Eye,
+  compass: Compass,
+  'message-square': MessageSquare,
+  activity: Activity,
+  wrench: Wrench,
+  'heart-handshake': HeartHandshake,
+};
 
 export default function AssistiveTechLab() {
   const { docs: allItems, loading } = useOrderedCollection<DifferentiatorItemDoc>('differentiatorItems', 'order');
@@ -44,10 +60,29 @@ export default function AssistiveTechLab() {
   const [lightbox, setLightbox] = useState<{ photos: { imageUrl: string; caption?: string }[]; index: number } | null>(null);
   const [activeNav, setActiveNav] = useState('overview');
   const [selectedYearIdx, setSelectedYearIdx] = useState(0);
+  const { data: remoteData } = useDocument<AssistiveTechLabDoc>('settings', 'assistiveTechLab');
+  const atl = { ...assistiveTechLab, ...(remoteData || {}) };
+
+  const dynamicTitle = item?.title || 'Assistive Technology Lab (ATL)';
+  const dynamicSubtitle = item?.summary || item?.desc || 'A visionary center established in collaboration with University of Massachusetts (UMass), Lowell, USA — applying multidisciplinary engineering to design life-changing devices for the differently-abled.';
+
+  const aboutParagraphs = (item?.description && hasCustomSectionContent(item.description) && item.description.textContent)
+    ? [item.description.textContent]
+    : item?.desc
+    ? [item.desc]
+    : atl.paragraphs;
+
+  const missionList = (item?.mission && hasCustomSectionContent(item.mission))
+    ? (item.mission.listText ? item.mission.listText.split('\n').filter(Boolean) : [item.mission.textContent || ''])
+    : atl.mission;
+
+  const objectivesList = (item?.objectives && hasCustomSectionContent(item.objectives))
+    ? (item.objectives.listText ? item.objectives.listText.split('\n').filter(Boolean) : [item.objectives.textContent || ''])
+    : atl.objectives;
 
   useEffect(() => {
-    document.title = "Assistive Technology Lab (ATL) | Vishnu Women's University";
-  }, []);
+    document.title = `${dynamicTitle} | Vishnu Women's University`;
+  }, [dynamicTitle]);
 
   // Update active nav link based on scroll position
   useEffect(() => {
@@ -97,102 +132,16 @@ export default function AssistiveTechLab() {
 
   const allGalleryPhotos = dynamicPhotos.length > 0 ? dynamicPhotos : defaultGalleryPhotos;
 
-  // Key assistive devices portfolio
-  const assistiveDevices = [
-    {
-      title: 'Smart Braille Slate & Reader',
-      category: 'Visual & Tactile Aids',
-      description: 'An affordable electronic Braille writing and reading aid with real-time audio playback feedback for visually impaired students.',
-      icon: Eye,
-      tag: 'Visual Impairment',
-    },
-    {
-      title: 'Haptic Obstacle Navigator',
-      category: 'Sensory Navigation',
-      description: 'Wearable ultrasonic sensor belt and smart cane that produces graduated vibrational alerts for obstacle avoidance.',
-      icon: Compass,
-      tag: 'Mobility Assist',
-    },
-    {
-      title: 'Sign Language Translator Glove',
-      category: 'Communication Assist',
-      description: 'Flex-sensor embedded smart glove that translates hand gestures into synthesized speech and text on mobile screens.',
-      icon: MessageSquare,
-      tag: 'Deaf & Mute Community',
-    },
-    {
-      title: 'Automated Smart Wheelchair',
-      category: 'Mobility & Motor Control',
-      description: 'Intelligent motorized wheelchair with head-tilt, joystick, and obstacle avoidance features for individuals with quadriplegia.',
-      icon: Activity,
-      tag: 'Motor Disability',
-    },
-    {
-      title: 'Tremor-Stabilizing Smart Cutlery',
-      category: 'Daily Living Assist',
-      description: 'Active gyroscopic stabilizing spoon and fork enabling individuals with Parkinson’s or essential tremors to dine independently.',
-      icon: Wrench,
-      tag: 'Elderly & Neurological',
-    },
-    {
-      title: 'Zion Special School Custom Aids',
-      category: 'Community Prototypes',
-      description: 'Custom therapeutic and educational interactive kits co-created with special educators at Zion Special School, Rajahmundry.',
-      icon: HeartHandshake,
-      tag: 'Special Education',
-    },
-  ];
-
-  // Community Events and Exhibitions
-  const communityEvents = [
-    {
-      title: 'Zion Special School, Rajahmundry Client Visits',
-      badge: 'Community Outreach',
-      description: 'SVECW student teams conduct on-site field visits to understand the daily physical and educational needs of differently-abled children, gathering real user requirements.',
-      date: 'Annual Engagement',
-    },
-    {
-      title: 'International Day of Persons with Disabilities',
-      badge: 'Annual Exhibition',
-      description: 'Annual flagship exhibition showcasing student-developed assistive prototypes, interactive demos for NGO representatives, and public awareness campaigns.',
-      date: 'Dec 3 (2023, 2024, 2025)',
-    },
-    {
-      title: 'IIC Regional Meet Vijayawada',
-      badge: 'Innovation Spotlight',
-      description: 'ATL student innovators presented patented assistive technology prototypes before national innovation council leaders and jury members.',
-      date: 'Regional Showcase',
-    },
-    {
-      title: 'Innovation Project Fair at JNTU Kakinada',
-      badge: 'University Level Honor',
-      description: 'Recognition and top accolades awarded to interdisciplinary assistive hardware rigs engineered by women engineering students.',
-      date: 'State-Level Fair',
-    },
-    {
-      title: 'AVISHKANDHRA RTIH & Trance 2K25',
-      badge: 'National Technical Fest',
-      description: 'Live field demonstrations of assistive robotic devices and smart sensor kits before academic and industry experts.',
-      date: 'National Fest',
-    },
-  ];
-
-  // Facilities & Equipment
-  const equipmentList = [
-    'Complete electronic hardware prototyping and sensor characterization workstations.',
-    'Dedicated 3D printing and rapid mechanical prototyping rigs for custom ergonomic enclosures.',
-    'DSP, microcontroller, and FPGA embedded development boards (Arduino, STM32, Raspberry Pi, TI DSP).',
-    'Assistive software suite for audio synthesis, image processing, and gesture recognition algorithms.',
-    'Biomedical sensor kits (EMG, EEG, Flex sensors, load cells, ultrasonic arrays).',
-  ];
-
-  const highlightsList = [
-    'Established in 2009 in global collaboration with University of Massachusetts (UMass), Lowell, USA.',
-    'Annual mentorship visits by Prof. Alan Rux, founder of Assistive Technology Program at UMass Lowell.',
-    'Interdisciplinary platform uniting students from ECE, EEE, CSE, IT, ME, and Basic Sciences for noble social engineering.',
-    'Real-world service learning directly impacting community special schools and people with disabilities.',
-    'Comprehensive multi-year bridge courses cultivating product design, budget management, and empathy-driven engineering.',
-  ];
+  // Key assistive devices portfolio, community events, facilities/equipment
+  // and key highlights — all admin-editable (Admin → Differentiators →
+  // Assistive Technology Lab → All Page Content & Sections), same
+  // paragraphs/mission/objectives/team/trainingByYear pattern as above:
+  // `atl.*` already falls back to assistiveTechLab.data.ts's defaults when
+  // nothing's been saved to Firestore yet, so this never renders blank.
+  const assistiveDevices = atl.assistiveDevices;
+  const communityEvents = atl.communityEvents;
+  const equipmentList = atl.equipmentList;
+  const highlightsList = atl.highlightsList;
 
   return (
     <main className="page-wrapper atl-page">
@@ -231,11 +180,10 @@ export default function AssistiveTechLab() {
                 <HeartHandshake size={14} /> {category?.label || 'Research & Specialised Labs'}
               </div>
 
-              <h1 className="atl-hero-title">Assistive Technology Lab (ATL)</h1>
+              <h1 className="atl-hero-title">{dynamicTitle}</h1>
 
               <p className="atl-hero-subtitle">
-                {item?.summary ||
-                  'A visionary center established in collaboration with University of Massachusetts (UMass), Lowell, USA — applying multidisciplinary engineering to design life-changing devices for the differently-abled.'}
+                {renderBold(dynamicSubtitle)}
               </p>
 
               <div className="atl-hero-stats">
@@ -304,7 +252,7 @@ export default function AssistiveTechLab() {
           <div className="atl-overview-card">
             <HeartHandshake size={140} className="atl-overview-watermark" aria-hidden="true" />
             <div className="atl-prose">
-              {assistiveTechLab.paragraphs.map((p, i) => (
+              {aboutParagraphs.map((p, i) => (
                 <p key={i}>{renderBold(p)}</p>
               ))}
             </div>
@@ -321,7 +269,7 @@ export default function AssistiveTechLab() {
                 <h3 className="atl-vm-title">Our Mission</h3>
               </div>
               <ul className="atl-checklist">
-                {assistiveTechLab.mission.map((item, i) => (
+                {missionList.map((item, i) => (
                   <li key={i} className="atl-checklist-item">
                     <span className="atl-check-badge">
                       <Check size={12} strokeWidth={3} />
@@ -341,7 +289,7 @@ export default function AssistiveTechLab() {
                 <h3 className="atl-vm-title">Core Objectives</h3>
               </div>
               <ul className="atl-checklist">
-                {assistiveTechLab.objectives.map((item, i) => (
+                {objectivesList.map((item, i) => (
                   <li key={i} className="atl-checklist-item">
                     <span className="atl-check-badge">
                       <Check size={12} strokeWidth={3} />
@@ -404,7 +352,7 @@ export default function AssistiveTechLab() {
 
           <div className="atl-devices-grid">
             {assistiveDevices.map((device, i) => {
-              const Icon = device.icon;
+              const Icon = DEVICE_ICONS[device.icon] || Eye;
               return (
                 <div key={i} className="atl-device-card">
                   <div>
@@ -430,7 +378,7 @@ export default function AssistiveTechLab() {
       </section>
 
       {/* 4. Bridge Courses & Annual Student Projects */}
-      {assistiveTechLab.trainingByYear.length > 0 && (
+      {atl.trainingByYear.length > 0 && (
         <section id="trainings" className="atl-section atl-section--alt">
           <div className="container">
             <div className="atl-section-header">
@@ -445,7 +393,7 @@ export default function AssistiveTechLab() {
 
             {/* Year selector pills */}
             <div style={{ display: 'flex', gap: 'var(--space-2)', overflowX: 'auto', paddingBottom: 'var(--space-4)', marginBottom: 'var(--space-4)' }}>
-              {assistiveTechLab.trainingByYear.map((t, idx) => (
+              {atl.trainingByYear.map((t, idx) => (
                 <button
                   key={idx}
                   type="button"
@@ -469,10 +417,10 @@ export default function AssistiveTechLab() {
             </div>
 
             {/* Selected Year Detail Card */}
-            {assistiveTechLab.trainingByYear[selectedYearIdx] && (
+            {atl.trainingByYear[selectedYearIdx] && (
               <div className="atl-training-year-card">
                 <div className="atl-training-year-header">
-                  <h3 className="atl-training-year-title">{assistiveTechLab.trainingByYear[selectedYearIdx].yearLabel} — Bridge Course Details</h3>
+                  <h3 className="atl-training-year-title">{atl.trainingByYear[selectedYearIdx].yearLabel} — Bridge Course Details</h3>
                 </div>
 
                 <div className="atl-training-body">
@@ -481,15 +429,15 @@ export default function AssistiveTechLab() {
                     <table className="atl-table">
                       <thead>
                         <tr>
-                          {assistiveTechLab.trainingByYear[selectedYearIdx].bridgeCourse.headers.map((h, i) => (
+                          {atl.trainingByYear[selectedYearIdx].bridgeCourse.headers.map((h, i) => (
                             <th key={i}>{h}</th>
                           ))}
                         </tr>
                       </thead>
                       <tbody>
-                        {assistiveTechLab.trainingByYear[selectedYearIdx].bridgeCourse.rows.map((row, rIdx) => (
+                        {atl.trainingByYear[selectedYearIdx].bridgeCourse.rows.map((row, rIdx) => (
                           <tr key={rIdx}>
-                            {row.map((cell, cIdx) => (
+                            {row.cells.map((cell, cIdx) => (
                               <td key={cIdx}>{cell}</td>
                             ))}
                           </tr>
@@ -499,13 +447,13 @@ export default function AssistiveTechLab() {
                   </div>
 
                   {/* Projects for this year */}
-                  {assistiveTechLab.trainingByYear[selectedYearIdx].projects.length > 0 && (
+                  {atl.trainingByYear[selectedYearIdx].projects.length > 0 && (
                     <div style={{ marginTop: 'var(--space-6)' }}>
                       <h4 style={{ fontSize: 'var(--text-base)', fontWeight: 800, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>
                         Selected Projects Developed:
                       </h4>
                       <div className="atl-training-projects-grid">
-                        {assistiveTechLab.trainingByYear[selectedYearIdx].projects.map((proj, pIdx) => (
+                        {atl.trainingByYear[selectedYearIdx].projects.map((proj, pIdx) => (
                           <div key={pIdx} className="atl-project-mini-card">
                             <div className="atl-project-mini-title">{proj.title}</div>
                             <p className="atl-project-mini-desc">{renderBold(proj.description)}</p>
@@ -566,18 +514,18 @@ export default function AssistiveTechLab() {
             <div className="atl-faculty-card atl-faculty-card--dean">
               <div>
                 <span className="atl-faculty-role">Dean & Faculty Advisor</span>
-                <h3 className="atl-faculty-name">{assistiveTechLab.team.dean.name}</h3>
-                <div className="atl-faculty-desig">{assistiveTechLab.team.dean.designation}</div>
+                <h3 className="atl-faculty-name">{atl.team.dean.name}</h3>
+                <div className="atl-faculty-desig">{atl.team.dean.designation}</div>
               </div>
               <div className="atl-faculty-contact">
-                {assistiveTechLab.team.dean.email && (
-                  <a href={`mailto:${assistiveTechLab.team.dean.email}`} className="atl-faculty-link">
-                    <Mail size={14} color="var(--color-accent)" /> {assistiveTechLab.team.dean.email}
+                {atl.team.dean.email && (
+                  <a href={`mailto:${atl.team.dean.email}`} className="atl-faculty-link">
+                    <Mail size={14} color="var(--color-accent)" /> {atl.team.dean.email}
                   </a>
                 )}
-                {assistiveTechLab.team.dean.mobile && (
-                  <a href={`tel:${assistiveTechLab.team.dean.mobile}`} className="atl-faculty-link">
-                    <Phone size={14} color="var(--color-accent)" /> +91 {assistiveTechLab.team.dean.mobile}
+                {atl.team.dean.mobile && (
+                  <a href={`tel:${atl.team.dean.mobile}`} className="atl-faculty-link">
+                    <Phone size={14} color="var(--color-accent)" /> +91 {atl.team.dean.mobile}
                   </a>
                 )}
               </div>
@@ -587,25 +535,25 @@ export default function AssistiveTechLab() {
             <div className="atl-faculty-card" style={{ border: '1.5px solid var(--color-accent)' }}>
               <div>
                 <span className="atl-faculty-role">Laboratory In-Charge</span>
-                <h3 className="atl-faculty-name">{assistiveTechLab.team.inCharge.name}</h3>
-                <div className="atl-faculty-desig">{assistiveTechLab.team.inCharge.designation}</div>
+                <h3 className="atl-faculty-name">{atl.team.inCharge.name}</h3>
+                <div className="atl-faculty-desig">{atl.team.inCharge.designation}</div>
               </div>
               <div className="atl-faculty-contact">
-                {assistiveTechLab.team.inCharge.email && (
-                  <a href={`mailto:${assistiveTechLab.team.inCharge.email}`} className="atl-faculty-link">
-                    <Mail size={14} color="var(--color-accent)" /> {assistiveTechLab.team.inCharge.email}
+                {atl.team.inCharge.email && (
+                  <a href={`mailto:${atl.team.inCharge.email}`} className="atl-faculty-link">
+                    <Mail size={14} color="var(--color-accent)" /> {atl.team.inCharge.email}
                   </a>
                 )}
-                {assistiveTechLab.team.inCharge.mobile && (
-                  <a href={`tel:${assistiveTechLab.team.inCharge.mobile}`} className="atl-faculty-link">
-                    <Phone size={14} color="var(--color-accent)" /> +91 {assistiveTechLab.team.inCharge.mobile}
+                {atl.team.inCharge.mobile && (
+                  <a href={`tel:${atl.team.inCharge.mobile}`} className="atl-faculty-link">
+                    <Phone size={14} color="var(--color-accent)" /> +91 {atl.team.inCharge.mobile}
                   </a>
                 )}
               </div>
             </div>
 
             {/* Other Faculty Mentors */}
-            {assistiveTechLab.team.facultyMembers.map((member, i) => (
+            {atl.team.facultyMembers.map((member, i) => (
               <div key={i} className="atl-faculty-card">
                 <div>
                   <span className="atl-faculty-role">Faculty Mentor</span>
@@ -707,6 +655,23 @@ export default function AssistiveTechLab() {
                 </button>
               ))}
             </div>
+          </div>
+        </section>
+      )}
+
+      {/* DYNAMIC CUSTOM SECTIONS */}
+      {customSections.some((s) => s.placement === 'intro') && (
+        <section className="atl-section">
+          <div className="container">
+            <CustomSectionsIntro sections={customSections} />
+          </div>
+        </section>
+      )}
+      {customSections.length > 0 && (
+        <section className="atl-section">
+          <div className="container">
+            <CustomSectionsGalleries sections={customSections} />
+            <CustomSectionsAccordion sections={customSections.filter((s) => s.placement !== 'intro' && s.contentType !== 'gallery')} />
           </div>
         </section>
       )}

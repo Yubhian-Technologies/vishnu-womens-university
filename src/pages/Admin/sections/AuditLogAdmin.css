@@ -1,0 +1,87 @@
+.audit-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.audit-filters input,
+.audit-filters select {
+  padding: 0.5rem 0.7rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font: inherit;
+  background: #fff;
+  min-height: 40px;
+}
+
+.audit-filters__search {
+  flex: 1 1 240px;
+}
+
+.audit-nowrap { white-space: nowrap; }
+
+.audit-sub {
+  font-size: 0.78rem;
+  color: #6b7280;
+  word-break: break-all;
+}
+
+.audit-badge {
+  display: inline-block;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+.audit-badge--create { background: #dcfce7; color: #166534; }
+.audit-badge--update { background: #dbeafe; color: #1e40af; }
+.audit-badge--delete { background: #fee2e2; color: #991b1b; }
+
+.audit-row--open td { background: #f9fafb; }
+
+.audit-detail-row > td { padding: 0 !important; background: #f9fafb; }
+.audit-detail { padding: 0.75rem 1rem 1rem; }
+.audit-detail__path { margin: 0 0 0.6rem; font-size: 0.82rem; color: #374151; word-break: break-all; }
+
+.audit-changes {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 0.85rem;
+}
+.audit-changes th {
+  text-align: left;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #6b7280;
+}
+.audit-changes td {
+  padding: 0.4rem 0.6rem;
+  vertical-align: top;
+  border-top: 1px solid #e5e7eb;
+}
+.audit-changes th:first-child,
+.audit-changes td:first-child { width: 18%; }
+.audit-changes__field { font-weight: 700; word-break: break-word; }
+.audit-changes__before { background: #fef2f2; }
+.audit-changes__after { background: #f0fdf4; }
+
+.audit-value {
+  margin: 0;
+  font: inherit;
+  font-size: 0.82rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 240px;
+  overflow: auto;
+}
+.audit-value--none { color: #9ca3af; font-style: italic; }
+
+@media (max-width: 640px) {
+  .audit-changes { table-layout: auto; }
+  .audit-changes th:first-child,
+  .audit-changes td:first-child { width: auto; }
+}

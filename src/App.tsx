@@ -31,6 +31,7 @@ const Admissions = lazyWithRetry(() => import('./pages/Admissions/Admissions'));
 const CampusVisit = lazyWithRetry(() => import('./pages/CampusVisit/CampusVisit'));
 const AlumniGiving = lazyWithRetry(() => import('./pages/AlumniGiving/AlumniGiving'));
 const About = lazyWithRetry(() => import('./pages/About/About'));
+const CoreExecutives = lazyWithRetry(() => import('./pages/CoreExecutives/CoreExecutives'));
 const News = lazyWithRetry(() => import('./pages/News/News'));
 const VisionMission = lazyWithRetry(() => import('./pages/VisionMission/VisionMission'));
 const Governance = lazyWithRetry(() => import('./pages/Governance/Governance'));
@@ -158,6 +159,7 @@ function PublicApp() {
             <Route path="/campus-visit" element={<CampusVisit />} />
             <Route path="/alumni-giving" element={<AlumniGiving />} />
             <Route path="/about" element={<About />} />
+            <Route path="/core-executive-body" element={<CoreExecutives />} />
             <Route path="/vision-mission" element={<VisionMission />} />
             <Route path="/governance" element={<Governance />} />
             <Route path="/governance/governing-body" element={<GoverningBody />} />

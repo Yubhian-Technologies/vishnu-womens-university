@@ -3,6 +3,7 @@ import { SECTIONS } from './AdminLayout';
 import Overview from './sections/Overview';
 import ThemeAdmin from './sections/ThemeAdmin';
 import FeaturePopupAdmin from './sections/FeaturePopupAdmin';
+import HomeHeroBannersAdmin from './sections/HomeHeroBannersAdmin';
 import BannersAdmin from './sections/BannersAdmin';
 import LandingPagesAdmin from './sections/LandingPagesAdmin';
 import NewsAdmin from './sections/NewsAdmin';
@@ -59,6 +60,7 @@ import IloOfficePhotosAdmin from './sections/IloOfficePhotosAdmin';
 import RecruiterLogosAdmin from './sections/RecruiterLogosAdmin';
 import GsacPhotosAdmin from './sections/GsacPhotosAdmin';
 import UsersRolesAdmin from './sections/UsersRolesAdmin';
+import AuditLogAdmin from './sections/AuditLogAdmin';
 import { useAdminSession } from './AdminSessionContext';
 import ReadOnlyGate from './ReadOnlyGate';
 import { canEdit, canWriteModule, RESOURCES, type ResourceKey } from '../../lib/rbac';
@@ -94,12 +96,13 @@ const SELF_GATED_SECTIONS = new Set(['banners', 'site-photos', 'content-blocks']
 
 // Overview is a read-only stats dashboard for every session (nothing to
 // edit even for Admin), so it never shows a read-only badge or gets wrapped.
-const UNGATED_SECTIONS = new Set(['overview']);
+const UNGATED_SECTIONS = new Set(['overview', 'audit-log']);
 
 const SECTION_MAP: Record<string, React.ReactNode> = {
   overview: <Overview />,
   theme: <ThemeAdmin />,
   'feature-popup': <FeaturePopupAdmin />,
+  'home-hero-banners': <HomeHeroBannersAdmin />,
   banners: <BannersAdmin />,
   'landing-pages': <LandingPagesAdmin />,
   news: <NewsAdmin />,
@@ -156,6 +159,7 @@ const SECTION_MAP: Record<string, React.ReactNode> = {
   'compliance-docs': <ComplianceDocsAdmin />,
   policies: <PoliciesAdmin />,
   'users-roles': <UsersRolesAdmin />,
+  'audit-log': <AuditLogAdmin />,
 };
 
 export default function AdminDashboard({ activeSection, setActiveSection, visibleSectionIds }: Props) {
@@ -174,7 +178,9 @@ export default function AdminDashboard({ activeSection, setActiveSection, visibl
   const readOnly = !selfGated && !sectionEditable;
   // Defense in depth beyond the sidebar hiding it: even a hand-typed
   // ?section=users-roles must not render for a non-Super-Admin session.
-  const canSeeUsersRoles = activeSection !== 'users-roles' || !!session?.isSuperAdmin;
+  const canSeeUsersRoles =
+    (activeSection !== 'users-roles' || !!session?.isSuperAdmin) &&
+    (activeSection !== 'audit-log' || !!session?.isAdmin);
 
   return (
     <div className="admin-content">

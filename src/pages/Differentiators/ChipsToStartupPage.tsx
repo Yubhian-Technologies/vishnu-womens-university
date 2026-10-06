@@ -24,6 +24,8 @@ import { CustomSectionsGalleries, SectionSubtree } from '../../components/Custom
 import SmoothCollapse from '../../components/SmoothCollapse/SmoothCollapse';
 import { hasCustomSectionContent, type CustomSection } from '../../lib/customSections';
 import { smoothScrollTo } from '../../lib/smoothScroll';
+import { useDocument } from '../../hooks/useDocument';
+import type { ChipsToStartupDoc } from '../Admin/sections/ChipsToStartupContentAdmin';
 import type { DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
 import { chipsToStartup } from './chipsToStartup.data';
 import { renderBold } from '../../lib/boldText';
@@ -47,23 +49,35 @@ export default function ChipsToStartupPage({
   item: DifferentiatorItemDoc;
   customSections: CustomSection[];
 }) {
-  const {
-    heroPills,
-    heroTitle,
-    heroSubtitle,
-    heroCtaText,
-    aboutTitle,
-    aboutParagraphs,
-    statCards,
-    objectives,
-    galleryCaption,
-    projectOutlay,
-    resources,
-    edaTools,
-    projectObjectives,
-    facilities,
-    keyHighlights,
-  } = chipsToStartup;
+  const { data: remoteData } = useDocument<ChipsToStartupDoc>('settings', 'chipsToStartup');
+
+  const heroPills = chipsToStartup.heroPills;
+  const heroTitle = remoteData?.heroTitle || chipsToStartup.heroTitle;
+  const heroSubtitle = remoteData?.heroSubtitle || chipsToStartup.heroSubtitle;
+  const heroCtaText = chipsToStartup.heroCtaText;
+  const aboutTitle = remoteData?.aboutTitle || chipsToStartup.aboutTitle;
+  const aboutParagraphs = remoteData?.aboutParagraphs && remoteData.aboutParagraphs.length > 0 ? remoteData.aboutParagraphs : chipsToStartup.aboutParagraphs;
+  const statCards = remoteData?.statCards && remoteData.statCards.length > 0 ? remoteData.statCards : chipsToStartup.statCards;
+  const objectives = remoteData?.objectives && remoteData.objectives.length > 0 ? remoteData.objectives : chipsToStartup.objectives;
+  const galleryCaption = chipsToStartup.galleryCaption;
+  const projectOutlay = remoteData?.projectOutlay || chipsToStartup.projectOutlay;
+  const resources = remoteData?.resources || chipsToStartup.resources;
+  const edaTools = remoteData?.edaTools || chipsToStartup.edaTools;
+  const projectObjectives = chipsToStartup.projectObjectives;
+  const facilities = remoteData?.facilities || chipsToStartup.facilities;
+  const keyHighlights = chipsToStartup.keyHighlights;
+
+  const dynamicTitle = item?.title || heroTitle;
+  const dynamicSubtitle = item?.summary || item?.desc || heroSubtitle;
+  const dynamicAbout = (item?.description && hasCustomSectionContent(item.description) && item.description.textContent)
+    ? [item.description.textContent]
+    : item?.desc
+    ? [item.desc]
+    : aboutParagraphs;
+
+  const dynamicObjectives = (item?.objectives && hasCustomSectionContent(item.objectives))
+    ? (item.objectives.listText ? item.objectives.listText.split('\n').filter(Boolean) : [item.objectives.textContent || ''])
+    : objectives;
 
   const modules = customSections.filter(
     (s) => s.placement !== 'intro' && s.contentType !== 'gallery' && hasCustomSectionContent(s)
@@ -77,7 +91,7 @@ export default function ChipsToStartupPage({
         {item.heroImage && (
           <SmoothImage
             src={item.heroImage}
-            alt={heroTitle}
+            alt={dynamicTitle}
             className="cts-hero-img"
             loading="eager"
             decoding="sync"
@@ -102,10 +116,10 @@ export default function ChipsToStartupPage({
               ))}
             </div>
             <h1 className="cts-hero-title" style={{ fontSize: '2.4rem' }}>
-              {heroTitle}
+              {dynamicTitle}
             </h1>
             <p className="cts-hero-sub" style={{ fontSize: '1rem', lineHeight: '1.65' }}>
-              {renderBold(heroSubtitle)}
+              {renderBold(dynamicSubtitle)}
             </p>
             <button
               type="button"
@@ -126,7 +140,7 @@ export default function ChipsToStartupPage({
           </span>
           <h2 className="cts-card-title">{aboutTitle}</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-            {aboutParagraphs.map((p, i) => (
+            {dynamicAbout.map((p, i) => (
               <p key={i}>{renderBold(p)}</p>
             ))}
           </div>
@@ -162,7 +176,7 @@ export default function ChipsToStartupPage({
           </span>
           <h2 className="cts-card-title">Objectives</h2>
           <ul className="cts-checklist">
-            {objectives.map((o, i) => (
+            {dynamicObjectives.map((o, i) => (
               <li key={i}>
                 <CheckCircle2 size={16} strokeWidth={2} className="cts-check-icon" />
                 <span>{renderBold(o)}</span>
@@ -241,7 +255,7 @@ export default function ChipsToStartupPage({
             Project Investigators
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '0.75rem' }}>
-            {projectOutlay.investigators.map((inv, idx) => (
+            {(projectOutlay?.investigators || []).map((inv, idx) => (
               <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', color: '#1E293B', fontWeight: 500 }}>
                 <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: idx === 0 ? '#C9973A' : '#64748B', flexShrink: 0 }} />
                 <span>{renderBold(inv)}</span>
@@ -264,7 +278,7 @@ export default function ChipsToStartupPage({
           {renderBold(resources.keyIntro)}
         </p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '0.75rem' }}>
-          {resources.items.map((itemStr, idx) => (
+          {(resources?.items || []).map((itemStr, idx) => (
             <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.6rem', background: '#F8FAFC', padding: '0.85rem 1rem', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
               <CheckCircle2 size={16} className="cts-check-icon" style={{ marginTop: '2px' }} />
               <span style={{ fontSize: '0.9rem', color: '#1E293B', fontWeight: 500, lineHeight: '1.4' }}>{renderBold(itemStr)}</span>
@@ -287,7 +301,7 @@ export default function ChipsToStartupPage({
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
             <thead>
               <tr style={{ background: '#0F2547', color: '#FFFFFF' }}>
-                {edaTools.headers.map((h, idx) => (
+                {(edaTools?.headers || []).map((h, idx) => (
                   <th key={idx} style={{ padding: '0.85rem 1rem', fontWeight: 600, borderBottom: '1px solid #1E293B', width: idx === 0 ? '70px' : idx === 1 ? '220px' : 'auto' }}>
                     {h}
                   </th>
@@ -295,7 +309,7 @@ export default function ChipsToStartupPage({
               </tr>
             </thead>
             <tbody>
-              {edaTools.rows.map((row, rIdx) => (
+              {(edaTools?.rows || []).map((row, rIdx) => (
                 <tr key={rIdx} style={{ background: rIdx % 2 === 0 ? '#FFFFFF' : '#F8FAFC', borderBottom: '1px solid #E2E8F0' }}>
                   <td style={{ padding: '0.85rem 1rem', fontWeight: 700, color: '#64748B' }}>{row[0]}</td>
                   <td style={{ padding: '0.85rem 1rem', fontWeight: 600, color: '#0F2547' }}>{row[1]}</td>
@@ -343,7 +357,7 @@ export default function ChipsToStartupPage({
               <Cpu size={16} /> Development Hardware
             </h4>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-              {facilities.developmentHardware.map((hw, idx) => (
+              {(facilities?.developmentHardware || []).map((hw, idx) => (
                 <li key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', fontSize: '0.88rem', color: '#334155' }}>
                   <CheckCircle2 size={15} className="cts-check-icon" style={{ marginTop: '2px' }} />
                   <span>{renderBold(hw)}</span>
@@ -357,7 +371,7 @@ export default function ChipsToStartupPage({
               <Boxes size={16} /> Design Infrastructure
             </h4>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-              {facilities.designInfrastructure.map((infra, idx) => (
+              {(facilities?.designInfrastructure || []).map((infra, idx) => (
                 <li key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', fontSize: '0.88rem', color: '#334155' }}>
                   <CheckCircle2 size={15} className="cts-check-icon" style={{ marginTop: '2px' }} />
                   <span>{renderBold(infra)}</span>

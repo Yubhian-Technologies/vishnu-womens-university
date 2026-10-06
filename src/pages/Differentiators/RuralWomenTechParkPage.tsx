@@ -12,9 +12,14 @@ import {
   FileText,
   ArrowRight,
 } from 'lucide-react';
+import { CustomSectionsIntro, CustomSectionsGalleries, CustomSectionsAccordion } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
+import { hasCustomSectionContent } from '../../lib/customSections';
 import type { DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
 import type { CustomSection } from '../../lib/customSections';
+import { useDocument } from '../../hooks/useDocument';
 import { ruralWomenTechPark } from './ruralWomenTechPark.data';
+import type { RuralWomenTechParkDoc } from '../Admin/sections/RuralWomenTechParkContentAdmin';
+import { renderBold } from '../../lib/boldText';
 import './rural-women-tech-park.css';
 
 interface RwtpReportLink {
@@ -62,6 +67,15 @@ export default function RuralWomenTechParkPage({
   reportLinks,
   customSections,
 }: RuralWomenTechParkPageProps) {
+  const { data: remoteData } = useDocument<RuralWomenTechParkDoc>('settings', 'ruralWomenTechPark');
+  const rwtp = {
+    ...ruralWomenTechPark,
+    ...(remoteData || {}),
+    paragraphs: remoteData?.paragraphs || ruralWomenTechPark.paragraphs,
+    interventions: remoteData?.interventions || ruralWomenTechPark.interventions,
+    activities: remoteData?.activities || ruralWomenTechPark.activities,
+  };
+
   // Accordion open/close state. Open item '01' by default.
   const [openItems, setOpenItems] = useState<Record<string, boolean>>({
     '01': true,
@@ -99,6 +113,12 @@ export default function RuralWomenTechParkPage({
 
   const photos = uploadedPhotos.length > 0 ? uploadedPhotos : DEFAULT_RWTP_GALLERY;
 
+  const dynamicTitle = item?.title || 'Rural Women Technology Park – WTP';
+  const dynamicSubtitle = item?.summary || item?.desc || 'Empowering rural women through skill development, technology adoption and innovation to create sustainable livelihoods and stronger, self-reliant communities.';
+  const dynamicAbout = (item?.description && hasCustomSectionContent(item.description) && item.description.textContent)
+    ? item.description.textContent
+    : item?.desc || `The programme empowers lifelong development access to labs, responsibilities, and the use of technology in rural communities, financial services at the households leverages indigenous resources for socio-economic impact across the domains of healthcare, education, livelihood, and technology. Corporate Social Responsibility initiatives, women's health and nutrition, rural financial and value-added products, and modern village-making ideas.`;
+
   return (
     <div className="rwtp-page">
       {/* HERO BANNER REDESIGN */}
@@ -107,7 +127,7 @@ export default function RuralWomenTechParkPage({
           {/* Background Photo */}
           <img loading="lazy"
             src={item.heroImage || 'https://images.unsplash.com/photo-1590650516494-0c8e4a4dd67e?w=1600&auto=format&fit=crop&q=80'}
-            alt={item.title || 'Rural Women Technology Park'}
+            alt={dynamicTitle}
             className="rwtp-hero-bg-img"
           />
 
@@ -135,12 +155,11 @@ export default function RuralWomenTechParkPage({
               </div>
 
               <h1 className="rwtp-hero-title">
-                Rural Women<br />
-                Technology Park – <span className="rwtp-hero-wtp">WTP</span>
+                {dynamicTitle}
               </h1>
 
               <p className="rwtp-hero-desc">
-                Empowering rural women through skill development, technology adoption and innovation to create sustainable livelihoods and stronger, self-reliant communities.
+                {renderBold(dynamicSubtitle)}
               </p>
 
               <a href="#stepper" className="rwtp-hero-btn">
@@ -180,10 +199,7 @@ export default function RuralWomenTechParkPage({
               <Leaf size={16} /> ABOUT WTP
             </div>
             <p className="rwtp-about-text">
-              The programme empowers lifelong development access to labs, responsibilities, and the use of technology
-              in rural communities, financial services at the households leverages indigenous resources for socio-economic
-              impact across the domains of healthcare, education, livelihood, and technology. Corporate Social Responsibility
-              initiatives, women's health and nutrition, rural financial and value-added products, and modern village-making ideas.
+              {renderBold(dynamicAbout)}
             </p>
             <svg
               className="rwtp-about-leaf-bg"
@@ -316,49 +332,34 @@ export default function RuralWomenTechParkPage({
                   <div className="rwtp-interventions-grid">
                     {/* Left Column */}
                     <div>
-                      <div className="rwtp-intervention-block">
-                        <h4 className="rwtp-intervention-title">Production of high value consumer goods</h4>
-                        <p className="rwtp-intervention-desc">
-                          Here, our graduates do the designing, space and demand; raise benefits of PUCs. There are demonstration areas ways to earthly to counsel skill, ready are identified links gear demonstrate its process and make our scale, stops, of city.. In the diversi are for different consumers for production's with simple products some for empowering livelihoods or incomes.
-                        </p>
-                      </div>
-
-                      <div className="rwtp-intervention-block">
-                        <h4 className="rwtp-intervention-title">Computer Aided Design for Spicing and Notebook Weaving</h4>
-                        <p className="rwtp-intervention-desc">
-                          We could approach in Art of weaving or make Notebook for Boxes of Standing and stationary at libraries. In this center we have pinoeered the grinding and spill boxes of cutting stewing designs and dress deep and costume sector / traditional of clothing according to the choices and needs of the customers.
-                        </p>
-                      </div>
-
-                      <div className="rwtp-intervention-block">
-                        <h4 className="rwtp-intervention-title">Women Health & Nutrition</h4>
-                        <p className="rwtp-intervention-desc">
-                          "Small changes can make a large difference" — a healthy balance program that are conducted to engage, educate and encourage. We highlighted our healthy choices and understanding and using a available foods.
-                        </p>
-                      </div>
+                      {rwtp.interventions.slice(0, Math.ceil(rwtp.interventions.length / 2)).map((interv, idx) => (
+                        <div key={idx} className="rwtp-intervention-block">
+                          <h4 className="rwtp-intervention-title">{interv.title}</h4>
+                          {interv.paragraphs.map((p, pIdx) => (
+                            <p key={pIdx} className="rwtp-intervention-desc">{renderBold(p)}</p>
+                          ))}
+                        </div>
+                      ))}
                     </div>
 
                     {/* Right Column */}
                     <div>
-                      <div className="rwtp-intervention-block">
-                        <h4 className="rwtp-intervention-title">Food Processing and Value Added Products</h4>
-                        <p className="rwtp-intervention-desc">
-                          "HARNESS LE CHANGE". Training modules to provide tools and requirements. The program covers familiarization and uses of equipment for breads, cookies, cakes, chutneys and commercial items etc. Technology doctrine areas of making specialises and creation of allimony products.
-                        </p>
-                      </div>
-
-                      <div className="rwtp-intervention-block">
-                        <h4 className="rwtp-intervention-title">Power Making for Spicing of Modern Rural</h4>
-                        <p className="rwtp-intervention-desc">
-                          We introduce both the design and introduced to weave the ideas of spicing each paper. The need, our focused on expanding awareness about the household health affects of plastic and casing frame how to make astible bags and solutions of non-conventional uses.
-                        </p>
-                      </div>
+                      {rwtp.interventions.slice(Math.ceil(rwtp.interventions.length / 2)).map((interv, idx) => (
+                        <div key={idx} className="rwtp-intervention-block">
+                          <h4 className="rwtp-intervention-title">{interv.title}</h4>
+                          {interv.paragraphs.map((p, pIdx) => (
+                            <p key={pIdx} className="rwtp-intervention-desc">{renderBold(p)}</p>
+                          ))}
+                        </div>
+                      ))}
                     </div>
                   </div>
 
-                  <p className="rwtp-step-summary-paragraph">
-                    To maximize product market price through their educated materials without conducting group study, Dept. Pariait, Data. Practical knowledge analyses and marketing techniques used. Though these few activities, women have learned waste or converting mainstream by half filling the waste products made in the landfills and how they can be turned into beautiful usable dresses.
-                  </p>
+                  {(rwtp.paragraphs || []).length > 0 && (
+                    <p className="rwtp-step-summary-paragraph">
+                      {renderBold(rwtp.paragraphs[rwtp.paragraphs.length - 1])}
+                    </p>
+                  )}
                 </div>
               )}
             </div>
@@ -375,7 +376,7 @@ export default function RuralWomenTechParkPage({
             </button>
             <div className="rwtp-step-card">
               <div className="rwtp-step-header" onClick={() => toggleItem('02')}>
-                <h3 className="rwtp-step-title">Working Activities & Impact</h3>
+                <h3 className="rwtp-step-title">{rwtp.activitiesHeading || 'Working Activities & Impact'}</h3>
                 <div className="rwtp-step-right">
                   <span className="rwtp-step-badge">SKILLS THAT CREATE CHANGE</span>
                   <button type="button" className="rwtp-toggle-btn" aria-label="Toggle Step 02">
@@ -397,7 +398,7 @@ export default function RuralWomenTechParkPage({
                         </tr>
                       </thead>
                       <tbody>
-                        {ruralWomenTechPark.activities.map((act, i) => (
+                        {(rwtp.activities || []).map((act, i) => (
                           <tr key={i}>
                             <td style={{ fontWeight: 600 }}>{act.activity}</td>
                             <td>{act.trainings}</td>
@@ -409,7 +410,7 @@ export default function RuralWomenTechParkPage({
                     </table>
                   </div>
                   <div className="rwtp-total-badge">
-                    Total Rural Beneficiaries Trained: <strong>{ruralWomenTechPark.activitiesTotalBeneficiaries}+</strong>
+                    Total Rural Beneficiaries Trained: <strong>{rwtp.activitiesTotalBeneficiaries}+</strong>
                   </div>
                 </div>
               )}
@@ -572,6 +573,23 @@ export default function RuralWomenTechParkPage({
           </div>
         </div>
       </section>
+
+      {/* DYNAMIC CUSTOM SECTIONS */}
+      {customSections.some((s) => s.placement === 'intro') && (
+        <section className="section bg-white" style={{ padding: '2rem 0' }}>
+          <div className="container">
+            <CustomSectionsIntro sections={customSections} />
+          </div>
+        </section>
+      )}
+      {customSections.length > 0 && (
+        <section className="section bg-white" style={{ padding: '2rem 0' }}>
+          <div className="container">
+            <CustomSectionsGalleries sections={customSections} />
+            <CustomSectionsAccordion sections={customSections.filter((s) => s.placement !== 'intro' && s.contentType !== 'gallery')} />
+          </div>
+        </section>
+      )}
 
       {/* SECTION 5: EXPLORE MORE DIFFERENTIATORS CTA */}
       <section className="rwtp-cta-section">

@@ -1,4 +1,5 @@
-import { collection, deleteDoc, doc, getDocs, query, setDoc, where } from 'firebase/firestore';
+import { collection, doc, getDocs, query, where } from 'firebase/firestore';
+import { deleteDoc, setDoc } from './auditLog';
 import type { User } from 'firebase/auth';
 import { db } from './firebase';
 
