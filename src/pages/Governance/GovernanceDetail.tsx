@@ -20,11 +20,10 @@ import NirfReportsSection from './NirfReportsSection';
 import NbaDataSection from './NbaDataSection';
 import type { GovernanceItemDoc } from '../Admin/sections/GovernanceItemsAdmin';
 import { renderBold } from '../../lib/boldText';
+import { CustomSectionsIntro, CustomSectionsGalleries, CustomSectionsAccordion, SectionSubtree } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
+import { hasCustomSectionContent, type CustomSection } from '../../lib/customSections';
 import '../detail-layout.css';
 
-// Fallback intro/about for About IQAC and Quality Parameters, used only
-// until an admin fills in item.intro/item.about from the Governance Items
-// admin section — the Firestore value always wins once set (see below).
 const DEFAULT_INTRO_BY_SLUG: Record<string, string> = {
   'about-iqac': DEFAULT_IQAC_INTRO,
   'quality-parameters': DEFAULT_QUALITY_PARAMETERS_INTRO,
@@ -33,29 +32,10 @@ const DEFAULT_ABOUT_BY_SLUG: Record<string, string> = {
   'about-iqac': DEFAULT_IQAC_ABOUT,
 };
 
-// Quality Parameters' item.about/item.highlights/item.outcomes in Firestore
-// are currently a generic, unrelated placeholder (a synthesized "NAAC seven
-// criteria" blurb, matching fabricated highlight bullets, and fabricated
-// achievement cards) — this slug gets its own A/B/C/D parameter-checklist
-// accordion below instead (see QualityParametersSection), so all three
-// fields are suppressed regardless of what Firestore holds.
-// Annual Reports & Reforms' item.about/item.highlights/item.outcomes in
-// Firestore are the same kind of generic, unrelated placeholder (a
-// synthesized AQAR blurb and fabricated achievement cards) — this slug gets
-// its own year-by-year report archive below instead (see
-// AnnualReportsSection), so those fields are suppressed here too.
 const SUPPRESS_ABOUT_SLUGS = new Set(['quality-parameters', 'annual-reports']);
-// IQAC Committee's sidebar column now shows the Committees quick-nav card
-// instead — Key Highlights was crowding it out, so it's dropped here too.
 const SUPPRESS_HIGHLIGHTS_SLUGS = new Set(['quality-parameters', 'iqac-committee', 'annual-reports']);
 const SUPPRESS_OUTCOMES_SLUGS = new Set(['quality-parameters', 'annual-reports']);
 
-// The IQAC Committee page gets a "Committees" quick-nav card (matching the
-// same committee list shown in the header's Statutory > Committees menu),
-// so a visitor reading about the IQAC committee can jump straight to any of
-// the institution's other statutory committees. "Internal Quality Assurance
-// Cell" is the entry kept highlighted, since that's the committee this page
-// documents.
 const IQAC_COMMITTEE_SIDEBAR_ITEMS: { label: string; path: string }[] = [
   { label: 'College Academic Committee', path: '/governance/college-academic-committee' },
   { label: 'Internal Quality Assurance Cell', path: '/governance/internal-quality-assurance-cell' },
@@ -80,8 +60,6 @@ interface FacultyDoc {
   department: string;
 }
 
-// Maps a Board of Studies table title to the matching FacultyAdmin department value,
-// so faculty added in /admin show up under the right department's BoS table.
 const BOS_DEPARTMENT_MAP: Record<string, string> = {
   'Computer Science & Engineering': 'CSE',
   'CSE [Cyber Security]': 'Cyber Security',
@@ -95,36 +73,74 @@ const BOS_DEPARTMENT_MAP: Record<string, string> = {
   'Master of Business Administration (MBA)': 'MBA',
 };
 
+const DUMMY_GOV_ITEMS: Record<string, { title: string; category: 'governance' | 'committees' | 'iqac' }> = {
+  'idp': { title: 'Institutional Development Plan', category: 'governance' },
+  'governing-body': { title: 'Governing Body', category: 'governance' },
+  'academic-council': { title: 'Academic Council', category: 'governance' },
+  'board-of-studies': { title: 'Board of Studies', category: 'governance' },
+  'finance-committee': { title: 'Finance Committee', category: 'governance' },
+  'college-academic-committee': { title: 'College Academic Committee', category: 'committees' },
+  'academic-administrative-audit': { title: 'Acad. & Admin. Audit Committee', category: 'committees' },
+  'freshmen-committee': { title: 'Freshmen Committee', category: 'committees' },
+  'infrastructure-management': { title: 'Infrastructure Management', category: 'committees' },
+  'faculty-grievance': { title: 'Faculty Grievance Redressal', category: 'committees' },
+  'student-grievance': { title: 'Student Grievance Redressal', category: 'committees' },
+  'central-purchase': { title: 'Central Purchase Committee', category: 'committees' },
+  'anti-ragging': { title: 'Anti-Ragging Committee', category: 'committees' },
+  'internal-committee': { title: 'Internal Committee (POSH)', category: 'committees' },
+  'sc-st-cell': { title: 'SC/ST Cell', category: 'committees' },
+  'rd-committee': { title: 'R&D Committee', category: 'committees' },
+  'about-iqac': { title: 'About IQAC', category: 'iqac' },
+  'iqac-worksystem': { title: 'IQAC Worksystem', category: 'iqac' },
+  'quality-parameters': { title: 'Quality Parameters', category: 'iqac' },
+  'iqac-committee': { title: 'IQAC Committee', category: 'iqac' },
+  'policies-procedures': { title: 'Policies & Procedures', category: 'iqac' },
+};
+
 export default function GovernanceDetail() {
   const { slug } = useParams<{ slug: string }>();
   const { docs: govDocs, loading: govLoading } = useOrderedCollection<GovernanceItemDoc>('governanceItems', 'order');
-  const item = govDocs.find((i) => i.slug === slug) ?? null;
+  const foundItem = govDocs.find((i) => i.slug === slug) ?? null;
+
+  const defaultMeta = slug ? DUMMY_GOV_ITEMS[slug] : null;
+  const fallbackTitle = defaultMeta?.title || (slug || '')
+    .split('-')
+    .filter(Boolean)
+    .map((w) => w[0].toUpperCase() + w.slice(1))
+    .join(' ');
+  const fallbackCategory = defaultMeta?.category || 'governance';
+
+  const fallbackItem: GovernanceItemDoc = {
+    id: slug || 'governance-item',
+    slug: slug || 'governance-item',
+    title: fallbackTitle,
+    category: fallbackCategory,
+    icon: 'Landmark',
+    desc: `Overview and details regarding ${fallbackTitle} at Vishnu Women's University.`,
+    intro: `Vishnu Women's University maintains standard policies, procedures, and statutory guidelines for ${fallbackTitle}.`,
+    about: '',
+    highlights: [],
+    outcomes: [],
+    tableText: '',
+    heroImage: '',
+    heroStoragePath: '',
+    order: 99,
+  };
+
+  const item = foundItem || (govLoading ? null : fallbackItem);
+
   const { docs: faculty } = useOrderedCollection<FacultyDoc>('faculty', 'name');
-  // Each item can have its own hero image (set in the Governance/Committees/
-  // IQAC admin); falls back to the shared "Governance Detail Pages" banner.
-  // No hardcoded stock-photo fallback — the hero just shows its solid
-  // background color if neither is set yet.
   const { slides: heroSlides } = usePageBanners('governance-detail');
   const heroImage = item?.heroImage || heroSlides[0]?.imageUrl;
 
-  // No scroll-reveal here — this whole page's content (including the hero
-  // title) only renders once the Firestore-backed `item` has loaded, so any
-  // .reveal/IntersectionObserver setup would be racing async data on every
-  // navigation (see the gotcha documented in CLAUDE.md).
   useEffect(() => {
     if (item) document.title = `${item.title} | Vishnu Women's University`;
   }, [item]);
 
   if (!item) {
     if (govLoading) {
-      return (
-        <RouteFallback />
-      );
+      return <RouteFallback />;
     }
-    // No governanceItems doc for this slug yet (an admin hasn't filled it in)
-    // — show a proper placeholder instead of silently bouncing back to
-    // /governance, since the nav link that sent someone here is a real,
-    // clickable link now rather than a disabled one.
     const niceTitle = (slug || '')
       .split('-')
       .filter(Boolean)
@@ -137,6 +153,14 @@ export default function GovernanceDetail() {
   const about = SUPPRESS_ABOUT_SLUGS.has(item.slug) ? '' : item.about || DEFAULT_ABOUT_BY_SLUG[item.slug] || '';
   const aboutBlocks = parseAboutContent(about);
   const highlights = SUPPRESS_HIGHLIGHTS_SLUGS.has(item.slug) ? [] : item.highlights || [];
+
+  const customSections = item.customSections || [];
+  const blockSections = [
+    item.description,
+    item.vision,
+    item.mission,
+    item.objectives,
+  ].filter((b): b is CustomSection => !!b && hasCustomSectionContent(b));
 
   const parsedTable = parseStructuredTable(item.tableText);
   const tableSections = item.slug === 'board-of-studies'
@@ -209,6 +233,17 @@ export default function GovernanceDetail() {
                   {renderBold(intro)}
                 </p>
               )}
+
+              {/* Block sections (Description, Vision, Mission, Objectives) */}
+              {blockSections.map((block) => (
+                <div key={block.id} style={{ marginBottom: 'var(--space-6)' }}>
+                  <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-lg)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>
+                    {block.label}
+                  </h3>
+                  <SectionSubtree section={block} />
+                </div>
+              ))}
+
               {aboutBlocks.map((block, bi) => {
                 if (block.type === 'heading') {
                   return (
@@ -245,10 +280,19 @@ export default function GovernanceDetail() {
                   </p>
                 );
               })}
-              {!intro && aboutBlocks.length === 0 && (
+              {!intro && aboutBlocks.length === 0 && blockSections.length === 0 && (
                 <p style={{ fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: 1.75 }}>
                   {renderBold(item.desc)}
                 </p>
+              )}
+
+              {/* Differentiators-style Custom Sections (Intro & Accordion & Galleries) */}
+              {customSections.length > 0 && (
+                <div style={{ marginTop: 'var(--space-8)' }}>
+                  <CustomSectionsIntro sections={customSections} />
+                  <CustomSectionsGalleries sections={customSections} />
+                  <CustomSectionsAccordion sections={customSections.filter((s) => s.placement !== 'intro' && s.contentType !== 'gallery')} />
+                </div>
               )}
             </div>
 
@@ -296,12 +340,7 @@ export default function GovernanceDetail() {
         </div>
       </section>
 
-      {/* IQAC Worksystem gets a framed diagram of the VWU IQAC Work System
-          Framework (the Plan/Do/Analyse/Improve cycle, stakeholders, IDP
-          enablers, and quality-parameter categories), placed as its own
-          full-width card below the overview text since it's a single wide
-          infographic rather than something the plain intro/about copy or a
-          data table could represent. */}
+      {/* IQAC Worksystem */}
       {item.slug === 'iqac-worksystem' && (
         <section className="section bg-off-white">
           <div className="container">
@@ -327,10 +366,7 @@ export default function GovernanceDetail() {
         </section>
       )}
 
-      {/* Quality Parameters gets its own A/B/C/D checklist accordion —
-          richer than the plain paragraph/table content the other
-          Governance/IQAC sub-pages use, so it's rendered directly instead
-          of through the generic table renderer below. */}
+      {/* Quality Parameters */}
       {item.slug === 'quality-parameters' && (
         <section className="section bg-off-white">
           <div className="container">
@@ -342,10 +378,7 @@ export default function GovernanceDetail() {
         </section>
       )}
 
-      {/* Policies & Procedures gets the same admin-managed policy list
-          (title + "View" link once a PDF is uploaded + description) used by
-          the standalone /policies-procedures page, reading the same
-          institutionalPolicies collection so the two never drift apart. */}
+      {/* Policies & Procedures */}
       {item.slug === 'policies-procedures' && (
         <section className="section bg-off-white">
           <div className="container">
@@ -357,11 +390,7 @@ export default function GovernanceDetail() {
         </section>
       )}
 
-      {/* Annual Reports & Reforms gets a year-by-year archive of downloadable
-          PDFs (College Annual Reports, Annual Examination Reports,
-          Examination Reforms, Financial Audit Statements) instead of the
-          plain paragraph/table content the other Governance/IQAC sub-pages
-          use. */}
+      {/* Annual Reports & Reforms */}
       {item.slug === 'annual-reports' && (
         <section className="section bg-off-white">
           <div className="container">
@@ -373,9 +402,7 @@ export default function GovernanceDetail() {
         </section>
       )}
 
-      {/* MHRD NIRF Reports gets a tabbed browser (Engineering / Innovation /
-          SDG / Overall), each holding its own dated report PDFs, instead of
-          the plain paragraph/table content the other Governance/IQAC subpages use. */}
+      {/* MHRD NIRF Reports */}
       {item.slug === 'nirf-reports' && (
         <section className="section bg-off-white">
           <div className="container">
@@ -387,9 +414,7 @@ export default function GovernanceDetail() {
         </section>
       )}
 
-      {/* NBA – Data Capturing Points gets a plain bulleted list of the real
-          per-programme and institution-wide DCP document links, instead of
-          the plain paragraph/table content the other Governance/IQAC subpages use. */}
+      {/* NBA Data */}
       {item.slug === 'nba-data' && (
         <section className="section bg-off-white">
           <div className="container">
@@ -401,10 +426,7 @@ export default function GovernanceDetail() {
         </section>
       )}
 
-      {/* Internal Quality Assurance Cell gets its own tabbed Members/
-          Functions view — the full 25-member roster needs Designation/Type
-          of Membership/Position columns beyond the shared Name/Role/Notes
-          table below, so it's rendered directly instead. */}
+      {/* Internal Quality Assurance Cell */}
       {item.slug === 'internal-quality-assurance-cell' && (
         <section className="section bg-off-white">
           <div className="container">
