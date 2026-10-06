@@ -203,6 +203,35 @@
   overflow: hidden;
 }
 
+.m3-testi-quote-text--expanded {
+  display: block;
+  -webkit-line-clamp: unset;
+  overflow: visible;
+}
+
+.m3-testi-more-btn {
+  background: none;
+  border: none;
+  color: #C9973A;
+  font-weight: 700;
+  font-size: 0.88rem;
+  font-family: inherit;
+  cursor: pointer;
+  padding: 0;
+  margin: -0.75rem 0 1rem 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 200ms ease;
+  align-self: flex-start;
+}
+
+.m3-testi-more-btn:hover {
+  color: #0B1E42;
+}
+
 /* Author Block */
 .m3-testi-author-block {
   display: flex;
