@@ -15,8 +15,9 @@ import PlacementYearAccordion, { BranchOffersBarChart, formatSalary } from './Pl
 import type { PlacementYear } from './placementStats.data';
 import SmoothCollapse from '../../components/SmoothCollapse/SmoothCollapse';
 import CareerGuidanceInterestForm from '../../components/CareerGuidanceInterestForm/CareerGuidanceInterestForm';
-import { successStories } from './successStories.data';
-import { industryLiaisonOffices } from './industryLiaisonOffices.data';
+import { DEFAULT_SUCCESS_STORIES, SUCCESS_STORIES_COLLECTION, type SuccessStoryDoc } from '../Admin/sections/SuccessStoriesAdmin';
+import { industryLiaisonOffices as defaultIndustryLiaisonOffices } from './industryLiaisonOffices.data';
+import { ILO_OFFICE_DETAILS_COLLECTION, type IloOfficeDetailDoc } from '../Admin/sections/IloOfficeDetailsAdmin';
 import { employabilitySkillTabs } from './employabilitySkills.data';
 import { higherEducationSections } from './higherEducation.data';
 import { usePlacementYears } from './usePlacementYears';
@@ -1332,6 +1333,12 @@ export default function PlacementDetail() {
   const { docs: crtDocs } = useOrderedCollection<PlacementCrtDoc>('placementCrtDocsList', 'order');
   const crtCdpDoc = crtDocs.find((d) => d.category === 'cdp');
   const crtCProgramDoc = crtDocs.find((d) => d.category === 'c-program');
+  const { docs: successStoryDocs } = useOrderedCollection<SuccessStoryDoc>(SUCCESS_STORIES_COLLECTION, 'order');
+  const successStories = successStoryDocs.length > 0 ? successStoryDocs : DEFAULT_SUCCESS_STORIES;
+  const { docs: iloOfficeDetailDocs } = useOrderedCollection<IloOfficeDetailDoc>(ILO_OFFICE_DETAILS_COLLECTION, 'order');
+  const industryLiaisonOffices = iloOfficeDetailDocs.length > 0
+    ? Object.fromEntries(iloOfficeDetailDocs.map((d) => [d.officeName, { address: d.address, bullets: d.bullets }]))
+    : defaultIndustryLiaisonOffices;
   // Each item can have its own hero image (set in the Placement Sub-pages
   // admin); falls back to the shared "Placement Detail" banner. No
   // hardcoded stock-photo fallback — the hero just shows its solid

@@ -74,6 +74,8 @@ import SocialServicesContentAdmin from './sections/SocialServicesContentAdmin';
 import AcademicsContentAdmin from './sections/AcademicsContentAdmin';
 import OtherPracticesAdmin from './sections/OtherPracticesAdmin';
 import GsacHeroContentAdmin from './sections/GsacHeroContentAdmin';
+import SuccessStoriesAdmin from './sections/SuccessStoriesAdmin';
+import IloOfficeDetailsAdmin from './sections/IloOfficeDetailsAdmin';
 import InsightsAdmin from './sections/InsightsAdmin';
 import CareerGuidanceInterestAdmin from './sections/CareerGuidanceInterestAdmin';
 import ResearchItemsAdmin from './sections/ResearchItemsAdmin';
@@ -203,6 +205,8 @@ const SECTION_MAP: Record<string, React.ReactNode> = {
   'academics-content': <AcademicsContentAdmin />,
   'other-practices': <OtherPracticesAdmin />,
   'gsac-hero-content': <GsacHeroContentAdmin />,
+  'success-stories': <SuccessStoriesAdmin />,
+  'ilo-office-details': <IloOfficeDetailsAdmin />,
   insights: <InsightsAdmin />,
   'career-guidance-interest': <CareerGuidanceInterestAdmin />,
   'research-items': <ResearchItemsAdmin />,
