@@ -13,33 +13,17 @@ import type { FaqDoc } from '../Admin/sections/FaqAdmin';
 import { ClipboardList, Users, Phone, Mail, MapPin, Sparkles } from 'lucide-react';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import { useHashScroll } from '../../hooks/useHashScroll';
+import { useDocument } from '../../hooks/useDocument';
+import {
+  DEFAULT_ADMISSIONS_RANKS,
+  ADMISSIONS_RANKS_COLLECTION,
+  ADMISSIONS_RANKS_DOC_ID,
+  type AdmissionsRanksDoc,
+  type RankAnalysisRow,
+} from '../Admin/sections/AdmissionsRanksAdmin';
 import { dotTech } from '../../lib/academicDegreeNames';
 
-interface RankAnalysisItem {
-  code: string;
-  course: string;
-  collegeCode: 'VISW' | 'VISWPU';
-  beginRank2026: string;
-  endingRank2026: string;
-  beginRank2025: string;
-  endingRank2025: string;
-}
-
-const eapcetRanksData: RankAnalysisItem[] = [
-  // VISW
-  { code: 'CIV', course: 'CIVIL ENGINEERING', collegeCode: 'VISW', beginRank2026: '10,350', endingRank2026: '30,914', beginRank2025: '11,298', endingRank2025: '51,609' },
-  { code: 'CSE', course: 'COMPUTER SCIENCE AND ENGINEERING', collegeCode: 'VISW', beginRank2026: '375', endingRank2026: '4,020', beginRank2025: '681', endingRank2025: '4,325' },
-  { code: 'CSC', course: 'COMPUTER SCIENCE AND ENGINEERING (CYBER SECURITY)', collegeCode: 'VISW', beginRank2026: '2,647', endingRank2026: '5,705', beginRank2025: '1,962', endingRank2025: '7,152' },
-  { code: 'CSM', course: 'CSE (ARTIFICIAL INTELLIGENCE AND MACHINE LEARNING)', collegeCode: 'VISW', beginRank2026: '1,733', endingRank2026: '4,814', beginRank2025: '523', endingRank2025: '5,256' },
-  { code: 'CAD', course: 'CSE (ARTIFICIAL INTELLIGENCE & DATA SCIENCE)', collegeCode: 'VISW', beginRank2026: '1,481', endingRank2026: '5,475', beginRank2025: '1,466', endingRank2025: '6,284' },
-  { code: 'EEE', course: 'ELECTRICAL AND ELECTRONICS ENGINEERING', collegeCode: 'VISW', beginRank2026: '9,353', endingRank2026: '16,183', beginRank2025: '13,282', endingRank2025: '20,962' },
-  { code: 'ECE', course: 'ELECTRONICS AND COMMUNICATION ENGINEERING', collegeCode: 'VISW', beginRank2026: '2,484', endingRank2026: '6,978', beginRank2025: '3,684', endingRank2025: '9,659' },
-  { code: 'INF', course: 'INFORMATION TECHNOLOGY', collegeCode: 'VISW', beginRank2026: '5,297', endingRank2026: '8,023', beginRank2025: '6,126', endingRank2025: '10,089' },
-  { code: 'MEC', course: 'MECHANICAL ENGINEERING', collegeCode: 'VISW', beginRank2026: '7,904', endingRank2026: '20,739', beginRank2025: '18,156', endingRank2025: '33,395' },
-  // VISWPU
-  { code: 'CSM', course: 'CSE (ARTIFICIAL INTELLIGENCE AND MACHINE LEARNING)', collegeCode: 'VISWPU', beginRank2026: '1,242', endingRank2026: '9,991', beginRank2025: '---', endingRank2025: '---' },
-  { code: 'EVT', course: 'ELECTRONICS ENGINEERING (VLSI DESIGN AND TECHNOLOGY)', collegeCode: 'VISWPU', beginRank2026: '2,331', endingRank2026: '7,756', beginRank2025: '---', endingRank2025: '---' },
-];
+type RankAnalysisItem = RankAnalysisRow;
 
 const defaultAdmissionsPhotos = [
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'VWU campus buildings', caption: 'VWU Campus' },
@@ -103,6 +87,11 @@ export default function Admissions() {
   const { docs: allFaqs } = useOrderedCollection<FaqDoc>('faqs', 'order');
   const liveFaqs = allFaqs.filter((f) => f.page === 'admissions');
   const faqs = liveFaqs.length > 0 ? liveFaqs : DEFAULT_ADMISSIONS_FAQS;
+  // Admin → Admissions & Campus Info → AP EAPCET Rank Analysis. Falls back
+  // to the original hardcoded content until an admin saves anything.
+  const { data: remoteRanks } = useDocument<AdmissionsRanksDoc>(ADMISSIONS_RANKS_COLLECTION, ADMISSIONS_RANKS_DOC_ID);
+  const eapcetRanksData: RankAnalysisItem[] = remoteRanks?.rows?.length ? remoteRanks.rows : DEFAULT_ADMISSIONS_RANKS.rows;
+  const eapcetRankYears: string[] = remoteRanks?.years?.length ? remoteRanks.years : DEFAULT_ADMISSIONS_RANKS.years;
   const rawTuitionData = useContentBlocks('admissions', 'tuitionData');
   const tuitionData = useMemo(() => {
     if (!rawTuitionData || rawTuitionData.length === 0) {
@@ -136,7 +125,11 @@ export default function Admissions() {
   const pgPhotos = useSitePhotos('admissions', 'pg', defaultPgPhotos);
   const hasPgPhotos = useSectionHasPhotos('admissions', 'pg');
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const [rankYear, setRankYear] = useState<'2026-27' | '2025-26'>('2026-27');
+  const [rankYear, setRankYear] = useState<string>(DEFAULT_ADMISSIONS_RANKS.years[0]);
+  // The admin can add/remove years, so the selected one might not exist in
+  // the current list (e.g. right after it loads, or after a removal) —
+  // fall back to the newest available year rather than showing nothing.
+  const effectiveRankYear = eapcetRankYears.includes(rankYear) ? rankYear : eapcetRankYears[0];
   const [rankCollege, setRankCollege] = useState<'VISW' | 'VISWPU'>('VISW');
   const [rankProgramme, setRankProgramme] = useState<string>('all');
   useEffect(() => {
@@ -259,17 +252,16 @@ export default function Admissions() {
           </div>
 
           {(() => {
-            const parseRank = (val: string) => {
-              const num = parseInt(val.replace(/,/g, ''), 10);
+            const parseRank = (val: string | undefined) => {
+              const num = parseInt((val || '').replace(/,/g, ''), 10);
               return isNaN(num) ? Infinity : num;
             };
-            const beginKey: keyof RankAnalysisItem = rankYear === '2026-27' ? 'beginRank2026' : 'beginRank2025';
-            const endKey: keyof RankAnalysisItem = rankYear === '2026-27' ? 'endingRank2026' : 'endingRank2025';
+            const rankFor = (row: RankAnalysisItem) => row.ranks[effectiveRankYear] || { beginRank: '---', endingRank: '---' };
             const collegeRows = eapcetRanksData.filter(r => r.collegeCode === rankCollege);
             const programmeOptions = [...new Map(collegeRows.map(r => [r.code, r.course])).entries()];
             const filteredRows = collegeRows
               .filter(r => rankProgramme === 'all' || r.code === rankProgramme)
-              .sort((a, b) => parseRank(a[endKey]) - parseRank(b[endKey]));
+              .sort((a, b) => parseRank(rankFor(a).endingRank) - parseRank(rankFor(b).endingRank));
 
             const selectStyle: CSSProperties = {
               border: '1.5px solid var(--color-light-gray)',
@@ -300,12 +292,11 @@ export default function Admissions() {
               <label style={labelStyle}>
                 Academic Year
                 <select
-                  value={rankYear}
-                  onChange={(e) => setRankYear(e.target.value as typeof rankYear)}
+                  value={effectiveRankYear}
+                  onChange={(e) => setRankYear(e.target.value)}
                   style={selectStyle}
                 >
-                  <option value="2026-27">2026 – 27</option>
-                  <option value="2025-26">2025 – 26</option>
+                  {eapcetRankYears.map((y) => <option key={y} value={y}>{y}</option>)}
                 </select>
               </label>
               <label style={labelStyle}>
@@ -359,14 +350,14 @@ export default function Admissions() {
                         <span style={{ background: 'rgba(0,47,25,0.08)', color: 'var(--color-primary)', padding: '0.15rem 0.5rem', borderRadius: '4px', fontWeight: 800, fontSize: 'var(--text-xs)' }}>{row.code}</span>
                       </td>
                       <td style={{ padding: 'var(--space-3) var(--space-4)', fontWeight: 700, color: 'var(--color-primary)', fontSize: 'var(--text-xs)' }}>{row.course}</td>
-                      <td style={{ padding: 'var(--space-3)', textAlign: 'center', fontWeight: 700, color: '#1b5e20', fontSize: 'var(--text-xs)' }}>{row[beginKey]}</td>
-                      <td style={{ padding: 'var(--space-3)', textAlign: 'center', fontWeight: 700, color: 'var(--color-primary)', fontSize: 'var(--text-xs)' }}>{row[endKey]}</td>
+                      <td style={{ padding: 'var(--space-3)', textAlign: 'center', fontWeight: 700, color: '#1b5e20', fontSize: 'var(--text-xs)' }}>{rankFor(row).beginRank}</td>
+                      <td style={{ padding: 'var(--space-3)', textAlign: 'center', fontWeight: 700, color: 'var(--color-primary)', fontSize: 'var(--text-xs)' }}>{rankFor(row).endingRank}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
               <div style={{ marginTop: 'var(--space-4)', fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', textAlign: 'right', fontStyle: 'italic' }}>
-                * Official AP EAPCET Cut-off Ranks (OC) for VWU — College Code: {rankCollege}, {rankYear} counseling.
+                * Official AP EAPCET Cut-off Ranks (OC) for VWU — College Code: {rankCollege}, {effectiveRankYear} counseling.
               </div>
             </div>
           </>
