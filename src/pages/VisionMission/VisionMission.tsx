@@ -10,6 +10,8 @@ import { useSitePhotos, useSectionHasPhotos } from '../../hooks/useSitePhotos';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import { renderBold } from '../../lib/boldText';
+import { useDocument } from '../../hooks/useDocument';
+import { DEFAULT_VISION_MISSION_CONTENT, VISION_MISSION_CONTENT_COLLECTION, VISION_MISSION_CONTENT_DOC_ID, type VisionMissionContentDoc } from '../Admin/sections/VisionMissionContentAdmin';
 
 const defaultInspirationPhotos = [
   // Slots 0-4: "Our Values in Action" PhotoGrid gallery
@@ -22,13 +24,6 @@ const defaultInspirationPhotos = [
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'VWU quality education', caption: '' },
 ];
 
-const QUALITY_COMMITMENT_ITEMS = [
-  { title: 'Academic Quality', desc: 'Maintain high standards across teaching, learning and research.' },
-  { title: 'Student Development', desc: 'Support meaningful learning experiences and the overall development of students.' },
-  { title: 'Continuous Improvement', desc: 'Respond to evolving educational needs, technologies and academic practices.' },
-  { title: 'Integrity & Responsibility', desc: 'Uphold integrity, consistency and responsible practices across the University.' },
-];
-
 const defaultCoreValuesPhotos = [
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Empowering Women in Tech', caption: '' },
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Tech Innovation', caption: '' },
@@ -38,6 +33,8 @@ const defaultCoreValuesPhotos = [
 ];
 
 export default function VisionMission() {
+  const { data: remoteContent } = useDocument<VisionMissionContentDoc>(VISION_MISSION_CONTENT_COLLECTION, VISION_MISSION_CONTENT_DOC_ID);
+  const content = { ...DEFAULT_VISION_MISSION_CONTENT, ...remoteContent };
   const missionPoints = useContentBlocks('vision-mission', 'missionPoints');
   const values = useContentBlocks('vision-mission', 'values');
   const visionMissionPhotos = useSitePhotos('vision-mission', 'main', defaultInspirationPhotos);
@@ -86,12 +83,7 @@ export default function VisionMission() {
             <div className="vm-content">
               <div className="vm-vision-box">
                 <span className="vm-quote-icon">❝</span>
-                <p>
-                  To emerge as a globally benchmarked, women-centric university that advances the
-                  Sustainable Development Goals (SDGs) through academic excellence, ethical leadership, and
-                  transformative innovation—empowering women to shape an equitable, sustainable, and
-                  resilient world.
-                </p>
+                <p>{renderBold(content.visionStatement)}</p>
               </div>
             </div>
           </div>
@@ -107,12 +99,7 @@ export default function VisionMission() {
               <h2>Mission</h2>
             </div>
             <div className="vm-content">
-              <p className="vm-mission-intro">
-                To advance knowledge and women’s education through academic excellence, research, innovation and
-                responsible engagement with society. We are committed to equity, sustainability, global
-                collaboration and the development of graduates who are prepared to contribute with competence and
-                integrity.
-              </p>
+              <p className="vm-mission-intro">{renderBold(content.missionIntro)}</p>
               <ul className="vm-mission-list">
                 {missionPoints.map((point, i) => {
                   const num = String(i + 1).padStart(2, '0');
@@ -133,9 +120,9 @@ export default function VisionMission() {
       <section className="section bg-white">
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>
-            <h2 className="section-title">What We Stand For</h2>
+            <h2 className="section-title">{content.valuesHeading}</h2>
             <p className="section-desc" style={{ margin: '0 auto' }}>
-              The values that guide our teaching, research and engagement.
+              {content.valuesDesc}
             </p>
           </div>
           <div className="vm-values-grid">
@@ -159,14 +146,9 @@ export default function VisionMission() {
           <PhotoGrid
             images={inspirationPhotos}
             label="Our Values in Action"
-            title="Where Purpose Meets Practice"
-            subtitle="Every corner of VWU reflects the values we stand for — in classrooms, on the field, and in the community."
-            highlights={[
-              'Excellence in teaching, research & outcomes',
-              'Innovation through TBI & AICTE IDEA Lab',
-              'Community service via NSS & Dr. B.V. Raju Foundation',
-              'Environmental stewardship — green campus initiative',
-            ]}
+            title={content.galleryTitle}
+            subtitle={content.gallerySubtitle}
+            highlights={content.galleryHighlights.filter(Boolean)}
             columns={2}
             layout="side-text"
             showGalleryLink={false}
@@ -195,15 +177,14 @@ export default function VisionMission() {
           <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-12)', alignItems: 'center' }}>
             <div className="reveal-left">
               <span style={{ display: 'block', fontFamily: 'var(--font-sans)', fontSize: '0.8rem', fontWeight: 800, letterSpacing: '0.1em', color: 'var(--color-accent)', marginBottom: 'var(--space-3)' }}>
-                QUALITY COMMITMENT
+                {content.qualityEyebrow}
               </span>
-              <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>Quality Policy</h2>
+              <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>{content.qualityHeading}</h2>
               <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 'var(--text-base)', lineHeight: 1.75, marginBottom: 'var(--space-6)' }}>
-                We are committed to maintaining high standards in teaching, learning, research and institutional
-                practice, with a continued focus on student development and academic improvement.
+                {content.qualityParagraph}
               </p>
               <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-                {QUALITY_COMMITMENT_ITEMS.map((item) => (
+                {content.qualityItems.map((item) => (
                   <li key={item.title} style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
                     <Check size={17} strokeWidth={2.5} style={{ color: 'var(--color-accent)', flexShrink: 0, marginTop: 4 }} />
                     <div>
@@ -232,15 +213,15 @@ export default function VisionMission() {
         <div className="container" style={{ textAlign: 'center' }}>
           <div className="reveal">
             <h2 style={{ color: 'var(--color-white)', fontSize: 'clamp(1.75rem, 4vw, 2.75rem)', marginBottom: 'var(--space-4)' }}>
-              Empowering Women Through Excellence
+              {content.ctaHeading}
             </h2>
             <div style={{ maxWidth: 720, margin: '0 auto var(--space-8)' }}>
               <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 'var(--text-lg)', marginBottom: 'var(--space-4)' }}>
-                Discover our academic programs, state-of-the-art campus infrastructure, and vibrant student community.
+                {content.ctaParagraph}
               </p>
             </div>
             <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Link to="/about" className="btn btn-accent btn-lg">About VWU</Link>
+              <Link to="/about" className="btn btn-accent btn-lg">{content.ctaButtonLabel}</Link>
             </div>
           </div>
         </div>
