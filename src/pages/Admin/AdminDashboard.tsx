@@ -72,6 +72,7 @@ import FitnessCentreContentAdmin from './sections/FitnessCentreContentAdmin';
 import SewageTreatmentContentAdmin from './sections/SewageTreatmentContentAdmin';
 import SocialServicesContentAdmin from './sections/SocialServicesContentAdmin';
 import AcademicsContentAdmin from './sections/AcademicsContentAdmin';
+import OtherPracticesAdmin from './sections/OtherPracticesAdmin';
 import InsightsAdmin from './sections/InsightsAdmin';
 import CareerGuidanceInterestAdmin from './sections/CareerGuidanceInterestAdmin';
 import ResearchItemsAdmin from './sections/ResearchItemsAdmin';
@@ -199,6 +200,7 @@ const SECTION_MAP: Record<string, React.ReactNode> = {
   'sewage-treatment-content': <SewageTreatmentContentAdmin />,
   'social-services-content': <SocialServicesContentAdmin />,
   'academics-content': <AcademicsContentAdmin />,
+  'other-practices': <OtherPracticesAdmin />,
   insights: <InsightsAdmin />,
   'career-guidance-interest': <CareerGuidanceInterestAdmin />,
   'research-items': <ResearchItemsAdmin />,
