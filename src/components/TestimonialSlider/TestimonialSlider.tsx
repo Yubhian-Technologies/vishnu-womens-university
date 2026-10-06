@@ -32,6 +32,11 @@ export default function TestimonialSlider({
   const [direction, setDirection] = useState(1);
   const [isPaused, setIsPaused] = useState(false);
   const [, setProgress] = useState(0);
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  useEffect(() => {
+    setIsExpanded(false);
+  }, [current]);
 
   const count = testimonials.length;
   const progressIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -190,9 +195,20 @@ export default function TestimonialSlider({
                   </div>
 
                   {/* Main Quote (Clamped 3-4 lines) */}
-                  <blockquote className="m3-testi-quote-text">
+                  <blockquote className={`m3-testi-quote-text ${isExpanded ? 'm3-testi-quote-text--expanded' : ''}`}>
                     "{renderBold(item.desc)}"
                   </blockquote>
+
+                  {item.desc && item.desc.length > 130 && (
+                    <button
+                      type="button"
+                      className="m3-testi-more-btn"
+                      onClick={() => setIsExpanded((prev) => !prev)}
+                      aria-expanded={isExpanded}
+                    >
+                      {isExpanded ? 'Less' : 'More'}
+                    </button>
+                  )}
 
                   {/* Prominent Author Name & Subtle Designation */}
                   <div className="m3-testi-author-block">
