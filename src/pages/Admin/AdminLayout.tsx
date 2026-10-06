@@ -91,6 +91,7 @@ export const SECTIONS: { id: string; icon: IconDefinition; label: string }[] = [
   { id: 'recruiter-logos', icon: faTag, label: 'Recruiter Logos' },
   { id: 'gsac-photos', icon: faPlane, label: 'GSAC Photos' },
   { id: 'news-awards-data', icon: faTrophy, label: 'Happenings & Awards' },
+  { id: 'news-awards-content', icon: faNewspaper, label: 'News & Awards Hub — Copy' },
   { id: 'insights',       icon: faLightbulb, label: 'VWU Insights' },
   { id: 'research-items', icon: faFlask, label: 'Research' },
   { id: 'compliance-docs', icon: faFileCircleCheck, label: 'Compliance Documents' },
@@ -121,7 +122,7 @@ export const SECTION_GROUPS: { label: string; ids: string[] }[] = [
   { label: 'Placements & Careers', ids: ['placements', 'placement-highlights', 'placement-items', 'tpo-team-info', 'placement-crt-docs', 'tpo-team-photos', 'ilo-office-photos', 'recruiter-logos', 'gsac-photos'] },
   { label: 'Differentiators', ids: ['differentiators'] },
   { label: 'Research', ids: ['research-items'] },
-  { label: 'News & Awards', ids: ['news', 'gallery', 'news-awards-data', 'insights', 'announcements'] },
+  { label: 'News & Awards', ids: ['news', 'gallery', 'news-awards-data', 'news-awards-content', 'insights', 'announcements'] },
   { label: 'Alumni & Giving', ids: ['alumni'] },
   { label: 'Administration', ids: ['users-roles', 'audit-log'] },
 ];
