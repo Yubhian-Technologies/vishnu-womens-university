@@ -14,9 +14,9 @@ import '../Academics/Academics.css';
 import '../detail-layout.css';
 import './Schools.css';
 
-// Per-school highlight line shown under the title. Keyed by normalised
-// school title (lowercased, trimmed). Not an admin field yet — add a
-// `tagline` to SchoolDoc + SchoolsAdmin if these need editing without a deploy.
+// Fallback for schools saved before SchoolDoc.tagline existed — the admin
+// editor (Admin -> Schools) now has its own Tagline field, which always
+// wins once an admin sets one. Keyed by normalised school title.
 const SCHOOL_TAGLINES: Record<string, string> = {
   'school of computing': 'Empowering Women to Shape the Digital Future.',
   'school of engineering': 'Empowering Women to Engineer the Future.',
@@ -72,8 +72,8 @@ export default function Schools() {
                 <div className="school-header-text">
                   <span className="school-index" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
                   <h2 className="section-title school-title">{school.title}</h2>
-                  {SCHOOL_TAGLINES[school.title.trim().toLowerCase()] && (
-                    <p className="school-tagline">{SCHOOL_TAGLINES[school.title.trim().toLowerCase()]}</p>
+                  {(school.tagline || SCHOOL_TAGLINES[school.title.trim().toLowerCase()]) && (
+                    <p className="school-tagline">{school.tagline || SCHOOL_TAGLINES[school.title.trim().toLowerCase()]}</p>
                   )}
                   {school.description && (
                     <p className="section-desc">{renderBold(school.description)}</p>
