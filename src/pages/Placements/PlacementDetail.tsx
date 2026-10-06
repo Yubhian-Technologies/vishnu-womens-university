@@ -832,6 +832,10 @@ function TeamRosterRow({
   // Address block, never the Role/Notes or static-data-file fallbacks below.
   addressOnly?: boolean;
 }) {
+  const { docs: iloOfficeDetailDocs } = useOrderedCollection<IloOfficeDetailDoc>(ILO_OFFICE_DETAILS_COLLECTION, 'order');
+  const industryLiaisonOffices = iloOfficeDetailDocs.length > 0
+    ? Object.fromEntries(iloOfficeDetailDocs.map((d) => [d.officeName, { address: d.address, bullets: d.bullets }]))
+    : defaultIndustryLiaisonOffices;
   const bio = tpoBiosMap.get(row.name);
   // Roster-row email/linkedin (Placement Sub-pages' Data Table, this row's
   // own 4th/5th field) and TPO Team Info's bio emails/linkedins are two
@@ -1340,10 +1344,6 @@ export default function PlacementDetail() {
   const crtCProgramDoc = crtDocs.find((d) => d.category === 'c-program');
   const { docs: successStoryDocs } = useOrderedCollection<SuccessStoryDoc>(SUCCESS_STORIES_COLLECTION, 'order');
   const successStories = successStoryDocs.length > 0 ? successStoryDocs : DEFAULT_SUCCESS_STORIES;
-  const { docs: iloOfficeDetailDocs } = useOrderedCollection<IloOfficeDetailDoc>(ILO_OFFICE_DETAILS_COLLECTION, 'order');
-  const industryLiaisonOffices = iloOfficeDetailDocs.length > 0
-    ? Object.fromEntries(iloOfficeDetailDocs.map((d) => [d.officeName, { address: d.address, bullets: d.bullets }]))
-    : defaultIndustryLiaisonOffices;
   // Each item can have its own hero image (set in the Placement Sub-pages
   // admin); falls back to the shared "Placement Detail" banner. No
   // hardcoded stock-photo fallback — the hero just shows its solid
