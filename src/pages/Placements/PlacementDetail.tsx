@@ -3,6 +3,7 @@ import { Link, useParams, Navigate } from 'react-router-dom';
 import { orderBy } from 'firebase/firestore';
 import { Trophy, BarChart3, PlayCircle, MapPin, CheckCircle2, ChevronLeft, ChevronRight, ChevronDown, Clock } from 'lucide-react';
 import { useCollection, useOrderedCollection, type WithId } from '../../hooks/useCollection';
+import { useDocument } from '../../hooks/useDocument';
 import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import { usePageBanners } from '../../hooks/usePageBanners';
 import { fetchPriorityAttr } from '../../lib/domAttrs';
@@ -18,8 +19,8 @@ import CareerGuidanceInterestForm from '../../components/CareerGuidanceInterestF
 import { DEFAULT_SUCCESS_STORIES, SUCCESS_STORIES_COLLECTION, type SuccessStoryDoc } from '../Admin/sections/SuccessStoriesAdmin';
 import { industryLiaisonOffices as defaultIndustryLiaisonOffices } from './industryLiaisonOffices.data';
 import { ILO_OFFICE_DETAILS_COLLECTION, type IloOfficeDetailDoc } from '../Admin/sections/IloOfficeDetailsAdmin';
-import { employabilitySkillTabs } from './employabilitySkills.data';
-import { higherEducationSections } from './higherEducation.data';
+import { DEFAULT_EMPLOYABILITY_SKILLS, EMPLOYABILITY_SKILLS_COLLECTION, EMPLOYABILITY_SKILLS_DOC_ID, type EmployabilitySkillsDoc } from '../Admin/sections/EmployabilitySkillsAdmin';
+import { DEFAULT_HIGHER_EDUCATION, HIGHER_EDUCATION_COLLECTION, HIGHER_EDUCATION_DOC_ID, type HigherEducationDoc } from '../Admin/sections/HigherEducationAdmin';
 import { usePlacementYears } from './usePlacementYears';
 import PlacementAnnouncementsTicker from './PlacementAnnouncementsTicker';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
@@ -273,6 +274,8 @@ function AllRecruiters({ logoMap }: { logoMap: Map<string, string> }) {
 // has content so far; other tabs fall back to a coming-soon note.
 function EmployabilitySkillsGrid() {
   const [activeTab, setActiveTab] = useState(0);
+  const { data: remoteSkills } = useDocument<EmployabilitySkillsDoc>(EMPLOYABILITY_SKILLS_COLLECTION, EMPLOYABILITY_SKILLS_DOC_ID);
+  const employabilitySkillTabs = remoteSkills?.tabs?.length === 2 ? remoteSkills.tabs : DEFAULT_EMPLOYABILITY_SKILLS.tabs;
   const tab = employabilitySkillTabs[activeTab];
 
   return (
@@ -341,6 +344,8 @@ function EmployabilitySkillsGrid() {
 // with country tab pills inside since it covers three countries at once.
 // Styled to match the site rather than the source's purple/tan look.
 function HigherEducationAccordion() {
+  const { data: remoteHigherEd } = useDocument<HigherEducationDoc>(HIGHER_EDUCATION_COLLECTION, HIGHER_EDUCATION_DOC_ID);
+  const higherEducationSections = remoteHigherEd?.sections?.length === 2 ? remoteHigherEd.sections : DEFAULT_HIGHER_EDUCATION.sections;
   const [activeSection, setActiveSection] = useState(higherEducationSections[higherEducationSections.length - 1]?.title ?? '');
   const [activeTabBySection, setActiveTabBySection] = useState<Record<string, number>>({});
 
