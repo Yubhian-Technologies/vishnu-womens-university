@@ -14,6 +14,7 @@ import FacultyCarousel from '../../components/FacultyCarousel/FacultyCarousel';
 import LabsCarousel from '../../components/LabsCarousel/LabsCarousel';
 import TestimonialMarquee, { PlacementRecordCard, type PlacementItem } from '../../components/ui/marquee-01';
 import { Marquee } from '../../components/ui/marquee-01-utils/marquee';
+import { hodTitle } from '../../lib/hod';
 
 const SECONDS_PER_CARD = 5;
 const MIN_DURATION_S = 45;
@@ -646,7 +647,7 @@ function SingleProgramDetail() {
                       <div className="dept-fact-icon-badge">
                         <GraduationCap size={14} strokeWidth={2.4} />
                       </div>
-                      <span className="dept-fact-col-title">Head of the Department</span>
+                      <span className="dept-fact-col-title">{hodTitle(dept?.title || program.department)}</span>
                     </div>
                     <div className="dept-fact-items-window">
                       <div className="dept-fact-static-list">
@@ -767,7 +768,7 @@ function SingleProgramDetail() {
                   <div className="dept-hod-media-frame">
                     <SmoothImage
                       src={shared.hodImage}
-                      alt={shared.hod || 'Head of Department'}
+                      alt={shared.hod || hodTitle(dept?.title || program.department)}
                       className="dept-hod-photo"
                     />
                   </div>
@@ -775,7 +776,7 @@ function SingleProgramDetail() {
                 {shared.hod && (
                   <div className="dept-hod-media-caption">
                     <h3 className="dept-hod-name">{shared.hod}</h3>
-                    <div className="dept-hod-meta">Head of the Department</div>
+                    <div className="dept-hod-meta">{hodTitle(dept?.title || program.department)}</div>
                   </div>
                 )}
               </div>
