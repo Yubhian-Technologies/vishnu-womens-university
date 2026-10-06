@@ -30,11 +30,35 @@ import {
 } from '../../components/Footer/SocialIcons';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
+import { useDocument } from '../../hooks/useDocument';
 import { useSiteContact, DEFAULT_PHONE } from '../../hooks/useSiteContact';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import type { ContactDoc } from '../Admin/sections/ContactsAdmin';
-import { renderBold } from '../../lib/boldText';
+import {
+  DEFAULT_CONTACT_EXTRAS,
+  CONTACT_EXTRAS_COLLECTION,
+  CONTACT_EXTRAS_DOC_ID,
+  type ContactPageExtrasDoc,
+} from '../Admin/sections/ContactPageExtrasAdmin';
+import { renderBold, splitBold } from '../../lib/boldText';
 import './Contact.css';
+
+/** Renders **bold** segments per line, with each line break becoming its
+ *  own line (<br/> between them) — matches the original hardcoded JSX's
+ *  mix of <strong> spans and a literal <br/> in the Air route info. */
+function TransitInfo({ text }: { text: string }) {
+  const lines = text.split('\n');
+  return (
+    <p>
+      {lines.map((line, i) => (
+        <span key={i}>
+          {splitBold(line).map((seg, j) => (seg.bold ? <strong key={j}>{seg.text}</strong> : seg.text))}
+          {i < lines.length - 1 && <br />}
+        </span>
+      ))}
+    </p>
+  );
+}
 
 interface ContactForm {
   name: string;
@@ -176,6 +200,11 @@ export default function Contact() {
   const liveSocialLinks = useContentBlocks('contact', 'socialLinks');
   const { email: siteEmail, phone: sitePhone } = useSiteContact();
   const defaultPhoneDigits = DEFAULT_PHONE.replace(/\D/g, '');
+  // Admin → About & Governance → Contact Page — Helplines & Travel Guide.
+  // Falls back to the original hardcoded content until an admin saves
+  // anything, so this renders identically to before.
+  const { data: remoteExtras } = useDocument<ContactPageExtrasDoc>(CONTACT_EXTRAS_COLLECTION, CONTACT_EXTRAS_DOC_ID);
+  const extras = remoteExtras || DEFAULT_CONTACT_EXTRAS;
 
   // Two independent info-card fixes compose here, in order: legacy email
   // domains and a missing admissions address get normalized first (our
@@ -370,30 +399,20 @@ export default function Contact() {
                 <ShieldCheck size={26} />
               </div>
               <div>
-                <h3 className="emergency-title">24x7 Women's Safety &amp; Helplines</h3>
+                <h3 className="emergency-title">{extras.helplineTitle}</h3>
                 <p className="emergency-sub">
-                  Round-the-clock emergency support for student security, health, and campus safety.
+                  {extras.helplineSubtitle}
                 </p>
               </div>
             </div>
 
             <div className="emergency-box__numbers">
-              <a href="tel:18005990599" className="emergency-pill">
-                <span className="emergency-pill__label">University Toll-Free</span>
-                <span className="emergency-pill__num">1800 599 0599</span>
-              </a>
-              <a href="tel:+918816250864" className="emergency-pill">
-                <span className="emergency-pill__label">Campus Security</span>
-                <span className="emergency-pill__num">+91 8816 250864</span>
-              </a>
-              <a href="tel:+918816250869" className="emergency-pill">
-                <span className="emergency-pill__label">Health Centre</span>
-                <span className="emergency-pill__num">+91 8816 250869</span>
-              </a>
-              <a href="tel:18001805522" className="emergency-pill">
-                <span className="emergency-pill__label">Anti-Ragging Toll-Free</span>
-                <span className="emergency-pill__num">1800-180-5522</span>
-              </a>
+              {extras.helplines.map((h, i) => (
+                <a key={i} href={`tel:${h.tel}`} className="emergency-pill">
+                  <span className="emergency-pill__label">{h.label}</span>
+                  <span className="emergency-pill__num">{h.num}</span>
+                </a>
+              ))}
             </div>
           </div>
         </div>
@@ -445,26 +464,19 @@ export default function Contact() {
               <div className="transit-body">
                 {activeTransitTab === 'train' && (
                   <div className="transit-info">
-                    <p>
-                      <strong>Bhimavaram Town (BVRM)</strong> &amp; <strong>Junction (BVRT)</strong> stations are <strong>3.8 km and 4.2 km</strong> away. Autos and cabs operate continuously to campus.
-                    </p>
+                    <TransitInfo text={extras.trainInfo} />
                   </div>
                 )}
 
                 {activeTransitTab === 'air' && (
                   <div className="transit-info">
-                    <p>
-                      <strong>Vijayawada International Airport (VGA):</strong> ~92 km (2 hrs drive).<br />
-                      <strong>Rajahmundry Domestic Airport (RJA):</strong> ~78 km (2 hrs drive).
-                    </p>
+                    <TransitInfo text={extras.airInfo} />
                   </div>
                 )}
 
                 {activeTransitTab === 'road' && (
                   <div className="transit-info">
-                    <p>
-                      Located on SH-63 / NH-216A. Direct APSRTC buses connect from Vijayawada, Guntur, Rajahmundry, Eluru, and Tanuku.
-                    </p>
+                    <TransitInfo text={extras.roadInfo} />
                   </div>
                 )}
               </div>

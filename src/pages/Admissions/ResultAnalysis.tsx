@@ -1,34 +1,16 @@
 import { useEffect, type CSSProperties } from 'react';
 import PageHero from '../../components/PageHero/PageHero';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
+import { useDocument } from '../../hooks/useDocument';
+import {
+  DEFAULT_RESULT_ANALYSIS,
+  RESULT_ANALYSIS_COLLECTION,
+  RESULT_ANALYSIS_DOC_ID,
+  type ResultAnalysisDoc,
+} from '../Admin/sections/ResultAnalysisAdmin';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import { dotTech } from '../../lib/academicDegreeNames';
 import { Trophy } from 'lucide-react';
-
-const batchPassRates: { batch: string; passPercent: number }[] = [
-  { batch: '2001 - 05', passPercent: 99.48 },
-  { batch: '2002 - 06', passPercent: 94.47 },
-  { batch: '2003 - 07', passPercent: 97.59 },
-  { batch: '2004 - 08', passPercent: 99.16 },
-  { batch: '2005 - 09', passPercent: 97.26 },
-  { batch: '2006 - 10', passPercent: 96.80 },
-  { batch: '2007 - 11', passPercent: 95.83 },
-  { batch: '2008 - 12', passPercent: 94.74 },
-  { batch: '2009 - 13', passPercent: 91.36 },
-  { batch: '2010 - 14', passPercent: 91.94 },
-  { batch: '2011 - 15', passPercent: 87.58 },
-  { batch: '2012 - 16', passPercent: 88.68 },
-  { batch: '2013 - 17', passPercent: 92.74 },
-  { batch: '2014 - 18', passPercent: 94.42 },
-  { batch: '2015 - 19', passPercent: 92.83 },
-  { batch: '2016 - 20', passPercent: 88.61 },
-  { batch: '2017-21', passPercent: 89.56 },
-  { batch: '2018-22', passPercent: 92.86 },
-  { batch: '2019-23', passPercent: 95.53 },
-  { batch: '2020-24', passPercent: 97.16 },
-  { batch: '2021-25', passPercent: 96.58 },
-  { batch: '2022-26', passPercent: 97.88 },
-];
 
 const CHART_TOP = 20;
 const CHART_BAR_AREA_HEIGHT = 260;
@@ -37,14 +19,6 @@ const CHART_BAR_WIDTH = 28;
 const CHART_BAR_GAP = 12;
 const CHART_BOTTOM = 100;
 const chartGridlines = [0, 20, 40, 60, 80, 100];
-const chartPlotWidth = batchPassRates.length * (CHART_BAR_WIDTH + CHART_BAR_GAP) - CHART_BAR_GAP;
-const chartWidth = CHART_LEFT + chartPlotWidth + 16;
-const chartHeight = CHART_TOP + CHART_BAR_AREA_HEIGHT + CHART_BOTTOM;
-
-const highestBatch = batchPassRates.reduce((a, b) => (b.passPercent > a.passPercent ? b : a));
-const lowestBatch = batchPassRates.reduce((a, b) => (b.passPercent < a.passPercent ? b : a));
-const latestBatch = batchPassRates[batchPassRates.length - 1];
-const averagePassPercent = batchPassRates.reduce((sum, b) => sum + b.passPercent, 0) / batchPassRates.length;
 
 const statTileStyle: CSSProperties = { background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', textAlign: 'center' };
 const statValueStyle: CSSProperties = { fontFamily: 'var(--font-serif)', fontSize: 'var(--text-2xl)', fontWeight: 900, color: 'var(--color-primary)' };
@@ -52,6 +26,20 @@ const statLabelStyle: CSSProperties = { fontFamily: 'var(--font-sans)', fontSize
 
 export default function ResultAnalysis() {
   const factors = useContentBlocks('result-analysis', 'factors');
+  // Admin → Admissions & Campus Info → Results Analysis — Batch Pass Rates.
+  // Falls back to the original hardcoded content until an admin saves
+  // anything. Everything that used to be derived at module scope from the
+  // hardcoded array now has to be derived here instead, since it depends on
+  // this live (hook-sourced) data.
+  const { data: remoteResult } = useDocument<ResultAnalysisDoc>(RESULT_ANALYSIS_COLLECTION, RESULT_ANALYSIS_DOC_ID);
+  const batchPassRates = remoteResult?.batchPassRates?.length ? remoteResult.batchPassRates : DEFAULT_RESULT_ANALYSIS.batchPassRates;
+  const chartPlotWidth = batchPassRates.length * (CHART_BAR_WIDTH + CHART_BAR_GAP) - CHART_BAR_GAP;
+  const chartWidth = CHART_LEFT + chartPlotWidth + 16;
+  const chartHeight = CHART_TOP + CHART_BAR_AREA_HEIGHT + CHART_BOTTOM;
+  const highestBatch = batchPassRates.reduce((a, b) => (b.passPercent > a.passPercent ? b : a));
+  const lowestBatch = batchPassRates.reduce((a, b) => (b.passPercent < a.passPercent ? b : a));
+  const latestBatch = batchPassRates[batchPassRates.length - 1];
+  const averagePassPercent = batchPassRates.reduce((sum, b) => sum + b.passPercent, 0) / batchPassRates.length;
 
   useEffect(() => {
     document.title = 'Results Analysis | VWU';

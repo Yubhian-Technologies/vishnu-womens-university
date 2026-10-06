@@ -2,49 +2,18 @@ import { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
 import { useOrderedCollection } from '../../hooks/useCollection';
+import { useDocument } from '../../hooks/useDocument';
 import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
+import {
+  DEFAULT_PROGRAMMES_FEE,
+  PROGRAMMES_FEE_COLLECTION,
+  PROGRAMMES_FEE_DOC_ID,
+  type ProgrammesFeeDoc,
+} from '../Admin/sections/ProgrammesFeeAdmin';
 import { dotTech } from '../../lib/academicDegreeNames';
-import { renderBold } from '../../lib/boldText';
-
-const BTECH_FEE = '₹ 1,05,000';
-const VISWPU_BTECH_FEE = '₹ 47,000';
-const MTECH_FEE = '₹ 55,800';
-const MBA_FEE = '₹ 55,000';
+import { renderBold, splitBold } from '../../lib/boldText';
 
 type ProgramRow = { name: string; code: string; intake: number; fee: string };
-
-// All programme tables on this page are hardcoded reference data (Category A
-// intake + fee), not admin-managed content — these are fixed, externally
-// issued branch codes and seat counts.
-
-// Category A, VISW college code.
-const BTECH_VISW_PROGRAMS: ProgramRow[] = [
-  { name: 'Computer Science & Engineering', code: 'B.Tech CSE', intake: 180, fee: BTECH_FEE },
-  { name: 'CSE [Artificial Intelligence & Machine Learning]', code: 'B.Tech CSE(AI & ML)', intake: 120, fee: BTECH_FEE },
-  { name: 'CSE [Artificial Intelligence & Data Science]', code: 'B.Tech CSE(AI & DS)', intake: 120, fee: BTECH_FEE },
-  { name: 'CSE [Cyber Security]', code: 'B.Tech Cyber Security', intake: 60, fee: BTECH_FEE },
-  { name: 'Information Technology', code: 'B.Tech IT', intake: 180, fee: BTECH_FEE },
-  { name: 'Electronics & Communication Engineering', code: 'B.Tech ECE', intake: 120, fee: BTECH_FEE },
-  { name: 'Electrical & Electronics Engineering', code: 'B.Tech EEE', intake: 60, fee: BTECH_FEE },
-  { name: 'Civil Engineering', code: 'B.Tech CE', intake: 60, fee: BTECH_FEE },
-  { name: 'Mechanical Engineering', code: 'B.Tech ME', intake: 60, fee: BTECH_FEE },
-];
-
-// Second AP EAPCET college code (VISWPU) — separate B.Tech seats.
-const VISWPU_BTECH_PROGRAMS: ProgramRow[] = [
-  { name: 'CSE [Artificial Intelligence & Machine Learning]', code: 'CSM', intake: 120, fee: VISWPU_BTECH_FEE },
-  { name: 'Electronics Engineering (VLSI Design & Technology)', code: 'EVT', intake: 60, fee: VISWPU_BTECH_FEE },
-];
-
-const MTECH_PROGRAMS: ProgramRow[] = [
-  { name: 'M.Tech – Computer Science & Engineering', code: 'M.Tech CSE', intake: 27, fee: MTECH_FEE },
-  { name: 'M.Tech – VLSI Design', code: 'M.Tech VLSI', intake: 18, fee: MTECH_FEE },
-  { name: 'M.Tech – Power Electronics', code: 'M.Tech Power Electronics', intake: 9, fee: MTECH_FEE },
-  { name: 'M.Tech – Software Engineering', code: 'M.Tech Software Engg.', intake: 9, fee: MTECH_FEE },
-];
-
-const BTECH_TOTAL_INTAKE = [...BTECH_VISW_PROGRAMS, ...VISWPU_BTECH_PROGRAMS].reduce((s, p) => s + p.intake, 0);
-const MTECH_TOTAL_INTAKE = MTECH_PROGRAMS.reduce((s, p) => s + p.intake, 0);
 
 const tableHead: React.CSSProperties = {
   background: 'var(--color-primary)',
@@ -91,6 +60,21 @@ export default function ProgrammesFee() {
   const { docs: allPrograms } = useOrderedCollection<ProgramDoc>('programs', 'order');
   const phdPrograms = useMemo(() => allPrograms.filter(p => p.category === 'phd'), [allPrograms]);
 
+  // Admin → Admissions & Campus Info → Programmes & Fee Structure. Falls
+  // back to the original hardcoded content (DEFAULT_PROGRAMMES_FEE) until
+  // an admin saves anything, so this renders identically to before.
+  const { data: remoteFee } = useDocument<ProgrammesFeeDoc>(PROGRAMMES_FEE_COLLECTION, PROGRAMMES_FEE_DOC_ID);
+  const fee = remoteFee || DEFAULT_PROGRAMMES_FEE;
+  const BTECH_FEE = fee.btechFee;
+  const VISWPU_BTECH_FEE = fee.viswpuBtechFee;
+  const MTECH_FEE = fee.mtechFee;
+  const MBA_FEE = fee.mbaFee;
+  const BTECH_VISW_PROGRAMS: ProgramRow[] = fee.btechViswPrograms.map((p) => ({ ...p, fee: BTECH_FEE }));
+  const VISWPU_BTECH_PROGRAMS: ProgramRow[] = fee.viswpuBtechPrograms.map((p) => ({ ...p, fee: VISWPU_BTECH_FEE }));
+  const MTECH_PROGRAMS: ProgramRow[] = fee.mtechPrograms.map((p) => ({ ...p, fee: MTECH_FEE }));
+  const BTECH_TOTAL_INTAKE = [...BTECH_VISW_PROGRAMS, ...VISWPU_BTECH_PROGRAMS].reduce((s, p) => s + p.intake, 0);
+  const MTECH_TOTAL_INTAKE = MTECH_PROGRAMS.reduce((s, p) => s + p.intake, 0);
+
   useEffect(() => {
     document.title = 'Programmes & Fee Structure | VWU';
     const observer = new IntersectionObserver(
@@ -127,7 +111,7 @@ export default function ProgrammesFee() {
             <h2 className="section-title">{dotTech('B.Tech Programs')}</h2>
             <div style={{ display: 'flex', gap: 'var(--space-6)', flexWrap: 'wrap', marginTop: 'var(--space-4)' }}>
               {[
-                { label: 'Duration', value: '4 Years' },
+                { label: 'Duration', value: fee.btechDuration },
                 { label: 'Tuition Fee (VISW / VISWPU)', value: `${BTECH_FEE} / ${VISWPU_BTECH_FEE}` },
                 { label: 'Total Intake', value: `${BTECH_TOTAL_INTAKE} Seats` },
               ].map(s => (
@@ -190,7 +174,7 @@ export default function ProgrammesFee() {
             <h2 className="section-title">{dotTech('M.Tech Programs')}</h2>
             <div style={{ display: 'flex', gap: 'var(--space-6)', flexWrap: 'wrap', marginTop: 'var(--space-4)' }}>
               {[
-                { label: 'Duration', value: '2 Years' },
+                { label: 'Duration', value: fee.mtechDuration },
                 { label: 'Tuition Fee', value: MTECH_FEE },
                 { label: 'Total Intake', value: `${MTECH_TOTAL_INTAKE} Seats` },
               ].map(s => (
@@ -228,9 +212,9 @@ export default function ProgrammesFee() {
             <h2 className="section-title">MBA</h2>
             <div style={{ display: 'flex', gap: 'var(--space-6)', flexWrap: 'wrap', marginTop: 'var(--space-4)' }}>
               {[
-                { label: 'Duration', value: '2 Years' },
+                { label: 'Duration', value: fee.mbaDuration },
                 { label: 'Tuition Fee', value: MBA_FEE },
-                { label: 'Total Intake', value: '60 Seats' },
+                { label: 'Total Intake', value: `${fee.mba.intake} Seats` },
               ].map(s => (
                 <div key={s.label} style={{ background: 'var(--color-primary)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4) var(--space-6)', textAlign: 'center' }}>
                   <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.4rem', fontWeight: 900, color: 'var(--color-accent)' }}>{renderBold(s.value)}</div>
@@ -246,11 +230,11 @@ export default function ProgrammesFee() {
               <tbody>
                 <tr style={{ background: 'var(--color-white)' }}>
                   <td style={{ ...tableCell, color: 'var(--color-accent)', fontWeight: 900 }}>01</td>
-                  <td style={{ ...tableCell, fontWeight: 600, color: 'var(--color-primary)' }}>Master of Business Administration</td>
-                  <td style={tableCell}>MBA</td>
-                  <td style={{ ...tableCell, textAlign: 'center', fontWeight: 700 }}>60</td>
+                  <td style={{ ...tableCell, fontWeight: 600, color: 'var(--color-primary)' }}>{fee.mba.name}</td>
+                  <td style={tableCell}>{fee.mba.code}</td>
+                  <td style={{ ...tableCell, textAlign: 'center', fontWeight: 700 }}>{fee.mba.intake}</td>
                   <td style={{ ...tableCell, textAlign: 'center', fontWeight: 700, color: 'var(--color-primary)' }}>{MBA_FEE}</td>
-                  <td style={{ ...tableCell, textAlign: 'center' }}>ICET</td>
+                  <td style={{ ...tableCell, textAlign: 'center' }}>{fee.mba.entrance}</td>
                 </tr>
               </tbody>
             </table>
@@ -282,8 +266,11 @@ export default function ProgrammesFee() {
             <div style={{ flex: 1, minWidth: 280 }}>
               <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-3)' }}>PM Vidyalaxmi Scheme</h2>
               <p style={{ color: 'rgba(255,255,255,0.8)', lineHeight: 1.7 }}>
-                Meritorious students can avail financial assistance through the <strong style={{ color: 'var(--color-accent)' }}>PM Vidyalaxmi Scheme</strong>,
-                making quality engineering education accessible to all deserving students regardless of financial background.
+                {splitBold(fee.pmVidyalaxmiText).map((seg, i) =>
+                  seg.bold
+                    ? <strong key={i} style={{ color: 'var(--color-accent)' }}>{seg.text}</strong>
+                    : seg.text
+                )}
               </p>
             </div>
             <div style={{ display: 'flex', gap: 'var(--space-4)', flexWrap: 'wrap' }}>

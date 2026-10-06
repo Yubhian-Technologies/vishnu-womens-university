@@ -3,7 +3,13 @@ import { Link } from 'react-router-dom';
 import { Check } from 'lucide-react';
 import PageHero from '../../components/PageHero/PageHero';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
-import { admissionTabs, CATEGORY_B_FOOTNOTE } from './admissionProcedure.data';
+import { useDocument } from '../../hooks/useDocument';
+import {
+  DEFAULT_ADMISSION_PROCEDURE,
+  ADMISSION_PROCEDURE_COLLECTION,
+  ADMISSION_PROCEDURE_DOC_ID,
+  type AdmissionProcedureDoc,
+} from '../Admin/sections/AdmissionProcedureAdmin';
 import { dotTech } from '../../lib/academicDegreeNames';
 import './AdmissionProcedure.css';
 /** Split "Name (note)" -> ["Name", "note"]; no parens -> ["Name", ""]. */
@@ -15,18 +21,29 @@ const splitNote = (s: string): [string, string] => {
 export default function AdmissionProcedure() {
   const documents = useContentBlocks('admission-procedure', 'documents');
 
-  const [activeTabKey, setActiveTabKey] = useState(admissionTabs[0].key);
+  // Admin → Admissions & Campus Info → Admission Procedure. Falls back to
+  // the original hardcoded content (admissionProcedure.data.ts, via
+  // DEFAULT_ADMISSION_PROCEDURE) until an admin saves anything, so this
+  // renders identically to before. The 4 tabs' keys never change from this
+  // editor, so initializing state from the (always-available) defaults is
+  // safe even before the live doc has loaded.
+  const { data: remoteProcedure } = useDocument<AdmissionProcedureDoc>(ADMISSION_PROCEDURE_COLLECTION, ADMISSION_PROCEDURE_DOC_ID);
+  const procedure = remoteProcedure?.tabs?.length ? remoteProcedure : DEFAULT_ADMISSION_PROCEDURE;
+  const admissionTabs = procedure.tabs;
+  const CATEGORY_B_FOOTNOTE = procedure.categoryBFootnote;
+
+  const [activeTabKey, setActiveTabKey] = useState(DEFAULT_ADMISSION_PROCEDURE.tabs[0].key);
   const activeTab = admissionTabs.find((t) => t.key === activeTabKey) ?? admissionTabs[0];
-  const [activeCatKey, setActiveCatKey] = useState(admissionTabs[0].categories[0].key);
+  const [activeCatKey, setActiveCatKey] = useState(DEFAULT_ADMISSION_PROCEDURE.tabs[0].categories[0]?.key ?? 'A');
   const activeCat = activeTab.categories.find((c) => c.key === activeCatKey) ?? activeTab.categories[0];
   const [progName, progNote] = splitNote(dotTech(activeTab.label));
   const showCategoryTabs = activeTab.categories.length > 0;
-  const catIsVwunet = /VWUNET/.test(activeCat.examName);
+  const catIsVwunet = /VWUNET/.test(activeCat?.examName || '');
 
   const selectTab = (key: string) => {
     setActiveTabKey(key);
     const next = admissionTabs.find((t) => t.key === key);
-    setActiveCatKey(next?.categories[0].key ?? 'A');
+    setActiveCatKey(next?.categories[0]?.key ?? 'A');
   };
 
   useEffect(() => {
@@ -58,8 +75,8 @@ export default function AdmissionProcedure() {
 
       <section className="ap-codes">
         <div className="container ap-codes__inner">
-          <span className="ap-codes__exams">EAPCET | ECET | PGCET | ICET</span>
-          <span className="ap-codes__code">CODES: VISW & VISWPU</span>
+          <span className="ap-codes__exams">{procedure.examsCodesLine}</span>
+          <span className="ap-codes__code">{procedure.collegeCodesLine}</span>
         </div>
       </section>
 
@@ -117,6 +134,7 @@ export default function AdmissionProcedure() {
               </div>
             )}
 
+            {activeCat && (
             <article className="ap-route">
               <h3 className="ap-route__exam">{dotTech(activeCat.examName)}</h3>
               <p className="ap-route__desc">{dotTech(activeCat.description)}</p>
@@ -179,6 +197,7 @@ export default function AdmissionProcedure() {
 
               {activeCat.key === 'B' && <p className="ap-route__foot">{dotTech(CATEGORY_B_FOOTNOTE)}</p>}
             </article>
+            )}
           </div>
         </div>
       </section>
