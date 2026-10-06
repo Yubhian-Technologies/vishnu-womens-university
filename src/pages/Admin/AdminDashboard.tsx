@@ -67,6 +67,7 @@ import CampusVisitContentAdmin from './sections/CampusVisitContentAdmin';
 import AntiRaggingContentAdmin from './sections/AntiRaggingContentAdmin';
 import AicteFeedbackContentAdmin from './sections/AicteFeedbackContentAdmin';
 import PoliciesIntroAdmin from './sections/PoliciesIntroAdmin';
+import UGCDisclosureContentAdmin from './sections/UGCDisclosureContentAdmin';
 import InsightsAdmin from './sections/InsightsAdmin';
 import CareerGuidanceInterestAdmin from './sections/CareerGuidanceInterestAdmin';
 import ResearchItemsAdmin from './sections/ResearchItemsAdmin';
@@ -189,6 +190,7 @@ const SECTION_MAP: Record<string, React.ReactNode> = {
   'anti-ragging-content': <AntiRaggingContentAdmin />,
   'aicte-feedback-content': <AicteFeedbackContentAdmin />,
   'policies-intro': <PoliciesIntroAdmin />,
+  'ugc-disclosure-content': <UGCDisclosureContentAdmin />,
   insights: <InsightsAdmin />,
   'career-guidance-interest': <CareerGuidanceInterestAdmin />,
   'research-items': <ResearchItemsAdmin />,
