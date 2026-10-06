@@ -335,10 +335,20 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  /* Matches .navbar-logo-desktop's rendered height (the visible teal logo
+     graphic, not the taller .navbar-brand-link container around it with
+     its own invisible breathing room) so Apply Now reads as the same
+     size as the logo beside it. The logo's own height changes per
+     breakpoint (62px >=1200px, 56px <1200px) — matched in those same
+     media queries below, since this base value is only a fallback. */
+  height: 74px !important;
   padding: 10px 20px !important;
   border-radius: 10px !important;
   background: var(--color-primary);
-  color: #ffffff;
+  /* Matches the cream/ivory color of the "VISHNU WOMEN'S UNIVERSITY" text
+     baked into the logo image beside it (sampled as #F5F0C6), instead of
+     plain white. */
+  color: #F5F0C6;
   font-family: var(--font-sans);
   font-size: 1.1rem;
   font-weight: 700;
@@ -361,7 +371,7 @@
 
 .navbar-cta-btn:hover {
   background: color-mix(in srgb, var(--color-primary) 85%, black);
-  color: #ffffff;
+  color: #F5F0C6;
   border-color: color-mix(in srgb, var(--color-primary) 70%, black);
   box-shadow: 0 6px 20px color-mix(in srgb, var(--color-primary) 40%, transparent);
   transform: translateY(-2px);
@@ -1283,6 +1293,7 @@
     letter-spacing: 0;
   }
   .navbar-cta-btn {
+    height: 62px !important;
     padding: 13px 17px;
     font-size: 0.92rem;
   }
@@ -1357,6 +1368,10 @@
     height: 56px !important;
     max-height: 56px !important;
     max-width: 46vw;
+  }
+
+  .navbar-cta-btn {
+    height: 56px !important;
   }
 }
 
