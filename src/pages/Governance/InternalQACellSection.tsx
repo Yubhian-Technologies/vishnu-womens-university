@@ -1,6 +1,7 @@
 import { useState, type CSSProperties } from 'react';
 import { Check } from 'lucide-react';
-import { IQAC_CELL_MEMBERS, IQAC_CELL_FUNCTIONS } from './internalQACellDefault';
+import { useDocument } from '../../hooks/useDocument';
+import { DEFAULT_INTERNAL_QA_CELL, INTERNAL_QA_CELL_COLLECTION, INTERNAL_QA_CELL_DOC_ID, type InternalQACellDoc } from '../Admin/sections/InternalQACellAdmin';
 import { renderBold } from '../../lib/boldText';
 
 const TH_STYLE: CSSProperties = {
@@ -22,6 +23,9 @@ const TD_STYLE: CSSProperties = {
 // Role/Notes table GovernanceDetail.tsx otherwise renders for committee
 // pages, so it's rendered directly instead.
 export default function InternalQACellSection() {
+  const { data: remote } = useDocument<InternalQACellDoc>(INTERNAL_QA_CELL_COLLECTION, INTERNAL_QA_CELL_DOC_ID);
+  const members = remote?.members?.length ? remote.members : DEFAULT_INTERNAL_QA_CELL.members;
+  const functions = (remote?.functions?.length ? remote.functions : DEFAULT_INTERNAL_QA_CELL.functions).filter(Boolean);
   const [tab, setTab] = useState<'members' | 'functions'>('members');
 
   return (
@@ -56,7 +60,7 @@ export default function InternalQACellSection() {
               </tr>
             </thead>
             <tbody>
-              {IQAC_CELL_MEMBERS.map((m, i) => (
+              {members.map((m, i) => (
                 <tr key={i} style={{ background: i % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)', borderBottom: '1px solid var(--color-light-gray)' }}>
                   <td style={{ ...TD_STYLE, textAlign: 'center', color: 'var(--color-text-light)' }}>{i + 1}</td>
                   <td style={{ ...TD_STYLE, fontWeight: 600, color: 'var(--color-primary)' }}>{m.name}</td>
@@ -70,7 +74,7 @@ export default function InternalQACellSection() {
         </div>
       ) : (
         <ul className="pb-bullets" style={{ margin: 0 }}>
-          {IQAC_CELL_FUNCTIONS.map((f, i) => (
+          {functions.map((f, i) => (
             <li key={i}>
               <Check size={13} strokeWidth={2.5} className="pb-bullet-icon" />
               <span>{renderBold(f)}</span>

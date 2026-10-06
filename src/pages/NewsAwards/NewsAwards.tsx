@@ -5,34 +5,23 @@ import PageHero from '../../components/PageHero/PageHero';
 import { useHashScroll } from '../../hooks/useHashScroll';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { renderBold } from '../../lib/boldText';
+import { useDocument } from '../../hooks/useDocument';
+import { DEFAULT_NEWS_AWARDS_CONTENT, NEWS_AWARDS_CONTENT_COLLECTION, NEWS_AWARDS_CONTENT_DOC_ID, type NewsAwardsContentDoc } from '../Admin/sections/NewsAwardsContentAdmin';
 
-const sections = [
-  {
-    slug: 'happenings',
-    anchor: 'upcoming-events',
-    title: 'Happenings at VWU',
-    icon: Calendar,
-    desc: 'Stay updated with the latest events, workshops, MoUs, competitions, and campus milestones — from recent achievements to upcoming programmes.',
-  },
-  {
-    slug: 'accreditations-awards',
-    anchor: 'accreditations-content',
-    title: 'Accreditations & Awards',
-    icon: Trophy,
-    desc: 'VWU is recognised by NAAC, NBA, NIRF, ARIIA, IEI, ISTE, and more. Explore our full record of national rankings, quality awards, and institutional accreditations.',
-  },
-  {
-    slug: 'gallery',
-    anchor: 'gallery-content',
-    title: 'Gallery',
-    icon: Image,
-    desc: 'A visual archive of campus life — from national symposia, graduation days, and cultural festivals to sports championships and industry collaborations.',
-  },
+// slug/anchor/icon per card are structural/position-matched -- title/desc
+// come from the settings/newsAwardsContent doc (see NewsAwardsContentAdmin).
+const SECTION_META = [
+  { slug: 'happenings', anchor: 'upcoming-events', icon: Calendar },
+  { slug: 'accreditations-awards', anchor: 'accreditations-content', icon: Trophy },
+  { slug: 'gallery', anchor: 'gallery-content', icon: Image },
 ];
 
 export default function NewsAwards() {
   useHashScroll();
   const highlights = useContentBlocks('news-awards', 'highlights');
+  const { data: remoteContent } = useDocument<NewsAwardsContentDoc>(NEWS_AWARDS_CONTENT_COLLECTION, NEWS_AWARDS_CONTENT_DOC_ID);
+  const content = { ...DEFAULT_NEWS_AWARDS_CONTENT, ...remoteContent };
+  const sections = SECTION_META.map((meta, idx) => ({ ...meta, ...(content.cards[idx] || DEFAULT_NEWS_AWARDS_CONTENT.cards[idx]) }));
 
   useEffect(() => {
     document.title = "News & Awards | Vishnu Women's University";
@@ -81,9 +70,9 @@ export default function NewsAwards() {
       <section className="section bg-off-white">
         <div className="container">
           <div className="reveal" style={{ marginBottom: 'var(--space-10)' }}>
-            <h2 className="section-title">Explore News & Awards</h2>
+            <h2 className="section-title">{content.cardsHeading}</h2>
             <p style={{ color: 'var(--color-text-light)', maxWidth: 600, lineHeight: 1.7 }}>
-              Everything you need to know about VWU's recognition, campus life, and visual history — all in one place.
+              {content.cardsParagraph}
             </p>
           </div>
 
@@ -126,10 +115,10 @@ export default function NewsAwards() {
         <div className="container" style={{ textAlign: 'center' }}>
           <div className="reveal">
             <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>
-              Be Part of VWU's Story
+              {content.ctaHeading}
             </h2>
             <p style={{ color: 'rgba(255,255,255,0.75)', maxWidth: 500, margin: '0 auto var(--space-6)' }}>
-              Join a university that earns its recognition every year through student achievement, research, and institutional excellence.
+              {content.ctaParagraph}
             </p>
             <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
               <Link to="/apply-now" className="btn btn-accent">Apply Now</Link>

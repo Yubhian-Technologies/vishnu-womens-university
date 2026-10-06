@@ -19,6 +19,8 @@ import { resolveContentIcon } from '../../lib/contentIcons';
 import { isUpcomingHappening, parseHappeningDate } from '../../lib/happenings';
 import type { HappeningDoc } from '../Admin/sections/NewsAwardsDataAdmin';
 import type { ContentBlockDoc } from '../Admin/sections/ContentBlocksAdmin';
+import { useDocument } from '../../hooks/useDocument';
+import { DEFAULT_HOME_CONTENT, HOME_CONTENT_COLLECTION, HOME_CONTENT_DOC_ID, type HomeContentDoc } from '../Admin/sections/HomeContentAdmin';
 
 import SEO from '../../components/SEO/SEO';
 import UpcomingEvents from '../../components/UpcomingEvents/UpcomingEvents';
@@ -182,6 +184,9 @@ export default function Home() {
       return tb - ta;
     });
 
+  const { data: remoteHomeContent } = useDocument<HomeContentDoc>(HOME_CONTENT_COLLECTION, HOME_CONTENT_DOC_ID);
+  const homeContent = { ...DEFAULT_HOME_CONTENT, ...remoteHomeContent };
+
   const liveTestimonials = useContentBlocks('home', 'testimonials');
   const testimonials = liveTestimonials.length > 0 ? liveTestimonials : defaultTestimonials;
   const liveStudyCards = useContentBlocks('home', 'studyCards');
@@ -220,8 +225,10 @@ export default function Home() {
   }, [activityItems]);
 
   useEffect(() => {
-    document.title = 'VWU | Leading by Design — Women in Engineering';
+    document.title = homeContent.browserTabTitle;
+  }, [homeContent.browserTabTitle]);
 
+  useEffect(() => {
     // Scroll reveal
     const observer = new IntersectionObserver(
       (entries) => {
@@ -244,8 +251,8 @@ export default function Home() {
   return (
     <main className="home-page">
       <SEO
-        title="Vishnu Women's University | Empowering Women Through Knowledge & Technology"
-        description="First private university for women in Telugu states located in Bhimavaram, Andhra Pradesh. Offering B.Tech, M.Tech, MBA, and Ph.D. programs with world-class infrastructure and top placements."
+        title={homeContent.metaTitle}
+        description={homeContent.metaDescription}
         canonicalPath="/"
         jsonLd={getUniversitySchema()}
       />
@@ -275,18 +282,12 @@ export default function Home() {
         </div>
         <div className="container">
           <div className="study-intro reveal">
-            <h2 className="section-title gradient-text">Study at VWU</h2>
-            <h3 className="study-intro-subtitle">Courses for Women</h3>
+            <h2 className="section-title gradient-text">{homeContent.studyIntroTitle}</h2>
+            <h3 className="study-intro-subtitle">{homeContent.studyIntroSubtitle}</h3>
             <div className="study-intro-body">
-              <p>
-                At VWU, learning extends far beyond the traditional classroom. Students gain personalized, industry-oriented education designed to develop technical expertise, leadership skills, creativity, and the confidence to shape their future.
-              </p>
-              <p>
-                Every programme is designed exclusively for women and emphasizes hands-on learning through modern laboratories and practical experiences. Our faculty bring valuable industry exposure into the classroom from the very first year, helping students connect academic knowledge with real-world applications.
-              </p>
-              <p>
-                All programmes are approved by AICTE and recognized by the UGC.
-              </p>
+              {homeContent.studyIntroParagraphs.filter(Boolean).map((p, i) => (
+                <p key={i}>{renderBold(p)}</p>
+              ))}
             </div>
           </div>
           <div className="study-grid">
@@ -306,11 +307,11 @@ export default function Home() {
           <div className="activity-section-header reveal">
             <div className="activity-section-titlebar">
               <div className="activity-section-meta">
-                <p className="activity-section-eyebrow">Campus Life</p>
-                <h2 className="section-title">Recent Events/ News</h2>
+                <p className="activity-section-eyebrow">{homeContent.activityEyebrow}</p>
+                <h2 className="section-title">{homeContent.activityTitle}</h2>
               </div>
               <p className="activity-section-desc">
-                A rolling glimpse of the events, celebrations, and everyday moments that shape life at VWU.
+                {homeContent.activityDesc}
               </p>
             </div>
             <Link to="/news-awards/happenings#recent-events" className="btn btn-outline reveal-right">View All Events →</Link>
@@ -358,7 +359,7 @@ export default function Home() {
       <AlumniConnect />
 
       {/* ── Chapter 6: Student Voices & Testimonials ── */}
-      <TestimonialSlider testimonials={testimonials} title="What Our Students Say" />
+      <TestimonialSlider testimonials={testimonials} title={homeContent.testimonialSectionTitle} />
 
       <UpcomingEvents happenings={upcomingHappenings} />
 
@@ -373,12 +374,12 @@ export default function Home() {
         </div>
         <div className="container">
           <div className="cta-banner-content reveal">
-            <h2>The best way to understand VWU is to see it for yourself.</h2>
-            <p>Arrange a campus tour, speak with our admissions team, or submit your application today. Your path to a purposeful engineering career starts here.</p>
+            <h2>{homeContent.ctaHeading}</h2>
+            <p>{homeContent.ctaBody}</p>
             <div className="cta-actions">
-              <Link to="/admissions" className="btn btn-accent btn-lg">Schedule a Visit</Link>
-              <Link to="/admissions" className="btn btn-secondary btn-lg">Request Information</Link>
-              <Link to="/admissions" className="btn btn-secondary btn-lg">Apply via AP EAPCET</Link>
+              {homeContent.ctaButtons.map((b, i) => (
+                <Link key={i} to={b.link} className={`btn ${i === 0 ? 'btn-accent' : 'btn-secondary'} btn-lg`}>{b.label}</Link>
+              ))}
             </div>
           </div>
         </div>

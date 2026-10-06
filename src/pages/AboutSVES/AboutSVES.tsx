@@ -15,6 +15,8 @@ import { useSitePhotos, useSectionHasPhotos } from '../../hooks/useSitePhotos';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import type { SvesCampusDoc } from '../Admin/sections/SvesCampusesAdmin';
 import { renderBold } from '../../lib/boldText';
+import { useDocument } from '../../hooks/useDocument';
+import { DEFAULT_ABOUT_SVES_CONTENT, ABOUT_SVES_CONTENT_COLLECTION, ABOUT_SVES_CONTENT_DOC_ID, type AboutSvesContentDoc } from '../Admin/sections/AboutSvesContentAdmin';
 
 const STAT_ICONS = [Building2, GraduationCap, Users, Award, BookOpen, Sparkles, MapPin, Globe];
 
@@ -46,6 +48,8 @@ const defaultLeadershipCulturePhotos = [
 ];
 
 export default function AboutSVES() {
+  const { data: remoteContent } = useDocument<AboutSvesContentDoc>(ABOUT_SVES_CONTENT_COLLECTION, ABOUT_SVES_CONTENT_DOC_ID);
+  const content = { ...DEFAULT_ABOUT_SVES_CONTENT, ...remoteContent };
   const svesStats = useContentBlocks('about-sves', 'stats');
   const milestones = useContentBlocks('about-sves', 'milestones');
   const legacyVisionBlocks = useContentBlocks('about-sves', 'legacy-vision');
@@ -97,10 +101,10 @@ export default function AboutSVES() {
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-6)' }}>
             <h2 style={{ color: 'var(--color-white)', fontSize: 'clamp(1.5rem, 3vw, 2.15rem)', fontWeight: 800, marginBottom: 'var(--space-2)' }}>
-              SVES AT A GLANCE
+              {content.statsHeading}
             </h2>
             <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: '0.95rem' }}>
-              A Growing Educational Community
+              {content.statsSubtitle}
             </p>
           </div>
           <div className="about-facts-bar">
@@ -125,20 +129,14 @@ export default function AboutSVES() {
             <div className="reveal-left">
               <h2 className="section-title">Sri Vishnu Educational Society</h2>
               <p style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-4)' }}>
-               Sri Vishnu Educational Society Education with a Long View since 1992
+               {content.introSubheading}
               </p>
               <div className="divider" />
-              <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-4)', color: 'var(--color-text-light)' }}>
-                Sri Vishnu Educational Society was founded in 1992 by Late <strong>Dr. B. V. Raju</strong>, an industrialist, philanthropist and recipient of the <strong>Padma Shri and Padma Bhushan</strong>.
-              </p>
-              <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-4)', color: 'var(--color-text-light)' }}>
-                Established as a not-for-profit educational organisation, SVES has developed institutions across engineering, pharmacy, dentistry, management, sciences, polytechnic and school education.
-              </p>
-              <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-5)', color: 'var(--color-text-light)' }}>
-                Over the years, the Society has focused on creating learning environments that bring together academic quality, practical exposure and opportunities for students to progress in their chosen fields.
-              </p>
+              {content.introParagraphs.filter(Boolean).map((p, i) => (
+                <p key={i} style={{ lineHeight: 1.8, marginBottom: i === content.introParagraphs.length - 1 ? 'var(--space-5)' : 'var(--space-4)', color: 'var(--color-text-light)' }}>{renderBold(p)}</p>
+              ))}
               <a href="https://www.srivishnu.edu.in/" target="_blank" rel="noopener noreferrer" className="btn btn-primary">
-                Know More <ExternalLink size={15} strokeWidth={2.4} style={{ marginLeft: '0.4rem' }} />
+                {content.introLinkLabel} <ExternalLink size={15} strokeWidth={2.4} style={{ marginLeft: '0.4rem' }} />
               </a>
             </div>
             {svesIntroImg && (
@@ -257,9 +255,9 @@ export default function AboutSVES() {
       <section className="section bg-white">
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-10)' }}>
-            <h2 className="section-title">Four Campus Communities.</h2>
+            <h2 className="section-title">{content.campusesHeading}</h2>
             <p style={{ color: 'var(--color-text-light)', maxWidth: '650px', margin: '0.5rem auto 0', lineHeight: 1.7, fontSize: '1.02rem' }}>
-              SVES institutions are organised across distinct campus communities in Andhra Pradesh and Telangana, each contributing to the Society's wider academic network.
+              {content.campusesParagraph}
             </p>
           </div>
           <div className="sves-campuses-grid">
@@ -350,9 +348,9 @@ export default function AboutSVES() {
         <div className="container">
           <PhotoGrid
             images={svesPhotos}
-            label="ACROSS SVES"
-            title="Life Across Our Campuses"
-            subtitle="A glimpse of the academic spaces, people and experiences that make up the wider SVES community."
+            label={content.galleryLabel}
+            title={content.galleryTitle}
+            subtitle={content.gallerySubtitle}
             columns={2}
             layout="side-text"
           />
@@ -378,9 +376,9 @@ export default function AboutSVES() {
       <section className="section" style={{ background: 'linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%)' }}>
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>
-            <h2 className="section-title" style={{ color: 'var(--color-white)' }}>Milestones in the SVES Journey</h2>
+            <h2 className="section-title" style={{ color: 'var(--color-white)' }}>{content.milestonesHeading}</h2>
             <p style={{ color: 'rgba(255,255,255,0.8)', maxWidth: '600px', margin: '0.5rem auto 0', lineHeight: 1.7, fontSize: '1.02rem' }}>
-              Each milestone reflects the Society's continued growth across institutions, disciplines and learning communities.
+              {content.milestonesParagraph}
             </p>
           </div>
           <div className="sves-milestones">
@@ -400,21 +398,18 @@ export default function AboutSVES() {
         <div className="container" style={{ textAlign: 'center' }}>
           <div className="reveal">
             <span style={{ display: 'block', color: 'var(--color-accent)', fontSize: '0.82rem', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 'var(--space-3)' }}>
-              Vishnu Women&rsquo;s University
+              {content.ctaEyebrow}
             </span>
             <h2 style={{ color: 'var(--color-white)', fontSize: 'clamp(1.75rem, 4vw, 2.75rem)', marginBottom: 'var(--space-4)' }}>
-              Explore Vishnu Women&rsquo;s University
+              {content.ctaHeading}
             </h2>
             <div style={{ maxWidth: 720, margin: '0 auto var(--space-8)' }}>
-              <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 'var(--text-lg)', marginBottom: 'var(--space-4)' }}>
-                Vishnu Women&rsquo;s University carries forward the educational legacy of SVES through academic programmes, research, student development and a university experience centred on women.
-              </p>
-              <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: 'var(--text-lg)', fontWeight: 700, marginBottom: 0 }}>
-                Discover the University, its academic environment and the opportunities available to students.
-              </p>
+              {content.ctaParagraphs.filter(Boolean).map((p, i, arr) => (
+                <p key={i} style={i === arr.length - 1 ? { color: 'rgba(255,255,255,0.9)', fontSize: 'var(--text-lg)', fontWeight: 700, marginBottom: 0 } : { color: 'rgba(255,255,255,0.8)', fontSize: 'var(--text-lg)', marginBottom: 'var(--space-4)' }}>{p}</p>
+              ))}
             </div>
             <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Link to="/about" className="btn btn-accent btn-lg">Join VWU →</Link>
+              <Link to="/about" className="btn btn-accent btn-lg">{content.ctaButtonLabel}</Link>
             </div>
           </div>
         </div>

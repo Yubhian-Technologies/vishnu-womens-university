@@ -237,7 +237,7 @@ export default function ConcreteCanoeLab() {
                 <h3 className="canoe-vm-title">Our Vision</h3>
               </div>
               <p style={{ fontSize: 'var(--text-base)', lineHeight: 1.7, color: 'var(--color-text)', margin: 0 }}>
-                {concreteCanoeLab.vision}
+                {canoe.vision}
               </p>
             </div>
 
@@ -250,7 +250,7 @@ export default function ConcreteCanoeLab() {
                 <h3 className="canoe-vm-title">Our Mission</h3>
               </div>
               <ul className="canoe-mission-list">
-                {concreteCanoeLab.mission.map((item, i) => (
+                {canoe.mission.map((item, i) => (
                   <li key={i} className="canoe-mission-item">
                     <span className="canoe-check-badge">
                       <Check size={12} strokeWidth={3} />
@@ -263,7 +263,7 @@ export default function ConcreteCanoeLab() {
           </div>
 
           {/* Objectives Banner */}
-          {concreteCanoeLab.objectives.length > 0 && (
+          {canoe.objectives.length > 0 && (
             <div className="canoe-objective-banner">
               <div className="canoe-objective-icon">
                 <Compass size={24} />
@@ -272,7 +272,7 @@ export default function ConcreteCanoeLab() {
                 <strong style={{ display: 'block', fontSize: 'var(--text-xs)', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--color-accent)', marginBottom: '0.25rem' }}>
                   Laboratory Objective
                 </strong>
-                <p className="canoe-objective-text">{concreteCanoeLab.objectives[0]}</p>
+                <p className="canoe-objective-text">{canoe.objectives[0]}</p>
               </div>
             </div>
           )}
@@ -286,13 +286,13 @@ export default function ConcreteCanoeLab() {
             <span className="canoe-section-label">
               <Award size={14} /> Incubation & Enterprise
             </span>
-            <h2 className="canoe-section-title">{concreteCanoeLab.outcomes.heading}</h2>
+            <h2 className="canoe-section-title">{canoe.outcomes.heading}</h2>
           </div>
 
           <div className="canoe-spotlight-card">
             <div className="canoe-spotlight-top">
               <div className="canoe-spotlight-badge">
-                <Trophy size={14} /> {concreteCanoeLab.outcomes.subheading}
+                <Trophy size={14} /> {canoe.outcomes.subheading}
               </div>
               <div className="canoe-grant-pill">
                 <span>Seed Capital:</span>
@@ -302,20 +302,20 @@ export default function ConcreteCanoeLab() {
 
             <h3 className="canoe-spotlight-title">IIT Hyderabad Technology Incubation Centre (ITIC) Awardee</h3>
 
-            {concreteCanoeLab.outcomes.paragraphs.map((para, i) => (
+            {canoe.outcomes.paragraphs.map((para, i) => (
               <p key={i} className="canoe-spotlight-desc">
                 {renderBold(para)}
               </p>
             ))}
 
             <div className="canoe-spotlight-brief">
-              <strong>Innovation Brief:</strong> {concreteCanoeLab.outcomes.brief}
+              <strong>Innovation Brief:</strong> {canoe.outcomes.brief}
             </div>
 
             <div>
               <div className="canoe-spotlight-team-title">Student Innovators & Founders (Team WAKA)</div>
               <div className="canoe-student-badges-grid">
-                {concreteCanoeLab.outcomes.team.rows.map((row, idx) => (
+                {canoe.outcomes.team.rows.map((row, idx) => (
                   <div key={idx} className="canoe-student-badge">
                     <span className="canoe-student-reg">{row[1]}</span>
                     <span>{row[2]}</span>
@@ -339,12 +339,12 @@ export default function ConcreteCanoeLab() {
 
           <div className="canoe-project-card">
             <div className="canoe-project-header">
-              <h3 className="canoe-project-heading">{concreteCanoeLab.academicProject.heading}</h3>
+              <h3 className="canoe-project-heading">{canoe.academicProject.heading}</h3>
             </div>
 
             <div className="canoe-project-body">
               <div className="canoe-project-prose">
-                {concreteCanoeLab.academicProject.paragraphs.map((p, i) => (
+                {canoe.academicProject.paragraphs.map((p, i) => (
                   <p key={i}>{renderBold(p)}</p>
                 ))}
               </div>
@@ -357,13 +357,13 @@ export default function ConcreteCanoeLab() {
                 <table className="canoe-table">
                   <thead>
                     <tr>
-                      {concreteCanoeLab.academicProject.team.headers.map((h, i) => (
+                      {canoe.academicProject.team.headers.map((h, i) => (
                         <th key={i}>{h}</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
-                    {concreteCanoeLab.academicProject.team.rows.map((r, i) => (
+                    {canoe.academicProject.team.rows.map((r, i) => (
                       <tr key={i}>
                         {r.map((cell, cIdx) => (
                           <td key={cIdx} style={cIdx === 1 ? { fontWeight: 700, color: 'var(--color-primary)' } : {}}>
@@ -397,13 +397,13 @@ export default function ConcreteCanoeLab() {
             <table className="canoe-fleet-table">
               <thead>
                 <tr>
-                  {concreteCanoeLab.previousProjects.table.headers.map((h, i) => (
+                  {canoe.previousProjects.table.headers.map((h, i) => (
                     <th key={i}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {concreteCanoeLab.previousProjects.table.rows.map((row, rIdx) => (
+                {canoe.previousProjects.table.rows.map((row, rIdx) => (
                   <tr key={rIdx}>
                     {row.map((cell, cIdx) => (
                       <td key={cIdx}>{cell}</td>
@@ -430,7 +430,7 @@ export default function ConcreteCanoeLab() {
           </div>
 
           <div className="canoe-competitions-grid">
-            {concreteCanoeLab.competitions.map((comp, i) => {
+            {canoe.competitions.map((comp, i) => {
               const isFirstPrize = comp.remarks.toLowerCase().includes('first prize');
               return (
                 <div key={i} className="canoe-award-card">
@@ -477,7 +477,7 @@ export default function ConcreteCanoeLab() {
             </span>
             <h3 className="canoe-event-title">National Concrete Canoe Competition (NCCC)</h3>
             <div className="canoe-event-body">
-              {concreteCanoeLab.activities.map((act, i) => (
+              {canoe.activities.map((act, i) => (
                 <p key={i}>{renderBold(act)}</p>
               ))}
             </div>
@@ -499,27 +499,27 @@ export default function ConcreteCanoeLab() {
             {/* Faculty In-Charge Card */}
             <div className="canoe-incharge-card">
               <span className="canoe-incharge-tag">Faculty In-Charge</span>
-              <h3 className="canoe-incharge-name">{concreteCanoeLab.inCharge.name}</h3>
-              <div className="canoe-incharge-role">{concreteCanoeLab.inCharge.designation}</div>
+              <h3 className="canoe-incharge-name">{canoe.inCharge.name}</h3>
+              <div className="canoe-incharge-role">{canoe.inCharge.designation}</div>
 
               <div className="canoe-incharge-contacts">
-                {concreteCanoeLab.inCharge.email && (
-                  <a href={`mailto:${concreteCanoeLab.inCharge.email}`} className="canoe-contact-link">
-                    <Mail size={16} color="var(--color-accent)" /> {concreteCanoeLab.inCharge.email}
+                {canoe.inCharge.email && (
+                  <a href={`mailto:${canoe.inCharge.email}`} className="canoe-contact-link">
+                    <Mail size={16} color="var(--color-accent)" /> {canoe.inCharge.email}
                   </a>
                 )}
-                {concreteCanoeLab.inCharge.mobile && (
-                  <a href={`tel:${concreteCanoeLab.inCharge.mobile}`} className="canoe-contact-link">
-                    <Phone size={16} color="var(--color-accent)" /> +91 {concreteCanoeLab.inCharge.mobile}
+                {canoe.inCharge.mobile && (
+                  <a href={`tel:${canoe.inCharge.mobile}`} className="canoe-contact-link">
+                    <Phone size={16} color="var(--color-accent)" /> +91 {canoe.inCharge.mobile}
                   </a>
                 )}
               </div>
 
-              {concreteCanoeLab.inCharge.interests && (
+              {canoe.inCharge.interests && (
                 <div>
                   <div className="canoe-incharge-interests-label">Research & Domain Interests:</div>
                   <div className="canoe-interests-chips">
-                    {concreteCanoeLab.inCharge.interests.split(',').map((int, i) => (
+                    {canoe.inCharge.interests.split(',').map((int, i) => (
                       <span key={i} className="canoe-interest-chip">
                         {int.trim()}
                       </span>
@@ -537,7 +537,7 @@ export default function ConcreteCanoeLab() {
                   <Users size={18} color="var(--color-accent)" /> Faculty Mentors
                 </h4>
                 <ul className="canoe-mentors-list">
-                  {concreteCanoeLab.facultyMentors.map((mentor, i) => (
+                  {canoe.facultyMentors.map((mentor, i) => (
                     <li key={i} className="canoe-mentor-item">
                       <span className="canoe-check-badge">
                         <Check size={12} strokeWidth={3} />
@@ -554,7 +554,7 @@ export default function ConcreteCanoeLab() {
                   <Award size={18} color="var(--color-accent)" /> Students Benefited & Cohorts
                 </h4>
                 <div className="canoe-teams-grid">
-                  {concreteCanoeLab.studentsBenefited.map((team, i) => (
+                  {canoe.studentsBenefited.map((team, i) => (
                     <div key={i} className="canoe-team-card">
                       <div className="canoe-team-header">
                         <span>{team.label}</span>

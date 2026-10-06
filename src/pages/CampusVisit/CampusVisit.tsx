@@ -10,14 +10,18 @@ import { HERO_VIDEO_SRC } from '../../lib/heroVideo';
 import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
 import { Users, Target, Globe, School } from 'lucide-react';
 import { renderBold } from '../../lib/boldText';
+import { useDocument } from '../../hooks/useDocument';
+import { DEFAULT_CAMPUS_VISIT_CONTENT, CAMPUS_VISIT_CONTENT_COLLECTION, CAMPUS_VISIT_CONTENT_DOC_ID, type CampusVisitContentDoc } from '../Admin/sections/CampusVisitContentAdmin';
 
 type VisitType = 'group' | 'individual' | 'virtual' | 'openday';
 
-const VISIT_TYPES: { key: VisitType; title: string; desc: string; icon: typeof Users; buttonText: string }[] = [
-  { key: 'group', title: 'Group Campus Tour', desc: 'Join a guided walkthrough of the VWU campus — see the labs, smart classrooms, hostels, and student facilities in Bhimavaram.', icon: Users, buttonText: 'Book a Group Tour' },
-  { key: 'individual', title: 'Individual Visit Day', desc: 'Arrange a one-on-one visit with our admissions team, sit in on a demo class, and meet faculty from your preferred department.', icon: Target, buttonText: 'Schedule a Visit' },
-  { key: 'virtual', title: 'Virtual Campus Tour', desc: 'Unable to travel to Bhimavaram? Take an online tour of the campus and speak with our admissions team via video call.', icon: Globe, buttonText: 'Take the Virtual Tour' },
-  { key: 'openday', title: 'Open Day for Admitted Students', desc: 'Spend a full day at VWU after confirming your admission — meet your future classmates, faculty, and student activity groups.', icon: School, buttonText: 'Register for Open Day' },
+// key/icon per slot are structural (drive form logic) -- title/desc/
+// buttonText come from the settings/campusVisitContent doc.
+const VISIT_TYPE_META: { key: VisitType; icon: typeof Users }[] = [
+  { key: 'group', icon: Users },
+  { key: 'individual', icon: Target },
+  { key: 'virtual', icon: Globe },
+  { key: 'openday', icon: School },
 ];
 
 const PERSON_COUNTS = ['2-5', '6-10', '11-20', '20+'];
@@ -58,6 +62,10 @@ function validate(type: VisitType, form: VisitForm): VisitFormErrors {
 }
 
 export default function CampusVisit() {
+  const { data: remoteVisitContent } = useDocument<CampusVisitContentDoc>(CAMPUS_VISIT_CONTENT_COLLECTION, CAMPUS_VISIT_CONTENT_DOC_ID);
+  const visitCopy = remoteVisitContent?.visitTypes?.length === DEFAULT_CAMPUS_VISIT_CONTENT.visitTypes.length ? remoteVisitContent.visitTypes : DEFAULT_CAMPUS_VISIT_CONTENT.visitTypes;
+  const VISIT_TYPES = VISIT_TYPE_META.map((meta, idx) => ({ ...meta, ...visitCopy[idx] }));
+
   const [searchParams] = useSearchParams();
   const requestedType = searchParams.get('type');
   const initialType = VISIT_TYPES.some((t) => t.key === requestedType) ? (requestedType as VisitType) : 'group';

@@ -11,7 +11,9 @@ import { CalendarOff, Monitor, FileText } from 'lucide-react';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import { ICT_RESOURCE_GROUPS } from './ictResources.data';
-import { DEFAULT_OTHER_PRACTICES, EXPERIENTIAL_LEARNING_INTRO, type OtherPracticeItem } from './otherPractices.data';
+import type { OtherPracticeItem } from './otherPractices.data';
+import { useDocument } from '../../hooks/useDocument';
+import { DEFAULT_OTHER_PRACTICES_CONTENT, OTHER_PRACTICES_COLLECTION, OTHER_PRACTICES_DOC_ID, type OtherPracticesDoc } from '../Admin/sections/OtherPracticesAdmin';
 import { renderBold } from '../../lib/boldText';
 import './Information.css';
 
@@ -29,6 +31,19 @@ const defaultAntiRaggingSafetyPhotos = [
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Awareness Poster Displays', caption: '' },
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Counseling Room', caption: '' },
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Campus Patrol & Security', caption: '' },
+];
+
+// Fallback for the Counselling Scheme bullet list, shown until an admin adds
+// real items under Page Content Blocks -> "Information — Counselling Scheme"
+// (title = label, desc = text).
+const DEFAULT_COUNSELLING_ITEMS: [string, string][] = [
+  ['Personalised Guidance', 'Each student is assigned a faculty counsellor who provides individual attention and guidance for academic, personal, and career-related concerns.'],
+  ['A Trusted Faculty Connect', 'Faculty members serve as counsellors and mentors, creating a supportive environment where students can openly share their concerns without hesitation.'],
+  ['Dedicated Student Support', 'Each counsellor mentors approximately 20 students, enabling meaningful interaction, regular follow-up, and close attention to individual needs.'],
+  ['Holistic Well-being', "Counsellors listen to concerns that may affect a student's learning, well-being, relationships, or personal growth and help identify appropriate support."],
+  ['A Safe Space to Be Heard', 'Students can discuss academic challenges, hostel or campus facilities, and other concerns directly with their counsellors.'],
+  ['Responsive Resolution', 'Counsellors work closely with the Counselling Coordinator and concerned authorities to ensure that genuine concerns are addressed promptly and appropriate solutions are identified.'],
+  ['Continuous Care', 'Counselling is not limited to scheduled meetings. Faculty mentors remain accessible to students whenever guidance, encouragement, or support is needed.'],
 ];
 
 type TabId = 'calendar' | 'holidays' | 'counselling' | 'ict' | 'practices';
@@ -58,7 +73,16 @@ export default function Information() {
   const antiRaggingSafetyPhotos = useSitePhotos('information', 'anti-ragging-safety', defaultAntiRaggingSafetyPhotos);
   const hasAntiRaggingSafetyPhotos = useSectionHasPhotos('information', 'anti-ragging-safety');
   const ictPlatforms = useContentBlocks('information', 'ictPlatforms');
-  const otherPractices = DEFAULT_OTHER_PRACTICES;
+  const liveCounsellingItems = useContentBlocks('information', 'counsellingScheme');
+  const counsellingItems: [string, string][] = liveCounsellingItems.length > 0
+    ? liveCounsellingItems.map((b) => [b.title, b.desc])
+    : DEFAULT_COUNSELLING_ITEMS;
+  const { data: remoteOtherPractices } = useDocument<OtherPracticesDoc>(OTHER_PRACTICES_COLLECTION, OTHER_PRACTICES_DOC_ID);
+  const otherPracticesContent = {
+    intro: remoteOtherPractices?.intro || DEFAULT_OTHER_PRACTICES_CONTENT.intro,
+    items: remoteOtherPractices?.items?.length ? remoteOtherPractices.items : DEFAULT_OTHER_PRACTICES_CONTENT.items,
+  };
+  const otherPractices = otherPracticesContent.items;
 
   useEffect(() => {
     const tab = hashToTab[location.hash];
@@ -182,15 +206,7 @@ export default function Information() {
                   journey, personal challenges, and overall development with confidence.
                 </p>
                 <ul style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', listStyle: 'none', padding: 0, margin: '0 0 var(--space-6)' }}>
-                  {[
-                    ['Personalised Guidance', 'Each student is assigned a faculty counsellor who provides individual attention and guidance for academic, personal, and career-related concerns.'],
-                    ['A Trusted Faculty Connect', 'Faculty members serve as counsellors and mentors, creating a supportive environment where students can openly share their concerns without hesitation.'],
-                    ['Dedicated Student Support', 'Each counsellor mentors approximately 20 students, enabling meaningful interaction, regular follow-up, and close attention to individual needs.'],
-                    ['Holistic Well-being', "Counsellors listen to concerns that may affect a student's learning, well-being, relationships, or personal growth and help identify appropriate support."],
-                    ['A Safe Space to Be Heard', 'Students can discuss academic challenges, hostel or campus facilities, and other concerns directly with their counsellors.'],
-                    ['Responsive Resolution', 'Counsellors work closely with the Counselling Coordinator and concerned authorities to ensure that genuine concerns are addressed promptly and appropriate solutions are identified.'],
-                    ['Continuous Care', 'Counselling is not limited to scheduled meetings. Faculty mentors remain accessible to students whenever guidance, encouragement, or support is needed.'],
-                  ].map(([label, text]) => (
+                  {counsellingItems.map(([label, text]) => (
                     <li key={label} style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
                       <span style={{ flexShrink: 0, width: 8, height: 8, borderRadius: '50% 50% 50% 0', background: 'var(--color-accent)', marginTop: '0.5em' }} />
                       <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.7 }}>
@@ -272,7 +288,7 @@ export default function Information() {
               <h2 className="section-title" style={{ marginBottom: 'var(--space-3)' }}>Experiential Learning & Other Practices at VWU</h2>
               <div style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderLeft: '4px solid var(--color-accent)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', marginBottom: 'var(--space-8)' }}>
                 <p style={{ color: 'var(--color-text)', fontSize: 'var(--text-base)', lineHeight: 1.7, margin: 0 }}>
-                  {EXPERIENTIAL_LEARNING_INTRO}
+                  {otherPracticesContent.intro}
                 </p>
               </div>
 

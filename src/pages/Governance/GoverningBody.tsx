@@ -1,5 +1,7 @@
 import { useEffect } from 'react';
 import PageHero from '../../components/PageHero/PageHero';
+import { useOrderedCollection } from '../../hooks/useCollection';
+import type { GoverningBodyDoc } from '../Admin/sections/GoverningBodyAdmin';
 import './GoverningBody.css';
 
 export interface GoverningBodyMember {
@@ -53,7 +55,19 @@ const GB_TABLE: { category: string; rows: { nature: string; name?: string; org?:
   },
 ];
 
-function GoverningBodyTable() {
+type GbGroup = { category: string; rows: { nature: string; name?: string; org?: string }[] };
+
+function groupsFromDocs(docs: GoverningBodyDoc[]): GbGroup[] {
+  const order: string[] = [];
+  const map = new Map<string, GbGroup['rows']>();
+  docs.forEach((m) => {
+    if (!map.has(m.category)) { map.set(m.category, []); order.push(m.category); }
+    map.get(m.category)!.push({ nature: m.nature || m.position || '', name: m.name, org: m.org });
+  });
+  return order.map((category) => ({ category, rows: map.get(category)! }));
+}
+
+function GoverningBodyTable({ groups }: { groups: GbGroup[] }) {
   let n = 0;
   return (
     <div className="gb-table-wrap">
@@ -67,7 +81,7 @@ function GoverningBodyTable() {
           </tr>
         </thead>
         <tbody>
-          {GB_TABLE.map((group) =>
+          {groups.map((group) =>
             group.rows.map((row, i) => (
               <tr key={`${group.category}-${i}`} className={i === 0 ? 'gb-table__group-start' : undefined}>
                 <td>Member {++n}</td>
@@ -91,6 +105,9 @@ function GoverningBodyTable() {
 }
 
 export default function GoverningBody() {
+  const { docs: members } = useOrderedCollection<GoverningBodyDoc>('governingBody', 'order');
+  const groups = members.length ? groupsFromDocs(members) : GB_TABLE;
+
   useEffect(() => {
     document.title = "Governing Body | Vishnu Women's University";
     const observer = new IntersectionObserver(
@@ -125,7 +142,7 @@ export default function GoverningBody() {
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-8)' }}>
             <h2 className="gb-overview__title">Governing Body at VWU</h2>
           </div>
-          <GoverningBodyTable />
+          <GoverningBodyTable groups={groups} />
         </div>
       </section>
     </main>

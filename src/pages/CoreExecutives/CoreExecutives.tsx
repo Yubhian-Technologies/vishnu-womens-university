@@ -6,6 +6,8 @@ import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { renderBold } from '../../lib/boldText';
 import { defaultExecutives, type CoreExecutiveMember } from '../About/About';
+import { useDocument } from '../../hooks/useDocument';
+import { DEFAULT_ABOUT_CONTENT, ABOUT_CONTENT_COLLECTION, ABOUT_CONTENT_DOC_ID, type AboutContentDoc } from '../Admin/sections/AboutContentAdmin';
 
 // Admin-entered links may omit the scheme — see the same helper in About.tsx.
 function toAbsoluteUrl(url: string) {
@@ -46,6 +48,8 @@ export default function CoreExecutives() {
     };
   }, [execBannerOpen]);
 
+  const { data: remoteAboutContent } = useDocument<AboutContentDoc>(ABOUT_CONTENT_COLLECTION, ABOUT_CONTENT_DOC_ID);
+  const content = { ...DEFAULT_ABOUT_CONTENT, ...remoteAboutContent };
   const { docs: execDocs, loading: execLoading } = useOrderedCollection<CoreExecutiveMember>('coreExecutives', 'order');
   const executives = !execLoading && execDocs.length > 0 ? execDocs : defaultExecutives;
   const executivesByLevel = useMemo(() => {
@@ -63,9 +67,9 @@ export default function CoreExecutives() {
       <section id="core-executive" className="section bg-off-white" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
         <div className="container">
           <div style={{ textAlign: 'center', marginBottom: 'var(--space-10)' }}>
-            <h1 className="section-title">Core Executive Body</h1>
+            <h1 className="section-title">{content.execHeading}</h1>
             <p className="section-desc" style={{ margin: '0 auto' }}>
-              A distinguished leadership team shaping the University's academic vision, strategic direction, and institutional excellence.
+              {content.execSubtitle}
             </p>
           </div>
           {executivesByLevel.map(([level, members]) => (

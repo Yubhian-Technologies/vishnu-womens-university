@@ -6,42 +6,26 @@ import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import AdmissionApplyForm from '../../components/AdmissionApplyForm/AdmissionApplyForm';
 import { useSitePhotos } from '../../hooks/useSitePhotos';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
+import { useSiteContact, telHref } from '../../hooks/useSiteContact';
+import { useDocument } from '../../hooks/useDocument';
+import { DEFAULT_APPLY_NOW_CONTENT, APPLY_NOW_CONTENT_COLLECTION, APPLY_NOW_CONTENT_DOC_ID, type ApplyNowContentDoc } from '../Admin/sections/ApplyNowContentAdmin';
 import './ApplyNow.css';
 
 const defaultHeroPhoto = [
   { src: '/images/apply-bg.png', alt: 'VWU campus', caption: '' },
 ];
 
-const PROGRAMMES_DATA = [
-  {
-    key: 'ug',
-    count: '10',
-    fullForm: 'Undergraduate (UG)',
-    icon: BookOpen,
-  },
-  {
-    key: 'mba',
-    count: '1',
-    fullForm: 'Master of Business Administration (MBA)',
-    icon: Briefcase,
-  },
-  {
-    key: 'pg',
-    count: '4',
-    fullForm: 'Postgraduate (M.Tech.)',
-    icon: Cpu,
-  },
-  {
-    key: 'research',
-    count: '3',
-    fullForm: 'Doctoral & Research (Ph.D.)',
-    icon: Microscope,
-  },
-];
+// Icons for the 4 programme cards are position-matched and structural --
+// count/label come from ApplyNowContentAdmin's `programmes` field.
+const PROGRAMME_ICONS = [BookOpen, Briefcase, Cpu, Microscope];
+const PROGRAMME_KEYS = ['ug', 'mba', 'pg', 'research'];
 
 export default function ApplyNow() {
   const heroPhoto = useSitePhotos('apply-now', 'hero', defaultHeroPhoto)[0];
   const photoSrc = heroPhoto?.src || PHOTO_NEEDED_PLACEHOLDER;
+  const { phone } = useSiteContact();
+  const { data: remoteContent } = useDocument<ApplyNowContentDoc>(APPLY_NOW_CONTENT_COLLECTION, APPLY_NOW_CONTENT_DOC_ID);
+  const content = { ...DEFAULT_APPLY_NOW_CONTENT, ...remoteContent };
 
   useEffect(() => {
     document.title = "Apply Now | Vishnu Women's University";
@@ -62,28 +46,28 @@ export default function ApplyNow() {
 
       <div className="apply-now-phone-badge">
         <Phone size={14} />
-        <a href="tel:08816250864">08816-250864</a>
+        <a href={telHref(phone)}>{phone}</a>
       </div>
 
       <div className="container apply-now-grid">
         <div className="apply-now-info-col">
           <h1 className="apply-now-headline">
-            Academic Excellence. <span>Limitless Possibilities.</span>
+            {content.headline} <span>{content.headlineAccent}</span>
           </h1>
           <p className="apply-now-desc">
-            Vishnu Women&rsquo;s University offers quality education, modern infrastructure, experienced faculty, research opportunities, and a vibrant campus environment&mdash;empowering women to learn, lead, and excel.
+            {content.description}
           </p>
 
           <div className="apply-now-programmes-container">
             <div className="apply-now-stat-label-wrap">
-              <span className="apply-now-stat-label">Programmes Offered</span>
+              <span className="apply-now-stat-label">{content.statLabel}</span>
             </div>
 
             <div className="apply-now-cards-grid">
-              {PROGRAMMES_DATA.map((prog) => {
-                const IconComp = prog.icon;
+              {content.programmes.map((prog, idx) => {
+                const IconComp = PROGRAMME_ICONS[idx % PROGRAMME_ICONS.length];
                 return (
-                  <Link key={prog.key} to="/academics/departments" className="apply-now-card">
+                  <Link key={PROGRAMME_KEYS[idx] || idx} to="/academics/departments" className="apply-now-card">
                     <div className="apply-now-card-top">
                       <div className="apply-now-card-icon-wrap">
                         <IconComp size={18} className="apply-now-card-icon" />

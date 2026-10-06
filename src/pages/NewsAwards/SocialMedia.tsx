@@ -2,17 +2,19 @@ import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
 import { InstagramIcon, FacebookIcon, TwitterIcon, LinkedInIcon, YouTubeIcon } from '../../components/Footer/SocialIcons';
+import { useDocument } from '../../hooks/useDocument';
+import { DEFAULT_SOCIAL_HANDLES, SOCIAL_HANDLES_COLLECTION, SOCIAL_HANDLES_DOC_ID, type SocialHandlesDoc } from '../Admin/sections/SocialHandlesAdmin';
 
-// Mirrors Footer.tsx's socialLinks list — same accounts, same order.
-const socialHandles = [
-  { label: 'Instagram', href: 'http://instagram.com/vishnu_svecw/', handle: '@vishnu_svecw', Icon: InstagramIcon },
-  { label: 'Facebook', href: 'https://www.facebook.com/svecwcollege', handle: 'svecwcollege', Icon: FacebookIcon },
-  { label: 'Twitter', href: 'https://twitter.com/svecw2', handle: '@svecw2', Icon: TwitterIcon },
-  { label: 'LinkedIn', href: 'https://www.linkedin.com/school/vishnusvecw/', handle: 'Vishnu SVECW', Icon: LinkedInIcon },
-  { label: 'YouTube', href: 'https://www.youtube.com/@SVECW-B0', handle: '@SVECW-B0', Icon: YouTubeIcon },
-];
+// Icon per slot is structural/position-matched -- shared with Footer.tsx's
+// social strip via the same settings/socialHandles doc, so the two can't
+// drift out of sync.
+const SOCIAL_ICONS = [InstagramIcon, FacebookIcon, TwitterIcon, LinkedInIcon, YouTubeIcon];
 
 export default function SocialMedia() {
+  const { data: remoteSocialHandles } = useDocument<SocialHandlesDoc>(SOCIAL_HANDLES_COLLECTION, SOCIAL_HANDLES_DOC_ID);
+  const socialHandles = (remoteSocialHandles?.platforms?.length === DEFAULT_SOCIAL_HANDLES.platforms.length ? remoteSocialHandles.platforms : DEFAULT_SOCIAL_HANDLES.platforms)
+    .map((p, idx) => ({ ...p, Icon: SOCIAL_ICONS[idx % SOCIAL_ICONS.length] }));
+
   useEffect(() => {
     document.title = "Social Media Handles | Vishnu Women's University";
   }, []);

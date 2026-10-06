@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { DEFAULT_COMPLIANCE_DOCS, type ComplianceDocDoc } from '../Admin/sections/ComplianceDocsAdmin';
+import { useDocument } from '../../hooks/useDocument';
+import { DEFAULT_UGC_DISCLOSURE_CONTENT, UGC_DISCLOSURE_CONTENT_COLLECTION, UGC_DISCLOSURE_CONTENT_DOC_ID, type UGCDisclosureContentDoc } from '../Admin/sections/UGCDisclosureContentAdmin';
 import SEO from '../../components/SEO/SEO';
 import { getBreadcrumbSchema } from '../../lib/seo/schemas';
 import '../detail-layout.css';
@@ -187,6 +189,17 @@ export default function UGCDisclosure() {
   const complianceDocs = liveComplianceDocs.length > 0 ? liveComplianceDocs : (DEFAULT_COMPLIANCE_DOCS as ComplianceDocDoc[]);
   const docsByKey = new Map(complianceDocs.filter((d) => d.key).map((d) => [d.key, d]));
 
+  const { data: remoteDisclosureContent } = useDocument<UGCDisclosureContentDoc>(UGC_DISCLOSURE_CONTENT_COLLECTION, UGC_DISCLOSURE_CONTENT_DOC_ID);
+  const disclosureContent = remoteDisclosureContent?.sections?.length === DEFAULT_UGC_DISCLOSURE_CONTENT.sections.length ? remoteDisclosureContent : DEFAULT_UGC_DISCLOSURE_CONTENT;
+  const introText = disclosureContent.intro || DEFAULT_UGC_DISCLOSURE_CONTENT.intro;
+  const displaySections = sections.map((section, sIdx) => ({
+    ...section,
+    items: section.items.map((item, iIdx) => {
+      const copy = disclosureContent.sections[sIdx]?.items[iIdx];
+      return copy ? { ...item, label: copy.label, status: copy.status } : item;
+    }),
+  }));
+
   return (
     <main className="page-wrapper">
       <SEO
@@ -205,10 +218,7 @@ export default function UGCDisclosure() {
       <section className="section bg-white">
         <div className="container">
           <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, maxWidth: 820, marginBottom: 'var(--space-4)' }}>
-            We hereby give an undertaking that all the Regulations notified by the University Grants
-            Commission, New Delhi, will be followed in letter and spirit by Shri Vishnu Engineering
-            College for Women (Autonomous), Bhimavaram, West Godavari District, Andhra Pradesh, from
-            time to time.
+            {introText}
           </p>
           {docsByKey.get('ugc-public-self-disclosure') && (
             <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6, maxWidth: 820 }}>
@@ -221,7 +231,7 @@ export default function UGCDisclosure() {
         </div>
       </section>
 
-      {sections.map((section) => (
+      {displaySections.map((section) => (
         <section key={section.title} className="section bg-off-white" style={{ paddingTop: 'var(--space-8)', paddingBottom: 'var(--space-8)' }}>
           <div className="container">
             <h2 className="section-title" style={{ fontSize: '1.4rem', marginBottom: 'var(--space-5)' }}>{section.title}</h2>

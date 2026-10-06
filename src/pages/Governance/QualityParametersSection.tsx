@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ChevronDown, Check } from 'lucide-react';
-import { QUALITY_PARAMETER_CATEGORIES } from './qualityParametersDefault';
+import { useDocument } from '../../hooks/useDocument';
+import { DEFAULT_QUALITY_PARAMETERS, QUALITY_PARAMETERS_COLLECTION, QUALITY_PARAMETERS_DOC_ID, type QualityParametersDoc } from '../Admin/sections/QualityParametersAdmin';
 import { renderBold } from '../../lib/boldText';
 
 // A single-level accordion (A. Quality Education, B. Academic
@@ -10,7 +11,9 @@ import { renderBold } from '../../lib/boldText';
 // checkmark bullet list) is identical, just without that page's
 // paragraphs/people/table blocks.
 export default function QualityParametersSection() {
-  const [openKey, setOpenKey] = useState<string | null>(QUALITY_PARAMETER_CATEGORIES[0]?.key ?? null);
+  const { data: remote } = useDocument<QualityParametersDoc>(QUALITY_PARAMETERS_COLLECTION, QUALITY_PARAMETERS_DOC_ID);
+  const categories = remote?.categories?.length ? remote.categories : DEFAULT_QUALITY_PARAMETERS.categories;
+  const [openKey, setOpenKey] = useState<string | null>(categories[0]?.key ?? null);
 
   const toggle = (key: string) => {
     setOpenKey((prev) => (prev === key ? null : key));
@@ -18,7 +21,7 @@ export default function QualityParametersSection() {
 
   return (
     <div className="pb-list">
-      {QUALITY_PARAMETER_CATEGORIES.map((cat) => {
+      {categories.map((cat) => {
         const isOpen = openKey === cat.key;
         return (
           <div key={cat.key} className={`pb-item${isOpen ? ' open' : ''}`}>
@@ -37,7 +40,7 @@ export default function QualityParametersSection() {
               <div className="pb-item-body-inner">
                 <div className="pb-item-content">
                   <ul className="pb-bullets">
-                    {cat.items.map((it, ii) => (
+                    {cat.items.filter(Boolean).map((it, ii) => (
                       <li key={ii}>
                         <Check size={13} strokeWidth={2.5} className="pb-bullet-icon" />
                         <span>{renderBold(it)}</span>

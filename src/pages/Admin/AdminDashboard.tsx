@@ -4,6 +4,7 @@ import Overview from './sections/Overview';
 import ThemeAdmin from './sections/ThemeAdmin';
 import FeaturePopupAdmin from './sections/FeaturePopupAdmin';
 import HomeHeroBannersAdmin from './sections/HomeHeroBannersAdmin';
+import HomeContentAdmin from './sections/HomeContentAdmin';
 import BannersAdmin from './sections/BannersAdmin';
 import LandingPagesAdmin from './sections/LandingPagesAdmin';
 import NewsAdmin from './sections/NewsAdmin';
@@ -12,6 +13,9 @@ import ProgramsAdmin from './sections/ProgramsAdmin';
 import DepartmentsAdmin from './sections/DepartmentsAdmin';
 import SchoolsAdmin from './sections/SchoolsAdmin';
 import FacultyAdmin from './sections/FacultyAdmin';
+import AboutContentAdmin from './sections/AboutContentAdmin';
+import VisionMissionContentAdmin from './sections/VisionMissionContentAdmin';
+import AboutSvesContentAdmin from './sections/AboutSvesContentAdmin';
 import GoverningBodyAdmin from './sections/GoverningBodyAdmin';
 import CoreExecutivesAdmin from './sections/CoreExecutivesAdmin';
 import PlacementYearsAdmin from './sections/PlacementYearsAdmin';
@@ -46,7 +50,10 @@ import SitePhotosAdmin from './sections/SitePhotosAdmin';
 import NavLinkOverridesAdmin from './sections/NavLinkOverridesAdmin';
 import HeaderMenuAdmin from './sections/HeaderMenuAdmin';
 import FooterLinksAdmin from './sections/FooterLinksAdmin';
+import SocialHandlesAdmin from './sections/SocialHandlesAdmin';
 import GovernanceItemsAdmin from './sections/GovernanceItemsAdmin';
+import QualityParametersAdmin from './sections/QualityParametersAdmin';
+import InternalQACellAdmin from './sections/InternalQACellAdmin';
 import AnnualReportsAdmin from './sections/AnnualReportsAdmin';
 import NirfReportsAdmin from './sections/NirfReportsAdmin';
 import NbaDataAdmin from './sections/NbaDataAdmin';
@@ -54,6 +61,23 @@ import DifferentiatorsAdmin from './sections/DifferentiatorsAdmin';
 import PlacementItemsAdmin from './sections/PlacementItemsAdmin';
 import PlacementCrtDocsAdmin from './sections/PlacementCrtDocsAdmin';
 import NewsAwardsDataAdmin from './sections/NewsAwardsDataAdmin';
+import NewsAwardsContentAdmin from './sections/NewsAwardsContentAdmin';
+import ApplyNowContentAdmin from './sections/ApplyNowContentAdmin';
+import CampusVisitContentAdmin from './sections/CampusVisitContentAdmin';
+import AntiRaggingContentAdmin from './sections/AntiRaggingContentAdmin';
+import AicteFeedbackContentAdmin from './sections/AicteFeedbackContentAdmin';
+import PoliciesIntroAdmin from './sections/PoliciesIntroAdmin';
+import UGCDisclosureContentAdmin from './sections/UGCDisclosureContentAdmin';
+import FitnessCentreContentAdmin from './sections/FitnessCentreContentAdmin';
+import SewageTreatmentContentAdmin from './sections/SewageTreatmentContentAdmin';
+import SocialServicesContentAdmin from './sections/SocialServicesContentAdmin';
+import AcademicsContentAdmin from './sections/AcademicsContentAdmin';
+import OtherPracticesAdmin from './sections/OtherPracticesAdmin';
+import GsacHeroContentAdmin from './sections/GsacHeroContentAdmin';
+import SuccessStoriesAdmin from './sections/SuccessStoriesAdmin';
+import IloOfficeDetailsAdmin from './sections/IloOfficeDetailsAdmin';
+import EmployabilitySkillsAdmin from './sections/EmployabilitySkillsAdmin';
+import HigherEducationAdmin from './sections/HigherEducationAdmin';
 import InsightsAdmin from './sections/InsightsAdmin';
 import CareerGuidanceInterestAdmin from './sections/CareerGuidanceInterestAdmin';
 import ResearchItemsAdmin from './sections/ResearchItemsAdmin';
@@ -108,6 +132,7 @@ const SECTION_MAP: Record<string, React.ReactNode> = {
   theme: <ThemeAdmin />,
   'feature-popup': <FeaturePopupAdmin />,
   'home-hero-banners': <HomeHeroBannersAdmin />,
+  'home-content': <HomeContentAdmin />,
   banners: <BannersAdmin />,
   'landing-pages': <LandingPagesAdmin />,
   news: <NewsAdmin />,
@@ -116,6 +141,9 @@ const SECTION_MAP: Record<string, React.ReactNode> = {
   schools: <SchoolsAdmin />,
   departments: <DepartmentsAdmin />,
   faculty: <FacultyAdmin />,
+  'about-content': <AboutContentAdmin />,
+  'vision-mission-content': <VisionMissionContentAdmin />,
+  'about-sves-content': <AboutSvesContentAdmin />,
   'governing-body': <GoverningBodyAdmin />,
   'core-executives': <CoreExecutivesAdmin />,
   placements: <PlacementYearsAdmin />,
@@ -150,7 +178,10 @@ const SECTION_MAP: Record<string, React.ReactNode> = {
   'header-menu': <HeaderMenuAdmin />,
   'nav-links': <NavLinkOverridesAdmin />,
   'footer-links': <FooterLinksAdmin />,
+  'social-handles': <SocialHandlesAdmin />,
   'governance-items': <GovernanceItemsAdmin />,
+  'quality-parameters': <QualityParametersAdmin />,
+  'internal-qa-cell': <InternalQACellAdmin />,
   'annual-reports': <AnnualReportsAdmin />,
   'nirf-reports': <NirfReportsAdmin />,
   'nba-data': <NbaDataAdmin />,
@@ -163,6 +194,23 @@ const SECTION_MAP: Record<string, React.ReactNode> = {
   'recruiter-logos': <RecruiterLogosAdmin />,
   'gsac-photos': <GsacPhotosAdmin />,
   'news-awards-data': <NewsAwardsDataAdmin />,
+  'news-awards-content': <NewsAwardsContentAdmin />,
+  'apply-now-content': <ApplyNowContentAdmin />,
+  'campus-visit-content': <CampusVisitContentAdmin />,
+  'anti-ragging-content': <AntiRaggingContentAdmin />,
+  'aicte-feedback-content': <AicteFeedbackContentAdmin />,
+  'policies-intro': <PoliciesIntroAdmin />,
+  'ugc-disclosure-content': <UGCDisclosureContentAdmin />,
+  'fitness-centre-content': <FitnessCentreContentAdmin />,
+  'sewage-treatment-content': <SewageTreatmentContentAdmin />,
+  'social-services-content': <SocialServicesContentAdmin />,
+  'academics-content': <AcademicsContentAdmin />,
+  'other-practices': <OtherPracticesAdmin />,
+  'gsac-hero-content': <GsacHeroContentAdmin />,
+  'success-stories': <SuccessStoriesAdmin />,
+  'ilo-office-details': <IloOfficeDetailsAdmin />,
+  'employability-skills': <EmployabilitySkillsAdmin />,
+  'higher-education': <HigherEducationAdmin />,
   insights: <InsightsAdmin />,
   'career-guidance-interest': <CareerGuidanceInterestAdmin />,
   'research-items': <ResearchItemsAdmin />,

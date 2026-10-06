@@ -14,6 +14,9 @@ import type { DepartmentDoc } from './DepartmentsAdmin';
 export interface SchoolDoc {
   id: string;
   title: string;
+  /** Short highlight line shown directly under the title on the public
+   *  page, above the longer description. */
+  tagline?: string;
   description: string;
   order: number;
   departmentIds: string[];
@@ -24,7 +27,7 @@ export interface SchoolDoc {
   imageStoragePath?: string;
 }
 
-const EMPTY: Omit<SchoolDoc, 'id'> = { title: '', description: '', order: 0, departmentIds: [], imageUrl: '', imageStoragePath: '' };
+const EMPTY: Omit<SchoolDoc, 'id'> = { title: '', tagline: '', description: '', order: 0, departmentIds: [], imageUrl: '', imageStoragePath: '' };
 
 export default function SchoolsAdmin() {
   const { docs: schools, loading } = useOrderedCollection<SchoolDoc>('schools', 'order');
@@ -91,7 +94,7 @@ export default function SchoolsAdmin() {
   const startEdit = (s: SchoolDoc) => {
     setEditing(s.id);
     setForm({
-      title: s.title, description: s.description || '', order: s.order,
+      title: s.title, tagline: s.tagline || '', description: s.description || '', order: s.order,
       departmentIds: (s.departmentIds || []).filter((id) => departmentById.has(id)),
       imageUrl: s.imageUrl || '', imageStoragePath: s.imageStoragePath || '',
     });
@@ -124,6 +127,11 @@ export default function SchoolsAdmin() {
           <div className="admin-field">
             <label htmlFor="field-display-order">Display Order</label>
             <input id="field-display-order" type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label htmlFor="field-tagline">Tagline</label>
+            <input id="field-tagline" value={form.tagline || ''} onChange={(e) => set('tagline', e.target.value)} placeholder="Empowering Women to Shape the Digital Future." />
+            <p className="admin-field__hint" style={{ marginTop: '0.25rem' }}>Short highlight line shown directly under the title, above the description.</p>
           </div>
           <div className="admin-field admin-field--full">
             <label htmlFor="field-description">Description</label>

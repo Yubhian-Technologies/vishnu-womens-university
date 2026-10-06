@@ -10,6 +10,7 @@ import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { useDocument } from '../../hooks/useDocument';
 import CustomSectionsRenderer from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import { ABOUT_DIFFERENTIATORS_CUSTOM_COLLECTION, ABOUT_DIFFERENTIATORS_CUSTOM_DOC_ID, type AboutDifferentiatorsCustomDoc } from '../Admin/sections/AboutDifferentiatorsCustomAdmin';
+import { DEFAULT_ABOUT_CONTENT, ABOUT_CONTENT_COLLECTION, ABOUT_CONTENT_DOC_ID, type AboutContentDoc } from '../Admin/sections/AboutContentAdmin';
 import { useSitePhotos, useSectionHasPhotos } from '../../hooks/useSitePhotos';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import {
@@ -24,12 +25,17 @@ import { renderBold } from '../../lib/boldText';
 
 const STAT_ICONS = [Calendar, MapPin, GraduationCap, Users, Briefcase, Award, CheckCircle, Sparkles];
 
-const PILLAR_ITEMS = [
-  { title: '250+ Expert Faculty', desc: 'B.Tech, M.Tech, MBA and Ph.D. programmes built on strong fundamentals and professional practice.', icon: BookOpen },
-  { title: '30+ Innovation Initiatives', desc: 'AICTE IDEA Lab, STI Hub and the Vishnu Technology Business Incubator.', icon: Lightbulb },
-  { title: '1,100+ Placements', desc: 'Industry programmes with NASSCOM, HCL Tech, Microchip and TI.', icon: Briefcase },
-  { title: '10 Departments', desc: 'Clubs, sports and events that build leadership and confidence alongside academics.', icon: Sparkles },
-  { title: '80+ Acre Campus', desc: 'Advanced labs, smart classrooms, ICT tools and seminar halls.', icon: Globe },
+// Icons for the 5 pillar cards are position-matched and structural (not
+// admin-editable) -- the title/desc text for each slot comes from
+// AboutContentAdmin's `pillars` field.
+const PILLAR_ICONS = [BookOpen, Lightbulb, Briefcase, Sparkles, Globe];
+
+// Same idea for the 3 Campus Snapshot facility cards -- icon/colour theme is
+// structural, title/desc comes from AboutContentAdmin's `campusFacilityCards`.
+const CAMPUS_FACILITY_THEME = [
+  { icon: Building2, bg: '#E8EEF7', fg: 'var(--color-primary)' },
+  { icon: Wifi, bg: '#E4F0EA', fg: '#2F7D5D' },
+  { icon: Users, bg: '#F7EEDD', fg: 'var(--color-accent)' },
 ];
 
 // Admin-entered links may omit the scheme (e.g. "linkedin.com/in/..."),
@@ -161,6 +167,8 @@ export default function About() {
   // (see AboutDifferentiatorsCustomAdmin) — empty by default, so this adds
   // nothing to the page until an admin adds a Custom Section.
   const { data: diffCustomDoc } = useDocument<AboutDifferentiatorsCustomDoc>(ABOUT_DIFFERENTIATORS_CUSTOM_COLLECTION, ABOUT_DIFFERENTIATORS_CUSTOM_DOC_ID);
+  const { data: remoteAboutContent } = useDocument<AboutContentDoc>(ABOUT_CONTENT_COLLECTION, ABOUT_CONTENT_DOC_ID);
+  const content = { ...DEFAULT_ABOUT_CONTENT, ...remoteAboutContent };
 
   const differentiators = useMemo(() => {
     const groups: { cat: string; icon: string; items: { id: string; title: string }[] }[] = [];
@@ -212,7 +220,7 @@ export default function About() {
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-6)' }}>
             <h2 style={{ color: 'var(--color-white)', fontSize: 'clamp(1.5rem, 3vw, 2.15rem)', fontWeight: 800, marginBottom: 'var(--space-2)' }}>
-              Two Decades of Women's Education in Andhra Pradesh
+              {content.statsHeading}
             </h2>
           </div>
           <div className="about-facts-bar">
@@ -228,7 +236,7 @@ export default function About() {
             })}
           </div>
           <p style={{ textAlign: 'center', color: 'rgba(255,255,255,0.75)', marginTop: 'var(--space-6)', fontSize: '0.92rem' }}>
-            Building on decades of experience in women's education and professional learning.
+            {content.statsFootnote}
           </p>
         </div>
       </section>
@@ -238,19 +246,11 @@ export default function About() {
         <div className="container">
           <div className="about-mission-grid">
             <div className="reveal-left">
-              <h2 className="section-title">First Private State Women's University in Telugu States</h2>
+              <h2 className="section-title">{content.overviewHeading}</h2>
               <div className="divider" />
-              <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-6)', color: 'var(--color-text-light)' }}>
-                Vishnu Women's University (VWU), located at Vishnupur, Bhimavaram, Andhra Pradesh, is dedicated to
-                providing quality higher education for women. Established in 2001, the institution transitioned into
-                a Brownfield University in 2026 under the Andhra Pradesh Private Universities Act, 2016, carrying
-                forward the rich educational legacy of the Sri Vishnu Educational Society.
-              </p>
-              <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-6)', color: 'var(--color-text-light)' }}>
-                With a focus on education, innovation, leadership, and entrepreneurship, VWU aims to empower women
-                to achieve their academic and professional goals. Over 15,000 women have graduated from the
-                institution, which currently offers B.Tech, M.Tech, MBA, and Ph.D. programmes exclusively for women.
-              </p>
+              {content.overviewParagraphs.filter(Boolean).map((p, i) => (
+                <p key={i} style={{ lineHeight: 1.8, marginBottom: 'var(--space-6)', color: 'var(--color-text-light)' }}>{renderBold(p)}</p>
+              ))}
               <div style={{ display: 'flex', gap: 'var(--space-4)', flexWrap: 'wrap' }}>
                 <Link to="/vision-mission" className="btn btn-primary">Vision & Mission</Link>
                 <Link to="/about-sves" className="btn btn-outline">About SVES</Link>
@@ -273,18 +273,15 @@ export default function About() {
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', maxWidth: 820, margin: '0 auto var(--space-10)' }}>
             <h2 className="section-title">Where Women Learn, Lead & Transform</h2>
-            <p style={{ color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-4)' }}>
-              Vishnu Women’s University is situated in the serene, green surroundings of Bhimavaram, West Godavari District, Andhra Pradesh. The University is located on the Bhimavaram–Tadepalligudem Road, with convenient access from Bhimavaram town via B. V. Raju Marg.
-            </p>
-            <p style={{ color: 'var(--color-text-light)', lineHeight: 1.8 }}>
-              The campus is well connected to Bhimavaram and neighbouring towns, making it easily accessible for students, parents, faculty, and visitors.
-            </p>
+            {content.pillarsIntroParagraphs.filter(Boolean).map((p, i) => (
+              <p key={i} style={{ color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-4)' }}>{renderBold(p)}</p>
+            ))}
           </div>
           <div className="about-pillars-grid reveal-scale">
-            {PILLAR_ITEMS.map((pillar) => {
-              const IconComp = pillar.icon;
+            {content.pillars.map((pillar, idx) => {
+              const IconComp = PILLAR_ICONS[idx % PILLAR_ICONS.length];
               return (
-                <div key={pillar.title} className="about-pillar-card">
+                <div key={idx} className="about-pillar-card">
                   <div className="about-pillar-icon-wrap">
                     <IconComp size={26} strokeWidth={1.8} />
                   </div>
@@ -309,16 +306,13 @@ export default function About() {
             />
           </div>
           <div className="reveal-right" style={{ background: 'var(--color-off-white)', padding: 'clamp(2.5rem, 5vw, 5rem)', display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '100%' }}>
-            <h2 className="section-title" style={{ marginTop: '0.25rem' }}>A University Built for Her Ambition</h2>
-            <p style={{ color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-4)', fontSize: '1.02rem' }}>
-              At Vishnu Women's University, every opportunity on campus belongs to a woman. She leads the project, runs the laboratory, heads the club and represents the University, not as an exception, but as a matter of course.
-            </p>
-            <p style={{ color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-4)', fontSize: '1.02rem' }}>
-              This is what a women's university makes possible. Over two decades, the Sri Vishnu Educational Society has seen the difference it makes to how a student works, speaks and plans her career. VWU is built to carry that forward.
-            </p>
+            <h2 className="section-title" style={{ marginTop: '0.25rem' }}>{content.ambitionHeading}</h2>
+            {content.ambitionParagraphs.filter(Boolean).map((p, i) => (
+              <p key={i} style={{ color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-4)', fontSize: '1.02rem' }}>{renderBold(p)}</p>
+            ))}
             <p style={{ fontFamily: 'var(--font-serif)', fontWeight: 800, fontSize: 'clamp(1.2rem, 2.2vw, 1.5rem)', color: 'var(--color-primary)', margin: '0 0 var(--space-5) 0' }}>
-              Her Education. Her Confidence. Her Future.<br />
-              <span style={{ color: 'var(--color-accent)', fontStyle: 'normal' }}>Her University — Vishnu Women's University.</span>
+              {content.ambitionTagline}<br />
+              <span style={{ color: 'var(--color-accent)', fontStyle: 'normal' }}>{content.ambitionTaglineAccent}</span>
             </p>
           </div>
         </div>
@@ -329,9 +323,9 @@ export default function About() {
         <div className="container">
           <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-12)', alignItems: 'center' }}>
             <div className="reveal-left">
-              <h2 className="section-title">Where Ambition Meets Opportunity.</h2>
+              <h2 className="section-title">{content.academicHeading}</h2>
               <p style={{ color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-6)' }}>
-                Explore a diverse academic ecosystem spanning Engineering, Management &amp; Research&mdash;designed to develop knowledge, innovation, leadership, and future-ready capabilities.
+                {content.academicParagraph}
               </p>
               <Link to="/academics" className="btn btn-primary">View All Programs & Departments →</Link>
             </div>
@@ -356,9 +350,9 @@ export default function About() {
       <section id="core-executive" className="section bg-off-white" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-10)' }}>
-            <h2 className="section-title">Core Executive Body</h2>
+            <h2 className="section-title">{content.execHeading}</h2>
             <p className="section-desc" style={{ margin: '0 auto' }}>
-              A distinguished leadership team shaping the University's academic vision, strategic direction, and institutional excellence.
+              {content.execSubtitle}
             </p>
           </div>
           {executivesByLevel.map(([level, members]) => (
@@ -448,10 +442,9 @@ export default function About() {
       <section className="section bg-off-white">
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>
-            <h2 className="section-title">30+ Differentiating Initiatives</h2>
+            <h2 className="section-title">{content.diffHeading}</h2>
             <p className="section-desc" style={{ margin: '0 auto' }}>
-              VWU extends well beyond conventional engineering education through programs in innovation,
-              industry engagement, international exposure, and community-driven initiatives.
+              {content.diffParagraph}
             </p>
           </div>
           <div className="about-diff-grid">
@@ -489,9 +482,9 @@ export default function About() {
             title="Life at Vishnu Women's University"
             subtitle={(
               <>
-                <strong style={{ fontSize: '1.5em' }}>The best learning here isn't on the syllabus.</strong>
+                <strong style={{ fontSize: '1.5em' }}>{content.campusGalleryBold}</strong>
                 <br /><br />
-                A vibrant environment where ideas flourish, friendships grow, talents find expression, and aspirations take shape. Every student is encouraged to explore new possibilities, discover their potential, and develop the confidence to lead, innovate, and make a difference.
+                {content.campusGalleryBody}
               </>
             )}
             columns={2}
@@ -545,22 +538,19 @@ export default function About() {
             )}
             <div className="reveal-right">
               <h2 className="section-title">
-                <span style={{ display: 'block', fontSize: '0.55em', fontWeight: 600, opacity: 0.75 }}>Purpose-Built Infrastructure</span>
-                Everything You Need to Learn, Live &amp; Lead.
+                <span style={{ display: 'block', fontSize: '0.55em', fontWeight: 600, opacity: 0.75 }}>{content.campusSnapshotEyebrow}</span>
+                {content.campusSnapshotHeading}
               </h2>
               <p style={{ color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-4)' }}>
-                From advanced learning spaces and seamless connectivity to sports, wellness, residential, dining, and spiritual facilities, VWU offers a thoughtfully designed campus ecosystem that supports learning, well-being, belonging, and holistic student development.
+                {content.campusSnapshotParagraph}
               </p>
               <div className="about-pillars-grid" style={{ marginBottom: 'var(--space-5)' }}>
-                {[
-                  { title: 'Modern Campus Facilities', desc: 'Smart classrooms, well-equipped labs, and world-class infrastructure.', icon: Building2, bg: '#E8EEF7', fg: 'var(--color-primary)' },
-                  { title: 'High-Speed Connectivity', desc: 'Seamless digital access for a smarter tomorrow.', icon: Wifi, bg: '#E4F0EA', fg: '#2F7D5D' },
-                  { title: 'Vibrant Student Life', desc: 'Clubs, sports, events and endless opportunities to grow.', icon: Users, bg: '#F7EEDD', fg: 'var(--color-accent)' },
-                ].map((card) => {
-                  const IconComp = card.icon;
+                {content.campusFacilityCards.map((card, idx) => {
+                  const theme = CAMPUS_FACILITY_THEME[idx % CAMPUS_FACILITY_THEME.length];
+                  const IconComp = theme.icon;
                   return (
-                    <div key={card.title} className="about-pillar-card">
-                      <div className="about-pillar-icon-wrap" style={{ background: card.bg, color: card.fg }}>
+                    <div key={idx} className="about-pillar-card">
+                      <div className="about-pillar-icon-wrap" style={{ background: theme.bg, color: theme.fg }}>
                         <IconComp size={26} strokeWidth={1.8} />
                       </div>
                       <h3 className="about-pillar-title">{card.title}</h3>
@@ -579,20 +569,17 @@ export default function About() {
         <div className="container">
           <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-12)', alignItems: 'center' }}>
             <div className="reveal-left">
-              <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>Sri Vishnu Educational Society (SVES)</h2>
+              <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>{content.svesHeading}</h2>
               <p style={{ color: 'rgba(255,255,255,0.75)', lineHeight: 1.8, marginBottom: 'var(--space-4)' }}>
-                Founded by Padma Bhushan Dr. B. V. Raju, Sri Vishnu Educational Society (SVES) is a distinguished
-                educational institution committed to excellence, innovation, and social impact.
+                {content.svesParagraph1}
               </p>
               <p style={{ color: 'rgba(255,255,255,0.75)', lineHeight: 1.8, marginBottom: 'var(--space-4)' }}>
-                With <strong style={{ color: 'var(--color-accent)' }}>11 institutions</strong> across four campuses in across two Telugu States with
-                <strong style={{ color: 'var(--color-accent)' }}> 25,000+ students</strong>, creating opportunities across education,
+                With <strong style={{ color: 'var(--color-accent)' }}>{content.svesStatInstitutions} institutions</strong> across four campuses in across two Telugu States with
+                <strong style={{ color: 'var(--color-accent)' }}> {content.svesStatStudents} students</strong>, creating opportunities across education,
                 technology, healthcare, and professional learning.
               </p>
               <p style={{ color: 'rgba(255,255,255,0.7)', lineHeight: 1.8, marginBottom: 'var(--space-6)' }}>
-                Vishnu Women's University is the flagship women's institution of SVES, carrying forward its enduring
-                vision of empowering women through quality education, technical excellence, research, leadership,
-                and innovation.
+                {content.svesParagraph3}
               </p>
               <Link to="/about-sves" className="btn btn-accent">Learn About SVES →</Link>
             </div>
@@ -605,17 +592,17 @@ export default function About() {
                 />
                 <div className="sves-floating-badge">
                   <div className="sves-stat-item">
-                    <span className="sves-stat-val">11</span>
+                    <span className="sves-stat-val">{content.svesStatInstitutions}</span>
                     <span className="sves-stat-lbl">Institutions</span>
                   </div>
                   <div style={{ width: 1, height: 28, background: 'rgba(255,255,255,0.2)' }} />
                   <div className="sves-stat-item">
-                    <span className="sves-stat-val">25,000+</span>
+                    <span className="sves-stat-val">{content.svesStatStudents}</span>
                     <span className="sves-stat-lbl">Students</span>
                   </div>
                   <div style={{ width: 1, height: 28, background: 'rgba(255,255,255,0.2)' }} />
                   <div className="sves-stat-item">
-                    <span className="sves-stat-val">4</span>
+                    <span className="sves-stat-val">{content.svesStatCampuses}</span>
                     <span className="sves-stat-lbl">Campuses</span>
                   </div>
                 </div>
@@ -629,7 +616,7 @@ export default function About() {
       <section className="section bg-off-white">
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-10)' }}>
-            <h2 className="section-title">Explore VWU in Detail</h2>
+            <h2 className="section-title">{content.discoverHeading}</h2>
           </div>
           <div className="about-discover-grid card-grid">
             {discoverCards.map((item) => {
@@ -666,24 +653,18 @@ export default function About() {
         <div className="container" style={{ textAlign: 'center' }}>
           <div className="reveal">
             <h2 style={{ color: 'var(--color-white)', fontSize: 'clamp(1.75rem, 4vw, 2.75rem)', marginBottom: 'var(--space-4)' }}>
-              Where Ambition Finds Its Purpose
+              {content.ctaHeading}
             </h2>
             <div style={{ maxWidth: 720, margin: '0 auto var(--space-8)' }}>
-              <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 'var(--text-lg)', marginBottom: 'var(--space-4)' }}>
-                Vishnu Women's University is more than a place to study. It is a community of curious minds, bold ideas, and women shaping the future.
-              </p>
-              <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 'var(--text-lg)', marginBottom: 'var(--space-4)' }}>
-                Whether you are here to learn, lead, innovate, recruit exceptional talent, or build partnerships that create lasting impact, you become part of a community connected by a shared belief: when women are empowered, possibilities are limitless.
-              </p>
-              <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 'var(--text-lg)', marginBottom: 'var(--space-4)' }}>
-                Find your place. Discover your purpose. Shape what comes next.
-              </p>
+              {content.ctaParagraphs.filter(Boolean).map((p, i) => (
+                <p key={i} style={{ color: 'rgba(255,255,255,0.8)', fontSize: 'var(--text-lg)', marginBottom: 'var(--space-4)' }}>{p}</p>
+              ))}
               <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: 'clamp(1.5rem, 3vw, 2.25rem)', fontWeight: 700, marginBottom: 0 }}>
-                Join VWU.
+                {content.ctaJoinLine}
               </p>
             </div>
             <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Link to="/apply-now" className="btn btn-accent btn-lg">Apply Now</Link>
+              <Link to="/apply-now" className="btn btn-accent btn-lg">{content.ctaButtonLabel}</Link>
             </div>
           </div>
         </div>

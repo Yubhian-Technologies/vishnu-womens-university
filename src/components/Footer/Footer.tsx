@@ -5,6 +5,8 @@ import { useSiteContact, telHref } from '../../hooks/useSiteContact';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { FOOTER_COLUMNS_COLLECTION, FOOTER_LINKS_COLLECTION, type FooterColumnDoc, type FooterLinkDoc } from '../../lib/footerLinks';
 import { InstagramIcon, FacebookIcon, TwitterIcon, LinkedInIcon, YouTubeIcon } from './SocialIcons';
+import { useDocument } from '../../hooks/useDocument';
+import { DEFAULT_SOCIAL_HANDLES, SOCIAL_HANDLES_COLLECTION, SOCIAL_HANDLES_DOC_ID, type SocialHandlesDoc } from '../../pages/Admin/sections/SocialHandlesAdmin';
 import SmoothCollapse from '../SmoothCollapse/SmoothCollapse';
 import './Footer.css';
 
@@ -30,13 +32,10 @@ function footerLinkToNavItem(l: FooterLinkDoc): FooterNavItem {
 /* Static Data & Navigation Structures                                        */
 /* -------------------------------------------------------------------------- */
 
-const SOCIAL_LINKS = [
-  { label: 'Instagram', href: 'http://instagram.com/vishnu_svecw/', Icon: InstagramIcon },
-  { label: 'Facebook', href: 'https://www.facebook.com/svecwcollege', Icon: FacebookIcon },
-  { label: 'Twitter / X', href: 'https://twitter.com/svecw2', Icon: TwitterIcon },
-  { label: 'LinkedIn', href: 'https://www.linkedin.com/school/vishnusvecw/', Icon: LinkedInIcon },
-  { label: 'YouTube', href: 'https://www.youtube.com/@SVECW-B0', Icon: YouTubeIcon },
-];
+// Icon per slot is structural/position-matched -- label/href come from the
+// settings/socialHandles doc (see SocialHandlesAdmin), shared with the
+// Social Media Handles page so the two can't drift out of sync.
+const SOCIAL_ICONS = [InstagramIcon, FacebookIcon, TwitterIcon, LinkedInIcon, YouTubeIcon];
 
 const UNIVERSITY_LINKS: { label: string; href: string; disabled?: boolean; external?: boolean }[] = [
   { label: 'About VWU', href: '/about' },
@@ -127,6 +126,8 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
   const accordionBaseId = useId();
   const { phone, email } = useSiteContact();
+  const { data: remoteSocialHandles } = useDocument<SocialHandlesDoc>(SOCIAL_HANDLES_COLLECTION, SOCIAL_HANDLES_DOC_ID);
+  const socialPlatforms = remoteSocialHandles?.platforms?.length === DEFAULT_SOCIAL_HANDLES.platforms.length ? remoteSocialHandles.platforms : DEFAULT_SOCIAL_HANDLES.platforms;
 
   // See the note atop this file — footerColumns is empty until an admin has
   // used "Load Existing Footer Links", so the fallback branch below (the
@@ -293,19 +294,22 @@ export default function Footer() {
         <div className="vwu-footer-inner vwu-footer-social-row">
           <span className="vwu-footer-social-label">Connect with Vishnu Women's University</span>
           <div className="vwu-footer-social-icons" aria-label="Social media channels">
-            {SOCIAL_LINKS.map((s) => (
-              <a
-                key={s.label}
-                href={s.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="vwu-footer-social-btn"
-                aria-label={`Visit VWU on ${s.label}`}
-                title={`Visit VWU on ${s.label}`}
-              >
-                <s.Icon size={16} />
-              </a>
-            ))}
+            {socialPlatforms.map((s, idx) => {
+              const Icon = SOCIAL_ICONS[idx % SOCIAL_ICONS.length];
+              return (
+                <a
+                  key={s.label}
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="vwu-footer-social-btn"
+                  aria-label={`Visit VWU on ${s.label}`}
+                  title={`Visit VWU on ${s.label}`}
+                >
+                  <Icon size={16} />
+                </a>
+              );
+            })}
           </div>
         </div>
       </div>
