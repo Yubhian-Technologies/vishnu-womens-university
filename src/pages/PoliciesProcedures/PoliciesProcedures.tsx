@@ -1,9 +1,14 @@
 import { useEffect } from 'react';
 import PageHero from '../../components/PageHero/PageHero';
 import PoliciesListSection from './PoliciesListSection';
+import { useDocument } from '../../hooks/useDocument';
+import { DEFAULT_POLICIES_INTRO, POLICIES_INTRO_COLLECTION, POLICIES_INTRO_DOC_ID, type PoliciesIntroDoc } from '../Admin/sections/PoliciesIntroAdmin';
 import '../detail-layout.css';
 
 export default function PoliciesProcedures() {
+  const { data: remoteIntro } = useDocument<PoliciesIntroDoc>(POLICIES_INTRO_COLLECTION, POLICIES_INTRO_DOC_ID);
+  const intro = remoteIntro?.paragraphs?.length ? remoteIntro.paragraphs : DEFAULT_POLICIES_INTRO.paragraphs;
+
   useEffect(() => {
     document.title = "Policies & Procedures | Vishnu Women's University";
   }, []);
@@ -19,16 +24,9 @@ export default function PoliciesProcedures() {
 
       <section className="section bg-white">
         <div className="container" style={{ maxWidth: 900 }}>
-          <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-5)' }}>
-            Vishnu Women's University has established a set of well-defined policies and standard operating procedures
-            to ensure effective governance, academic excellence, transparency, and continuous
-            institutional development.
-          </p>
-          <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-8)' }}>
-            These policies provide a structured framework for teaching–learning, research,
-            administration, student support, and campus sustainability, aligning with the
-            guidelines of statutory bodies such as AICTE and UGC.
-          </p>
+          {intro.filter(Boolean).map((p, i, arr) => (
+            <p key={i} style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: i === arr.length - 1 ? 'var(--space-8)' : 'var(--space-5)' }}>{p}</p>
+          ))}
 
           <PoliciesListSection />
         </div>

@@ -3,15 +3,15 @@ import { Megaphone, ExternalLink } from 'lucide-react';
 import PageHero from '../../components/PageHero/PageHero';
 import SEO from '../../components/SEO/SEO';
 import { getBreadcrumbSchema } from '../../lib/seo/schemas';
+import { useDocument } from '../../hooks/useDocument';
+import { DEFAULT_AICTE_FEEDBACK_CONTENT, AICTE_FEEDBACK_CONTENT_COLLECTION, AICTE_FEEDBACK_CONTENT_DOC_ID, type AicteFeedbackContentDoc } from '../Admin/sections/AicteFeedbackContentAdmin';
 import '../detail-layout.css';
 
-const feedbackLinks = [
-  { label: 'AICTE Feedback Portal', href: 'https://www.aicte-india.org/feedback/' },
-  { label: 'For Students', href: 'https://www.aicte-india.org/feedback/students.php' },
-  { label: 'For Staff', href: 'https://www.aicte-india.org/feedback/faculty.php' },
-];
-
 export default function AicteFeedback() {
+  const { data: remoteContent } = useDocument<AicteFeedbackContentDoc>(AICTE_FEEDBACK_CONTENT_COLLECTION, AICTE_FEEDBACK_CONTENT_DOC_ID);
+  const content = { ...DEFAULT_AICTE_FEEDBACK_CONTENT, ...remoteContent };
+  const feedbackLinks = content.links;
+
   useEffect(() => {
     document.title = "AICTE Feedback Facility | Vishnu Women's University";
   }, []);
@@ -49,9 +49,7 @@ export default function AicteFeedback() {
             </div>
 
             <p style={{ color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-6)' }}>
-              This is to inform all the faculty, staff and students that the feedback facility of
-              students and faculty is available in the AICTE Web-Portal. You may use the below
-              links to use this facility.
+              {content.notice}
             </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
