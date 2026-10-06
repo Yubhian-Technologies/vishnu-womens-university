@@ -17,6 +17,8 @@ import { useSitePhotos, useSitePhotosLoading } from '../../hooks/useSitePhotos';
 import { usePageBanners } from '../../hooks/usePageBanners';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import type { CampusLifeItemDoc } from '../Admin/sections/CampusLifeAdmin';
+import { useDocument } from '../../hooks/useDocument';
+import { DEFAULT_SOCIAL_SERVICES_CONTENT, SOCIAL_SERVICES_CONTENT_COLLECTION, SOCIAL_SERVICES_CONTENT_DOC_ID, type SocialServicesContentDoc } from '../Admin/sections/SocialServicesContentAdmin';
 import './SocialServicesPage.css';
 
 const HERO_DEFAULT = [{ src: '/images/campus-vibrant.jpeg', alt: 'NSS Social Services Community Outreach', caption: '' }];
@@ -26,6 +28,12 @@ const FOUNDER_DEFAULT = [{ src: '/images/governing-body-founder.jpg', alt: 'Padm
 // Admin → Website Photos → Student Life → Social Services (NSS), so an
 // admin-replaced photo for e.g. "Leprosy Care" always lands on that exact
 // card below regardless of gaps or upload order — see communityPhotoByAlt.
+// Icons for the 3 hero highlight tiles and the 6 core-value tiles are
+// position-matched and structural -- text comes from
+// SocialServicesContentAdmin's `highlights` / `coreValues` fields.
+const HIGHLIGHT_ICONS = [Users, GraduationCap, Sparkles];
+const CORE_VALUE_ICONS = [HeartHandshake, ShieldCheck, BookOpen, Users, Users, Leaf];
+
 const COMMUNITY_DEFAULTS = [
   { src: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=700&auto=format&fit=crop', alt: 'Rural Students', caption: '' },
   { src: 'https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?q=80&w=700&auto=format&fit=crop', alt: 'Leprosy Care', caption: '' },
@@ -39,6 +47,8 @@ export default function SocialServicesPage() {
   // Real-time Firestore subscription to campusLifeItems collection
   const { docs: items } = useOrderedCollection<CampusLifeItemDoc>('campusLifeItems', 'order');
   const firestoreDoc = items.find((i) => i.slug === 'social-services');
+  const { data: remoteContent } = useDocument<SocialServicesContentDoc>(SOCIAL_SERVICES_CONTENT_COLLECTION, SOCIAL_SERVICES_CONTENT_DOC_ID);
+  const content = { ...DEFAULT_SOCIAL_SERVICES_CONTENT, ...remoteContent };
 
   // This page's hero image can be set from EITHER admin screen — Hero
   // Banners (the same page='social-services' banner every other page's
@@ -156,35 +166,20 @@ export default function SocialServicesPage() {
         {/* Translucent Highlights Bar */}
         <div className="ss-hero-bar">
           <div className="ss-hero-bar-grid">
-            <div className="ss-bar-item">
-              <div className="ss-bar-icon">
-                <Users size={24} />
-              </div>
-              <div className="ss-bar-text">
-                <h4>Community Outreach</h4>
-                <p>Stronger communities, brighter futures</p>
-              </div>
-            </div>
-
-            <div className="ss-bar-item">
-              <div className="ss-bar-icon">
-                <GraduationCap size={24} />
-              </div>
-              <div className="ss-bar-text">
-                <h4>Student Volunteers</h4>
-                <p>Building skills, creating impact</p>
-              </div>
-            </div>
-
-            <div className="ss-bar-item">
-              <div className="ss-bar-icon">
-                <Sparkles size={24} />
-              </div>
-              <div className="ss-bar-text">
-                <h4>Social Initiatives</h4>
-                <p>Education | Health | Awareness</p>
-              </div>
-            </div>
+            {content.highlights.map((h, i) => {
+              const Icon = HIGHLIGHT_ICONS[i % HIGHLIGHT_ICONS.length];
+              return (
+                <div key={i} className="ss-bar-item">
+                  <div className="ss-bar-icon">
+                    <Icon size={24} />
+                  </div>
+                  <div className="ss-bar-text">
+                    <h4>{h.title}</h4>
+                    <p>{h.desc}</p>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -217,28 +212,22 @@ export default function SocialServicesPage() {
 
             {/* Right: Text & Quote */}
             <div className="ss-nss-content">
-              <span className="ss-pill-tag">NSS AT VWU</span>
+              <span className="ss-pill-tag">{content.nssTag}</span>
               <h2 className="ss-nss-title">
-                Serving the Nation<br />Through Education
+                {content.nssTitle}
               </h2>
 
               <div className="ss-nss-text">
-                <p>
-                  National integrity should flow from the heart of every citizen. Apart from academics, every student must involve in serving her country.
-                </p>
-                <p>
-                  At VWU, the National Service Scheme (NSS) is a meaningful part of student formation. The programme rests on the conviction that “Education and Service to the community and by the community” is the true basis of a complete education.
-                </p>
-                <p>
-                  Through NSS, students take part in nation-building work, strengthen their interpersonal abilities, and help foster a Technocratic Environment in rural communities — continuing the humanitarian values that our founder Dr. B. V. Raju embodied throughout his life.
-                </p>
+                {content.nssParagraphs.filter(Boolean).map((p, i) => (
+                  <p key={i}>{p}</p>
+                ))}
               </div>
 
               {/* Quote Box */}
               <div className="ss-nss-quote-box">
                 <span className="ss-quote-mark">“</span>
                 <p className="ss-quote-content">
-                  “Education and Service to the community and by the community.”
+                  “{content.nssQuote}”
                 </p>
               </div>
 
@@ -377,69 +366,23 @@ export default function SocialServicesPage() {
       <section className="ss-values-section">
         <div className="ss-section-inner">
           <div className="ss-section-title-wrap">
-            <h2 className="ss-main-title">Our Core Values</h2>
+            <h2 className="ss-main-title">{content.coreValuesHeading}</h2>
           </div>
 
           <div className="ss-values-grid-6">
-            {/* 01: Not Me But You */}
-            <div className="ss-value-item">
-              <span className="ss-value-num">01</span>
-              <div className="ss-value-icon-circle c-1">
-                <HeartHandshake size={24} />
-              </div>
-              <h3 className="ss-value-name">Not Me But You</h3>
-              <p className="ss-value-sub">Selfless service for better tomorrow.</p>
-            </div>
-
-            {/* 02: Service Before Self */}
-            <div className="ss-value-item">
-              <span className="ss-value-num">02</span>
-              <div className="ss-value-icon-circle c-2">
-                <ShieldCheck size={24} />
-              </div>
-              <h3 className="ss-value-name">Service Before Self</h3>
-              <p className="ss-value-sub">Putting community needs first.</p>
-            </div>
-
-            {/* 03: Education Through Community */}
-            <div className="ss-value-item">
-              <span className="ss-value-num">03</span>
-              <div className="ss-value-icon-circle c-3">
-                <BookOpen size={24} />
-              </div>
-              <h3 className="ss-value-name">Education Through Community</h3>
-              <p className="ss-value-sub">Learning, sharing, growing together.</p>
-            </div>
-
-            {/* 04: Nation Building Through Youth */}
-            <div className="ss-value-item">
-              <span className="ss-value-num">04</span>
-              <div className="ss-value-icon-circle c-4">
-                <Users size={24} />
-              </div>
-              <h3 className="ss-value-name">Nation Building Through Youth</h3>
-              <p className="ss-value-sub">Empowered youth, for a stronger nation.</p>
-            </div>
-
-            {/* 05: Inclusive Development */}
-            <div className="ss-value-item">
-              <span className="ss-value-num">05</span>
-              <div className="ss-value-icon-circle c-5">
-                <Users size={24} />
-              </div>
-              <h3 className="ss-value-name">Inclusive Development</h3>
-              <p className="ss-value-sub">Equal opportunities for all.</p>
-            </div>
-
-            {/* 06: Rural Empowerment */}
-            <div className="ss-value-item">
-              <span className="ss-value-num">06</span>
-              <div className="ss-value-icon-circle c-6">
-                <Leaf size={24} />
-              </div>
-              <h3 className="ss-value-name">Rural Empowerment</h3>
-              <p className="ss-value-sub">Stronger villages, brighter futures.</p>
-            </div>
+            {content.coreValues.map((v, i) => {
+              const Icon = CORE_VALUE_ICONS[i % CORE_VALUE_ICONS.length];
+              return (
+                <div key={i} className="ss-value-item">
+                  <span className="ss-value-num">{String(i + 1).padStart(2, '0')}</span>
+                  <div className={`ss-value-icon-circle c-${i + 1}`}>
+                    <Icon size={24} />
+                  </div>
+                  <h3 className="ss-value-name">{v.title}</h3>
+                  <p className="ss-value-sub">{v.desc}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -467,7 +410,7 @@ export default function SocialServicesPage() {
                     overrides this quote so it can be rewritten alongside
                     the photo. */}
                 <p className="ss-founder-quote-text">
-                  {founderPhotos[0]?.caption || '“Service to humanity is the highest form of education.”'}
+                  {founderPhotos[0]?.caption || `“${content.founderQuoteFallback}”`}
                 </p>
                 <p className="ss-founder-name">- Dr. B. V. Raju</p>
               </div>
@@ -477,12 +420,9 @@ export default function SocialServicesPage() {
             <div className="ss-legacy-text">
               <span className="ss-pill-tag">FOUNDER'S LEGACY</span>
               <h2 className="ss-nss-title">Dr. B. V. Raju Foundation</h2>
-              <p>
-                VWU's ethos of service has deep roots in the life of our founder, the late Padma Bhushan Dr. B. V. Raju, who devoted his later years to humanitarian causes — building leprosy care centres, schools, women's associations, community halls, and veterinary facilities in surrounding villages, all without government support.
-              </p>
-              <p>
-                The Dr. B. V. Raju Foundation continues this tradition today. VWU students take an active part in this mission, channelling their technical knowledge, empathy, and sense of purpose into communities that genuinely need both.
-              </p>
+              {content.founderParagraphs.filter(Boolean).map((p, i) => (
+                <p key={i}>{p}</p>
+              ))}
             </div>
           </div>
         </div>

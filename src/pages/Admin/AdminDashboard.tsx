@@ -70,6 +70,7 @@ import PoliciesIntroAdmin from './sections/PoliciesIntroAdmin';
 import UGCDisclosureContentAdmin from './sections/UGCDisclosureContentAdmin';
 import FitnessCentreContentAdmin from './sections/FitnessCentreContentAdmin';
 import SewageTreatmentContentAdmin from './sections/SewageTreatmentContentAdmin';
+import SocialServicesContentAdmin from './sections/SocialServicesContentAdmin';
 import InsightsAdmin from './sections/InsightsAdmin';
 import CareerGuidanceInterestAdmin from './sections/CareerGuidanceInterestAdmin';
 import ResearchItemsAdmin from './sections/ResearchItemsAdmin';
@@ -195,6 +196,7 @@ const SECTION_MAP: Record<string, React.ReactNode> = {
   'ugc-disclosure-content': <UGCDisclosureContentAdmin />,
   'fitness-centre-content': <FitnessCentreContentAdmin />,
   'sewage-treatment-content': <SewageTreatmentContentAdmin />,
+  'social-services-content': <SocialServicesContentAdmin />,
   insights: <InsightsAdmin />,
   'career-guidance-interest': <CareerGuidanceInterestAdmin />,
   'research-items': <ResearchItemsAdmin />,
