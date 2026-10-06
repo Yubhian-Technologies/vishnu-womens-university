@@ -5,6 +5,7 @@ import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
 import ImageUploader from '../../../components/ImageUploader/ImageUploader';
 import type { UploadResult } from '../../../lib/storage';
+import { NEWS_CATEGORIES } from '../../../lib/news';
 
 export interface HappeningDoc {
   id: string;
@@ -16,6 +17,9 @@ export interface HappeningDoc {
   imageUrl?: string;
   storagePath?: string;
   description?: string;
+  // Same category set as News & Events (lib/news.ts) — optional so existing
+  // happenings saved before this field existed still load fine.
+  category?: string;
 }
 
 export interface AwardDoc {
@@ -42,7 +46,7 @@ export interface HappeningsShowcaseDoc {
 
 export type StudentAchievementDoc = HappeningsShowcaseDoc;
 
-const EMPTY_HAPPENING: Omit<HappeningDoc, 'id'> = { title: '', date: '', type: 'recent', dept: '', order: 0, imageUrl: '', storagePath: '', description: '' };
+const EMPTY_HAPPENING: Omit<HappeningDoc, 'id'> = { title: '', date: '', type: 'recent', dept: '', order: 0, imageUrl: '', storagePath: '', description: '', category: 'News' };
 const EMPTY_AWARD: Omit<AwardDoc, 'id'> = { name: '', issuedBy: '', year: '', details: '', category: 'ranking', order: 0 };
 const EMPTY_SHOWCASE: Omit<HappeningsShowcaseDoc, 'id'> = {
   title: '',
@@ -338,7 +342,7 @@ function HappeningsPanel() {
 
   const startEdit = (it: HappeningDoc) => {
     setEditing(it.id);
-    setForm({ title: it.title, date: it.date, type: it.type, dept: it.dept || '', order: it.order, imageUrl: it.imageUrl || '', storagePath: it.storagePath || '', description: it.description || '' });
+    setForm({ title: it.title, date: it.date, type: it.type, dept: it.dept || '', order: it.order, imageUrl: it.imageUrl || '', storagePath: it.storagePath || '', description: it.description || '', category: it.category || 'News' });
   };
 
   const remove = async (id: string) => {
@@ -364,6 +368,12 @@ function HappeningsPanel() {
             <select id="field-type" value={form.type} onChange={(e) => set('type', e.target.value)}>
               <option value="recent">Recent Event</option>
               <option value="upcoming">Upcoming Event</option>
+            </select>
+          </div>
+          <div className="admin-field">
+            <label htmlFor="field-category">Category</label>
+            <select id="field-category" value={form.category || 'News'} onChange={(e) => set('category', e.target.value)}>
+              {NEWS_CATEGORIES.map((c) => <option key={c}>{c}</option>)}
             </select>
           </div>
           <div className="admin-field">
@@ -399,20 +409,20 @@ function HappeningsPanel() {
         {loading ? <p className="admin-loading">Loading…</p> : (
           <div className="admin-table-wrap">
             <table className="admin-table">
-              <thead><tr><th>Order</th><th>Photo</th><th>Title</th><th>Date</th><th>Type</th><th>Dept</th><th>Actions</th></tr></thead>
+              <thead><tr><th>Order</th><th>Photo</th><th>Title</th><th>Date</th><th>Type</th><th>Category</th><th>Dept</th><th>Actions</th></tr></thead>
               <tbody>
                 {items.map((it) => (
                   <tr key={it.id}>
                     <td>{it.order}</td>
                     <td>{it.imageUrl ? <img src={it.imageUrl} alt={it.title} style={{ width: 44, height: 28, objectFit: 'cover' }} /> : <span style={{ color: '#9ca3af' }}>None</span>}</td>
-                    <td>{it.title}</td><td>{it.date}</td><td><span className={`admin-badge admin-badge--${it.type}`}>{it.type}</span></td><td>{it.dept || '—'}</td>
+                    <td>{it.title}</td><td>{it.date}</td><td><span className={`admin-badge admin-badge--${it.type}`}>{it.type}</span></td><td>{it.category || 'News'}</td><td>{it.dept || '—'}</td>
                     <td>
                       <button className="admin-btn admin-btn--sm" onClick={() => startEdit(it)}>Edit</button>
                       <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(it.id)}>Delete</button>
                     </td>
                   </tr>
                 ))}
-                {items.length === 0 && <tr><td colSpan={7} className="admin-empty">No happenings yet.</td></tr>}
+                {items.length === 0 && <tr><td colSpan={8} className="admin-empty">No happenings yet.</td></tr>}
               </tbody>
             </table>
           </div>
