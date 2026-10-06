@@ -14,6 +14,8 @@ import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import { groupForDeptShortCode } from '../../lib/departmentGroups';
 import { Radio } from 'lucide-react';
 import { renderBold } from '../../lib/boldText';
+import { useDocument } from '../../hooks/useDocument';
+import { DEFAULT_ACADEMICS_CONTENT, ACADEMICS_CONTENT_COLLECTION, ACADEMICS_CONTENT_DOC_ID, type AcademicsContentDoc } from '../Admin/sections/AcademicsContentAdmin';
 
 const defaultAcademicsPhotos = [
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Smart lecture halls', caption: 'Smart Lecture Halls' },
@@ -166,6 +168,8 @@ export default function Academics() {
   const studentActivities = useContentBlocks('academics', 'studentActivities');
   const careerOutcomeStats = useContentBlocks('academics', 'careerOutcomeStats');
   const eapcetCode = useEapcetCode();
+  const { data: remoteAcademicsContent } = useDocument<AcademicsContentDoc>(ACADEMICS_CONTENT_COLLECTION, ACADEMICS_CONTENT_DOC_ID);
+  const academicsContent = { ...DEFAULT_ACADEMICS_CONTENT, ...remoteAcademicsContent };
 
   useEffect(() => {
     document.title = "Academics | Vishnu Women's University";
@@ -258,9 +262,9 @@ export default function Academics() {
       <section className="academics-programs-section">
         <div className="container">
           <div className="reveal">
-            <h2 className="section-title">Explore Your Options</h2>
+            <h2 className="section-title">{academicsContent.programsHeading}</h2>
             <p className="section-desc" style={{ marginBottom: 'var(--space-8)' }}>
-              Whether you are beginning your B.Tech, advancing to M.Tech, or pursuing doctoral research — VWU offers a program matched to your goals.
+              {academicsContent.programsDesc}
             </p>
           </div>
 
@@ -337,9 +341,9 @@ export default function Academics() {
       <section className="section bg-white">
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>
-            <h2 className="section-title">Academic Departments</h2>
+            <h2 className="section-title">{academicsContent.deptHeading}</h2>
             <p className="section-desc" style={{ margin: '0 auto' }}>
-              Specialised departments bringing together experienced faculty, modern laboratories, and industry-aligned curricula for relevant and future-ready education.
+              {academicsContent.deptDesc}
             </p>
           </div>
           <div className="dept-grid">
@@ -408,9 +412,9 @@ export default function Academics() {
       <section className="section bg-off-white">
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-10)' }}>
-            <h2 className="section-title">Beyond the Classroom</h2>
+            <h2 className="section-title">{academicsContent.activitiesHeading}</h2>
             <p className="section-desc" style={{ margin: '0 auto var(--space-8)' }}>
-              From managing a campus radio station to competing at inter-collegiate sports meets — there is a great deal more to life at VWU than lectures alone.
+              {academicsContent.activitiesDesc}
             </p>
           </div>
           <div className="activities-grid">
@@ -467,9 +471,9 @@ export default function Academics() {
         <div className="container">
           <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-12)', alignItems: 'center' }}>
             <div className="reveal-left">
-              <h2 className="section-title">Where VWU Engineers Go</h2>
+              <h2 className="section-title">{academicsContent.placementsHeading}</h2>
               <p style={{ color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-6)' }}>
-                The Training & Placement Cell maintains year-round engagement with India's leading employers — including Amazon, TCS, Infosys, Wipro, HCL, Cognizant, and 150+ other companies.
+                {academicsContent.placementsParagraph}
               </p>
               <Link to="/placements/placement-details" className="btn btn-primary">Explore →</Link>
             </div>
@@ -493,15 +497,9 @@ export default function Academics() {
           <PhotoGrid
             images={academicsPhotos}
             label="Academic Life"
-            title="Learning, Research & Innovation"
-            subtitle="Inside VWU's labs, classrooms, and events — where students are trained to think, build, and lead."
-            highlights={[
-              '10 B.Tech specialisations with UGC Autonomous curriculum',
-              '50+ specialised labs across all departments',
-              '200+ smart classrooms with interactive boards',
-              'IEEE, Springer & NPTEL digital library access',
-              'Industry-sponsored research & funded projects',
-            ]}
+            title={academicsContent.galleryTitle}
+            subtitle={academicsContent.gallerySubtitle}
+            highlights={academicsContent.galleryHighlights.filter(Boolean)}
             columns={2}
             layout="side-text-reverse"
             showGalleryLink={false}
@@ -544,9 +542,9 @@ export default function Academics() {
       <section className="section" style={{ background: 'var(--color-primary)' }}>
         <div className="container" style={{ textAlign: 'center' }}>
           <div className="reveal">
-            <h2 className="section-title" style={{ color: 'var(--color-white)' }}>Ready to Join VWU?</h2>
+            <h2 className="section-title" style={{ color: 'var(--color-white)' }}>{academicsContent.ctaHeading}</h2>
             <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 'var(--text-lg)', maxWidth: 560, margin: '0 auto var(--space-8)' }}>
-              Arrange a campus visit, request further information, or apply through AP EAPCET (Code: {eapcetCode}) today.
+              {academicsContent.ctaParagraph.replace('{eapcetCode}', eapcetCode)}
             </p>
             <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
               <Link to="/admissions" className="btn btn-accent btn-lg">Apply via AP EAPCET</Link>
