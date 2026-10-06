@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ArrowRight, ChevronDown, ArrowUpRight } from 'lucide-react';
+import { ArrowRight, ChevronDown, ArrowUpRight, GraduationCap, Briefcase, FileText, ChevronRight, PhoneCall } from 'lucide-react';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useNavLinkOverride } from '../../hooks/useNavLinkOverride';
 import { DIFFERENTIATOR_CATEGORIES } from '../../pages/Admin/sections/DifferentiatorsAdmin';
@@ -77,6 +77,7 @@ export default function Header() {
     height: 0,
     opacity: 0,
   });
+  const [isCtaOpen, setIsCtaOpen] = useState(false);
 
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
   const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
@@ -150,6 +151,7 @@ export default function Header() {
     setExpandedItem(null);
     setExpandedGroup(null);
     setOpenItem(null);
+    setIsCtaOpen(false);
     setHoverPillStyle((prev) => ({ ...prev, opacity: 0 }));
   }, [location]);
 
@@ -374,27 +376,142 @@ export default function Header() {
 
           {/* Right Action & Mobile Trigger */}
           <div className="navbar-actions">
-            {/* Desktop CTA Pill */}
-            {headerApplyNow.external ? (
-              <a
-                href={headerApplyNow.path}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="navbar-cta-btn"
-              >
-                <span>Apply Now</span>
-                <span className="navbar-cta-icon-wrap">
-                  <ArrowRight size={14.6} strokeWidth={2.5} aria-hidden="true" />
-                </span>
-              </a>
-            ) : (
-              <Link to={headerApplyNow.path} className="navbar-cta-btn">
-                <span>Apply Now</span>
-                <span className="navbar-cta-icon-wrap">
-                  <ArrowRight size={14.6} strokeWidth={2.5} aria-hidden="true" />
-                </span>
-              </Link>
-            )}
+            {/* Desktop CTA Pill with Enhanced Dropdown */}
+            <div
+              className={`navbar-cta-dropdown${isCtaOpen ? ' is-active' : ''}`}
+              onMouseEnter={() => setIsCtaOpen(true)}
+              onMouseLeave={() => setIsCtaOpen(false)}
+            >
+              {headerApplyNow.external ? (
+                <a
+                  href={headerApplyNow.path}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="navbar-cta-btn"
+                  aria-haspopup="true"
+                  aria-expanded={isCtaOpen}
+                >
+                  <span>Apply Now</span>
+                  <span className="navbar-cta-icon-wrap">
+                    <ChevronDown size={14.6} strokeWidth={2.5} className="navbar-cta-chevron" aria-hidden="true" />
+                  </span>
+                </a>
+              ) : (
+                <Link
+                  to={headerApplyNow.path}
+                  className="navbar-cta-btn"
+                  aria-haspopup="true"
+                  aria-expanded={isCtaOpen}
+                >
+                  <span>Apply Now</span>
+                  <span className="navbar-cta-icon-wrap">
+                    <ChevronDown size={14.6} strokeWidth={2.5} className="navbar-cta-chevron" aria-hidden="true" />
+                  </span>
+                </Link>
+              )}
+
+              <div className="navbar-cta-menu" role="menu" aria-label="Application Options">
+                <div className="navbar-cta-menu-header">
+                  <span className="navbar-cta-menu-title">
+                    <span className="navbar-cta-pulse-dot" aria-hidden="true" />
+                    Select Application Type
+                  </span>
+                  <span className="navbar-cta-header-tag">2026–27</span>
+                </div>
+
+                <div className="navbar-cta-menu-list">
+                  {/* Option 1: Admissions */}
+                  {headerApplyNow.external ? (
+                    <a
+                      href={headerApplyNow.path}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="navbar-cta-item-link"
+                      role="menuitem"
+                      onClick={() => setIsCtaOpen(false)}
+                    >
+                      <div className="navbar-cta-item-icon">
+                        <GraduationCap size={19} strokeWidth={2.2} />
+                      </div>
+                      <div className="navbar-cta-item-content">
+                        <div className="navbar-cta-item-title">
+                          Student Admissions
+                          <span className="navbar-cta-item-badge">Open</span>
+                        </div>
+                        <span className="navbar-cta-item-sub">B.Tech, M.Tech, MBA & Ph.D</span>
+                      </div>
+                      <ChevronRight size={15} className="navbar-cta-item-arrow" aria-hidden="true" />
+                    </a>
+                  ) : (
+                    <Link
+                      to={headerApplyNow.path}
+                      className="navbar-cta-item-link"
+                      role="menuitem"
+                      onClick={() => setIsCtaOpen(false)}
+                    >
+                      <div className="navbar-cta-item-icon">
+                        <GraduationCap size={19} strokeWidth={2.2} />
+                      </div>
+                      <div className="navbar-cta-item-content">
+                        <div className="navbar-cta-item-title">
+                          Student Admissions
+                          <span className="navbar-cta-item-badge">Open</span>
+                        </div>
+                        <span className="navbar-cta-item-sub">B.Tech, M.Tech, MBA & Ph.D</span>
+                      </div>
+                      <ChevronRight size={15} className="navbar-cta-item-arrow" aria-hidden="true" />
+                    </Link>
+                  )}
+
+                  {/* Option 2: Careers */}
+                  <Link
+                    to="/careers"
+                    className="navbar-cta-item-link"
+                    role="menuitem"
+                    onClick={() => setIsCtaOpen(false)}
+                  >
+                    <div className="navbar-cta-item-icon navbar-cta-icon--careers">
+                      <Briefcase size={19} strokeWidth={2.2} />
+                    </div>
+                    <div className="navbar-cta-item-content">
+                      <div className="navbar-cta-item-title">
+                        Careers at VWU
+                        <span className="navbar-cta-item-badge navbar-cta-badge--hiring">Hiring</span>
+                      </div>
+                      <span className="navbar-cta-item-sub">Faculty & Staff Vacancies</span>
+                    </div>
+                    <ChevronRight size={15} className="navbar-cta-item-arrow" aria-hidden="true" />
+                  </Link>
+
+                  {/* Option 3: Procedure & Fees */}
+                  <Link
+                    to="/admission-procedure"
+                    className="navbar-cta-item-link"
+                    role="menuitem"
+                    onClick={() => setIsCtaOpen(false)}
+                  >
+                    <div className="navbar-cta-item-icon navbar-cta-icon--guide">
+                      <FileText size={19} strokeWidth={2.2} />
+                    </div>
+                    <div className="navbar-cta-item-content">
+                      <div className="navbar-cta-item-title">
+                        Procedure & Fees
+                      </div>
+                      <span className="navbar-cta-item-sub">Eligibility, steps & fee details</span>
+                    </div>
+                    <ChevronRight size={15} className="navbar-cta-item-arrow" aria-hidden="true" />
+                  </Link>
+                </div>
+
+                <div className="navbar-cta-menu-footer">
+                  <span>Admissions Helpline</span>
+                  <a href="tel:08816250864" className="navbar-cta-menu-footer-link">
+                    <PhoneCall size={12} aria-hidden="true" />
+                    <span>08816-250864</span>
+                  </a>
+                </div>
+              </div>
+            </div>
 
             {/* Mobile 2-Bar Animated Toggle */}
             <button
