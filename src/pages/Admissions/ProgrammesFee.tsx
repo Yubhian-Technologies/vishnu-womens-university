@@ -247,7 +247,7 @@ export default function ProgrammesFee() {
                 <tr style={{ background: 'var(--color-white)' }}>
                   <td style={{ ...tableCell, color: 'var(--color-accent)', fontWeight: 900 }}>01</td>
                   <td style={{ ...tableCell, fontWeight: 600, color: 'var(--color-primary)' }}>Master of Business Administration</td>
-                  <td style={tableCell}></td>
+                  <td style={tableCell}>MBA</td>
                   <td style={{ ...tableCell, textAlign: 'center', fontWeight: 700 }}>60</td>
                   <td style={{ ...tableCell, textAlign: 'center', fontWeight: 700, color: 'var(--color-primary)' }}>{MBA_FEE}</td>
                   <td style={{ ...tableCell, textAlign: 'center' }}>ICET</td>
