@@ -15,6 +15,7 @@ import PopupOverlay from './components/PopupOverlay/PopupOverlay';
 import { smoothScrollTo } from './lib/smoothScroll';
 import { lazyWithRetry } from './lib/lazyWithRetry';
 import { useRevealSafetyNet } from './hooks/useRevealSafetyNet';
+import { initAnalytics, trackPageview } from './lib/analytics';
 
 const Academics = lazyWithRetry(() => import('./pages/Academics/Academics'));
 const ProgramDetail = lazyWithRetry(() => import('./pages/Academics/ProgramDetail'));
@@ -129,6 +130,14 @@ function RouteScrollReset() {
 function PublicApp() {
   const location = useLocation();
   useRevealSafetyNet();
+
+  useEffect(() => {
+    initAnalytics();
+  }, []);
+
+  useEffect(() => {
+    trackPageview(location.pathname + location.search);
+  }, [location.pathname, location.search]);
 
   return (
     <>
