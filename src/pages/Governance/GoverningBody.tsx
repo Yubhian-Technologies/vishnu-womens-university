@@ -13,6 +13,9 @@ export interface GoverningBodyMember {
   order: number;
 }
 
+
+
+
 export const defaultMembers: Omit<GoverningBodyMember, 'id'>[] = [
   { name: 'Sri K.V. Vishnu Raju', position: 'Chairman, SVES', category: 'Management', order: 1 },
   { name: 'Sri Ravichandran Rajagopal', position: 'Vice-Chancellor, SVES', category: 'Management', order: 2 },
