@@ -257,8 +257,30 @@
 .lpe-section--dark .lpe-stat__label { opacity: 0.65; }
 
 @media (max-width: 640px) {
-  .lpe-hero { align-items: flex-end; min-height: 92vh; }
-  .lpe-hero__content { padding-top: 3rem; padding-bottom: 2.5rem; }
+  .lpe-hero {
+    margin-top: 96px !important;
+    align-items: flex-end;
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 16 / 9 !important;
+    min-height: unset !important;
+    max-height: unset !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    overflow: hidden;
+  }
+  .lpe-hero__content {
+    padding: 1rem !important;
+  }
+  .lpe-hero__headline {
+    font-size: clamp(1.05rem, 4.5vw, 1.45rem) !important;
+    line-height: 1.2 !important;
+  }
+  .lpe-hero__lede {
+    font-size: 0.78rem !important;
+    line-height: 1.35 !important;
+    margin-bottom: 0.5rem !important;
+  }
   .lpe-hero__scroll-cue { display: none; }
 }
 
