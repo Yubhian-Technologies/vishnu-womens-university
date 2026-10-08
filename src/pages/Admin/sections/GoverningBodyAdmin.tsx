@@ -5,10 +5,11 @@ import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
 import ImageUploader from '../../../components/ImageUploader/ImageUploader';
 import type { UploadResult } from '../../../lib/storage';
+import { GOVERNING_BODY_DEFAULTS } from '../../Governance/governingBody.data';
 
 export interface GoverningBodyDoc {
   id: string;
-  category: string;
+  number?: number;
   nature: string;
   name: string;
   org?: string;
@@ -19,7 +20,6 @@ export interface GoverningBodyDoc {
 }
 
 const EMPTY: Omit<GoverningBodyDoc, 'id'> = {
-  category: 'Category (A): Ex-Officio Members',
   nature: '',
   name: '',
   org: '',
@@ -29,117 +29,14 @@ const EMPTY: Omit<GoverningBodyDoc, 'id'> = {
   order: 0,
 };
 
-const CATEGORIES = [
-  'Category (A): Ex-Officio Members',
-  'Category (B): Nominated Members',
-];
-
-const DEFAULT_GB_TABLE_MEMBERS: Omit<GoverningBodyDoc, 'id'>[] = [
-  {
-    category: 'Category (A): Ex-Officio Members',
-    nature: 'Chancellor of the University',
-    name: 'Sri K.V. Vishnu Raju',
-    org: '',
-    position: 'Chancellor of the University',
-    order: 1,
-  },
-  {
-    category: 'Category (A): Ex-Officio Members',
-    nature: 'Vice-Chancellor of the University',
-    name: 'Dr. K V N Sunitha',
-    org: '',
-    position: 'Vice-Chancellor of the University',
-    order: 2,
-  },
-  {
-    category: 'Category (A): Ex-Officio Members',
-    nature: 'Chairman, APSCHE',
-    name: 'Prof. S. Vijaya Bhaskara Rao',
-    org: '',
-    position: 'Chairman, APSCHE',
-    order: 3,
-  },
-  {
-    category: 'Category (A): Ex-Officio Members',
-    nature: 'Secretary, Govt. of AP, HE Department',
-    name: '',
-    org: '',
-    position: 'Secretary, Govt. of AP, HE Department',
-    order: 4,
-  },
-  {
-    category: 'Category (A): Ex-Officio Members',
-    nature: 'Registrar of the University',
-    name: 'Dr. P Srinivasa Raju',
-    org: '',
-    position: 'Registrar of the University',
-    order: 5,
-  },
-  {
-    category: 'Category (B): Nominated Members',
-    nature: 'An eminent academician from the field of science/engineering & Technology/social sciences/Law/Management',
-    name: 'Dr. Seema Varma',
-    org: 'NITTTR, Bhopal',
-    position: 'NITTTR, Bhopal',
-    order: 6,
-  },
-  {
-    category: 'Category (B): Nominated Members',
-    nature: 'The director of National Laboratory or his/her nominee not below the rank of Scientist G',
-    name: 'Dr Uma',
-    org: 'ISRO Scientist G',
-    position: 'ISRO Scientist G',
-    order: 7,
-  },
-  {
-    category: 'Category (B): Nominated Members',
-    nature: 'Nominee of CII',
-    name: '',
-    org: '',
-    position: 'Nominee of CII',
-    order: 8,
-  },
-  {
-    category: 'Category (B): Nominated Members',
-    nature: 'A reputed Chartered Accountant',
-    name: '',
-    org: '',
-    position: 'A reputed Chartered Accountant',
-    order: 9,
-  },
-  {
-    category: 'Category (B): Nominated Members',
-    nature: 'A Member from public life who has contributed significantly to societal/national development',
-    name: '',
-    org: '',
-    position: 'A Member from public life',
-    order: 10,
-  },
-  {
-    category: 'Category (B): Nominated Members',
-    nature: 'A Member of the sponsoring body',
-    name: 'Shri Ravi Chandran Rajagopal',
-    org: 'Vice Chairman, SVES',
-    position: 'Vice Chairman, SVES',
-    order: 11,
-  },
-  {
-    category: 'Category (B): Nominated Members',
-    nature: 'Nominee by the sponsoring Body',
-    name: 'Mr K Aditya Vissam',
-    org: 'Secretary, SVES',
-    position: 'Secretary, SVES',
-    order: 12,
-  },
-  {
-    category: 'Category (B): Nominated Members',
-    nature: 'Nominee by the Sponsoring Body',
-    name: 'Dr G Srinivasa Rao',
-    org: 'Pro Vice-Chancellor, VWU',
-    position: 'Pro Vice-Chancellor, VWU',
-    order: 13,
-  },
-];
+const DEFAULT_GB_TABLE_MEMBERS: Omit<GoverningBodyDoc, 'id'>[] = GOVERNING_BODY_DEFAULTS.map((m, i) => ({
+  nature: m.details,
+  number: m.number,
+  name: m.name,
+  org: '',
+  position: m.details,
+  order: i + 1,
+}));
 
 export default function GoverningBodyAdmin() {
   const { docs: members, loading } = useOrderedCollection<GoverningBodyDoc>('governingBody', 'order');
@@ -184,7 +81,7 @@ export default function GoverningBodyAdmin() {
   const handleImage = (r: UploadResult) => setForm((p) => ({ ...p, photoUrl: r.url, storagePath: r.path }));
 
   const save = async () => {
-    if (!form.nature) return alert('Nature / Statutory Role is required.');
+    if (!form.nature) return alert('Details is required.');
     setSaving(true);
     try {
       const payload = {
@@ -209,7 +106,7 @@ export default function GoverningBodyAdmin() {
   const startEdit = (m: GoverningBodyDoc) => {
     setEditing(m.id);
     setForm({
-      category: m.category || 'Category (A): Ex-Officio Members',
+      number: m.number,
       nature: m.nature || m.position || '',
       name: m.name || '',
       org: m.org || '',
@@ -230,7 +127,7 @@ export default function GoverningBodyAdmin() {
   };
 
   const seedWebsiteDefaults = async () => {
-    if (!confirm('Populate Governing Body table with standard website statutory entries?')) return;
+    if (!confirm('Populate Governing Body table with the current official member list?')) return;
     setSeeding(true);
     try {
       const batch = writeBatch(db);
@@ -268,25 +165,23 @@ export default function GoverningBodyAdmin() {
       <div className="admin-card">
         <h2 className="admin-card__title">{editing ? 'Edit Governing Body Member' : 'Add Governing Body Member'}</h2>
         <p className="admin-lead" style={{ marginBottom: '1rem' }}>
-          Matches the statutory Governing Body composition table on the live website (Category A: Ex-Officio Members and Category B: Nominated Members).
+          Matches the Governing Body table on the live website (Number, Name, Details).
         </p>
         <div className="admin-form-grid">
           <div className="admin-field">
-            <label htmlFor="field-category">Category *</label>
-            <select id="field-category" value={form.category} onChange={(e) => set('category', e.target.value)}>
-              {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
-            </select>
+            <label htmlFor="field-number">Number (as printed)</label>
+            <input id="field-number" type="number" value={form.number ?? ''} onChange={(e) => setForm((p) => ({ ...p, number: e.target.value === '' ? undefined : Number(e.target.value) }))} />
           </div>
           <div className="admin-field">
-            <label htmlFor="field-nature">Nature / Statutory Role *</label>
-            <input id="field-nature" value={form.nature} onChange={(e) => set('nature', e.target.value)} placeholder="Chancellor of the University" />
+            <label htmlFor="field-nature">Details *</label>
+            <input id="field-nature" value={form.nature} onChange={(e) => set('nature', e.target.value)} placeholder="Chancellor of the University & Chairman of SVES" />
           </div>
           <div className="admin-field">
             <label htmlFor="field-full-name">Name of the Member</label>
             <input id="field-full-name" value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="Sri K.V. Vishnu Raju" />
           </div>
           <div className="admin-field">
-            <label htmlFor="field-org">Organization / Details (optional)</label>
+            <label htmlFor="field-org">Additional details (optional)</label>
             <input id="field-org" value={form.org} onChange={(e) => set('org', e.target.value)} placeholder="Vice Chairman, SVES or NITTTR, Bhopal" />
           </div>
           <div className="admin-field">
@@ -332,10 +227,9 @@ export default function GoverningBodyAdmin() {
                 <tr>
                   <th></th>
                   <th>Order</th>
-                  <th>Category</th>
-                  <th>Nature / Role</th>
+                  <th>No.</th>
+                  <th>Details</th>
                   <th>Name of Member</th>
-                  <th>Organization / Details</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -352,11 +246,10 @@ export default function GoverningBodyAdmin() {
                   >
                     <td style={{ color: 'var(--color-text-light, #9ca3af)', fontSize: '1.1rem', userSelect: 'none' }}>⠿</td>
                     <td>{m.order || i + 1}</td>
-                    <td><span className="admin-badge admin-badge--sm">{m.category}</span></td>
-                    <td><strong>{m.nature || m.position}</strong></td>
+                    <td>{m.number ?? '-'}</td>
+                  <td><strong>{m.nature || m.position}</strong></td>
                     <td>{m.name || <em style={{ color: '#9ca3af' }}>—</em>}</td>
-                    <td>{m.org || m.position || <em style={{ color: '#9ca3af' }}>—</em>}</td>
-                    <td>
+                  <td>
                       <button className="admin-btn admin-btn--sm" onClick={() => startEdit(m)}>Edit</button>
                       <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(m.id)}>Delete</button>
                     </td>
@@ -364,7 +257,7 @@ export default function GoverningBodyAdmin() {
                 ))}
                 {members.length === 0 && (
                   <tr>
-                    <td colSpan={7} className="admin-empty">
+                    <td colSpan={6} className="admin-empty">
                       No Governing Body members yet. Click &quot;Populate Website Statutory Table&quot; or use the form above to add members.
                     </td>
                   </tr>
