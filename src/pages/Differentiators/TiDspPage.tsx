@@ -432,7 +432,7 @@ export default function TiDspPage({
                       <tbody>
                         {block.rows.map((row, rIdx) => (
                           <tr key={rIdx}>
-                            {row.map((cell, cIdx) => (
+                            {row.cells.map((cell, cIdx) => (
                               <td key={cIdx}>{cell}</td>
                             ))}
                           </tr>
