@@ -179,7 +179,7 @@ export default function AboutSVES() {
             )}
             <div className="reveal-right">
               <h2 className="section-title">
-                {legacyVisionBlocks[0]?.title || 'A Vision That Began in 1992'}
+                {legacyVisionBlocks[0]?.title || content.legacyHeading || 'A Vision That Began in 1992'}
               </h2>
               <div className="divider" style={{ margin: '0 0 var(--space-4) 0' }} />
               {legacyVisionBlocks.length > 0 ? (
@@ -189,17 +189,11 @@ export default function AboutSVES() {
                   </p>
                 ))
               ) : (
-                <>
-                  <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-4)', color: 'var(--color-text-light)' }}>
-                    Late Dr. B. V. Raju believed that quality education should be accessible to aspiring learners beyond major urban centres.
+                (content.legacyParagraphs || []).filter(Boolean).map((p, i, arr) => (
+                  <p key={i} style={{ lineHeight: 1.8, marginBottom: i === arr.length - 1 ? 0 : 'var(--space-4)', color: 'var(--color-text-light)' }}>
+                    {renderBold(p)}
                   </p>
-                  <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-4)', color: 'var(--color-text-light)' }}>
-                    That belief led to the establishment of Sri Vishnu Educational Society and shaped its approach to creating institutions where students could gain knowledge, develop skills and build meaningful futures.
-                  </p>
-                  <p style={{ lineHeight: 1.8, color: 'var(--color-text-light)' }}>
-                    His commitment to education continues to guide the Society's academic direction and growth.
-                  </p>
-                </>
+                ))
               )}
             </div>
           </div>
@@ -212,7 +206,7 @@ export default function AboutSVES() {
           <div className="about-mission-grid">
             <div className="reveal-left">
               <h2 className="section-title">
-                {leadershipCultureBlocks[0]?.title || 'Carrying the Vision Forward'}
+                {leadershipCultureBlocks[0]?.title || content.leadershipHeading || 'Carrying the Vision Forward'}
               </h2>
               <div className="divider" style={{ margin: '0 0 var(--space-4) 0' }} />
               {leadershipCultureBlocks.length > 0 ? (
@@ -222,14 +216,11 @@ export default function AboutSVES() {
                   </p>
                 ))
               ) : (
-                <>
-                  <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-4)', color: 'var(--color-text-light)' }}>
-                    The educational vision established by <strong>Late Dr. B. V. Raju</strong> continues under the leadership of <strong>Sri K. V. Vishnu Raju</strong>, Chairman, and grandson of the Founder Chairman.
+                (content.leadershipParagraphs || []).filter(Boolean).map((p, i, arr) => (
+                  <p key={i} style={{ lineHeight: 1.8, marginBottom: i === arr.length - 1 ? 0 : 'var(--space-4)', color: 'var(--color-text-light)' }}>
+                    {renderBold(p)}
                   </p>
-                  <p style={{ lineHeight: 1.8, color: 'var(--color-text-light)' }}>
-                    SVES remains committed to creating transformative educational experiences that empower students to realize their potential and contribute meaningfully to society across Andhra Pradesh and Telangana.
-                  </p>
-                </>
+                ))
               )}
             </div>
             {leadershipCultureImg && (

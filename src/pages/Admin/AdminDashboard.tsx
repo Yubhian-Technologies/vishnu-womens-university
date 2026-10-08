@@ -38,7 +38,6 @@ import CareerApplicationsAdmin from './sections/CareerApplicationsAdmin';
 import AdmissionInquiriesAdmin from './sections/AdmissionInquiriesAdmin';
 import AdmissionsCrmAdmin from './sections/AdmissionsCrmAdmin';
 import CampusVisitRequestsAdmin from './sections/CampusVisitRequestsAdmin';
-import SvesCampusesAdmin from './sections/SvesCampusesAdmin';
 import ProgrammesFeeAdmin from './sections/ProgrammesFeeAdmin';
 import AdmissionProcedureAdmin from './sections/AdmissionProcedureAdmin';
 import AdmissionsRanksAdmin from './sections/AdmissionsRanksAdmin';
@@ -166,7 +165,7 @@ const SECTION_MAP: Record<string, React.ReactNode> = {
   'career-applications': <CareerApplicationsAdmin />,
   'admission-inquiries': <AdmissionInquiriesAdmin />,
   'campus-visit-requests': <CampusVisitRequestsAdmin />,
-  'sves-campuses': <SvesCampusesAdmin />,
+  'sves-campuses': <AboutSvesContentAdmin />,
   'programmes-fee': <ProgrammesFeeAdmin />,
   'admission-procedure': <AdmissionProcedureAdmin />,
   'admissions-ranks': <AdmissionsRanksAdmin />,
