@@ -6,6 +6,7 @@ import { useDocument } from '../../../hooks/useDocument';
 import {
   tiDspCoe,
   type YearTab,
+  type TiDspFacultyMember,
 } from '../../Differentiators/tiDspCoe.data';
 
 export interface CustomTiDspSection {
@@ -62,8 +63,19 @@ export interface TiDspDoc {
     workshopTitle?: string;
     years?: YearTab[];
   };
+  team?: {
+    inCharge?: TiDspFacultyMember;
+    facultyMembers?: TiDspFacultyMember[];
+  };
   additionalSections?: CustomTiDspSection[];
 }
+
+// A definite (non-optional) fallback so spreading it always keeps
+// TiDspFacultyMember's required `name` field as `string`, not
+// `string | undefined` -- spreading `DEFAULT_STATE.team?.inCharge`
+// directly would widen `name` to optional since TiDspDoc['team'] is itself
+// an optional field.
+const EMPTY_IN_CHARGE: TiDspFacultyMember = { name: '', designation: '', email: '', mobile: '', interests: '' };
 
 const DEFAULT_STATE: TiDspDoc = {
   hero: {
@@ -107,6 +119,10 @@ const DEFAULT_STATE: TiDspDoc = {
     workshopTitle: tiDspCoe.trainingResearch.workshopTitle,
     years: tiDspCoe.trainingResearch.years.map((y) => ({ ...y })),
   },
+  team: {
+    inCharge: { ...tiDspCoe.team.inCharge },
+    facultyMembers: tiDspCoe.team.facultyMembers.map((m) => ({ ...m })),
+  },
   additionalSections: [],
 };
 
@@ -119,6 +135,7 @@ type ActiveSubSection =
   | 'research-outputs'
   | 'training-workshops'
   | 'highlights-facilities'
+  | 'team'
   | 'custom-sections';
 
 export default function TiDspContentAdmin() {
@@ -160,6 +177,10 @@ export default function TiDspContentAdmin() {
             archiveTitle: data.trainingResearch?.archiveTitle || DEFAULT_STATE.trainingResearch?.archiveTitle,
             workshopTitle: data.trainingResearch?.workshopTitle || DEFAULT_STATE.trainingResearch?.workshopTitle,
             years: data.trainingResearch?.years && data.trainingResearch.years.length > 0 ? data.trainingResearch.years : DEFAULT_STATE.trainingResearch?.years,
+          },
+          team: {
+            inCharge: { ...EMPTY_IN_CHARGE, ...DEFAULT_STATE.team?.inCharge, ...data.team?.inCharge },
+            facultyMembers: data.team?.facultyMembers && data.team.facultyMembers.length > 0 ? data.team.facultyMembers : DEFAULT_STATE.team?.facultyMembers,
           },
           additionalSections: data.additionalSections || [],
         });
@@ -324,7 +345,8 @@ export default function TiDspContentAdmin() {
           { key: 'research-outputs', label: '6. Publications & Outputs' },
           { key: 'training-workshops', label: '7. Training & Workshops' },
           { key: 'highlights-facilities', label: '8. Highlights & Facilities' },
-          { key: 'custom-sections', label: '9. Custom Extra Sections' },
+          { key: 'team', label: '9. Team & Faculty' },
+          { key: 'custom-sections', label: '10. Custom Extra Sections' },
         ].map((tab) => (
           <button
             key={tab.key}
@@ -856,7 +878,165 @@ export default function TiDspContentAdmin() {
         </div>
       )}
 
-      {/* TAB 9: CUSTOM SECTIONS */}
+      {/* TAB 9: TEAM & FACULTY */}
+      {activeTab === 'team' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          <div>
+            <h4 style={{ margin: '0 0 0.75rem', fontSize: '0.95rem', fontWeight: 800, color: '#0B1E42' }}>
+              Faculty In-Charge
+            </h4>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+              <div>
+                <label className="admin-label">Name</label>
+                <input
+                  type="text"
+                  className="admin-input"
+                  value={form.team?.inCharge?.name || ''}
+                  onChange={(e) => setForm((p) => ({ ...p, team: { ...p.team, inCharge: { ...EMPTY_IN_CHARGE, ...p.team?.inCharge, name: e.target.value } } }))}
+                />
+              </div>
+              <div>
+                <label className="admin-label">Designation</label>
+                <input
+                  type="text"
+                  className="admin-input"
+                  value={form.team?.inCharge?.designation || ''}
+                  onChange={(e) => setForm((p) => ({ ...p, team: { ...p.team, inCharge: { ...EMPTY_IN_CHARGE, ...p.team?.inCharge, designation: e.target.value } } }))}
+                />
+              </div>
+              <div>
+                <label className="admin-label">Email</label>
+                <input
+                  type="text"
+                  className="admin-input"
+                  value={form.team?.inCharge?.email || ''}
+                  onChange={(e) => setForm((p) => ({ ...p, team: { ...p.team, inCharge: { ...EMPTY_IN_CHARGE, ...p.team?.inCharge, email: e.target.value } } }))}
+                />
+              </div>
+              <div>
+                <label className="admin-label">Mobile</label>
+                <input
+                  type="text"
+                  className="admin-input"
+                  value={form.team?.inCharge?.mobile || ''}
+                  onChange={(e) => setForm((p) => ({ ...p, team: { ...p.team, inCharge: { ...EMPTY_IN_CHARGE, ...p.team?.inCharge, mobile: e.target.value } } }))}
+                />
+              </div>
+              <div style={{ gridColumn: '1 / -1' }}>
+                <label className="admin-label">Interests</label>
+                <input
+                  type="text"
+                  className="admin-input"
+                  value={form.team?.inCharge?.interests || ''}
+                  onChange={(e) => setForm((p) => ({ ...p, team: { ...p.team, inCharge: { ...EMPTY_IN_CHARGE, ...p.team?.inCharge, interests: e.target.value } } }))}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+              <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 800, color: '#0B1E42' }}>
+                Faculty Members
+              </h4>
+              <button
+                type="button"
+                onClick={() => {
+                  setForm((p) => ({ ...p, team: { ...p.team, facultyMembers: [...(p.team?.facultyMembers || []), { name: '', designation: '', email: '', mobile: '', interests: '' }] } }));
+                }}
+                className="admin-btn-secondary"
+                style={{ fontSize: '0.8rem' }}
+              >
+                + Add Faculty Member
+              </button>
+            </div>
+            {(form.team?.facultyMembers || []).map((member, idx) => (
+              <div key={idx} style={{ border: '1px solid #e2e8f0', borderRadius: '10px', padding: '0.9rem', marginBottom: '0.75rem', background: '#f8fafc' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.6rem' }}>
+                  <div>
+                    <label className="admin-label">Name</label>
+                    <input
+                      type="text"
+                      className="admin-input"
+                      value={member.name}
+                      onChange={(e) => {
+                        const list = [...(form.team?.facultyMembers || [])];
+                        list[idx] = { ...list[idx], name: e.target.value };
+                        setForm((p) => ({ ...p, team: { ...p.team, facultyMembers: list } }));
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <label className="admin-label">Designation</label>
+                    <input
+                      type="text"
+                      className="admin-input"
+                      value={member.designation || ''}
+                      onChange={(e) => {
+                        const list = [...(form.team?.facultyMembers || [])];
+                        list[idx] = { ...list[idx], designation: e.target.value };
+                        setForm((p) => ({ ...p, team: { ...p.team, facultyMembers: list } }));
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <label className="admin-label">Email</label>
+                    <input
+                      type="text"
+                      className="admin-input"
+                      value={member.email || ''}
+                      onChange={(e) => {
+                        const list = [...(form.team?.facultyMembers || [])];
+                        list[idx] = { ...list[idx], email: e.target.value };
+                        setForm((p) => ({ ...p, team: { ...p.team, facultyMembers: list } }));
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <label className="admin-label">Mobile</label>
+                    <input
+                      type="text"
+                      className="admin-input"
+                      value={member.mobile || ''}
+                      onChange={(e) => {
+                        const list = [...(form.team?.facultyMembers || [])];
+                        list[idx] = { ...list[idx], mobile: e.target.value };
+                        setForm((p) => ({ ...p, team: { ...p.team, facultyMembers: list } }));
+                      }}
+                    />
+                  </div>
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <label className="admin-label">Interests</label>
+                    <input
+                      type="text"
+                      className="admin-input"
+                      value={member.interests || ''}
+                      onChange={(e) => {
+                        const list = [...(form.team?.facultyMembers || [])];
+                        list[idx] = { ...list[idx], interests: e.target.value };
+                        setForm((p) => ({ ...p, team: { ...p.team, facultyMembers: list } }));
+                      }}
+                    />
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const list = (form.team?.facultyMembers || []).filter((_, i) => i !== idx);
+                    setForm((p) => ({ ...p, team: { ...p.team, facultyMembers: list } }));
+                  }}
+                  className="admin-btn-danger"
+                  style={{ marginTop: '0.6rem', fontSize: '0.8rem' }}
+                >
+                  ✕ Remove
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* TAB 10: CUSTOM SECTIONS */}
       {activeTab === 'custom-sections' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

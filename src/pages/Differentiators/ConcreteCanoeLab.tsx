@@ -317,8 +317,8 @@ export default function ConcreteCanoeLab() {
               <div className="canoe-student-badges-grid">
                 {canoe.outcomes.team.rows.map((row, idx) => (
                   <div key={idx} className="canoe-student-badge">
-                    <span className="canoe-student-reg">{row[1]}</span>
-                    <span>{row[2]}</span>
+                    <span className="canoe-student-reg">{row.cells[1]}</span>
+                    <span>{row.cells[2]}</span>
                   </div>
                 ))}
               </div>
@@ -365,7 +365,7 @@ export default function ConcreteCanoeLab() {
                   <tbody>
                     {canoe.academicProject.team.rows.map((r, i) => (
                       <tr key={i}>
-                        {r.map((cell, cIdx) => (
+                        {r.cells.map((cell, cIdx) => (
                           <td key={cIdx} style={cIdx === 1 ? { fontWeight: 700, color: 'var(--color-primary)' } : {}}>
                             {cell || '—'}
                           </td>
@@ -405,7 +405,7 @@ export default function ConcreteCanoeLab() {
               <tbody>
                 {canoe.previousProjects.table.rows.map((row, rIdx) => (
                   <tr key={rIdx}>
-                    {row.map((cell, cIdx) => (
+                    {row.cells.map((cell, cIdx) => (
                       <td key={cIdx}>{cell}</td>
                     ))}
                   </tr>

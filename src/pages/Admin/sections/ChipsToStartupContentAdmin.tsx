@@ -362,30 +362,30 @@ export default function ChipsToStartupContentAdmin() {
                 <input
                   type="text"
                   className="admin-input"
-                  value={row[0] || `${idx + 1}`}
+                  value={row.cells[0] || `${idx + 1}`}
                   onChange={(e) => {
                     const list = [...(form.edaTools?.rows || [])];
-                    list[idx] = [e.target.value, row[1] || '', row[2] || ''];
+                    list[idx] = { cells: [e.target.value, row.cells[1] || '', row.cells[2] || ''] };
                     setForm((p) => ({ ...p, edaTools: { ...p.edaTools, rows: list } }));
                   }}
                 />
                 <input
                   type="text"
                   className="admin-input"
-                  value={row[1] || ''}
+                  value={row.cells[1] || ''}
                   onChange={(e) => {
                     const list = [...(form.edaTools?.rows || [])];
-                    list[idx] = [row[0] || `${idx + 1}`, e.target.value, row[2] || ''];
+                    list[idx] = { cells: [row.cells[0] || `${idx + 1}`, e.target.value, row.cells[2] || ''] };
                     setForm((p) => ({ ...p, edaTools: { ...p.edaTools, rows: list } }));
                   }}
                 />
                 <input
                   type="text"
                   className="admin-input"
-                  value={row[2] || ''}
+                  value={row.cells[2] || ''}
                   onChange={(e) => {
                     const list = [...(form.edaTools?.rows || [])];
-                    list[idx] = [row[0] || `${idx + 1}`, row[1] || '', e.target.value];
+                    list[idx] = { cells: [row.cells[0] || `${idx + 1}`, row.cells[1] || '', e.target.value] };
                     setForm((p) => ({ ...p, edaTools: { ...p.edaTools, rows: list } }));
                   }}
                 />
@@ -405,7 +405,7 @@ export default function ChipsToStartupContentAdmin() {
               type="button"
               onClick={() => {
                 const count = (form.edaTools?.rows || []).length + 1;
-                setForm((p) => ({ ...p, edaTools: { ...p.edaTools, rows: [...(p.edaTools?.rows || []), [`${count}`, '', '']] } }));
+                setForm((p) => ({ ...p, edaTools: { ...p.edaTools, rows: [...(p.edaTools?.rows || []), { cells: [`${count}`, '', ''] }] } }));
               }}
               className="admin-btn-secondary"
               style={{ fontSize: '0.8rem' }}

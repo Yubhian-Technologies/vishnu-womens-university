@@ -13,7 +13,10 @@ export interface CanoeMember {
 
 export interface CanoeSimpleTable {
   headers: string[];
-  rows: string[][];
+  // Array of { cells } objects rather than a plain string[][] because
+  // Firestore rejects arrays nested directly inside arrays (the admin
+  // editor's save() writes this whole object straight to Firestore).
+  rows: { cells: string[] }[];
 }
 
 export interface CanoeStudentTeam {
@@ -55,11 +58,11 @@ export const concreteCanoeLab = {
     team: {
       headers: ['S.No', 'Regd No.', 'Name', 'Faculty'],
       rows: [
-        ['1', '20D01A0146', 'RAYAPUREDDY TEJASWI', 'Mr.L.Ramgopal'],
-        ['2', '20D01A0106', 'BAYI SOWMYA SRI', ''],
-        ['3', '20D01A0119', 'ILLURI SATYA PRANEETHA', ''],
-        ['4', '20D01A0129', 'KUSAM ROSHINI REDDY', ''],
-        ['5', '20D01A0136', 'PADARAPAKA MAHESWARI SATYA', ''],
+        { cells: ['1', '20D01A0146', 'RAYAPUREDDY TEJASWI', 'Mr.L.Ramgopal'] },
+        { cells: ['2', '20D01A0106', 'BAYI SOWMYA SRI', ''] },
+        { cells: ['3', '20D01A0119', 'ILLURI SATYA PRANEETHA', ''] },
+        { cells: ['4', '20D01A0129', 'KUSAM ROSHINI REDDY', ''] },
+        { cells: ['5', '20D01A0136', 'PADARAPAKA MAHESWARI SATYA', ''] },
       ],
     } as CanoeSimpleTable,
     paragraphs: [
@@ -71,13 +74,13 @@ export const concreteCanoeLab = {
     table: {
       headers: ['Description', 'WAKA', 'WAKA 1.2 & 2.0', 'KANU', 'AIKYAM', 'CANOE'],
       rows: [
-        ['Dimensions', 'Length – 3.2m\nBeam width – 0.47m\nDraft – 0.5m', 'Length – 1.95m\nBeam width – 0.47m\nDraft – 0.5m', 'Length – 1.97m\nBeam width – 0.5m\nDraft – 0.04m', 'Length – 2.1m\nBeam width – 0.5m\nDraft – 0.03m\nThickness – 0.04m', 'Length – 2m\nBeam width – 0.61m\nDraft – 0.28m\nThickness – 0.02m'],
-        ['Paddler', 'Double (Max 4)', 'Single', 'Single', 'Single', 'Single (Max 2)'],
-        ['Materials', 'Cement, Flyash, Cenosphere, Metakolin, 4mm rebars as reinforcement', 'Cement, Flyash, Cenosphere, Metakolin, glass fibre mesh reinforcement', 'Cement, Flyash, Cenosphere, GGBS, glass fibre mesh reinforcement', 'Cement, Aluminium powder, lime, polypropylene fibres', 'Cement, fly ash, cenosphere, CFRP sheet as main reinforcement, polypropylene fibres'],
-        ['Hull Shape', 'Flat bottom square arch hull', 'Round bottom hull', 'Flat bottom hull', 'Deep vee hull', 'Flat bottom hull'],
-        ['Mix Design', 'M20', 'M20', 'M30 (packing density model)', 'M30 (packing density model)', 'M30 (packing density model)'],
-        ['Modelling Tool', 'CAD & STAAD Pro', 'Maxsurf modeler & stabilizer', 'AutoCAD & STAAD Pro', 'Bearcat SP', 'Maxsurf modeler & stabilizer'],
-        ['Mould', 'Male mould, wood material', 'Male mould, clay mud, thermocol material', 'Male mould, cement mortar material', 'Male mould, clay mud and thermocol material', 'Male mould, cement mortar material'],
+        { cells: ['Dimensions', 'Length – 3.2m\nBeam width – 0.47m\nDraft – 0.5m', 'Length – 1.95m\nBeam width – 0.47m\nDraft – 0.5m', 'Length – 1.97m\nBeam width – 0.5m\nDraft – 0.04m', 'Length – 2.1m\nBeam width – 0.5m\nDraft – 0.03m\nThickness – 0.04m', 'Length – 2m\nBeam width – 0.61m\nDraft – 0.28m\nThickness – 0.02m'] },
+        { cells: ['Paddler', 'Double (Max 4)', 'Single', 'Single', 'Single', 'Single (Max 2)'] },
+        { cells: ['Materials', 'Cement, Flyash, Cenosphere, Metakolin, 4mm rebars as reinforcement', 'Cement, Flyash, Cenosphere, Metakolin, glass fibre mesh reinforcement', 'Cement, Flyash, Cenosphere, GGBS, glass fibre mesh reinforcement', 'Cement, Aluminium powder, lime, polypropylene fibres', 'Cement, fly ash, cenosphere, CFRP sheet as main reinforcement, polypropylene fibres'] },
+        { cells: ['Hull Shape', 'Flat bottom square arch hull', 'Round bottom hull', 'Flat bottom hull', 'Deep vee hull', 'Flat bottom hull'] },
+        { cells: ['Mix Design', 'M20', 'M20', 'M30 (packing density model)', 'M30 (packing density model)', 'M30 (packing density model)'] },
+        { cells: ['Modelling Tool', 'CAD & STAAD Pro', 'Maxsurf modeler & stabilizer', 'AutoCAD & STAAD Pro', 'Bearcat SP', 'Maxsurf modeler & stabilizer'] },
+        { cells: ['Mould', 'Male mould, wood material', 'Male mould, clay mud, thermocol material', 'Male mould, cement mortar material', 'Male mould, clay mud and thermocol material', 'Male mould, cement mortar material'] },
       ],
     } as CanoeSimpleTable,
   },
@@ -101,11 +104,11 @@ export const concreteCanoeLab = {
     team: {
       headers: ['S.No', 'Regd. No.', 'Name'],
       rows: [
-        ['1', '20D01A0146', 'RAYAPUREDDY TEJASWI'],
-        ['2', '20D01A0106', 'BAYI SOWMYA SRI'],
-        ['3', '20D01A0119', 'ILLURI SATYA PRANEETHA'],
-        ['4', '20D01A0129', 'KUSAM ROSHINI REDDY'],
-        ['5', '20D01A0136', 'PADARAPAKA MAHESWARI SATYA'],
+        { cells: ['1', '20D01A0146', 'RAYAPUREDDY TEJASWI'] },
+        { cells: ['2', '20D01A0106', 'BAYI SOWMYA SRI'] },
+        { cells: ['3', '20D01A0119', 'ILLURI SATYA PRANEETHA'] },
+        { cells: ['4', '20D01A0129', 'KUSAM ROSHINI REDDY'] },
+        { cells: ['5', '20D01A0136', 'PADARAPAKA MAHESWARI SATYA'] },
       ],
     } as CanoeSimpleTable,
   },

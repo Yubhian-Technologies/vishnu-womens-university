@@ -65,7 +65,10 @@ export default function TiDspPage({
   const industryAssociation = remoteData?.industryAssociation || tiDspCoe.industryAssociation;
   const trainingResearch = remoteData?.trainingResearch || tiDspCoe.trainingResearch;
   const additionalSections = remoteData?.additionalSections || [];
-  const team = tiDspCoe.team;
+  const team = {
+    inCharge: remoteData?.team?.inCharge?.name ? remoteData.team.inCharge : tiDspCoe.team.inCharge,
+    facultyMembers: remoteData?.team?.facultyMembers && remoteData.team.facultyMembers.length > 0 ? remoteData.team.facultyMembers : tiDspCoe.team.facultyMembers,
+  };
 
   const overviewParagraphs = item?.description?.textContent
     ? [item.description.textContent]
@@ -429,7 +432,7 @@ export default function TiDspPage({
                       <tbody>
                         {block.rows.map((row, rIdx) => (
                           <tr key={rIdx}>
-                            {row.map((cell, cIdx) => (
+                            {row.cells.map((cell, cIdx) => (
                               <td key={cIdx}>{cell}</td>
                             ))}
                           </tr>

@@ -387,7 +387,7 @@ export default function DreamHouseLabContentAdmin() {
                       ...data.academicProject,
                       team: {
                         headers: data.academicProject?.team?.headers || ['S.No', 'Regd No.', 'Name', 'Faculty'],
-                        rows: [...currentRows, [nextNo, '', '', '']],
+                        rows: [...currentRows, { cells: [nextNo, '', '', ''] }],
                       },
                     },
                   });
@@ -405,10 +405,10 @@ export default function DreamHouseLabContentAdmin() {
                   <input
                     type="text"
                     placeholder="S.No"
-                    value={row[0] || ''}
+                    value={row.cells[0] || ''}
                     onChange={(e) => {
                       const updatedRows = [...(data.academicProject?.team?.rows || [])];
-                      updatedRows[rIdx] = [e.target.value, row[1], row[2], row[3]];
+                      updatedRows[rIdx] = { cells: [e.target.value, row.cells[1], row.cells[2], row.cells[3]] };
                       setData({
                         ...data,
                         academicProject: {
@@ -423,10 +423,10 @@ export default function DreamHouseLabContentAdmin() {
                   <input
                     type="text"
                     placeholder="Regd No"
-                    value={row[1] || ''}
+                    value={row.cells[1] || ''}
                     onChange={(e) => {
                       const updatedRows = [...(data.academicProject?.team?.rows || [])];
-                      updatedRows[rIdx] = [row[0], e.target.value, row[2], row[3]];
+                      updatedRows[rIdx] = { cells: [row.cells[0], e.target.value, row.cells[2], row.cells[3]] };
                       setData({
                         ...data,
                         academicProject: {
@@ -441,10 +441,10 @@ export default function DreamHouseLabContentAdmin() {
                   <input
                     type="text"
                     placeholder="Student Name"
-                    value={row[2] || ''}
+                    value={row.cells[2] || ''}
                     onChange={(e) => {
                       const updatedRows = [...(data.academicProject?.team?.rows || [])];
-                      updatedRows[rIdx] = [row[0], row[1], e.target.value, row[3]];
+                      updatedRows[rIdx] = { cells: [row.cells[0], row.cells[1], e.target.value, row.cells[3]] };
                       setData({
                         ...data,
                         academicProject: {
@@ -459,10 +459,10 @@ export default function DreamHouseLabContentAdmin() {
                   <input
                     type="text"
                     placeholder="Faculty Guide"
-                    value={row[3] || ''}
+                    value={row.cells[3] || ''}
                     onChange={(e) => {
                       const updatedRows = [...(data.academicProject?.team?.rows || [])];
-                      updatedRows[rIdx] = [row[0], row[1], row[2], e.target.value];
+                      updatedRows[rIdx] = { cells: [row.cells[0], row.cells[1], row.cells[2], e.target.value] };
                       setData({
                         ...data,
                         academicProject: {

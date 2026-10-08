@@ -15,7 +15,11 @@ export type ContentBlock =
   | { type: 'bullets'; items: string[] }
   | { type: 'numbered'; items: string[] }
   | { type: 'heading'; text: string }
-  | { type: 'table'; headers: string[]; rows: string[][] }
+  // `rows` is an array of { cells } objects rather than a plain string[][]
+  // because Firestore rejects arrays nested directly inside arrays — see
+  // TiDspContentAdmin.tsx's save() error ("Nested arrays are not
+  // supported") this shape avoids.
+  | { type: 'table'; headers: string[]; rows: { cells: string[] }[] }
   | { type: 'iicdcBatches' };
 
 export interface YearTab {
@@ -218,18 +222,18 @@ export const tiDspCoe = {
             type: 'table',
             headers: ['S.No', 'Batch No', 'Branch', 'Year/Sem', 'Regd.No', 'Name of the student', 'Result'],
             rows: [
-              ['1', '6', 'ECE', 'IV/I', '11B01A0485', 'M.Dharani', 'Winners'],
-              ['2', '', '', 'IV/I', '11B01A0413', 'B.Renuka', ''],
-              ['3', '', '', 'IV/I', '11B01A0449', 'G.Swethapriyanka', ''],
-              ['4', '', '', 'IV/I', '12B05A0416', 'K.Durgaprasanna', ''],
-              ['5', '18', 'ECE', 'IV/I', '11B01A04B3', 'P.Samatha', '1st Runner up'],
-              ['6', '', '', 'IV/I', '11B01A04C8', 'P.Jyothi', ''],
-              ['7', '', '', 'IV/I', '11B01A0489', 'Mohamad.Ashrafunnisa', ''],
-              ['8', '', '', 'IV/I', '11B01A04D5', 'S.Reshma', ''],
-              ['9', '61', 'ECE', 'IV/I', '11B01A04C4', 'P.RAMA', '2nd Runner up'],
-              ['10', '', '', 'IV/I', '11A1A0417', 'K.VYSHNAVI', ''],
-              ['11', '', '', 'IV/I', '11B01A0466', 'K.REKHA', ''],
-              ['12', '', '', 'IV/I', '11B01A04A4', 'N.ANUSHA', ''],
+              { cells: ['1', '6', 'ECE', 'IV/I', '11B01A0485', 'M.Dharani', 'Winners'] },
+              { cells: ['2', '', '', 'IV/I', '11B01A0413', 'B.Renuka', ''] },
+              { cells: ['3', '', '', 'IV/I', '11B01A0449', 'G.Swethapriyanka', ''] },
+              { cells: ['4', '', '', 'IV/I', '12B05A0416', 'K.Durgaprasanna', ''] },
+              { cells: ['5', '18', 'ECE', 'IV/I', '11B01A04B3', 'P.Samatha', '1st Runner up'] },
+              { cells: ['6', '', '', 'IV/I', '11B01A04C8', 'P.Jyothi', ''] },
+              { cells: ['7', '', '', 'IV/I', '11B01A0489', 'Mohamad.Ashrafunnisa', ''] },
+              { cells: ['8', '', '', 'IV/I', '11B01A04D5', 'S.Reshma', ''] },
+              { cells: ['9', '61', 'ECE', 'IV/I', '11B01A04C4', 'P.RAMA', '2nd Runner up'] },
+              { cells: ['10', '', '', 'IV/I', '11A1A0417', 'K.VYSHNAVI', ''] },
+              { cells: ['11', '', '', 'IV/I', '11B01A0466', 'K.REKHA', ''] },
+              { cells: ['12', '', '', 'IV/I', '11B01A04A4', 'N.ANUSHA', ''] },
             ],
           },
         ],
@@ -243,18 +247,18 @@ export const tiDspCoe = {
             type: 'table',
             headers: ['S.No', 'Project Name', 'Domain', 'Mentor'],
             rows: [
-              ['1', 'Robotic Meal Feeder for Elderly', 'Medical/Assistive Technology', 'Dr. K. Padma Vasavi'],
-              ['2', 'Interactive Snoezelen Bubble Tube', '', 'Mr. Ch. Samba Siva Rao Mr. M. Pradeep'],
-              ['3', 'Versatile Wheel Chair', '', 'Mrs. S. M. Padmaja Mr. S. Hanumantha Rao'],
-              ['4', 'Sound Alert System for Hearing Challenged', '', 'Mr. V. S. R. Pavan Kumar'],
-              ['5', 'Third Eye for Visually Challenged', '', 'Dr. K. Padma Vasavi'],
-              ['6', 'Succor for Elderly People', '', 'Mr. K. Ramu Mr. E. R. Praveen Kumar'],
-              ['7', 'Block-D: A Game for Visually Challenged', '', 'Mr. D. Narasimha Raju'],
-              ['8', 'Fall Detector for Elderly People', '', 'Mr. V. S. R. Pavan Kumar'],
-              ['9', 'Medicine Identifier', '', 'Dr. K. Padma Vasavi'],
-              ['10', 'PC Based Data Logging System for Exhaust Gas Temperature Monitoring of an IC Engine', '', 'Mr. P. Devi Kiran Mr. Sekhar'],
-              ['11', 'Interactive alphabet learning system for mentally challenged children', '', 'Dr. K. Pushpa'],
-              ['12', 'System for behavioral therapy to children with attention deficit hyper active disorder', '', 'Dr. K. Pushpa'],
+              { cells: ['1', 'Robotic Meal Feeder for Elderly', 'Medical/Assistive Technology', 'Dr. K. Padma Vasavi'] },
+              { cells: ['2', 'Interactive Snoezelen Bubble Tube', '', 'Mr. Ch. Samba Siva Rao Mr. M. Pradeep'] },
+              { cells: ['3', 'Versatile Wheel Chair', '', 'Mrs. S. M. Padmaja Mr. S. Hanumantha Rao'] },
+              { cells: ['4', 'Sound Alert System for Hearing Challenged', '', 'Mr. V. S. R. Pavan Kumar'] },
+              { cells: ['5', 'Third Eye for Visually Challenged', '', 'Dr. K. Padma Vasavi'] },
+              { cells: ['6', 'Succor for Elderly People', '', 'Mr. K. Ramu Mr. E. R. Praveen Kumar'] },
+              { cells: ['7', 'Block-D: A Game for Visually Challenged', '', 'Mr. D. Narasimha Raju'] },
+              { cells: ['8', 'Fall Detector for Elderly People', '', 'Mr. V. S. R. Pavan Kumar'] },
+              { cells: ['9', 'Medicine Identifier', '', 'Dr. K. Padma Vasavi'] },
+              { cells: ['10', 'PC Based Data Logging System for Exhaust Gas Temperature Monitoring of an IC Engine', '', 'Mr. P. Devi Kiran Mr. Sekhar'] },
+              { cells: ['11', 'Interactive alphabet learning system for mentally challenged children', '', 'Dr. K. Pushpa'] },
+              { cells: ['12', 'System for behavioral therapy to children with attention deficit hyper active disorder', '', 'Dr. K. Pushpa'] },
             ],
           },
         ],
@@ -267,11 +271,11 @@ export const tiDspCoe = {
             type: 'table',
             headers: ['S.No', 'Name of Student', 'Contest'],
             rows: [
-              ['1', 'Alapati Modaka Priya', 'DST & Texas Instruments India Innovation Challenge Design Contest 2018'],
-              ['2', 'Ravuri Rupa Devi Sri', ''],
-              ['3', 'Balla Ganga Harika', ''],
-              ['4', 'Appari Lalitha Neeharika', ''],
-              ['5', 'Potti Sirisha', ''],
+              { cells: ['1', 'Alapati Modaka Priya', 'DST & Texas Instruments India Innovation Challenge Design Contest 2018'] },
+              { cells: ['2', 'Ravuri Rupa Devi Sri', ''] },
+              { cells: ['3', 'Balla Ganga Harika', ''] },
+              { cells: ['4', 'Appari Lalitha Neeharika', ''] },
+              { cells: ['5', 'Potti Sirisha', ''] },
             ],
           },
           { type: 'heading', text: 'Details of Participants in Texas Instruments Innovation Challenge India Design Contest.' },

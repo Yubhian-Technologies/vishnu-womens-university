@@ -311,9 +311,9 @@ export default function ChipsToStartupPage({
             <tbody>
               {(edaTools?.rows || []).map((row, rIdx) => (
                 <tr key={rIdx} style={{ background: rIdx % 2 === 0 ? '#FFFFFF' : '#F8FAFC', borderBottom: '1px solid #E2E8F0' }}>
-                  <td style={{ padding: '0.85rem 1rem', fontWeight: 700, color: '#64748B' }}>{row[0]}</td>
-                  <td style={{ padding: '0.85rem 1rem', fontWeight: 600, color: '#0F2547' }}>{row[1]}</td>
-                  <td style={{ padding: '0.85rem 1rem', color: '#334155', lineHeight: '1.5' }}>{row[2]}</td>
+                  <td style={{ padding: '0.85rem 1rem', fontWeight: 700, color: '#64748B' }}>{row.cells[0]}</td>
+                  <td style={{ padding: '0.85rem 1rem', fontWeight: 600, color: '#0F2547' }}>{row.cells[1]}</td>
+                  <td style={{ padding: '0.85rem 1rem', color: '#334155', lineHeight: '1.5' }}>{row.cells[2]}</td>
                 </tr>
               ))}
             </tbody>
