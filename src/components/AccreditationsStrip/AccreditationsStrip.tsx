@@ -1,38 +1,38 @@
+import { useDocument } from '../../hooks/useDocument';
+import { HOME_CONTENT_COLLECTION, HOME_CONTENT_DOC_ID, type HomeContentDoc, DEFAULT_HOME_CONTENT, DEFAULT_ACCREDITATIONS, type Accreditation } from '../../constants/homeContentDefaults';
 import './AccreditationsStrip.css';
 
-type Accreditation = {
-  code: string;
-  title: string;
-  logo: string;
-  years: string;
-};
-
-const ACCREDITATIONS: Accreditation[] = [
-  { code: 'NBA', title: 'National Board of Accreditation', logo: '/images/accreditations/nba.png', years: 'Accredited 2008–2028' },
-  { code: 'NAAC', title: 'National Assessment & Accreditation Council', logo: '/images/accreditations/naac.png', years: 'Accredited 2015–2027' },
-  { code: 'UGC', title: 'University Grants Commission', logo: '/images/accreditations/ugc.png', years: 'Approved 2014–2035' },
-  { code: 'AICTE', title: 'All India Council for Technical Education', logo: '/images/accreditations/aicte.png', years: 'Approved 2001–Present' },
-];
+export type { Accreditation };
+export { DEFAULT_ACCREDITATIONS };
 
 export default function AccreditationsStrip() {
+  const { data: remoteHomeContent } = useDocument<HomeContentDoc>(HOME_CONTENT_COLLECTION, HOME_CONTENT_DOC_ID);
+
+  const eyebrow = remoteHomeContent?.accreditationsEyebrow || DEFAULT_HOME_CONTENT.accreditationsEyebrow || 'Academic Recognition';
+  const title = remoteHomeContent?.accreditationsTitle || DEFAULT_HOME_CONTENT.accreditationsTitle || 'Accreditations & Affiliations';
+  const subtitle = remoteHomeContent?.accreditationsSubtitle || DEFAULT_HOME_CONTENT.accreditationsSubtitle || 'Recognized by leading academic and regulatory bodies in India.';
+  const accreditations = (remoteHomeContent?.accreditationsList && remoteHomeContent.accreditationsList.length > 0)
+    ? remoteHomeContent.accreditationsList
+    : DEFAULT_ACCREDITATIONS;
+
   return (
     <section className="accreditations-strip" aria-label="Accreditations and Affiliations">
       <div className="container">
         <div className="accreditations-strip-header">
-          <span className="accreditations-strip-eyebrow">Academic Recognition</span>
-          <h2 className="accreditations-strip-title">Accreditations &amp; Affiliations</h2>
-          <p className="accreditations-strip-subtitle">Recognized by leading academic and regulatory bodies in India.</p>
+          <span className="accreditations-strip-eyebrow">{eyebrow}</span>
+          <h2 className="accreditations-strip-title">{title}</h2>
+          <p className="accreditations-strip-subtitle">{subtitle}</p>
         </div>
 
         <div className="accreditations-strip-row">
-          {ACCREDITATIONS.map(({ code, title, logo, years }) => (
-            <div className="accreditations-strip-card" key={code} title={title}>
+          {accreditations.map(({ code, title: accTitle, logo, years }, idx) => (
+            <div className="accreditations-strip-card" key={`${code}-${idx}`} title={accTitle}>
               <div className="accreditations-strip-logo">
-                <img src={logo} alt={`${code} — ${title} logo`} loading="lazy" />
+                <img src={logo} alt={`${code} — ${accTitle} logo`} loading="lazy" />
               </div>
               <span className="accreditations-strip-code">{code}</span>
               <span className="accreditations-strip-rule" aria-hidden="true" />
-              <span className="accreditations-strip-desc">{title}</span>
+              <span className="accreditations-strip-desc">{accTitle}</span>
               <span className="accreditations-strip-years">{years}</span>
             </div>
           ))}
@@ -41,3 +41,4 @@ export default function AccreditationsStrip() {
     </section>
   );
 }
+

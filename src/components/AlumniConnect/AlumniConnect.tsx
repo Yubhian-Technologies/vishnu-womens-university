@@ -1,21 +1,11 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
 import { useOrderedCollection } from '../../hooks/useCollection';
+import { useDocument } from '../../hooks/useDocument';
+import { HOME_CONTENT_COLLECTION, HOME_CONTENT_DOC_ID, type HomeContentDoc, DEFAULT_HOME_CONTENT } from '../../constants/homeContentDefaults';
 import SmoothImage from '../SmoothImage/SmoothImage';
 import type { AlumniEvent } from '../../pages/Admin/sections/AlumniEventsAdmin';
 import { renderBold } from '../../lib/boldText';
 import './AlumniConnect.css';
-
-// Row 1 text content
-const ROW1_TEXT = {
-  title: 'SVES Global Alumni Network',
-  desc: "Launched in January 2025, The SVES GLOBAL ALUMNI NETWORK is an enterprising community where alumni and students connect to create win-win opportunities worldwide. From mentorship and research collaborations to job opportunities and entrepreneurship initiatives, alumni from 1997 to today, spanning India, the USA, Canada, Germany, the UK, the Netherlands, Australia, New Zealand, and beyond, are driving real change.",
-};
-
-// Row 2 text content
-const ROW2_TEXT = {
-  title: 'A Community That Delivers Results',
-  desc: "With the 'Alumni Spotlight' showcasing success stories and entrepreneurial alumni opening doors for projects and internships, this network is already delivering results. Through regional chapters, global events, career support, and collaboration initiatives, the SVES Global Alumni Network serves as a catalyst for personal growth, professional success, and lifelong engagement. Whether you are an entrepreneur, a technologist, a healthcare professional, an educator, or a leader in your field, this community is your home — a place to reconnect, give back, and grow together.",
-};
 
 interface PhotoScrollerProps {
   photos: AlumniEvent[];
@@ -87,19 +77,30 @@ function PhotoScroller({ photos, speed = 0.5 }: PhotoScrollerProps) {
 
 export default function AlumniConnect() {
   const { docs: events } = useOrderedCollection<AlumniEvent>('alumniEvents', 'order');
+  const { data: remoteHomeContent } = useDocument<HomeContentDoc>(HOME_CONTENT_COLLECTION, HOME_CONTENT_DOC_ID);
+
+  const alumni = remoteHomeContent?.alumniContent || DEFAULT_HOME_CONTENT.alumniContent;
+
+  const eyebrow = alumni?.eyebrow || DEFAULT_HOME_CONTENT.alumniContent.eyebrow;
+  const title = alumni?.title || DEFAULT_HOME_CONTENT.alumniContent.title;
+  const row1Title = alumni?.row1Title || DEFAULT_HOME_CONTENT.alumniContent.row1Title;
+  const row1Desc = alumni?.row1Desc || DEFAULT_HOME_CONTENT.alumniContent.row1Desc;
+  const row2Title = alumni?.row2Title || DEFAULT_HOME_CONTENT.alumniContent.row2Title;
+  const row2Desc = alumni?.row2Desc || DEFAULT_HOME_CONTENT.alumniContent.row2Desc;
+  const ctaLabel = alumni?.ctaLabel || DEFAULT_HOME_CONTENT.alumniContent.ctaLabel;
+  const ctaHref = alumni?.ctaHref || DEFAULT_HOME_CONTENT.alumniContent.ctaHref;
 
   // Separate photos by row
   const row1Photos = events.filter((e) => e.row === 1 && e.displayType === 'photo');
   const row2Photos = events.filter((e) => e.row === 2 && e.displayType === 'photo');
 
-  // Always render the section — text is hardcoded, photos are optional
   return (
     <section className="alumni-connect" aria-label="Alumni Connect">
       <div className="container">
         {/* Header */}
         <header className="alumni-connect-header">
-          <p className="alumni-connect-eyebrow">Stay Connected</p>
-          <h2 className="alumni-connect-title">Alumni Connect</h2>
+          <p className="alumni-connect-eyebrow">{eyebrow}</p>
+          <h2 className="alumni-connect-title">{title}</h2>
         </header>
 
         {/* Row 1: Photos 60% | Text 40% */}
@@ -112,16 +113,16 @@ export default function AlumniConnect() {
             )}
           </div>
           <div className="alumni-connect-text">
-            <h3 className="alumni-connect-text-title">{ROW1_TEXT.title}</h3>
-            <p className="alumni-connect-text-desc">{renderBold(ROW1_TEXT.desc)}</p>
+            <h3 className="alumni-connect-text-title">{row1Title}</h3>
+            <p className="alumni-connect-text-desc">{renderBold(row1Desc)}</p>
           </div>
         </div>
 
         {/* Row 2: Text 40% | Photos 60% */}
         <div className="alumni-connect-row alumni-connect-row--reversed">
           <div className="alumni-connect-text">
-            <h3 className="alumni-connect-text-title">{ROW2_TEXT.title}</h3>
-            <p className="alumni-connect-text-desc">{renderBold(ROW2_TEXT.desc)}</p>
+            <h3 className="alumni-connect-text-title">{row2Title}</h3>
+            <p className="alumni-connect-text-desc">{renderBold(row2Desc)}</p>
           </div>
           <div className="alumni-connect-photos">
             {row2Photos.length > 0 ? (
@@ -134,8 +135,8 @@ export default function AlumniConnect() {
 
         {/* CTA */}
         <div className="alumni-connect-cta">
-          <a href="https://alumni.srivishnu.edu.in/" target="_blank" rel="noopener noreferrer" className="btn btn-primary btn-lg">
-            Explore Our Global Alumni
+          <a href={ctaHref} target="_blank" rel="noopener noreferrer" className="btn btn-primary btn-lg">
+            {ctaLabel}
           </a>
         </div>
       </div>

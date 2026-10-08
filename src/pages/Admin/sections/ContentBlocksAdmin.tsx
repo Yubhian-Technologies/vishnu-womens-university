@@ -128,13 +128,21 @@ export const CONTENT_BLOCK_SECTIONS: { page: string; section: string; label: str
   // `contentBlocks` docs (page: 'auditoriums'), just a friendlier home.
 ];
 
-export default function ContentBlocksAdmin() {
+interface ContentBlocksAdminProps {
+  filterPage?: string;
+  filterSection?: string;
+  hideSectionSelector?: boolean;
+}
+
+export default function ContentBlocksAdmin({ filterPage, filterSection, hideSectionSelector }: ContentBlocksAdminProps = {}) {
   const session = useAdminSession();
   const { docs: blocks, loading } = useOrderedCollection<ContentBlockDoc>('contentBlocks', 'order');
-  const [form, setForm] = useState<Omit<ContentBlockDoc, 'id'>>({ ...EMPTY, page: CONTENT_BLOCK_SECTIONS[0].page, section: CONTENT_BLOCK_SECTIONS[0].section });
+  const initialPage = filterPage || CONTENT_BLOCK_SECTIONS[0].page;
+  const initialSection = filterSection || CONTENT_BLOCK_SECTIONS[0].section;
+  const [form, setForm] = useState<Omit<ContentBlockDoc, 'id'>>({ ...EMPTY, page: initialPage, section: initialSection });
   const [editing, setEditing] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-  const [filterKey, setFilterKey] = useState(`${CONTENT_BLOCK_SECTIONS[0].page}::${CONTENT_BLOCK_SECTIONS[0].section}`);
+  const [filterKey, setFilterKey] = useState(filterPage && filterSection ? `${filterPage}::${filterSection}` : `${CONTENT_BLOCK_SECTIONS[0].page}::${CONTENT_BLOCK_SECTIONS[0].section}`);
   const [sectionSearch, setSectionSearch] = useState('');
   // This screen covers page-content blocks for the whole site, not just
   // Placements, so — like Hero Banners — permission is scoped per item
@@ -193,17 +201,19 @@ export default function ContentBlocksAdmin() {
           page/section this item belongs to; fields not needed for that section (e.g. "Value") can be left blank.
         </p>
         <div className="admin-form-grid">
-          <div className="admin-field admin-field--full">
-            <label htmlFor="field-page-section">Page / Section *</label>
-            <select id="field-page-section" value={`${form.page}::${form.section}`} onChange={(e) => {
-              const [page, section] = e.target.value.split('::');
-              setForm((p) => ({ ...p, page, section }));
-            }}>
-              {CONTENT_BLOCK_SECTIONS.map((s) => (
-                <option key={`${s.page}::${s.section}`} value={`${s.page}::${s.section}`}>{s.label}</option>
-              ))}
-            </select>
-          </div>
+          {!hideSectionSelector && (
+            <div className="admin-field admin-field--full">
+              <label htmlFor="field-page-section">Page / Section *</label>
+              <select id="field-page-section" value={`${form.page}::${form.section}`} onChange={(e) => {
+                const [page, section] = e.target.value.split('::');
+                setForm((p) => ({ ...p, page, section }));
+              }}>
+                {CONTENT_BLOCK_SECTIONS.map((s) => (
+                  <option key={`${s.page}::${s.section}`} value={`${s.page}::${s.section}`}>{s.label}</option>
+                ))}
+              </select>
+            </div>
+          )}
           {/* display:contents on ReadOnlyGate's fieldset means these fields
               stay direct children of this grid — wrapping them here doesn't
               change the grid layout at all, only whether they're disabled. */}
@@ -266,24 +276,26 @@ export default function ContentBlocksAdmin() {
       <div className="admin-card">
         <div className="admin-card__toolbar">
           <h2 className="admin-card__title">Items ({filtered.length})</h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'flex-end' }}>
-            <div style={{ position: 'relative' }}>
-              <Search size={14} style={{ position: 'absolute', left: 8, top: '50%', transform: 'translateY(-50%)', opacity: 0.5 }} />
-              <input
-                type="text"
-                placeholder="Search sections…"
-                value={sectionSearch}
-                onChange={(e) => setSectionSearch(e.target.value)}
-                className="admin-select-sm"
-                style={{ paddingLeft: 28, width: 220 }}
-              />
+          {!hideSectionSelector && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'flex-end' }}>
+              <div style={{ position: 'relative' }}>
+                <Search size={14} style={{ position: 'absolute', left: 8, top: '50%', transform: 'translateY(-50%)', opacity: 0.5 }} />
+                <input
+                  type="text"
+                  placeholder="Search sections…"
+                  value={sectionSearch}
+                  onChange={(e) => setSectionSearch(e.target.value)}
+                  className="admin-select-sm"
+                  style={{ paddingLeft: 28, width: 220 }}
+                />
+              </div>
+              <select value={filterKey} onChange={(e) => setFilterKey(e.target.value)} className="admin-select-sm">
+                {filteredSections.map((s) => (
+                  <option key={`${s.page}::${s.section}`} value={`${s.page}::${s.section}`}>{s.label}</option>
+                ))}
+              </select>
             </div>
-            <select value={filterKey} onChange={(e) => setFilterKey(e.target.value)} className="admin-select-sm">
-              {filteredSections.map((s) => (
-                <option key={`${s.page}::${s.section}`} value={`${s.page}::${s.section}`}>{s.label}</option>
-              ))}
-            </select>
-          </div>
+          )}
         </div>
         {loading ? <p className="admin-loading">Loading…</p> : (
           <div className="admin-table-wrap">

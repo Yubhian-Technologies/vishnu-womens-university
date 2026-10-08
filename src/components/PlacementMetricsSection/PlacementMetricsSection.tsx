@@ -1,49 +1,24 @@
 import { useEffect, useRef, useState } from 'react';
+import { useDocument } from '../../hooks/useDocument';
+import { HOME_CONTENT_COLLECTION, HOME_CONTENT_DOC_ID, type HomeContentDoc, DEFAULT_HOME_CONTENT, DEFAULT_PLACEMENT_METRICS, type MetricItem } from '../../constants/homeContentDefaults';
 import { renderBold } from '../../lib/boldText';
 import './PlacementMetricsSection.css';
 
-interface MetricItem {
-  id: string;
-  value: string;
-  boldText: string;
-  line1: string;
-  line2: string;
-}
-
-const METRICS: MetricItem[] = [
-  {
-    id: 'recruiters',
-    value: '100+',
-    boldText: 'recruiters',
-    line1: 'partner with',
-    line2: 'VWU',
-  },
-  {
-    id: 'placements',
-    value: '1100+',
-    boldText: 'placements',
-    line1: 'every year',
-    line2: '',
-  },
-  {
-    id: 'package',
-    value: '₹59.29 LPA',
-    boldText: 'highest package',
-    line1: 'secured at',
-    line2: 'Google',
-  },
-  {
-    id: 'placement-rate',
-    value: '92%+',
-    boldText: 'placement rate',
-    line1: 'across B.Tech',
-    line2: 'disciplines',
-  },
-];
+export type { MetricItem };
+export { DEFAULT_PLACEMENT_METRICS };
 
 export default function PlacementMetricsSection() {
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
+  const { data: remoteHomeContent } = useDocument<HomeContentDoc>(HOME_CONTENT_COLLECTION, HOME_CONTENT_DOC_ID);
+
+  const badge = remoteHomeContent?.placementBadge || DEFAULT_HOME_CONTENT.placementBadge || 'PLACEMENTS';
+  const titleMain = remoteHomeContent?.placementTitleMain || DEFAULT_HOME_CONTENT.placementTitleMain || 'Explore';
+  const titleSub = remoteHomeContent?.placementTitleSub || DEFAULT_HOME_CONTENT.placementTitleSub || 'the Top Global recruiters who choose VWU talent';
+  const desc = remoteHomeContent?.placementDesc || DEFAULT_HOME_CONTENT.placementDesc || 'VWU offers top placements with packages of up to ₹59.29 LPA, featuring 100+ recruiters like Google, Amazon, Microsoft, Palo Alto Networks, and Adobe, along with 1,100+ career-focused placements every year.';
+  const metrics = (remoteHomeContent?.placementMetrics && remoteHomeContent.placementMetrics.length > 0)
+    ? remoteHomeContent.placementMetrics
+    : DEFAULT_PLACEMENT_METRICS;
 
   useEffect(() => {
     const el = sectionRef.current;
@@ -67,7 +42,7 @@ export default function PlacementMetricsSection() {
         {/* Header Layout */}
         <div className="vwu-pm-header">
           <div className="vwu-pm-badge-col">
-            <span className="vwu-pm-badge">PLACEMENTS</span>
+            <span className="vwu-pm-badge">{badge}</span>
             <svg className="vwu-pm-badge-swash" width="90" height="12" viewBox="0 0 100 14" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M2 8C25 2 75 2 98 10" stroke="#C9973A" strokeWidth="3.5" strokeLinecap="round"/>
             </svg>
@@ -75,20 +50,18 @@ export default function PlacementMetricsSection() {
 
           <div className="vwu-pm-header-content">
             <h2 className="vwu-pm-title">
-              <span className="vwu-pm-title-main">Explore</span>
-              <span className="vwu-pm-title-sub">the Top Global recruiters who choose VWU talent</span>
+              <span className="vwu-pm-title-main">{titleMain} </span>
+              <span className="vwu-pm-title-sub">{titleSub}</span>
             </h2>
-<p className="vwu-pm-desc">
-               VWU offers top placements with packages of up to ₹59.29 LPA, featuring 100+ recruiters like Google, Amazon, Microsoft, Palo Alto Networks, and Adobe, along with 1,100+ career-focused placements every year.
-             </p>
+            <p className="vwu-pm-desc">{renderBold(desc)}</p>
           </div>
         </div>
 
         {/* 4 Circular Metric Cards Row */}
         <div className={`vwu-pm-circles-grid ${isVisible ? 'is-in-view' : ''}`}>
-          {METRICS.map((item, index) => (
+          {metrics.map((item, index) => (
             <div
-              key={item.id}
+              key={item.id || `metric-${index}`}
               className="vwu-pm-circle-card"
               style={{ animationDelay: `${index * 120}ms` }}
             >

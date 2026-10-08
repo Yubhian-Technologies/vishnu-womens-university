@@ -3,57 +3,32 @@ import { doc, getDoc } from 'firebase/firestore';
 import { setDoc } from '../../../lib/auditLog';
 import { db } from '../../../lib/firebase';
 import { Plus, Trash2, Save, RotateCcw, Home as HomeIcon } from 'lucide-react';
+import ContentBlocksAdmin from './ContentBlocksAdmin';
+import HonouredGuestsAdmin from './HonouredGuestsAdmin';
+import AlumniEventsAdmin from './AlumniEventsAdmin';
+import {
+  type Accreditation,
+  DEFAULT_ACCREDITATIONS,
+  type MetricItem,
+  DEFAULT_PLACEMENT_METRICS,
+  type HomeCtaButton,
+  type AlumniContentData,
+  DEFAULT_ALUMNI_CONTENT,
+  type HomeContentDoc,
+  DEFAULT_HOME_CONTENT,
+  HOME_CONTENT_COLLECTION,
+  HOME_CONTENT_DOC_ID,
+} from '../../../constants/homeContentDefaults';
 
-export interface HomeCtaButton {
-  label: string;
-  link: string;
-}
-
-export interface HomeContentDoc {
-  browserTabTitle: string;
-  metaTitle: string;
-  metaDescription: string;
-  studyIntroTitle: string;
-  studyIntroSubtitle: string;
-  studyIntroParagraphs: string[];
-  activityEyebrow: string;
-  activityTitle: string;
-  activityDesc: string;
-  testimonialSectionTitle: string;
-  ctaHeading: string;
-  ctaBody: string;
-  ctaButtons: HomeCtaButton[];
-}
-
-// Mirrors the hardcoded copy Home.tsx shipped with before this admin editor
-// existed — the public page falls back to this until an admin saves a
-// change, so it renders identically.
-export const DEFAULT_HOME_CONTENT: HomeContentDoc = {
-  browserTabTitle: 'VWU | Leading by Design — Women in Engineering',
-  metaTitle: "Vishnu Women's University | Empowering Women Through Knowledge & Technology",
-  metaDescription: 'First private university for women in Telugu states located in Bhimavaram, Andhra Pradesh. Offering B.Tech, M.Tech, MBA, and Ph.D. programs with world-class infrastructure and top placements.',
-  studyIntroTitle: 'Study at VWU',
-  studyIntroSubtitle: 'Courses for Women',
-  studyIntroParagraphs: [
-    'At VWU, learning extends far beyond the traditional classroom. Students gain personalized, industry-oriented education designed to develop technical expertise, leadership skills, creativity, and the confidence to shape their future.',
-    'Every programme is designed exclusively for women and emphasizes hands-on learning through modern laboratories and practical experiences. Our faculty bring valuable industry exposure into the classroom from the very first year, helping students connect academic knowledge with real-world applications.',
-    'All programmes are approved by AICTE and recognized by the UGC.',
-  ],
-  activityEyebrow: 'Campus Life',
-  activityTitle: 'Recent Events/ News',
-  activityDesc: 'A rolling glimpse of the events, celebrations, and everyday moments that shape life at VWU.',
-  testimonialSectionTitle: 'What Our Students Say',
-  ctaHeading: 'The best way to understand VWU is to see it for yourself.',
-  ctaBody: 'Arrange a campus tour, speak with our admissions team, or submit your application today. Your path to a purposeful engineering career starts here.',
-  ctaButtons: [
-    { label: 'Schedule a Visit', link: '/admissions' },
-    { label: 'Request Information', link: '/admissions' },
-    { label: 'Apply via AP EAPCET', link: '/admissions' },
-  ],
+export type { Accreditation, MetricItem, HomeCtaButton, AlumniContentData, HomeContentDoc };
+export {
+  DEFAULT_ACCREDITATIONS,
+  DEFAULT_PLACEMENT_METRICS,
+  DEFAULT_ALUMNI_CONTENT,
+  DEFAULT_HOME_CONTENT,
+  HOME_CONTENT_COLLECTION,
+  HOME_CONTENT_DOC_ID,
 };
-
-export const HOME_CONTENT_COLLECTION = 'settings';
-export const HOME_CONTENT_DOC_ID = 'homeContent';
 
 export default function HomeContentAdmin() {
   const [data, setData] = useState<HomeContentDoc>(DEFAULT_HOME_CONTENT);
@@ -67,7 +42,13 @@ export default function HomeContentAdmin() {
         const snap = await getDoc(doc(db, HOME_CONTENT_COLLECTION, HOME_CONTENT_DOC_ID));
         if (snap.exists()) {
           const remote = snap.data() as Partial<HomeContentDoc>;
-          setData({ ...DEFAULT_HOME_CONTENT, ...remote });
+          setData({
+            ...DEFAULT_HOME_CONTENT,
+            ...remote,
+            accreditationsList: remote.accreditationsList || DEFAULT_ACCREDITATIONS,
+            placementMetrics: remote.placementMetrics || DEFAULT_PLACEMENT_METRICS,
+            alumniContent: { ...DEFAULT_ALUMNI_CONTENT, ...(remote.alumniContent || {}) },
+          });
         }
       } catch (err) {
         console.error('Failed to load Home page content:', err);
@@ -95,7 +76,19 @@ export default function HomeContentAdmin() {
   };
 
   const handleReset = () => {
-    if (confirm('Reset all Home page copy to original defaults?')) setData(DEFAULT_HOME_CONTENT);
+    if (confirm('Reset all Home page content to original defaults?')) setData(DEFAULT_HOME_CONTENT);
+  };
+
+  const updateAccreditation = (idx: number, patch: Partial<Accreditation>) => {
+    const list = [...(data.accreditationsList || DEFAULT_ACCREDITATIONS)];
+    list[idx] = { ...list[idx], ...patch };
+    set('accreditationsList', list);
+  };
+
+  const updateMetric = (idx: number, patch: Partial<MetricItem>) => {
+    const list = [...(data.placementMetrics || DEFAULT_PLACEMENT_METRICS)];
+    list[idx] = { ...list[idx], ...patch };
+    set('placementMetrics', list);
   };
 
   const updateButton = (idx: number, patch: Partial<HomeCtaButton>) => {
@@ -104,23 +97,25 @@ export default function HomeContentAdmin() {
     set('ctaButtons', ctaButtons);
   };
 
+  const updateAlumni = <K extends keyof AlumniContentData>(k: K, v: AlumniContentData[K]) => {
+    set('alumniContent', { ...data.alumniContent, [k]: v });
+  };
+
   if (loading) {
-    return <p className="admin-loading">Loading Home Page Content Editor...</p>;
+    return <p className="admin-loading">Loading Home Page Editor...</p>;
   }
 
   return (
     <div className="admin-section">
-      <div className="admin-card">
+      <div className="admin-card" style={{ marginBottom: '1.5rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '1.25rem', borderBottom: '1px solid #e5e7eb', paddingBottom: '1rem' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <HomeIcon size={18} color="#c8a03c" />
-              <h2 className="admin-card__title" style={{ margin: 0, padding: 0, border: 'none' }}>Home Page — Copy</h2>
+              <HomeIcon size={20} color="#c8a03c" />
+              <h2 className="admin-card__title" style={{ margin: 0, padding: 0, border: 'none' }}>Home Page</h2>
             </div>
             <p className="admin-field__hint" style={{ margin: '0.35rem 0 0' }}>
-              The narrative text on the Home page — SEO tags, the "Study at VWU" intro, the "Recent Events/News" strip
-              header, the testimonials heading, and the closing Admissions CTA banner. Study cards, testimonials,
-              and photos are each edited separately (Page Content Blocks / Website Photos).
+              Manage all Home page sections from top to bottom in the exact order displayed on the public website.
             </p>
           </div>
           <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -135,7 +130,8 @@ export default function HomeContentAdmin() {
           </div>
         )}
 
-        <h3 className="admin-card__title" style={{ fontSize: '0.95rem', marginTop: 0 }}>SEO</h3>
+        {/* 1. SEO & Tab Title */}
+        <h3 className="admin-card__title" style={{ fontSize: '1.05rem', marginTop: 0, color: '#1e293b' }}>1. SEO &amp; Browser Metadata</h3>
         <div className="admin-form-grid">
           <div className="admin-field">
             <label>Browser Tab Title</label>
@@ -150,9 +146,55 @@ export default function HomeContentAdmin() {
             <textarea value={data.metaDescription} onChange={(e) => set('metaDescription', e.target.value)} className="admin-input" rows={2} style={{ width: '100%', fontFamily: 'inherit' }} />
           </div>
         </div>
+      </div>
 
-        <h3 className="admin-card__title" style={{ fontSize: '0.95rem', marginTop: '1.25rem' }}>"Study at VWU" Intro</h3>
+      {/* 2. Academic Recognition */}
+      <div className="admin-card" style={{ marginBottom: '1.5rem' }}>
+        <h3 className="admin-card__title" style={{ fontSize: '1.05rem', marginTop: 0, color: '#1e293b' }}>2. Academic Recognition (Accreditations &amp; Affiliations)</h3>
         <div className="admin-form-grid">
+          <div className="admin-field">
+            <label>Eyebrow</label>
+            <input type="text" value={data.accreditationsEyebrow} onChange={(e) => set('accreditationsEyebrow', e.target.value)} className="admin-input" />
+          </div>
+          <div className="admin-field">
+            <label>Title</label>
+            <input type="text" value={data.accreditationsTitle} onChange={(e) => set('accreditationsTitle', e.target.value)} className="admin-input" />
+          </div>
+          <div className="admin-field" style={{ gridColumn: '1 / -1' }}>
+            <label>Subtitle</label>
+            <input type="text" value={data.accreditationsSubtitle} onChange={(e) => set('accreditationsSubtitle', e.target.value)} className="admin-input" />
+          </div>
+        </div>
+        <div style={{ marginTop: '1rem' }}>
+          <label style={{ fontWeight: 600, fontSize: '0.85rem', marginBottom: '0.5rem', display: 'block' }}>Accreditation Cards (NBA, NAAC, UGC, AICTE)</label>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '0.75rem' }}>
+            {(data.accreditationsList || DEFAULT_ACCREDITATIONS).map((acc, idx) => (
+              <div key={idx} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                <div style={{ display: 'flex', gap: '0.4rem' }}>
+                  <input type="text" placeholder="Code (e.g. NBA)" value={acc.code} onChange={(e) => updateAccreditation(idx, { code: e.target.value })} className="admin-input" style={{ width: '80px' }} />
+                  <input type="text" placeholder="Title" value={acc.title} onChange={(e) => updateAccreditation(idx, { title: e.target.value })} className="admin-input" style={{ flex: 1 }} />
+                </div>
+                <input type="text" placeholder="Years / Approval text" value={acc.years} onChange={(e) => updateAccreditation(idx, { years: e.target.value })} className="admin-input" />
+                <input type="text" placeholder="Logo Image URL" value={acc.logo} onChange={(e) => updateAccreditation(idx, { logo: e.target.value })} className="admin-input" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* 3. Key Statistics */}
+      <div className="admin-card" style={{ marginBottom: '1.5rem' }}>
+        <h3 className="admin-card__title" style={{ fontSize: '1.05rem', marginTop: 0, color: '#1e293b' }}>3. Key Statistics (VWU at a Glance)</h3>
+        <p className="admin-field__hint" style={{ marginBottom: '1rem' }}>
+          Edit the animated counter statistics displayed in the numbers matrix on the Home page.
+        </p>
+        <ContentBlocksAdmin filterPage="home" filterSection="counters" hideSectionSelector />
+      </div>
+
+      {/* 4. Study at VWU Cards & Intro */}
+      <div className="admin-card" style={{ marginBottom: '1.5rem' }}>
+        <h3 className="admin-card__title" style={{ fontSize: '1.05rem', marginTop: 0, color: '#1e293b' }}>4. "Study at VWU" Cards &amp; Intro</h3>
+        <div className="admin-form-grid" style={{ marginBottom: '1rem' }}>
           <div className="admin-field">
             <label>Heading</label>
             <input type="text" value={data.studyIntroTitle} onChange={(e) => set('studyIntroTitle', e.target.value)} className="admin-input" />
@@ -167,13 +209,18 @@ export default function HomeContentAdmin() {
               value={data.studyIntroParagraphs.join('\n')}
               onChange={(e) => set('studyIntroParagraphs', e.target.value.split('\n'))}
               className="admin-input"
-              rows={5}
+              rows={4}
               style={{ width: '100%', fontFamily: 'inherit', resize: 'vertical' }}
             />
           </div>
         </div>
+        <label style={{ fontWeight: 600, fontSize: '0.85rem', marginBottom: '0.5rem', display: 'block' }}>Study at VWU Cards</label>
+        <ContentBlocksAdmin filterPage="home" filterSection="studyCards" hideSectionSelector />
+      </div>
 
-        <h3 className="admin-card__title" style={{ fontSize: '0.95rem', marginTop: '1.25rem' }}>"Recent Events/News" Strip Header</h3>
+      {/* 5. VWU in Action */}
+      <div className="admin-card" style={{ marginBottom: '1.5rem' }}>
+        <h3 className="admin-card__title" style={{ fontSize: '1.05rem', marginTop: 0, color: '#1e293b' }}>5. VWU in Action (Recent Events / News Strip)</h3>
         <div className="admin-form-grid">
           <div className="admin-field">
             <label>Eyebrow</label>
@@ -188,13 +235,114 @@ export default function HomeContentAdmin() {
             <input type="text" value={data.activityDesc} onChange={(e) => set('activityDesc', e.target.value)} className="admin-input" />
           </div>
         </div>
+      </div>
 
-        <h3 className="admin-card__title" style={{ fontSize: '0.95rem', marginTop: '1.25rem' }}>Testimonials Heading</h3>
-        <div className="admin-field">
+      {/* 6. Placements Section */}
+      <div className="admin-card" style={{ marginBottom: '1.5rem' }}>
+        <h3 className="admin-card__title" style={{ fontSize: '1.05rem', marginTop: 0, color: '#1e293b' }}>6. Placements Section</h3>
+        <div className="admin-form-grid" style={{ marginBottom: '1rem' }}>
+          <div className="admin-field">
+            <label>Badge Label</label>
+            <input type="text" value={data.placementBadge} onChange={(e) => set('placementBadge', e.target.value)} className="admin-input" />
+          </div>
+          <div className="admin-field">
+            <label>Title Main Word</label>
+            <input type="text" value={data.placementTitleMain} onChange={(e) => set('placementTitleMain', e.target.value)} className="admin-input" />
+          </div>
+          <div className="admin-field" style={{ gridColumn: '1 / -1' }}>
+            <label>Title Sub</label>
+            <input type="text" value={data.placementTitleSub} onChange={(e) => set('placementTitleSub', e.target.value)} className="admin-input" />
+          </div>
+          <div className="admin-field" style={{ gridColumn: '1 / -1' }}>
+            <label>Description</label>
+            <textarea value={data.placementDesc} onChange={(e) => set('placementDesc', e.target.value)} className="admin-input" rows={2} style={{ width: '100%', fontFamily: 'inherit' }} />
+          </div>
+        </div>
+        <label style={{ fontWeight: 600, fontSize: '0.85rem', marginBottom: '0.5rem', display: 'block' }}>Placement Highlight Cards</label>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '0.75rem' }}>
+          {(data.placementMetrics || DEFAULT_PLACEMENT_METRICS).map((item, idx) => (
+            <div key={idx} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+              <input type="text" placeholder="Value (e.g. 100+)" value={item.value} onChange={(e) => updateMetric(idx, { value: e.target.value })} className="admin-input" style={{ fontWeight: 600 }} />
+              <input type="text" placeholder="Bold text (e.g. recruiters)" value={item.boldText} onChange={(e) => updateMetric(idx, { boldText: e.target.value })} className="admin-input" />
+              <input type="text" placeholder="Line 1 (e.g. partner with)" value={item.line1} onChange={(e) => updateMetric(idx, { line1: e.target.value })} className="admin-input" />
+              <input type="text" placeholder="Line 2 (e.g. VWU)" value={item.line2} onChange={(e) => updateMetric(idx, { line2: e.target.value })} className="admin-input" />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 7. VWU in Action (YouTube Videos) */}
+      <div className="admin-card" style={{ marginBottom: '1.5rem' }}>
+        <h3 className="admin-card__title" style={{ fontSize: '1.05rem', marginTop: 0, color: '#1e293b' }}>7. VWU in Action (YouTube Showcase Videos)</h3>
+        <p className="admin-field__hint" style={{ marginBottom: '1rem' }}>
+          Manage the YouTube showcase video carousel featured on the Home page. Title = Name/Topic, Value/Slug = YouTube URL (e.g. https://youtu.be/P9TPB69kmWQ).
+        </p>
+        <ContentBlocksAdmin filterPage="home" filterSection="vwuInAction" hideSectionSelector />
+      </div>
+
+      {/* 8. Eminent Personalities */}
+      <div className="admin-card" style={{ marginBottom: '1.5rem' }}>
+        <h3 className="admin-card__title" style={{ fontSize: '1.05rem', marginTop: 0, color: '#1e293b' }}>8. Eminent Personalities (Honoured Guests)</h3>
+        <p className="admin-field__hint" style={{ marginBottom: '1rem' }}>
+          Manage dignitaries, speakers, and eminent personalities featured on the Home page.
+        </p>
+        <HonouredGuestsAdmin />
+      </div>
+
+      {/* 9. Alumni & Giving */}
+      <div className="admin-card" style={{ marginBottom: '1.5rem' }}>
+        <h3 className="admin-card__title" style={{ fontSize: '1.05rem', marginTop: 0, color: '#1e293b' }}>9. Alumni &amp; Giving</h3>
+        <div className="admin-form-grid" style={{ marginBottom: '1rem' }}>
+          <div className="admin-field">
+            <label>Eyebrow</label>
+            <input type="text" value={data.alumniContent.eyebrow} onChange={(e) => updateAlumni('eyebrow', e.target.value)} className="admin-input" />
+          </div>
+          <div className="admin-field">
+            <label>Main Title</label>
+            <input type="text" value={data.alumniContent.title} onChange={(e) => updateAlumni('title', e.target.value)} className="admin-input" />
+          </div>
+          <div className="admin-field">
+            <label>Row 1 Title</label>
+            <input type="text" value={data.alumniContent.row1Title} onChange={(e) => updateAlumni('row1Title', e.target.value)} className="admin-input" />
+          </div>
+          <div className="admin-field" style={{ gridColumn: '1 / -1' }}>
+            <label>Row 1 Description</label>
+            <textarea value={data.alumniContent.row1Desc} onChange={(e) => updateAlumni('row1Desc', e.target.value)} className="admin-input" rows={3} style={{ width: '100%', fontFamily: 'inherit' }} />
+          </div>
+          <div className="admin-field">
+            <label>Row 2 Title</label>
+            <input type="text" value={data.alumniContent.row2Title} onChange={(e) => updateAlumni('row2Title', e.target.value)} className="admin-input" />
+          </div>
+          <div className="admin-field" style={{ gridColumn: '1 / -1' }}>
+            <label>Row 2 Description</label>
+            <textarea value={data.alumniContent.row2Desc} onChange={(e) => updateAlumni('row2Desc', e.target.value)} className="admin-input" rows={3} style={{ width: '100%', fontFamily: 'inherit' }} />
+          </div>
+          <div className="admin-field">
+            <label>CTA Button Label</label>
+            <input type="text" value={data.alumniContent.ctaLabel} onChange={(e) => updateAlumni('ctaLabel', e.target.value)} className="admin-input" />
+          </div>
+          <div className="admin-field">
+            <label>CTA Button Link</label>
+            <input type="text" value={data.alumniContent.ctaHref} onChange={(e) => updateAlumni('ctaHref', e.target.value)} className="admin-input" />
+          </div>
+        </div>
+        <label style={{ fontWeight: 600, fontSize: '0.85rem', marginBottom: '0.5rem', display: 'block' }}>Alumni Photos / Events</label>
+        <AlumniEventsAdmin />
+      </div>
+
+      {/* 10. Testimonials */}
+      <div className="admin-card" style={{ marginBottom: '1.5rem' }}>
+        <h3 className="admin-card__title" style={{ fontSize: '1.05rem', marginTop: 0, color: '#1e293b' }}>10. Student Voices &amp; Testimonials</h3>
+        <div className="admin-field" style={{ marginBottom: '1rem' }}>
+          <label>Section Heading</label>
           <input type="text" value={data.testimonialSectionTitle} onChange={(e) => set('testimonialSectionTitle', e.target.value)} className="admin-input" />
         </div>
+        <ContentBlocksAdmin filterPage="home" filterSection="testimonials" hideSectionSelector />
+      </div>
 
-        <h3 className="admin-card__title" style={{ fontSize: '0.95rem', marginTop: '1.25rem' }}>Admissions CTA Banner</h3>
+      {/* 11. Admissions CTA Banner */}
+      <div className="admin-card">
+        <h3 className="admin-card__title" style={{ fontSize: '1.05rem', marginTop: 0, color: '#1e293b' }}>11. Admissions CTA Banner</h3>
         <div className="admin-form-grid">
           <div className="admin-field" style={{ gridColumn: '1 / -1' }}>
             <label>Heading</label>
