@@ -292,7 +292,7 @@ export default function DreamHouseLabPage({ item, sections }: DreamHouseLabPageP
                     <tbody>
                       {dhcl.outcomes.team.rows.map((row, rIdx) => (
                         <tr key={rIdx}>
-                          {row.map((cell, cIdx) => (
+                          {row.cells.map((cell, cIdx) => (
                             <td key={cIdx} className={cIdx === 0 ? 'dhcl-td-sno' : cIdx === 1 ? 'dhcl-td-regd' : ''}>
                               {cell}
                             </td>
@@ -359,7 +359,7 @@ export default function DreamHouseLabPage({ item, sections }: DreamHouseLabPageP
                     <tbody>
                       {dhcl.academicProject.team.rows.map((row, rIdx) => (
                         <tr key={rIdx}>
-                          {row.map((cell, cIdx) => (
+                          {row.cells.map((cell, cIdx) => (
                             <td key={cIdx} className={cIdx === 3 && cell ? 'dhcl-faculty-cell' : ''}>
                               {cell}
                             </td>

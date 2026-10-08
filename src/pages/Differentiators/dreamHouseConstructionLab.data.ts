@@ -12,7 +12,10 @@ export interface DhclMember {
 
 export interface DhclSimpleTable {
   headers: string[];
-  rows: string[][];
+  // Array of { cells } objects rather than a plain string[][] because
+  // Firestore rejects arrays nested directly inside arrays (the admin
+  // editor's save() writes this whole object straight to Firestore).
+  rows: { cells: string[] }[];
 }
 
 export interface DhclStudentGroup {
@@ -48,10 +51,10 @@ export const dreamHouseConstructionLab = {
     team: {
       headers: ['S.No', 'Regd No.', 'Name', 'Faculty'],
       rows: [
-        ['1', '20D01A0116', 'G. Kavya Sri', 'Dr. P. Gireesh Kumar'],
-        ['2', '20D01A0118', 'G. Supriya', ''],
-        ['3', '20D01A0123', 'K. Naga Suneetha', ''],
-        ['4', '20D01A0128', 'K. V. N. B. L. Hima Bindu', ''],
+        { cells: ['1', '20D01A0116', 'G. Kavya Sri', 'Dr. P. Gireesh Kumar'] },
+        { cells: ['2', '20D01A0118', 'G. Supriya', ''] },
+        { cells: ['3', '20D01A0123', 'K. Naga Suneetha', ''] },
+        { cells: ['4', '20D01A0128', 'K. V. N. B. L. Hima Bindu', ''] },
       ],
     } as DhclSimpleTable,
     paragraphs: [
@@ -125,18 +128,18 @@ export const dreamHouseConstructionLab = {
     team: {
       headers: ['S.No', 'Regd. No.', 'Name'],
       rows: [
-        ['1', '20D01A0116', 'G. Kavya Sri – IV B.Tech'],
-        ['2', '20D01A0123', 'K. Naga Suneetha – IV B.Tech'],
-        ['3', '20D01A0114', 'G. Sraveni – IV B.Tech'],
-        ['4', '21B0A0107', 'G. Hari Priya – IV B.Tech'],
-        ['5', '20D01A0128', 'K. Hima Bindu – IV B.Tech'],
-        ['6', '20D01A0141', 'P. Guna Satya Vani – IV B.Tech'],
-        ['7', '21B0A0126', 'K. Lekshmi Praasnna – III B.Tech'],
-        ['8', '22B0A0110', 'D. Praasnna Lekshmi – III B.Tech'],
-        ['9', '22B0A0124', 'M. Poojithe – III B.Tech'],
-        ['10', '22B0A0139', 'S. Varshini – III B.Tech'],
-        ['11', '22B0A0147', 'V. Jehnavi – III B.Tech'],
-        ['12', '22B0A0105', 'Ch. Mourice – II B.Tech'],
+        { cells: ['1', '20D01A0116', 'G. Kavya Sri – IV B.Tech'] },
+        { cells: ['2', '20D01A0123', 'K. Naga Suneetha – IV B.Tech'] },
+        { cells: ['3', '20D01A0114', 'G. Sraveni – IV B.Tech'] },
+        { cells: ['4', '21B0A0107', 'G. Hari Priya – IV B.Tech'] },
+        { cells: ['5', '20D01A0128', 'K. Hima Bindu – IV B.Tech'] },
+        { cells: ['6', '20D01A0141', 'P. Guna Satya Vani – IV B.Tech'] },
+        { cells: ['7', '21B0A0126', 'K. Lekshmi Praasnna – III B.Tech'] },
+        { cells: ['8', '22B0A0110', 'D. Praasnna Lekshmi – III B.Tech'] },
+        { cells: ['9', '22B0A0124', 'M. Poojithe – III B.Tech'] },
+        { cells: ['10', '22B0A0139', 'S. Varshini – III B.Tech'] },
+        { cells: ['11', '22B0A0147', 'V. Jehnavi – III B.Tech'] },
+        { cells: ['12', '22B0A0105', 'Ch. Mourice – II B.Tech'] },
       ],
     } as DhclSimpleTable,
   },

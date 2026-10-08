@@ -15,7 +15,10 @@ export interface EdaToolsTable {
   title: string;
   intro: string;
   headers: string[];
-  rows: string[][];
+  // Array of { cells } objects rather than a plain string[][] because
+  // Firestore rejects arrays nested directly inside arrays (the admin
+  // editor's save() writes this whole object straight to Firestore).
+  rows: { cells: string[] }[];
 }
 
 export interface StatCard {
@@ -124,14 +127,14 @@ export const chipsToStartup = {
       'The programme provides access to a range of Electronic Design Automation tools, semiconductor design platforms and FPGA development resources supporting design, simulation, verification, synthesis and implementation.',
     headers: ['S. No', 'Name of the EDA Tool', 'Product Description'],
     rows: [
-      ['1', 'AMD Xilinx VITIS', 'VITIS, Vivado Tools, Vitis High Level Synthesis, Vitis Model Compressor, Matlab Addon'],
-      ['2', 'Cadence', 'Full custom IC design Bundle, Semi-custom IC Design Bundle, SCL PDK for tapeout'],
-      ['3', 'Synopsys', 'Front end and Back-end Bundles, TCAD and 2D TCAD Bundles'],
-      ['4', 'Siemens EDA', 'Tanner EDA, Calibre EDA, Questa EDA, Tessent EDA, Oasys, Nitro, Precision RTL synthesis, Catapult'],
-      ['5', 'Silvaco', 'TCAD (Semiconductor Process and Device Simulator), Analog Custom IC Design – EDA Tools, Standard Cell Library Development Tools, IPs'],
-      ['6', 'Ansys', 'HFSS, Totem, Redhawk, Power Artist EDA, RaptorX, Sea Scape'],
-      ['7', 'Keysight', 'Advanced Design System, PathWave Software, Quantumpro, SystemVue Software'],
-      ['8', 'FPGA Boards', 'PYNQ-Z2, UltraScale Boards, Zynq, Kria Development Boards'],
+      { cells: ['1', 'AMD Xilinx VITIS', 'VITIS, Vivado Tools, Vitis High Level Synthesis, Vitis Model Compressor, Matlab Addon'] },
+      { cells: ['2', 'Cadence', 'Full custom IC design Bundle, Semi-custom IC Design Bundle, SCL PDK for tapeout'] },
+      { cells: ['3', 'Synopsys', 'Front end and Back-end Bundles, TCAD and 2D TCAD Bundles'] },
+      { cells: ['4', 'Siemens EDA', 'Tanner EDA, Calibre EDA, Questa EDA, Tessent EDA, Oasys, Nitro, Precision RTL synthesis, Catapult'] },
+      { cells: ['5', 'Silvaco', 'TCAD (Semiconductor Process and Device Simulator), Analog Custom IC Design – EDA Tools, Standard Cell Library Development Tools, IPs'] },
+      { cells: ['6', 'Ansys', 'HFSS, Totem, Redhawk, Power Artist EDA, RaptorX, Sea Scape'] },
+      { cells: ['7', 'Keysight', 'Advanced Design System, PathWave Software, Quantumpro, SystemVue Software'] },
+      { cells: ['8', 'FPGA Boards', 'PYNQ-Z2, UltraScale Boards, Zynq, Kria Development Boards'] },
     ],
   } as EdaToolsTable,
 
