@@ -70,6 +70,13 @@ export interface TiDspDoc {
   additionalSections?: CustomTiDspSection[];
 }
 
+// A definite (non-optional) fallback so spreading it always keeps
+// TiDspFacultyMember's required `name` field as `string`, not
+// `string | undefined` -- spreading `DEFAULT_STATE.team?.inCharge`
+// directly would widen `name` to optional since TiDspDoc['team'] is itself
+// an optional field.
+const EMPTY_IN_CHARGE: TiDspFacultyMember = { name: '', designation: '', email: '', mobile: '', interests: '' };
+
 const DEFAULT_STATE: TiDspDoc = {
   hero: {
     title: 'TI-DSP Centre of Excellence',
@@ -172,7 +179,7 @@ export default function TiDspContentAdmin() {
             years: data.trainingResearch?.years && data.trainingResearch.years.length > 0 ? data.trainingResearch.years : DEFAULT_STATE.trainingResearch?.years,
           },
           team: {
-            inCharge: { ...DEFAULT_STATE.team?.inCharge, ...data.team?.inCharge },
+            inCharge: { ...EMPTY_IN_CHARGE, ...DEFAULT_STATE.team?.inCharge, ...data.team?.inCharge },
             facultyMembers: data.team?.facultyMembers && data.team.facultyMembers.length > 0 ? data.team.facultyMembers : DEFAULT_STATE.team?.facultyMembers,
           },
           additionalSections: data.additionalSections || [],
@@ -885,7 +892,7 @@ export default function TiDspContentAdmin() {
                   type="text"
                   className="admin-input"
                   value={form.team?.inCharge?.name || ''}
-                  onChange={(e) => setForm((p) => ({ ...p, team: { ...p.team, inCharge: { ...p.team?.inCharge, name: e.target.value } } }))}
+                  onChange={(e) => setForm((p) => ({ ...p, team: { ...p.team, inCharge: { ...EMPTY_IN_CHARGE, ...p.team?.inCharge, name: e.target.value } } }))}
                 />
               </div>
               <div>
@@ -894,7 +901,7 @@ export default function TiDspContentAdmin() {
                   type="text"
                   className="admin-input"
                   value={form.team?.inCharge?.designation || ''}
-                  onChange={(e) => setForm((p) => ({ ...p, team: { ...p.team, inCharge: { ...p.team?.inCharge, designation: e.target.value } } }))}
+                  onChange={(e) => setForm((p) => ({ ...p, team: { ...p.team, inCharge: { ...EMPTY_IN_CHARGE, ...p.team?.inCharge, designation: e.target.value } } }))}
                 />
               </div>
               <div>
@@ -903,7 +910,7 @@ export default function TiDspContentAdmin() {
                   type="text"
                   className="admin-input"
                   value={form.team?.inCharge?.email || ''}
-                  onChange={(e) => setForm((p) => ({ ...p, team: { ...p.team, inCharge: { ...p.team?.inCharge, email: e.target.value } } }))}
+                  onChange={(e) => setForm((p) => ({ ...p, team: { ...p.team, inCharge: { ...EMPTY_IN_CHARGE, ...p.team?.inCharge, email: e.target.value } } }))}
                 />
               </div>
               <div>
@@ -912,7 +919,7 @@ export default function TiDspContentAdmin() {
                   type="text"
                   className="admin-input"
                   value={form.team?.inCharge?.mobile || ''}
-                  onChange={(e) => setForm((p) => ({ ...p, team: { ...p.team, inCharge: { ...p.team?.inCharge, mobile: e.target.value } } }))}
+                  onChange={(e) => setForm((p) => ({ ...p, team: { ...p.team, inCharge: { ...EMPTY_IN_CHARGE, ...p.team?.inCharge, mobile: e.target.value } } }))}
                 />
               </div>
               <div style={{ gridColumn: '1 / -1' }}>
@@ -921,7 +928,7 @@ export default function TiDspContentAdmin() {
                   type="text"
                   className="admin-input"
                   value={form.team?.inCharge?.interests || ''}
-                  onChange={(e) => setForm((p) => ({ ...p, team: { ...p.team, inCharge: { ...p.team?.inCharge, interests: e.target.value } } }))}
+                  onChange={(e) => setForm((p) => ({ ...p, team: { ...p.team, inCharge: { ...EMPTY_IN_CHARGE, ...p.team?.inCharge, interests: e.target.value } } }))}
                 />
               </div>
             </div>
