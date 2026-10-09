@@ -31,8 +31,6 @@ import ForeignLanguagesContentAdmin from './ForeignLanguagesContentAdmin';
 import SmartInterviewsContentAdmin from './SmartInterviewsContentAdmin';
 import RuralWomenTechParkContentAdmin from './RuralWomenTechParkContentAdmin';
 import IicContentAdmin from './IicContentAdmin';
-import IicCouncilMembersAdmin from './IicCouncilMembersAdmin';
-import IicDocumentsAdmin from './IicDocumentsAdmin';
 import VdlAchievementsAdmin from './VdlAchievementsAdmin';
 import VdlTeamAdmin from './VdlTeamAdmin';
 import RwtpReportsAdmin from './RwtpReportsAdmin';
@@ -101,8 +99,6 @@ const ITEM_SUB_SECTIONS: Record<string, { key: string; label: string; Component:
   ],
   'institution-innovation-cell': [
     { key: 'page-content', label: 'All Page Content & Sections', Component: IicContentAdmin },
-    { key: 'council-members', label: 'Council Members', Component: IicCouncilMembersAdmin },
-    { key: 'documents', label: 'Documents', Component: IicDocumentsAdmin },
   ],
 };
 
@@ -248,7 +244,7 @@ export const DIFFERENTIATOR_CATEGORIES = [
 // Description/Vision/Mission/Objectives/Custom Sections Overview section
 // every other item has. Only gates the Tabs editor below; every other field
 // applies to these 4 exactly like any other item.
-const TABS_SLUGS = new Set(['talentsprint-wise', 'institution-innovation-cell', 'vehicle-design-lab', 'aicte-idea-lab']);
+const TABS_SLUGS = new Set(['talentsprint-wise', 'vehicle-design-lab', 'aicte-idea-lab']);
 
 // The single source of truth for "what does this item look like under the
 // new structure" — used both when opening one item for edit (startEdit) and
@@ -795,7 +791,7 @@ export default function DifferentiatorsAdmin() {
             <label htmlFor="field-hero-subtitle">Hero Subtitle (shown under the title on the detail page's hero banner, only when not an external link)</label>
             <textarea id="field-hero-subtitle" rows={2} value={form.summary || ''} onChange={(e) => set('summary', e.target.value)} />
           </div>
-          {form.slug !== 'aicte-idea-lab' && (
+          {form.slug !== 'aicte-idea-lab' && form.slug !== 'institution-innovation-cell' && form.slug !== 'microchip-embedded' && (
             <>
               <BlockEditor
                 blockKey="description"
@@ -831,6 +827,11 @@ export default function DifferentiatorsAdmin() {
                 onPhotoUploaded={(r) => handleBlockPhotoUploaded('objectives', r)}
                 onPhotoRemoved={() => handleBlockPhotoRemoved('objectives')}
               />
+            </>
+          )}
+
+          {!TABS_SLUGS.has(form.slug) && form.slug !== 'institution-innovation-cell' && form.slug !== 'microchip-embedded' && (
+            <>
               <div className="admin-field admin-field--full"><hr /><h3>Custom Sections</h3></div>
               <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
                 Add any section this item needs beyond Description/Vision/Mission/Objectives above — Key Highlights,
@@ -893,7 +894,11 @@ export default function DifferentiatorsAdmin() {
         const ActiveComponent = active.Component;
         return (
           <div className="admin-card">
-            <h2 className="admin-card__title">Extra Content — {form.title}</h2>
+            <h2 className="admin-card__title">
+              {subs.length === 1 && subs[0].key === 'page-content'
+                ? `Page Content & Sections — ${form.title}`
+                : `Extra Content — ${form.title}`}
+            </h2>
             <p className="admin-field__hint" style={{ marginBottom: '1rem' }}>
               This item has its own extra editable content, shown here while you're editing it.
             </p>

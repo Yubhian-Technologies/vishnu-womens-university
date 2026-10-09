@@ -134,6 +134,10 @@ export default function IicPage({ item, sections = [] }: IicPageProps) {
   const iic = {
     ...institutionInnovationCell,
     ...(remoteData || {}),
+    telemetry: {
+      ...institutionInnovationCell.telemetry,
+      ...(remoteData?.telemetry || {}),
+    },
     about: remoteData?.about || institutionInnovationCell.about,
     vision: remoteData?.vision || institutionInnovationCell.vision,
     mission: remoteData?.mission || institutionInnovationCell.mission,
@@ -223,8 +227,8 @@ export default function IicPage({ item, sections = [] }: IicPageProps) {
               <Star className="iic-telemetry-icon" />
             </div>
             <div className="iic-telemetry-info">
-              <span className="iic-telemetry-val">4 / 5 Stars</span>
-              <span className="iic-telemetry-lbl">IIC 5.0 Rating</span>
+              <span className="iic-telemetry-val">{iic.telemetry?.starsValue || '4 / 5 Stars'}</span>
+              <span className="iic-telemetry-lbl">{iic.telemetry?.starsLabel || 'IIC 5.0 Rating'}</span>
             </div>
           </div>
 
@@ -233,8 +237,8 @@ export default function IicPage({ item, sections = [] }: IicPageProps) {
               <Award className="iic-telemetry-icon" />
             </div>
             <div className="iic-telemetry-info">
-              <span className="iic-telemetry-val">Rank Band 151–300</span>
-              <span className="iic-telemetry-lbl">NIRF Innovation 2023</span>
+              <span className="iic-telemetry-val">{iic.telemetry?.rankValue || 'Rank Band 151–300'}</span>
+              <span className="iic-telemetry-lbl">{iic.telemetry?.rankLabel || 'NIRF Innovation 2023'}</span>
             </div>
           </div>
 
@@ -243,8 +247,8 @@ export default function IicPage({ item, sections = [] }: IicPageProps) {
               <Calendar className="iic-telemetry-icon" />
             </div>
             <div className="iic-telemetry-info">
-              <span className="iic-telemetry-val">2018–2019</span>
-              <span className="iic-telemetry-lbl">IIC Registration Year</span>
+              <span className="iic-telemetry-val">{iic.telemetry?.yearValue || '2018–2019'}</span>
+              <span className="iic-telemetry-lbl">{iic.telemetry?.yearLabel || 'IIC Registration Year'}</span>
             </div>
           </div>
 
@@ -253,8 +257,8 @@ export default function IicPage({ item, sections = [] }: IicPageProps) {
               <Building2 className="iic-telemetry-icon" />
             </div>
             <div className="iic-telemetry-info">
-              <span className="iic-telemetry-val">VISHVA TBI</span>
-              <span className="iic-telemetry-lbl">NIDHI TBI Ecosystem</span>
+              <span className="iic-telemetry-val">{iic.telemetry?.tbiValue || 'VISHVA TBI'}</span>
+              <span className="iic-telemetry-lbl">{iic.telemetry?.tbiLabel || 'NIDHI TBI Ecosystem'}</span>
             </div>
           </div>
         </div>
@@ -773,18 +777,9 @@ export default function IicPage({ item, sections = [] }: IicPageProps) {
         </aside>
       </div>
 
-      {/* Photos/sections added via Admin → Differentiators → (this item's)
-          main "Photos"/Custom Sections editor — separate from the Quick
-          Navigation admin tabs above (item.tabs, rendered via adminTabs).
-          Previously this component only ever read item.tabs and
-          item.description; the `sections` prop (item.customSections,
-          computed by DifferentiatorDetail.tsx) was accepted but never
-          rendered, so anything added there — photos included — silently
-          never showed up on this page. Always visible, not tied to any one
-          of the tabs above. Same pattern MicrochipPage.tsx already uses for
-          its own "Dynamic Custom Sections" block. */}
-      <CustomSectionsGalleries sections={sections} />
-      <CustomSectionsAccordion sections={sections} />
+      {/* Dynamic Custom Sections (Galleries & Accordions) */}
+      <CustomSectionsGalleries sections={(remoteData?.customSections && remoteData.customSections.length > 0) ? remoteData.customSections : sections} />
+      <CustomSectionsAccordion sections={(remoteData?.customSections && remoteData.customSections.length > 0) ? remoteData.customSections : sections} />
     </div>
   );
 }
