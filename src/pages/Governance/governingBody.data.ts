@@ -38,5 +38,5 @@ export const GOVERNING_BODY_DEFAULTS: GoverningBodyDefault[] = [
 export const GOVERNING_BODY_NOTES: string[] = [
   'The Chancellor is the chairperson of the Governing Body, and the Registrar is the Member-Secretary without voting rights',
   'The term of office of an ex-officio member shall be as long as he/she holds the post by virtue of which he/she becomes a member of the Governing Body',
-  'The GB shall meet at least four (4) times in an academic year, with at least one meeting in a quarter',
+  'The GB shall meet at least four times in an academic year, with at least one meeting in a quarter',
 ];
