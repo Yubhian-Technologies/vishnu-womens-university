@@ -20,6 +20,7 @@ import {
   Building2,
   Sparkles,
   CheckCircle2,
+  X,
 } from 'lucide-react';
 import { renderBold } from '../../lib/boldText';
 import './TiDspPage.css';
@@ -39,7 +40,10 @@ export default function TiDspPage({
 }: TiDspPageProps) {
   const { data: remoteData } = useDocument<TiDspDoc>('settings', 'tiDspCoe');
   const [isTeamOpen, setIsTeamOpen] = useState(false);
+  const [isCollabOpen, setIsCollabOpen] = useState(false);
+  const [isPartnersOpen, setIsPartnersOpen] = useState(false);
   const [activeProjectYear, setActiveProjectYear] = useState<number>(0);
+  const [lightboxImg, setLightboxImg] = useState<string | null>(null);
 
   const aboutTitle = remoteData?.aboutTitle || item?.title || tiDspCoe.aboutTitle;
   const overview = remoteData?.overview && remoteData.overview.length > 0 ? remoteData.overview : tiDspCoe.overview;
@@ -69,8 +73,34 @@ export default function TiDspPage({
     inCharge: remoteData?.team?.inCharge?.name ? remoteData.team.inCharge : tiDspCoe.team.inCharge,
     facultyMembers: remoteData?.team?.facultyMembers && remoteData.team.facultyMembers.length > 0 ? remoteData.team.facultyMembers : tiDspCoe.team.facultyMembers,
   };
+  const collaborations = remoteData?.collaborations || {
+    title: 'Collaborations [National / International]',
+    paragraphs: [
+      'The TI- DSP lab initially consisted of Five TMS320C6713 DSK kits along with accessories and then it received six Analog Starter Kits from Texas Instruments, India as donation. The Lab had thirty six Personal Computers a Cathode Ray Oscilloscope and Function generator other than the boards. Later, the Lab received a funding of Rs10 Lakhs in MODROBS from AICTE, New Delhi for modernizing the laboratory. Then, the following boards are purchased from Texas Instruments, India to enhance the lab facilities along with improving the research and development status of the lab.',
+    ],
+  };
+  const partners = remoteData?.partners || {
+    title: 'Partners',
+    paragraphs: [
+      'Texas Instruments, India — Technical resource and development platform partner.',
+      'AICTE, New Delhi — Modernisation funding partner under MODROBS.',
+      'Department of Science and Technology (DST), Government of India — Research funding partner for speech enhancement technology.',
+    ],
+    items: [
+      'Texas Instruments, India',
+      'AICTE, New Delhi',
+      'Department of Science and Technology (DST), Govt. of India',
+    ],
+  };
+  const gallery = remoteData?.gallery || {
+    title: 'Student Project Development Session',
+    subtitle: 'Glimpses of practical learning, experimentation and project development at the TI-DSP Centre.',
+    photos: [],
+  };
 
-  const overviewParagraphs = item?.description?.textContent
+  const overviewParagraphs = remoteData?.overview && remoteData.overview.length > 0
+    ? remoteData.overview
+    : item?.description?.textContent
     ? [item.description.textContent]
     : descriptionSection?.textContent
     ? [descriptionSection.textContent]
@@ -79,22 +109,56 @@ export default function TiDspPage({
     : overview;
 
   const visionText =
+    remoteData?.vision ||
     (item?.vision && hasCustomSectionContent(item.vision) && (item.vision.textContent || item.vision.listText)) ||
     introBlocks.find((s) => s.id === 'vision')?.textContent?.trim() ||
     vision;
 
   const missionList =
+    (remoteData?.mission && remoteData.mission.length > 0 ? remoteData.mission : null) ||
     (item?.mission && hasCustomSectionContent(item.mission) && (item.mission.listText?.split('\n').filter(Boolean) || [item.mission.textContent || ''])) ||
     introBlocks.find((s) => s.id === 'mission')?.listText?.split('\n').filter(Boolean) ||
     mission;
 
   const objectivesList =
+    (remoteData?.objectives && remoteData.objectives.length > 0 ? remoteData.objectives : null) ||
     (item?.objectives && hasCustomSectionContent(item.objectives) && (item.objectives.listText?.split('\n').filter(Boolean) || [item.objectives.textContent || ''])) ||
     introBlocks.find((s) => s.id === 'objectives')?.listText?.split('\n').filter(Boolean) ||
     objectives;
 
-  const accordionSections = customSections.filter(
-    (s) => s.id !== 'team' && !s.label.toLowerCase().includes('team') && s.placement !== 'intro'
+  const isDuplicateBuiltinSection = (s: CustomSection) => {
+    const lower = (s.label || '').toLowerCase();
+    const lowerId = (s.id || '').toLowerCase();
+    return (
+      lower.includes('team') ||
+      lowerId.includes('team') ||
+      lower.includes('collab') ||
+      lowerId.includes('collab') ||
+      lower.includes('partner') ||
+      lowerId.includes('partner') ||
+      lower.includes('national') ||
+      lower.includes('international') ||
+      lower.includes('training / research') ||
+      lower.includes('academic project') ||
+      lower.includes('student project') ||
+      lower.includes('training/research') ||
+      lowerId.includes('training-research') ||
+      lowerId.includes('academic-project') ||
+      lowerId.includes('training_research') ||
+      lowerId.includes('student-project')
+    );
+  };
+
+  const effectiveCustomSections = (
+    remoteData?.customSections && remoteData.customSections.length > 0
+      ? remoteData.customSections
+      : customSections.length > 0
+      ? customSections
+      : item?.customSections || []
+  ).filter((s) => !isDuplicateBuiltinSection(s));
+
+  const accordionSections = effectiveCustomSections.filter(
+    (s) => s.placement !== 'intro'
   );
 
   return (
@@ -448,8 +512,9 @@ export default function TiDspPage({
         </div>
       </section>
 
-      {/* 9. TEAM & FACULTY (COLLAPSIBLE ACCORDION ITEM) */}
-      <section className="ti-team-accordion-wrapper" style={{ marginTop: '2.5rem', marginBottom: '0.75rem' }}>
+      {/* 9. TEAM & ACCORDIONS (COLLAPSIBLE ACCORDION ITEMS) */}
+      <section className="ti-team-accordion-wrapper" style={{ marginTop: '2.5rem', marginBottom: '0.75rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        {/* Accordion 01: Team */}
         <div className={`cs-accordion-item${isTeamOpen ? ' is-open' : ''}`}>
           <button
             type="button"
@@ -522,17 +587,81 @@ export default function TiDspPage({
             </div>
           </SmoothCollapse>
         </div>
+
+        {/* Accordion 02: Collaborations [National / International] */}
+        <div className={`cs-accordion-item${isCollabOpen ? ' is-open' : ''}`}>
+          <button
+            type="button"
+            className="cs-accordion-trigger"
+            onClick={() => setIsCollabOpen(!isCollabOpen)}
+            aria-expanded={isCollabOpen}
+          >
+            <span className="cs-accordion-num" aria-hidden="true">02</span>
+            <span className="cs-accordion-title">{collaborations.title || 'Collaborations [National / International]'}</span>
+            <ChevronDown size={18} strokeWidth={2.25} className="cs-accordion-chevron" aria-hidden="true" />
+          </button>
+
+          <SmoothCollapse open={isCollabOpen}>
+            <div className="cs-accordion-body" style={{ padding: '2rem 1.5rem', background: '#ffffff', borderTop: '1px solid #e2e8f0' }}>
+              {(collaborations.paragraphs || []).map((p, pIdx) => (
+                <div key={pIdx} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', marginBottom: pIdx < (collaborations.paragraphs?.length || 0) - 1 ? '1rem' : 0 }}>
+                  <CheckCircle2 size={18} color="#f59e0b" style={{ flexShrink: 0, marginTop: '3px' }} />
+                  <p style={{ margin: 0, color: '#334155', lineHeight: 1.7, fontSize: '0.95rem' }}>
+                    {renderBold(p)}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </SmoothCollapse>
+        </div>
+
+        {/* Accordion 03: Partners */}
+        <div className={`cs-accordion-item${isPartnersOpen ? ' is-open' : ''}`}>
+          <button
+            type="button"
+            className="cs-accordion-trigger"
+            onClick={() => setIsPartnersOpen(!isPartnersOpen)}
+            aria-expanded={isPartnersOpen}
+          >
+            <span className="cs-accordion-num" aria-hidden="true">03</span>
+            <span className="cs-accordion-title">{partners.title || 'Partners'}</span>
+            <ChevronDown size={18} strokeWidth={2.25} className="cs-accordion-chevron" aria-hidden="true" />
+          </button>
+
+          <SmoothCollapse open={isPartnersOpen}>
+            <div className="cs-accordion-body" style={{ padding: '2rem 1.5rem', background: '#ffffff', borderTop: '1px solid #e2e8f0' }}>
+              {(partners.paragraphs || []).map((p, pIdx) => (
+                <div key={pIdx} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', marginBottom: pIdx < (partners.paragraphs?.length || 0) - 1 ? '1rem' : 0 }}>
+                  <CheckCircle2 size={18} color="#f59e0b" style={{ flexShrink: 0, marginTop: '3px' }} />
+                  <p style={{ margin: 0, color: '#334155', lineHeight: 1.7, fontSize: '0.95rem' }}>
+                    {renderBold(p)}
+                  </p>
+                </div>
+              ))}
+              {(partners.items && partners.items.length > 0) && !(partners.paragraphs && partners.paragraphs.length > 0) && (
+                <ul className="iic-checklist" style={{ margin: 0 }}>
+                  {partners.items.map((it, idx) => (
+                    <li key={idx}>
+                      <CheckCircle2 size={16} className="iic-check-icon gold" />
+                      <span>{renderBold(it)}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </SmoothCollapse>
+        </div>
       </section>
 
-      {/* 10. DYNAMIC CUSTOM SECTIONS ACCORDION (Starting at 02) */}
-      {customSections.some((s) => s.placement === 'intro') && (
+      {/* 10. DYNAMIC CUSTOM SECTIONS ACCORDION (Starting at 04) */}
+      {effectiveCustomSections.some((s) => s.placement === 'intro') && (
         <section className="ti-custom-sections" style={{ marginBottom: '1.5rem' }}>
-          <CustomSectionsIntro sections={customSections} />
+          <CustomSectionsIntro sections={effectiveCustomSections} />
         </section>
       )}
       {accordionSections.length > 0 && (
         <section className="ti-custom-sections">
-          <CustomSectionsAccordion sections={accordionSections} startIndex={2} />
+          <CustomSectionsAccordion sections={accordionSections} startIndex={4} />
         </section>
       )}
 
@@ -574,14 +703,60 @@ export default function TiDspPage({
         <div className="gsac-gallery-header" style={{ marginBottom: '1.5rem' }}>
           <div>
             <span className="section-label">Gallery</span>
-            <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Student Project Development Session</h2>
-            <p style={{ color: 'var(--color-text-light)', margin: 0 }}>Glimpses of practical learning, experimentation and project development at the TI-DSP Centre.</p>
+            <h2 className="section-title" style={{ fontSize: '1.75rem' }}>
+              {gallery.title || 'Student Project Development Session'}
+            </h2>
+            <p style={{ color: 'var(--color-text-light)', margin: 0 }}>
+              {gallery.subtitle || 'Glimpses of practical learning, experimentation and project development at the TI-DSP Centre.'}
+            </p>
           </div>
         </div>
-        {customSections.length > 0 && (
-          <CustomSectionsGalleries sections={customSections} />
+
+        {gallery.photos && gallery.photos.length > 0 && (
+          <div className="meda-gallery-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
+            {gallery.photos.map((photo, idx) => (
+              <div
+                key={photo.id || idx}
+                className="meda-gallery-item"
+                style={{ borderRadius: '12px', overflow: 'hidden', cursor: 'pointer', background: '#fff', border: '1px solid #e2e8f0', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
+                onClick={() => setLightboxImg(photo.url || photo.imageUrl || '')}
+              >
+                <div style={{ height: '200px', overflow: 'hidden' }}>
+                  <img
+                    src={photo.url || photo.imageUrl}
+                    alt={photo.caption || 'TI-DSP Centre Gallery'}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s ease' }}
+                  />
+                </div>
+                {photo.caption && (
+                  <div style={{ padding: '0.75rem 1rem', fontSize: '0.85rem', color: '#4A5568', fontWeight: 600 }}>
+                    {photo.caption}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {effectiveCustomSections.length > 0 && (
+          <CustomSectionsGalleries sections={effectiveCustomSections} />
         )}
       </section>
+
+      {/* LIGHTBOX MODAL */}
+      {lightboxImg && (
+        <div className="meda-lightbox-overlay" onClick={() => setLightboxImg(null)}>
+          <button
+            type="button"
+            className="meda-lightbox-close"
+            onClick={() => setLightboxImg(null)}
+            aria-label="Close"
+          >
+            <X size={24} />
+          </button>
+          <img src={lightboxImg} alt="Gallery Preview" className="meda-lightbox-img" onClick={(e) => e.stopPropagation()} />
+        </div>
+      )}
     </div>
   );
 }
