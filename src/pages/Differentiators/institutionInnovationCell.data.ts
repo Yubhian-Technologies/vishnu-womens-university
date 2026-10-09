@@ -3,6 +3,16 @@
 // Firestore intro/about text in DifferentiatorDetail.tsx.
 
 export const institutionInnovationCell = {
+  telemetry: {
+    starsValue: '4 / 5 Stars',
+    starsLabel: 'IIC 5.0 Rating',
+    rankValue: 'Rank Band 151–300',
+    rankLabel: 'NIRF Innovation 2023',
+    yearValue: '2018–2019',
+    yearLabel: 'IIC Registration Year',
+    tbiValue: 'VISHVA TBI',
+    tbiLabel: 'NIDHI TBI Ecosystem',
+  },
   aboutTitle: "About the Institution's Innovation Council",
   about: [
     "The Institution's Innovation Council (IIC) promotes a structured culture of innovation, entrepreneurship and start-up development among students and faculty.",

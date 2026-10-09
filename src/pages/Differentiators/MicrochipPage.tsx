@@ -70,36 +70,51 @@ export default function MicrochipPage({
       title: remoteData?.learningPartners?.title || microchipEmbedded.learningPartners.title,
       partners: remoteData?.learningPartners?.partners && remoteData.learningPartners.partners.length > 0 ? remoteData.learningPartners.partners : microchipEmbedded.learningPartners.partners,
     },
-    gallery: microchipEmbedded.gallery,
+    gallery: {
+      title: remoteData?.gallery?.title || microchipEmbedded.gallery.title,
+      caption: remoteData?.gallery?.caption || microchipEmbedded.gallery.caption,
+    },
     cta: microchipEmbedded.cta,
   };
   const additionalSections = remoteData?.additionalSections || [];
 
-  const aboutParagraphs = item?.description?.textContent
-    ? [item.description.textContent]
-    : descriptionSection?.textContent
-    ? [descriptionSection.textContent]
-    : item?.desc
-    ? [item.desc]
-    : data.about.paragraphs;
+  const aboutParagraphs =
+    remoteData?.about?.paragraphs && remoteData.about.paragraphs.length > 0
+      ? remoteData.about.paragraphs
+      : item?.description?.textContent
+      ? [item.description.textContent]
+      : descriptionSection?.textContent
+      ? [descriptionSection.textContent]
+      : item?.desc
+      ? [item.desc]
+      : data.about.paragraphs;
 
   const visionText =
+    remoteData?.vision?.statement ||
     (item?.vision && hasCustomSectionContent(item.vision) && (item.vision.textContent || item.vision.listText)) ||
     introBlocks.find((s) => s.id === 'vision')?.textContent?.trim() ||
     data.vision.statement;
 
   const missionList =
-    (item?.mission && hasCustomSectionContent(item.mission) && (item.mission.listText?.split('\n').filter(Boolean) || [item.mission.textContent || ''])) ||
-    introBlocks.find((s) => s.id === 'mission')?.listText?.split('\n').filter(Boolean) ||
-    data.mission.points;
+    remoteData?.mission?.points && remoteData.mission.points.length > 0
+      ? remoteData.mission.points
+      : (item?.mission && hasCustomSectionContent(item.mission) && (item.mission.listText?.split('\n').filter(Boolean) || [item.mission.textContent || ''])) ||
+      introBlocks.find((s) => s.id === 'mission')?.listText?.split('\n').filter(Boolean) ||
+      data.mission.points;
 
-  // Extract gallery photos from admin custom sections
+  // Extract gallery photos from remoteData gallery or admin custom sections
   const gallerySection = customSections.find(
     (s) => s.id === 'gallery' || s.label?.toLowerCase() === 'gallery' || s.contentType === 'gallery'
   );
   const galleryItems: { url: string; label: string }[] = [];
 
-  if (gallerySection) {
+  if (remoteData?.gallery?.photos && remoteData.gallery.photos.length > 0) {
+    remoteData.gallery.photos.forEach((p, idx) => {
+      if (p.imageUrl) galleryItems.push({ url: p.imageUrl, label: p.caption || `Microchip Workshop Photo ${idx + 1}` });
+    });
+  }
+
+  if (galleryItems.length === 0 && gallerySection) {
     if (gallerySection.galleryPhotos) {
       gallerySection.galleryPhotos.forEach((p, idx) => {
         if (p.imageUrl) galleryItems.push({ url: p.imageUrl, label: p.caption || `Microchip Workshop Photo ${idx + 1}` });
@@ -115,8 +130,13 @@ export default function MicrochipPage({
     }
   }
 
+  const allCustomSections =
+    remoteData?.customSections && remoteData.customSections.length > 0
+      ? remoteData.customSections
+      : customSections;
+
   // Filter out any custom sections handled specifically
-  const accordionSections = customSections.filter(
+  const accordionSections = allCustomSections.filter(
     (s) => s.id !== 'gallery' && s.contentType !== 'gallery' && s.placement !== 'intro'
   );
 
@@ -138,15 +158,18 @@ export default function MicrochipPage({
           </div>
 
           <div className="mc-key-tags">
-            <span className="mc-key-tag">
-              <Cpu size={14} /> 8, 16 & 32-Bit PIC Microcontrollers
-            </span>
-            <span className="mc-key-tag">
-              <Zap size={14} /> IoT & Sensor-Based Applications
-            </span>
-            <span className="mc-key-tag">
-              <Handshake size={14} /> EduSkills & AICTE ATAL Integration
-            </span>
+            {(remoteData?.about?.keyTags && remoteData.about.keyTags.length > 0
+              ? remoteData.about.keyTags
+              : [
+                  '8, 16 & 32-Bit PIC Microcontrollers',
+                  'IoT & Sensor-Based Applications',
+                  'EduSkills & AICTE ATAL Integration',
+                ]
+            ).map((tag, idx) => (
+              <span key={idx} className="mc-key-tag">
+                {idx === 0 ? <Cpu size={14} /> : idx === 1 ? <Zap size={14} /> : <Handshake size={14} />} {tag}
+              </span>
+            ))}
           </div>
         </div>
       </section>
@@ -204,6 +227,26 @@ export default function MicrochipPage({
         </div>
       </section>
 
+      {/* TEAM SECTION (If configured in admin) */}
+      {remoteData?.team?.members && remoteData.team.members.length > 0 && (
+        <section className="mc-team-section" style={{ margin: '2rem 0' }}>
+          <div className="mc-section-header">
+            <span className="mc-section-label">Faculty & Leadership</span>
+            <h2 className="mc-section-title">{remoteData.team.title || 'Team (Microchip Embedded System)'}</h2>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.25rem', marginTop: '1.25rem' }}>
+            {remoteData.team.members.map((member, idx) => (
+              <div key={idx} className="mc-details-card" style={{ padding: '1.25rem' }}>
+                <h4 style={{ margin: '0 0 0.35rem', fontSize: '1.05rem', fontWeight: 800, color: '#0B1E42' }}>{member.name}</h4>
+                {member.role && <p style={{ margin: '0 0 0.25rem', color: '#008080', fontWeight: 700, fontSize: '0.85rem' }}>{member.role}</p>}
+                {member.designation && <p style={{ margin: '0 0 0.5rem', color: '#64748B', fontSize: '0.85rem' }}>{member.designation}</p>}
+                {member.email && <p style={{ margin: '0', color: '#0284C7', fontSize: '0.825rem' }}>{member.email}</p>}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* 4. TRAINING & ACTIVITIES & PROGRAMME OUTCOME */}
       <section className="mc-training-outcome-section">
         <div className="mc-training-grid">
@@ -221,7 +264,7 @@ export default function MicrochipPage({
             <div className="mc-feature-badge mc-badge-outcome">
               <Sparkles size={14} /> {data.programmeOutcome.title}
             </div>
-            <h3 className="mc-outcome-title">Faculty Development & Impact</h3>
+            <h3 className="mc-outcome-title">{remoteData?.programmeOutcome?.subtitle || 'Faculty Development & Impact'}</h3>
             <p className="mc-outcome-desc">{renderBold(data.programmeOutcome.description)}</p>
           </div>
         </div>
@@ -330,9 +373,9 @@ export default function MicrochipPage({
       </section>
 
       {/* 8. DYNAMIC CUSTOM SECTIONS ACCORDION (If added via Admin) */}
-      {customSections.some((s) => s.placement === 'intro') && (
+      {allCustomSections.some((s) => s.placement === 'intro') && (
         <section className="mc-custom-sections" style={{ marginTop: '2rem' }}>
-          <CustomSectionsIntro sections={customSections} />
+          <CustomSectionsIntro sections={allCustomSections} />
         </section>
       )}
       {accordionSections.length > 0 && (
@@ -345,7 +388,7 @@ export default function MicrochipPage({
       {additionalSections.length > 0 && (
         <section className="mc-custom-sections" style={{ marginTop: '2rem' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            {additionalSections.map((sec) => (
+            {additionalSections.map((sec: { id: string; title: string; badge?: string; paragraphs?: string[]; bulletPoints?: string[] }) => (
               <div key={sec.id} className="mc-details-card">
                 {sec.badge && (
                   <div className="mc-feature-badge">
@@ -353,14 +396,14 @@ export default function MicrochipPage({
                   </div>
                 )}
                 <h3 className="mc-details-title">{sec.title}</h3>
-                {(sec.paragraphs || []).map((p, pIdx) => (
+                {(sec.paragraphs || []).map((p: string, pIdx: number) => (
                   <p key={pIdx} className="mc-facilities-intro" style={{ marginBottom: '0.75rem' }}>
                     {renderBold(p)}
                   </p>
                 ))}
                 {(sec.bulletPoints || []).length > 0 && (
                   <ul className="mc-facilities-list" style={{ marginTop: '0.5rem' }}>
-                    {sec.bulletPoints!.map((b, bIdx) => (
+                    {sec.bulletPoints!.map((b: string, bIdx: number) => (
                       <li key={bIdx} className="mc-facility-item">
                         <CheckCircle2 size={16} className="mc-facility-icon" />
                         <span>{renderBold(b)}</span>
