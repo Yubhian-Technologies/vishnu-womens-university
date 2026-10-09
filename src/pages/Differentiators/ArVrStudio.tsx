@@ -29,17 +29,24 @@ export default function ArVrStudio() {
   const { data: remoteData } = useDocument<ArVrStudioDoc>('settings', 'arVrStudio');
   const studio = { ...arVrStudio, ...(remoteData || {}) };
 
-  const dynamicTitle = item?.title || studio.heroTitle;
-  const dynamicSubtitle = item?.summary || item?.desc || studio.heroSubtitle;
-  const aboutParagraphs = (item?.description && hasCustomSectionContent(item.description) && item.description.textContent)
+  const dynamicCategory = remoteData?.heroCategory || studio.heroCategory;
+  const dynamicTitle = remoteData?.heroTitle || item?.title || studio.heroTitle;
+  const dynamicSubtitle = remoteData?.heroSubtitle || item?.summary || item?.desc || studio.heroSubtitle;
+
+  const aboutParagraphs = (remoteData?.aboutParagraphs && remoteData.aboutParagraphs.filter(p => p && p.trim()).length > 0)
+    ? remoteData.aboutParagraphs.filter(p => p && p.trim())
+    : (item?.description && hasCustomSectionContent(item.description) && item.description.textContent)
     ? [item.description.textContent]
     : item?.desc
     ? [item.desc]
     : studio.aboutParagraphs;
 
-  const visionText = (item?.vision && hasCustomSectionContent(item.vision) && (item.vision.textContent || item.vision.listText)) || studio.vision;
+  const visionText = remoteData?.vision || (item?.vision && hasCustomSectionContent(item.vision) && (item.vision.textContent || item.vision.listText)) || studio.vision;
 
-  const missionList = (item?.mission && hasCustomSectionContent(item.mission) && (item.mission.listText?.split('\n').filter(Boolean) || [item.mission.textContent || ''])) || studio.mission;
+  const missionList = (remoteData?.mission && remoteData.mission.filter(m => m && m.trim()).length > 0)
+    ? remoteData.mission.filter(m => m && m.trim())
+    : (item?.mission && hasCustomSectionContent(item.mission) && (item.mission.listText?.split('\n').filter(Boolean) || [item.mission.textContent || '']))
+    || studio.mission;
 
   useEffect(() => {
     document.title = `${dynamicTitle} | Vishnu Women's University`;
@@ -49,10 +56,20 @@ export default function ArVrStudio() {
     return <RouteFallback />;
   }
 
-  // Extract gallery photos if any exist in admin dynamic customSections
-  const effectiveCustomSections = item?.customSections || [];
+  // Extract gallery photos from dedicated studio gallery and dynamic customSections
+  const effectiveCustomSections = (
+    remoteData?.customSections && remoteData.customSections.length > 0
+      ? remoteData.customSections
+      : item?.customSections || []
+  );
   const gallerySections = effectiveCustomSections.filter((s) => s.contentType === 'gallery' && hasCustomSectionContent(s));
-  const galleryPhotos = gallerySections.flatMap((s) => s.galleryPhotos || []).filter((p) => p.imageUrl);
+  const customGalleryPhotos = gallerySections.flatMap((s) => s.galleryPhotos || []).filter((p) => p.imageUrl);
+  const studioGalleryPhotos = (remoteData?.galleryPhotos || []).map((p) => ({
+    imageUrl: p.imageUrl || p.url || '',
+    caption: p.caption || '',
+    storagePath: p.storagePath || '',
+  })).filter((p) => p.imageUrl);
+  const galleryPhotos = [...studioGalleryPhotos, ...customGalleryPhotos];
 
   const heroImage = item?.heroImage || heroSlides[0]?.imageUrl || 'https://images.unsplash.com/photo-1593508512255-86ab42a8e620?auto=format&fit=crop&q=80&w=1600';
 
@@ -88,7 +105,7 @@ export default function ArVrStudio() {
             <span className="is-current">{dynamicTitle}</span>
           </div>
           <span className="arvr-eyebrow">
-            <Glasses size={14} strokeWidth={2.4} /> {studio.heroCategory}
+            <Glasses size={14} strokeWidth={2.4} /> {dynamicCategory}
           </span>
           <h1 className="arvr-hero__title">{dynamicTitle}</h1>
           <p className="arvr-hero__subtitle">{renderBold(dynamicSubtitle)}</p>
