@@ -1,6 +1,11 @@
 // Rich hardcoded content for the Dream House Construction Lab differentiator
 // page (slug: dream-house-lab) — overrides that item's generic Firestore
 // intro/about text in DifferentiatorDetail.tsx.
+export interface DhclStat {
+  value: string;
+  label: string;
+}
+
 export interface DhclMember {
   name: string;
   designation?: string;
@@ -24,6 +29,12 @@ export interface DhclStudentGroup {
 }
 
 export const dreamHouseConstructionLab = {
+  stats: {
+    stat1: { value: '4+', label: 'Years of Innovation' },
+    stat2: { value: '37+', label: 'Students Benefited' },
+    stat3: { value: '₹1 Lakh', label: 'ITIC Seed Funding' },
+    stat4: { value: 'Top 75', label: 'ITIC BUILD Winner' },
+  },
   paragraphs: [
     'The Dream House Construction Lab (DHCL) is a dedicated facility designed to support research initiatives and promote innovation in various fields. It serves as a dynamic space where faculty, students, and industry partners collaborate on projects aimed at advancing knowledge, developing new technologies, and addressing real-world challenges. By fostering interdisciplinary collaboration, providing facilities and resources, and engaging with industry partners, the lab creates an environment conducive to impactful research outcomes. Through project-based research, skill development, knowledge dissemination, and funding support, the lab enables faculty and students to contribute to the advancement of knowledge, address real-world challenges, and make significant contributions to their respective fields.',
   ],
@@ -146,5 +157,22 @@ export const dreamHouseConstructionLab = {
   activities: [
     'Department of Civil Engineering organized a Civil Expo on April 1, 2023.',
     'Department of Civil Engineering organized an exposure visit to Smt. B. Seetha Polytechnic College students from November 13 – 16, 2023.',
+  ],
+  highlights: [
+    'Pioneering sustainable and eco-friendly housing technologies using stabilized mud blocks (SMBs).',
+    'Selected as one of the top 75 winners in the BUILD program organized by IIT Hyderabad (ITIC) with ₹1 Lakh seed grant.',
+    'Over 37+ female civil engineering students trained in hands-on sustainable construction practices.',
+    'Active research in optimizing mix proportions using locally available soil, lime, and cement stabilizers.',
+  ],
+  facilities: [
+    'Dedicated Mud Block Preparation & Stabilizer Compaction Unit',
+    'Hydraulic Block Compression Testing Machine & Flexural Testing Rig',
+    'Curing & Durability Testing Tanks for Stabilized Masonry',
+    'Materials Characterization & Soil Mechanics Testing Suite',
+  ],
+  partners: [
+    'IIT Hyderabad Technology Incubation Centre (ITIC)',
+    'Smt. B. Seetha Polytechnic College',
+    'Sri Vishnu Educational Society (SVES)',
   ],
 };

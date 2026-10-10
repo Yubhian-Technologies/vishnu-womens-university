@@ -29,7 +29,6 @@ import { usePageBanners } from '../../hooks/usePageBanners';
 import { useDocument } from '../../hooks/useDocument';
 import { fetchPriorityAttr } from '../../lib/domAttrs';
 import { hasCustomSectionContent, type CustomSectionPhoto } from '../../lib/customSections';
-import { CustomSectionsIntro, CustomSectionsGalleries, CustomSectionsAccordion } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import { DIFFERENTIATOR_CATEGORIES, type DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
 import { defaultAdvancedElectrical, type AdvancedElectricalDoc } from '../Admin/sections/AdvancedElectricalContentAdmin';
 import { renderBold } from '../../lib/boldText';
@@ -53,7 +52,7 @@ export default function AdvancedElectricalRdLab() {
   // Update active nav link based on scroll position
   useEffect(() => {
     const handleScroll = () => {
-      const sectionIds = ['overview', 'patents', 'models', 'highlights', 'facilities', 'gallery'];
+      const sectionIds = ['overview', 'patents', 'models', 'highlights', 'facilities', 'outcomes', 'gallery'];
       const scrollPosition = window.scrollY + 140;
 
       for (let i = sectionIds.length - 1; i >= 0; i--) {
@@ -82,7 +81,7 @@ export default function AdvancedElectricalRdLab() {
     '/gallery/differentiators/elec-lab-1.jpg' ||
     heroSlides[0]?.imageUrl;
 
-  // Extract dynamic gallery photos if present in Firestore custom sections
+  // Extract dynamic gallery photos if present in Firestore custom sections or labData.gallery
   const customSections = item?.customSections || [];
   const gallerySections = customSections.filter((s) => s.contentType === 'gallery' && hasCustomSectionContent(s));
   const dynamicPhotos: CustomSectionPhoto[] = gallerySections.flatMap((s) => s.galleryPhotos || []).filter((p) => p.imageUrl);
@@ -94,30 +93,62 @@ export default function AdvancedElectricalRdLab() {
     { imageUrl: '/gallery/differentiators/elec-lab-4.jpg', caption: 'Testing team with faculty supervisors' },
   ];
 
-  const allGalleryPhotos = dynamicPhotos.length > 0 ? dynamicPhotos : defaultGalleryPhotos;
+  const allGalleryPhotos =
+    labData.gallery && labData.gallery.length > 0
+      ? labData.gallery
+      : dynamicPhotos.length > 0
+      ? dynamicPhotos
+      : defaultGalleryPhotos;
+
 
   // Patents data
   const patentIcons = [Flame, Printer, Zap];
-  const patents = labData.patents.map((p, idx) => ({
+  const patents = (labData.patents || []).map((p, idx) => ({
     ...p,
     icon: patentIcons[idx % patentIcons.length],
   }));
 
-  // 9 Operational Working Models
+  // Operational Working Models
   const modelIcons = [Sun, Cpu, Zap, Activity, Layers, Sun, HeartHandshake, Sparkles, Boxes];
-  const workingModels = labData.workingModels.map((m, idx) => ({
+  const workingModels = (labData.workingModels || []).map((m, idx) => ({
     ...m,
     icon: modelIcons[idx % modelIcons.length],
   }));
 
-  // Focus areas
-  const focusAreas = labData.focusAreas;
-  const highlightsList = labData.highlightsList;
-  const facilitiesList = labData.facilitiesList;
+  // Focus areas, Highlights, Facilities, Outcomes
+  const focusAreas = labData.focusAreas || [];
+  const highlightsList = labData.highlightsList || [];
+  const facilitiesList = labData.facilitiesList || [];
+  const outcomesList = labData.outcomesList || [];
 
-  const dynamicTitle = item?.title || labData.heroTitle;
-  const dynamicSubtitle = item?.summary || item?.desc || labData.heroSubtitle;
-  const aboutText = item?.description?.textContent || item?.desc || labData.aboutText;
+  const dynamicTitle = labData.heroTitle || item?.title || defaultAdvancedElectrical.heroTitle;
+  const dynamicSubtitle = labData.heroSubtitle || item?.summary || item?.desc || defaultAdvancedElectrical.heroSubtitle;
+  const aboutText = labData.aboutText || item?.description?.textContent || item?.desc || defaultAdvancedElectrical.aboutText;
+
+  const overviewBadge = labData.overviewBadge || 'Center of Excellence';
+  const overviewTitle = labData.overviewTitle || 'Laboratory Mission & Core Focus';
+  const overviewLead =
+    labData.overviewLead ||
+    'A state-of-the-art facility fostering industry-ready skills in electric mobility, green energy systems, and intelligent embedded automation.';
+
+  const patentsBadge = labData.patentsBadge || 'Intellectual Property & Innovation';
+  const patentsTitle = labData.patentsTitle || 'Patents Granted';
+  const patentsLead =
+    labData.patentsLead ||
+    'Transforming innovative engineering concepts into patented, industry-ready technologies and socially impactful assistive systems.';
+
+  const modelsBadge = labData.modelsBadge || 'Hardware Prototypes';
+  const modelsTitle = labData.modelsTitle || 'Operational Working Models';
+  const modelsLead =
+    labData.modelsLead ||
+    `The laboratory houses ${workingModels.length} fully functional hardware prototypes and test rigs developed by student and faculty researchers.`;
+
+  const highlightsTitle = labData.highlightsTitle || 'Key Highlights';
+  const facilitiesTitle = labData.facilitiesTitle || 'Facilities & Equipment';
+  const outcomesBadge = labData.outcomesBadge || 'Key Achievements';
+  const outcomesTitle = labData.outcomesTitle || 'Outcomes & Achievements';
+  const galleryBadge = labData.galleryBadge || 'Visual Showcase';
+  const galleryTitle = labData.galleryTitle || 'Laboratory & R&D Gallery';
 
   return (
     <main className="page-wrapper elec-page">
@@ -177,7 +208,7 @@ export default function AdvancedElectricalRdLab() {
               <Award size={14} /> Patents Granted
             </a>
             <a href="#models" className={`elec-nav-item ${activeNav === 'models' ? 'active' : ''}`}>
-              <Cpu size={14} /> Working Models (9)
+              <Cpu size={14} /> Working Models ({workingModels.length})
             </a>
             <a href="#highlights" className={`elec-nav-item ${activeNav === 'highlights' ? 'active' : ''}`}>
               <Sparkles size={14} /> Key Highlights
@@ -185,6 +216,11 @@ export default function AdvancedElectricalRdLab() {
             <a href="#facilities" className={`elec-nav-item ${activeNav === 'facilities' ? 'active' : ''}`}>
               <Layers size={14} /> Facilities
             </a>
+            {outcomesList.length > 0 && (
+              <a href="#outcomes" className={`elec-nav-item ${activeNav === 'outcomes' ? 'active' : ''}`}>
+                <Award size={14} /> Outcomes
+              </a>
+            )}
             {allGalleryPhotos.length > 0 && (
               <a href="#gallery" className={`elec-nav-item ${activeNav === 'gallery' ? 'active' : ''}`}>
                 <Maximize2 size={14} /> Gallery
@@ -199,11 +235,11 @@ export default function AdvancedElectricalRdLab() {
         <div className="container">
           <div className="elec-section-header">
             <span className="elec-section-label">
-              <Compass size={14} /> Center of Excellence
+              <Compass size={14} /> {overviewBadge}
             </span>
-            <h2 className="elec-section-title">Laboratory Mission & Core Focus</h2>
+            <h2 className="elec-section-title">{overviewTitle}</h2>
             <p className="elec-section-lead">
-              A state-of-the-art facility fostering industry-ready skills in electric mobility, green energy systems, and intelligent embedded automation.
+              {overviewLead}
             </p>
           </div>
 
@@ -235,11 +271,11 @@ export default function AdvancedElectricalRdLab() {
         <div className="container">
           <div className="elec-section-header">
             <span className="elec-section-label">
-              <Award size={14} /> Intellectual Property & Innovation
+              <Award size={14} /> {patentsBadge}
             </span>
-            <h2 className="elec-section-title">Patents Granted</h2>
+            <h2 className="elec-section-title">{patentsTitle}</h2>
             <p className="elec-section-lead">
-              Transforming innovative engineering concepts into patented, industry-ready technologies and socially impactful assistive systems.
+              {patentsLead}
             </p>
           </div>
 
@@ -269,16 +305,16 @@ export default function AdvancedElectricalRdLab() {
         </div>
       </section>
 
-      {/* 3. Operational Working Models (9 Models) */}
+      {/* 3. Operational Working Models */}
       <section id="models" className="elec-section">
         <div className="container">
           <div className="elec-section-header">
             <span className="elec-section-label">
-              <Cpu size={14} /> Hardware Prototypes
+              <Cpu size={14} /> {modelsBadge}
             </span>
-            <h2 className="elec-section-title">Operational Working Models</h2>
+            <h2 className="elec-section-title">{modelsTitle}</h2>
             <p className="elec-section-lead">
-              The laboratory houses 9 fully functional hardware prototypes and test rigs developed by student and faculty researchers.
+              {modelsLead}
             </p>
           </div>
 
@@ -312,15 +348,15 @@ export default function AdvancedElectricalRdLab() {
             <div className="elec-info-card">
               <div className="elec-info-header">
                 <Sparkles size={22} color="var(--color-accent)" />
-                <h3 className="elec-info-title">Key Highlights</h3>
+                <h3 className="elec-info-title">{highlightsTitle}</h3>
               </div>
               <ul className="elec-checklist">
-                {highlightsList.map((item, i) => (
+                {highlightsList.map((itemHighlight, i) => (
                   <li key={i} className="elec-checklist-item">
                     <span className="elec-check-badge">
                       <Check size={12} strokeWidth={3} />
                     </span>
-                    <span>{renderBold(item)}</span>
+                    <span>{renderBold(itemHighlight)}</span>
                   </li>
                 ))}
               </ul>
@@ -330,15 +366,15 @@ export default function AdvancedElectricalRdLab() {
             <div id="facilities" className="elec-info-card">
               <div className="elec-info-header">
                 <Layers size={22} color="var(--color-accent)" />
-                <h3 className="elec-info-title">Facilities & Equipment</h3>
+                <h3 className="elec-info-title">{facilitiesTitle}</h3>
               </div>
               <ul className="elec-checklist">
-                {facilitiesList.map((item, i) => (
+                {facilitiesList.map((itemFacility, i) => (
                   <li key={i} className="elec-checklist-item">
                     <span className="elec-check-badge">
                       <Check size={12} strokeWidth={3} />
                     </span>
-                    <span>{renderBold(item)}</span>
+                    <span>{renderBold(itemFacility)}</span>
                   </li>
                 ))}
               </ul>
@@ -347,15 +383,41 @@ export default function AdvancedElectricalRdLab() {
         </div>
       </section>
 
-      {/* 5. Photo Gallery */}
+      {/* 5. Outcomes & Achievements */}
+      {outcomesList.length > 0 && (
+        <section id="outcomes" className="elec-section">
+          <div className="container">
+            <div className="elec-section-header">
+              <span className="elec-section-label">
+                <Award size={14} /> {outcomesBadge}
+              </span>
+              <h2 className="elec-section-title">{outcomesTitle}</h2>
+            </div>
+            <div className="elec-info-card">
+              <ul className="elec-checklist">
+                {outcomesList.map((itemOutcome, i) => (
+                  <li key={i} className="elec-checklist-item">
+                    <span className="elec-check-badge">
+                      <Check size={12} strokeWidth={3} />
+                    </span>
+                    <span>{renderBold(itemOutcome)}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* 6. Photo Gallery */}
       {allGalleryPhotos.length > 0 && (
         <section id="gallery" className="elec-section">
           <div className="container">
             <div className="elec-section-header">
               <span className="elec-section-label">
-                <Maximize2 size={14} /> Visual Showcase
+                <Maximize2 size={14} /> {galleryBadge}
               </span>
-              <h2 className="elec-section-title">Laboratory & R&D Gallery</h2>
+              <h2 className="elec-section-title">{galleryTitle}</h2>
             </div>
 
             <div className="elec-gallery-grid">
@@ -381,18 +443,51 @@ export default function AdvancedElectricalRdLab() {
         </section>
       )}
 
-      {/* Dynamic Admin Custom Sections */}
-      {customSections.length > 0 && (
-        <section className="elec-section" style={{ background: '#f8fafc' }}>
-          <div className="container">
-            <CustomSectionsIntro sections={customSections} />
-            <CustomSectionsGalleries sections={customSections} />
-            <CustomSectionsAccordion sections={customSections} />
-          </div>
-        </section>
+      {/* 7. Dynamic Admin Custom Sections */}
+      {labData.additionalSections && labData.additionalSections.length > 0 && (
+        <div className="elec-custom-sections">
+          {labData.additionalSections.map((sec) => (
+            <section key={sec.id} id={sec.id} className="elec-section">
+              <div className="container">
+                <div className="elec-section-header">
+                  {sec.badge && (
+                    <span className="elec-section-label">
+                      <Sparkles size={14} /> {sec.badge}
+                    </span>
+                  )}
+                  <h2 className="elec-section-title">{sec.title}</h2>
+                </div>
+                {sec.paragraphs && sec.paragraphs.length > 0 && (
+                  <div className="elec-overview-card" style={{ marginBottom: sec.bulletPoints?.length ? '1.5rem' : 0 }}>
+                    <div className="elec-prose">
+                      {sec.paragraphs.map((p, idx) => (
+                        <p key={idx}>{renderBold(p)}</p>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {sec.bulletPoints && sec.bulletPoints.length > 0 && (
+                  <div className="elec-info-card">
+                    <ul className="elec-checklist">
+                      {sec.bulletPoints.map((bp, idx) => (
+                        <li key={idx} className="elec-checklist-item">
+                          <span className="elec-check-badge">
+                            <Check size={12} strokeWidth={3} />
+                          </span>
+                          <span>{renderBold(bp)}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </section>
+          ))}
+        </div>
       )}
 
-      {/* 6. University Call to Action (CTA) */}
+
+      {/* 9. University Call to Action (CTA) */}
       <section className="elec-cta-section">
         <div className="container">
           <h2 className="elec-cta-title">Explore More Differentiators</h2>
