@@ -791,7 +791,7 @@ export default function DifferentiatorsAdmin() {
             <label htmlFor="field-hero-subtitle">Hero Subtitle (shown under the title on the detail page's hero banner, only when not an external link)</label>
             <textarea id="field-hero-subtitle" rows={2} value={form.summary || ''} onChange={(e) => set('summary', e.target.value)} />
           </div>
-          {form.slug !== 'aicte-idea-lab' && form.slug !== 'institution-innovation-cell' && form.slug !== 'microchip-embedded' && form.slug !== 'ti-dsp-coe' && form.slug !== 'ar-vr-studio' && form.slug !== 'hpc-lab' && form.slug !== 'concrete-canoe-lab' && (
+          {form.slug !== 'aicte-idea-lab' && form.slug !== 'institution-innovation-cell' && form.slug !== 'microchip-embedded' && form.slug !== 'ti-dsp-coe' && form.slug !== 'ar-vr-studio' && form.slug !== 'hpc-lab' && form.slug !== 'concrete-canoe-lab' && form.slug !== 'dream-house-lab' && form.slug !== 'advanced-electrical-rd-lab' && (
             <>
               <BlockEditor
                 blockKey="description"
@@ -830,7 +830,7 @@ export default function DifferentiatorsAdmin() {
             </>
           )}
 
-          {!TABS_SLUGS.has(form.slug) && form.slug !== 'institution-innovation-cell' && form.slug !== 'microchip-embedded' && form.slug !== 'ti-dsp-coe' && form.slug !== 'ar-vr-studio' && form.slug !== 'hpc-lab' && form.slug !== 'concrete-canoe-lab' && (
+          {!TABS_SLUGS.has(form.slug) && form.slug !== 'institution-innovation-cell' && form.slug !== 'microchip-embedded' && form.slug !== 'ti-dsp-coe' && form.slug !== 'ar-vr-studio' && form.slug !== 'hpc-lab' && form.slug !== 'concrete-canoe-lab' && form.slug !== 'dream-house-lab' && form.slug !== 'advanced-electrical-rd-lab' && (
             <>
               <div className="admin-field admin-field--full"><hr /><h3>Custom Sections</h3></div>
               <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>

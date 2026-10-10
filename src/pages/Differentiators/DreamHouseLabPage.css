@@ -360,6 +360,10 @@ a.dhcl-contact-item:hover {
   color: #FDBA74;
 }
 
+.dhcl-vision-card .dhcl-vm-title {
+  color: #ffffff;
+}
+
 .dhcl-vm-title {
   font-size: 1.5rem;
   font-weight: 800;
