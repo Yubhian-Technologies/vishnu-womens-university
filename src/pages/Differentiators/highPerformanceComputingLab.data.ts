@@ -87,4 +87,23 @@ export const highPerformanceComputingLab = {
     'Training on the Data Visualization for III-I AI&DS students with Mr. Snehith Aliamraju during 5-09-2022 to 2-11-2022.',
     'Industrial / field visits by the faculty and students.',
   ],
+  highlights: [
+    'DST Sponsored R&D projects with dedicated funding for cutting-edge computing research.',
+    'High-throughput GPU-accelerated computing infrastructure supporting deep learning workflows.',
+    'Interdisciplinary research collaboration across Computer Science, Artificial Intelligence, and Data Science.',
+    'Over 9+ IEEE and Scopus-indexed research publications in top-tier conferences and journals.',
+    'Regular hands-on capacity building workshops and expert lecture series.',
+  ],
+  facilities: [
+    'High-End GPU Workstations equipped with NVIDIA RTX architectures.',
+    'High-speed network backbones for distributed and parallel processing simulations.',
+    'Dedicated Machine Learning & Deep Learning frameworks (PyTorch, TensorFlow, CUDA, cuDNN).',
+    'Data preprocessing and visualization compute environments with SPSS, MATLAB, and Python stacks.',
+  ],
+  partners: [
+    'Department of Science & Technology (DST), Government of India',
+    'Shri Vishnu Engineering College for Women (SVECW) R&D Cell',
+    'IEEE Computer Society & Computational Intelligence Society',
+    'Industry Collaborators in AI & Deep Vision Systems',
+  ],
 };

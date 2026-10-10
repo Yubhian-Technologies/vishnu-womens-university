@@ -51,10 +51,11 @@ export default function ConcreteCanoeLab() {
   const dynamicTitle = item?.title || 'Concrete Canoe Laboratory';
   const dynamicSubtitle = item?.summary || item?.desc || 'Equipping female civil engineers with hands-on skills in concrete canoe design, eco-friendly material research, and competitive boat engineering.';
 
-  const aboutParagraphs = (item?.description && hasCustomSectionContent(item.description) && item.description.textContent)
-    ? [item.description.textContent]
-    : item?.desc
-    ? [item.desc]
+  const overviewBadge = remoteData?.overviewBadge || 'Center of Excellence';
+  const overviewTitle = remoteData?.overviewTitle || 'About the Concrete Canoe Laboratory';
+
+  const aboutParagraphs = (remoteData?.paragraphs && remoteData.paragraphs.length > 0)
+    ? remoteData.paragraphs
     : canoe.paragraphs;
 
   useEffect(() => {
@@ -88,23 +89,27 @@ export default function ConcreteCanoeLab() {
   const category = item ? DIFFERENTIATOR_CATEGORIES.find((c) => c.id === item.category) : { id: 'research', label: 'Research & Specialised Labs' };
   const heroImage = item?.heroImage || heroSlides[0]?.imageUrl || 'https://res.cloudinary.com/dljzfysft/image/upload/v1777358383/download_u6eeyl.jpg';
 
-  // Extract any dynamic photos from Firestore custom sections (e.g. Gallery)
+  // Extract any dynamic photos from Firestore settings or custom sections
   const customSections = item?.customSections || [];
   const gallerySections = customSections.filter((s) => s.contentType === 'gallery' && hasCustomSectionContent(s));
   const dynamicPhotos: CustomSectionPhoto[] = gallerySections.flatMap((s) => s.galleryPhotos || []).filter((p) => p.imageUrl);
 
-  // Fallback / default gallery photos from the lab if none or supplement
-  const allGalleryPhotos = dynamicPhotos.length > 0
+  // Gallery photos precedence: remoteData settings > dynamic custom section photos > default hero
+  const allGalleryPhotos = (remoteData?.gallery && remoteData.gallery.length > 0)
+    ? remoteData.gallery
+    : dynamicPhotos.length > 0
     ? dynamicPhotos
     : [
         { imageUrl: heroImage, caption: 'WAKA Concrete Canoe at the lakeside test trials' },
       ];
 
-  // Highlights & Facilities extracted from custom sections or default items
+  // Highlights & Facilities extracted from settings, custom sections or defaults
   const highlightsSection = customSections.find((s) => s.id === 'highlights' || s.label?.toLowerCase().includes('highlight'));
   const facilitiesSection = customSections.find((s) => s.id === 'facilities' || s.label?.toLowerCase().includes('facilit'));
 
-  const highlightList = highlightsSection?.listText
+  const highlightList = (remoteData?.highlights && remoteData.highlights.length > 0)
+    ? remoteData.highlights
+    : highlightsSection?.listText
     ? highlightsSection.listText.split('\n').filter(Boolean)
     : [
         'First-ever concrete canoe engineering initiative in Andhra Pradesh and Telangana dedicated to women engineers.',
@@ -113,7 +118,9 @@ export default function ConcreteCanoeLab() {
         'Winners of IIT Hyderabad ITIC BUILD incubation grant (₹1 Lakh) for industry-ready marine prototype.',
       ];
 
-  const facilityList = facilitiesSection?.listText
+  const facilityList = (remoteData?.facilities && remoteData.facilities.length > 0)
+    ? remoteData.facilities
+    : facilitiesSection?.listText
     ? facilitiesSection.listText.split('\n').filter(Boolean)
     : [
         'Dedicated Concrete Technology & Materials Characterization Lab',
@@ -121,6 +128,27 @@ export default function ConcreteCanoeLab() {
         'Marine 3D Hull Modelling & Hydrodynamic Stabilizer Suite (Maxsurf, AutoCAD, STAAD Pro, Bearcat SP)',
         'Casting moulds & specialized fibre mesh reinforcement fabrication facilities',
       ];
+
+  const additionalSections = remoteData?.additionalSections || [];
+
+  const BUILT_IN_SECTION_NAMES = [
+    'in-charge', 'incharge', 'in charge',
+    'academic projects', 'academic-projects', 'academic-project', 'academic project',
+    'previous project works', 'previous-project-works', 'previous projects', 'previous-projects',
+    'students benefited', 'students-benefited',
+    'faculty mentors', 'faculty-mentors',
+    'outcomes', 'incubation',
+    'competitions', 'awards',
+    'activities', 'events',
+    'highlights', 'key highlights', 'key-highlights',
+    'facilities', 'facilities & equipment', 'facilities-&-equipment',
+  ];
+
+  const nonDuplicateCustomSections = customSections.filter((s) => {
+    const label = (s.label || '').toLowerCase().trim();
+    const id = (s.id || '').toLowerCase().trim();
+    return !BUILT_IN_SECTION_NAMES.some((b) => b === label || b === id);
+  });
 
   return (
     <main className="page-wrapper canoe-page">
@@ -211,9 +239,9 @@ export default function ConcreteCanoeLab() {
         <div className="container">
           <div className="canoe-section-header">
             <span className="canoe-section-label">
-              <Compass size={14} /> Center of Excellence
+              <Compass size={14} /> {overviewBadge}
             </span>
-            <h2 className="canoe-section-title">About the Concrete Canoe Laboratory</h2>
+            <h2 className="canoe-section-title">{overviewTitle}</h2>
           </div>
 
           {/* Overview Prose Card */}
@@ -652,18 +680,55 @@ export default function ConcreteCanoeLab() {
       </section>
 
       {/* DYNAMIC CUSTOM SECTIONS */}
-      {customSections.some((s) => s.placement === 'intro') && (
+      {nonDuplicateCustomSections.some((s) => s.placement === 'intro') && (
         <section className="canoe-section">
           <div className="container">
-            <CustomSectionsIntro sections={customSections} />
+            <CustomSectionsIntro sections={nonDuplicateCustomSections} />
           </div>
         </section>
       )}
-      {customSections.length > 0 && (
+      {nonDuplicateCustomSections.length > 0 && (
         <section className="canoe-section">
           <div className="container">
-            <CustomSectionsGalleries sections={customSections} />
-            <CustomSectionsAccordion sections={customSections.filter((s) => s.placement !== 'intro' && s.contentType !== 'gallery' && s.id !== 'highlights' && s.id !== 'facilities')} />
+            <CustomSectionsGalleries sections={nonDuplicateCustomSections} />
+            <CustomSectionsAccordion sections={nonDuplicateCustomSections.filter((s) => s.placement !== 'intro' && s.contentType !== 'gallery')} />
+          </div>
+        </section>
+      )}
+
+      {/* Dynamic Additional Sections from Concrete Canoe Admin */}
+      {additionalSections.length > 0 && (
+        <section className="canoe-section">
+          <div className="container" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            {additionalSections.map((sec) => (
+              <div key={sec.id} className="canoe-overview-card" style={{ display: 'block' }}>
+                {sec.badge && (
+                  <span className="canoe-section-label" style={{ marginBottom: '0.75rem', display: 'inline-flex' }}>
+                    <Sparkles size={14} /> {sec.badge}
+                  </span>
+                )}
+                <h3 className="canoe-vm-title" style={{ fontSize: 'var(--text-2xl)', marginBottom: '1rem' }}>
+                  {sec.title}
+                </h3>
+                <div className="canoe-prose">
+                  {(sec.paragraphs || []).map((p, pIdx) => (
+                    <p key={pIdx}>{renderBold(p)}</p>
+                  ))}
+                </div>
+                {(sec.bulletPoints || []).length > 0 && (
+                  <ul className="canoe-mission-list" style={{ marginTop: '1.25rem' }}>
+                    {sec.bulletPoints!.map((b, bIdx) => (
+                      <li key={bIdx} className="canoe-mission-item">
+                        <span className="canoe-check-badge">
+                          <Check size={12} strokeWidth={3} />
+                        </span>
+                        <span>{renderBold(b)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ))}
           </div>
         </section>
       )}
