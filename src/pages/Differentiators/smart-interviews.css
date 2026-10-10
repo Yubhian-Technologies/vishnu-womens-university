@@ -518,6 +518,22 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
 }
 
+.si-bullets-list {
+  list-style-type: disc !important;
+  padding-left: 1.4rem !important;
+  margin: 0 !important;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.si-bullets-list li {
+  list-style-type: disc !important;
+  display: list-item !important;
+  line-height: 1.65;
+  color: #334155;
+}
+
 .si-batch-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
