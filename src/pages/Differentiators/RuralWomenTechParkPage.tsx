@@ -113,11 +113,30 @@ export default function RuralWomenTechParkPage({
 
   const photos = uploadedPhotos.length > 0 ? uploadedPhotos : DEFAULT_RWTP_GALLERY;
 
-  const dynamicTitle = item?.title || 'Rural Women Technology Park – WTP';
-  const dynamicSubtitle = item?.summary || item?.desc || 'Empowering rural women through skill development, technology adoption and innovation to create sustainable livelihoods and stronger, self-reliant communities.';
-  const dynamicAbout = (item?.description && hasCustomSectionContent(item.description) && item.description.textContent)
+  const dynamicTitle = (rwtp as any).title || item?.title || 'Rural Women Technology Park – WTP';
+  const dynamicSubtitle = (rwtp as any).subtitle || item?.summary || item?.desc || 'Empowering rural women through skill development, technology adoption and innovation to create sustainable livelihoods and stronger, self-reliant communities.';
+  const dynamicAbout = (rwtp as any).aboutText || ((item?.description && hasCustomSectionContent(item.description) && item.description.textContent)
     ? item.description.textContent
-    : item?.desc || `The programme empowers lifelong development access to labs, responsibilities, and the use of technology in rural communities, financial services at the households leverages indigenous resources for socio-economic impact across the domains of healthcare, education, livelihood, and technology. Corporate Social Responsibility initiatives, women's health and nutrition, rural financial and value-added products, and modern village-making ideas.`;
+    : item?.desc || `The programme empowers lifelong development access to labs, responsibilities, and the use of technology in rural communities, financial services at the households leverages indigenous resources for socio-economic impact across the domains of healthcare, education, livelihood, and technology. Corporate Social Responsibility initiatives, women's health and nutrition, rural financial and value-added products, and modern village-making ideas.`);
+
+  const extraAccordionSections = customSections.filter((s) => {
+    if (s.placement === 'intro' || s.contentType === 'gallery') return false;
+    const id = (s.id || '').toLowerCase();
+    const label = (s.label || '').toLowerCase();
+    return !(
+      id === 'interventions' ||
+      id === 'activities' ||
+      id === 'highlights' ||
+      id === 'facilities' ||
+      id === 'outcomes' ||
+      label.includes('interventions identified') ||
+      label.includes('training activities') ||
+      label.includes('working activities') ||
+      label.includes('key highlights') ||
+      label.includes('facilities & equipment') ||
+      label.includes('outcomes & achievements')
+    );
+  });
 
   return (
     <div className="rwtp-page">
@@ -440,10 +459,18 @@ export default function RuralWomenTechParkPage({
               {openItems['03'] && (
                 <div className="rwtp-step-content">
                   <ul style={{ paddingLeft: '1.25rem', margin: 0, lineHeight: 1.7, color: '#3b5244' }}>
-                    <li style={{ marginBottom: '0.5rem' }}>Supported by Department of Science & Technology (DST), Govt. of India</li>
-                    <li style={{ marginBottom: '0.5rem' }}>Extensive training network covering over 1200+ rural women across Bhimavaram region</li>
-                    <li style={{ marginBottom: '0.5rem' }}>Established self-sustaining micro-enterprises in bakeries, tailoring, and eco-friendly products</li>
-                    <li style={{ marginBottom: '0.5rem' }}>Focus on waste paper recycling and indigenous virgin coconut oil processing</li>
+                    {((rwtp as any).highlights && (rwtp as any).highlights.length > 0) ? (
+                      (rwtp as any).highlights.map((h: string, idx: number) => (
+                        <li key={idx} style={{ marginBottom: '0.5rem' }}>{renderBold(h)}</li>
+                      ))
+                    ) : (
+                      <>
+                        <li style={{ marginBottom: '0.5rem' }}>Supported by Department of Science & Technology (DST), Govt. of India</li>
+                        <li style={{ marginBottom: '0.5rem' }}>Extensive training network covering over 1200+ rural women across Bhimavaram region</li>
+                        <li style={{ marginBottom: '0.5rem' }}>Established self-sustaining micro-enterprises in bakeries, tailoring, and eco-friendly products</li>
+                        <li style={{ marginBottom: '0.5rem' }}>Focus on waste paper recycling and indigenous virgin coconut oil processing</li>
+                      </>
+                    )}
                   </ul>
                 </div>
               )}
@@ -473,14 +500,25 @@ export default function RuralWomenTechParkPage({
               {openItems['04'] && (
                 <div className="rwtp-step-content">
                   <div className="rwtp-interventions-grid">
-                    <div>
-                      <h4 className="rwtp-intervention-title">Food Processing & Baking Lab</h4>
-                      <p className="rwtp-intervention-desc">Commercial ovens, dough mixers, biomass dryers, and icing workstations.</p>
-                    </div>
-                    <div>
-                      <h4 className="rwtp-intervention-title">CAD Tailoring & Embroidery Unit</h4>
-                      <p className="rwtp-intervention-desc">Computerized stitching machines, handlooms, and pattern drafting software.</p>
-                    </div>
+                    {((rwtp as any).facilities && (rwtp as any).facilities.length > 0) ? (
+                      (rwtp as any).facilities.map((fac: { title: string; description: string }, idx: number) => (
+                        <div key={idx}>
+                          <h4 className="rwtp-intervention-title">{fac.title}</h4>
+                          <p className="rwtp-intervention-desc">{renderBold(fac.description)}</p>
+                        </div>
+                      ))
+                    ) : (
+                      <>
+                        <div>
+                          <h4 className="rwtp-intervention-title">Food Processing & Baking Lab</h4>
+                          <p className="rwtp-intervention-desc">Commercial ovens, dough mixers, biomass dryers, and icing workstations.</p>
+                        </div>
+                        <div>
+                          <h4 className="rwtp-intervention-title">CAD Tailoring & Embroidery Unit</h4>
+                          <p className="rwtp-intervention-desc">Computerized stitching machines, handlooms, and pattern drafting software.</p>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
               )}
@@ -510,7 +548,7 @@ export default function RuralWomenTechParkPage({
               {openItems['05'] && (
                 <div className="rwtp-step-content">
                   <p className="rwtp-intervention-desc">
-                    Over 1400+ rural women and self-help group members have gained sustainable livelihoods, technical independence, and financial inclusion through the technology park initiatives.
+                    {renderBold((rwtp as any).outcomes || `Over 1400+ rural women and self-help group members have gained sustainable livelihoods, technical independence, and financial inclusion through the technology park initiatives.`)}
                   </p>
                 </div>
               )}
@@ -582,11 +620,13 @@ export default function RuralWomenTechParkPage({
           </div>
         </section>
       )}
-      {customSections.length > 0 && (
+      {(customSections.some((s) => s.contentType === 'gallery') || extraAccordionSections.length > 0) && (
         <section className="section bg-white" style={{ padding: '2rem 0' }}>
           <div className="container">
             <CustomSectionsGalleries sections={customSections} />
-            <CustomSectionsAccordion sections={customSections.filter((s) => s.placement !== 'intro' && s.contentType !== 'gallery')} />
+            {extraAccordionSections.length > 0 && (
+              <CustomSectionsAccordion sections={extraAccordionSections} />
+            )}
           </div>
         </section>
       )}

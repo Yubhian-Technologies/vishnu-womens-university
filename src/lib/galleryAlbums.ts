@@ -10,6 +10,12 @@ import { parseHappeningDate } from './happenings';
 export function albumDateTimestamp(album: { date?: string; year: number }): number | null {
   const start = (album.date || '').split(/\s+[–—-]\s+/)[0].trim();
   if (!start) return null;
+  // Numeric dates are day-first: "31/08/2026" (never month-first).
+  const dmy = start.match(/^(\d{1,2})[/.-](\d{1,2})[/.-]((?:19|20)\d{2})$/);
+  if (dmy) {
+    const d = new Date(+dmy[3], +dmy[2] - 1, +dmy[1]);
+    return Number.isNaN(d.getTime()) ? null : d.getTime();
+  }
   const withYear = /\b(19|20)\d{2}\b/.test(start) ? start : `${start}, ${album.year}`;
   const parsed = parseHappeningDate(withYear).timestamp;
   if (parsed !== null) return parsed;
@@ -18,6 +24,33 @@ export function albumDateTimestamp(album: { date?: string; year: number }): numb
   if (!/\d/.test(start)) return null;
   const t = Date.parse(withYear);
   return Number.isNaN(t) ? null : t;
+}
+
+/**
+ * Display form of an album's free-text date as DD/MM/YYYY ("Oct/08/2026" →
+ * "08/10/2026"). Only complete single dates are converted (each side of a
+ * "start – end" range separately); anything else is returned unchanged.
+ */
+export function formatAlbumDate(date: string | undefined): string {
+  const text = (date || '').trim();
+  if (!text) return '';
+  const fmt = (part: string): string => {
+    const p = part.trim();
+    if (/^\d{1,2}[/.-]\d{1,2}[/.-](19|20)\d{2}$/.test(p)) {
+      const [d, m, y] = p.split(/[/.-]/);
+      return `${d.padStart(2, '0')}/${m.padStart(2, '0')}/${y}`;
+    }
+    const full =
+      /^[A-Za-z]+[\s/.-]+\d{1,2},?[\s/.-]+(19|20)\d{2}$/.test(p) ||
+      /^\d{1,2}\s+[A-Za-z]+,?\s+(19|20)\d{2}$/.test(p) ||
+      /^(19|20)\d{2}-\d{1,2}-\d{1,2}$/.test(p);
+    if (!full) return part;
+    const iso = p.match(/^((?:19|20)\d{2})-(\d{1,2})-(\d{1,2})$/);
+    const d = iso ? new Date(+iso[1], +iso[2] - 1, +iso[3]) : new Date(p.replace(/[/.-]/g, ' '));
+    if (Number.isNaN(d.getTime())) return part;
+    return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+  };
+  return text.split(/(\s+[–—-]\s+)/).map((s, i) => (i % 2 ? s : fmt(s))).join('');
 }
 
 /** Albums sorted by date, latest first. Undated/unreadable dates go last, keeping their existing order. */

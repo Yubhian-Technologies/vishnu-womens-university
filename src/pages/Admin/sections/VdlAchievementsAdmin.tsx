@@ -26,6 +26,18 @@ const EMPTY: Omit<VdlAchievementReportDoc, 'id'> = {
   label: '', description: '', imageUrl: '', imageStoragePath: '', fileUrl: '', storagePath: '', order: 0,
 };
 
+const DEFAULT_ACHIEVEMENTS: Omit<VdlAchievementReportDoc, 'id'>[] = [
+  { label: 'ME-VDL Achievements 2024-25', description: '', imageUrl: '', imageStoragePath: '', fileUrl: '', storagePath: '', order: 1 },
+  { label: 'ME-VDL Achievements 2023-24', description: '', imageUrl: '', imageStoragePath: '', fileUrl: '', storagePath: '', order: 2 },
+  { label: 'ME-VDL Achievements 2022-23', description: '', imageUrl: '', imageStoragePath: '', fileUrl: '', storagePath: '', order: 3 },
+  { label: 'ME-VDL Achievements 2021-22', description: '', imageUrl: '', imageStoragePath: '', fileUrl: '', storagePath: '', order: 4 },
+  { label: 'ME-VDL Achievements 2020-21', description: '', imageUrl: '', imageStoragePath: '', fileUrl: '', storagePath: '', order: 5 },
+  { label: 'ME-VDL Achievements 2019-20', description: '', imageUrl: '', imageStoragePath: '', fileUrl: '', storagePath: '', order: 6 },
+  { label: 'ME-VDL Achievements 2018-19', description: '', imageUrl: '', imageStoragePath: '', fileUrl: '', storagePath: '', order: 7 },
+  { label: 'ME-VDL Achievements 2017-18', description: '', imageUrl: '', imageStoragePath: '', fileUrl: '', storagePath: '', order: 8 },
+  { label: 'ME-VDL Achievements 2016-17', description: '', imageUrl: '', imageStoragePath: '', fileUrl: '', storagePath: '', order: 9 },
+];
+
 export default function VdlAchievementsAdmin() {
   const { docs, loading } = useOrderedCollection<VdlAchievementReportDoc>('vdlAchievementReports', 'order');
   const [form, setForm] = useState<Omit<VdlAchievementReportDoc, 'id'>>(EMPTY);
@@ -75,6 +87,16 @@ export default function VdlAchievementsAdmin() {
     }
     if (storagePath) deleteFile(storagePath).catch(() => { /* best-effort */ });
     if (imageStoragePath) deleteFile(imageStoragePath).catch(() => { /* best-effort */ });
+  };
+
+  const seedAchievements = async () => {
+    try {
+      for (const item of DEFAULT_ACHIEVEMENTS) {
+        await addDoc(collection(db, 'vdlAchievementReports'), { ...item, createdAt: serverTimestamp() });
+      }
+    } catch (e) {
+      alert(`Couldn't seed achievements: ${(e as Error).message}`);
+    }
   };
 
   return (
@@ -141,7 +163,16 @@ export default function VdlAchievementsAdmin() {
                     </td>
                   </tr>
                 ))}
-                {docs.length === 0 && <tr><td colSpan={5} className="admin-empty">No achievements yet.</td></tr>}
+                {docs.length === 0 && (
+                  <tr>
+                    <td colSpan={5} className="admin-empty">
+                      No achievements yet.{' '}
+                      <button type="button" className="admin-btn admin-btn--sm" onClick={seedAchievements}>
+                        Add starter achievement documents (2016-2025)
+                      </button>
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>

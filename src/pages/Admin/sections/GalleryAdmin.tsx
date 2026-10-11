@@ -6,7 +6,7 @@ import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
 import { uploadImage } from '../../../lib/storage';
 import ImageUploader from '../../../components/ImageUploader/ImageUploader';
-import { sortAlbumsLatestFirst } from '../../../lib/galleryAlbums';
+import { formatAlbumDate, sortAlbumsLatestFirst } from '../../../lib/galleryAlbums';
 import { galleryAlbums as STATIC_ALBUMS } from '../../NewsAwards/news-awards.data';
 
 interface GalleryImage {
@@ -239,7 +239,7 @@ export default function GalleryAdmin() {
 
   const startEdit = (a: GalleryAlbumDoc) => {
     setEditingId(a.id);
-    setForm({ title: a.title || '', imageUrl: a.imageUrl || '', link: a.link || '', date: a.date || '' });
+    setForm({ title: a.title || '', imageUrl: a.imageUrl || '', link: a.link || '', date: formatAlbumDate(a.date) });
     setActiveYear(a.year);
   };
 
@@ -567,7 +567,7 @@ export default function GalleryAdmin() {
           </div>
           <div className="admin-field">
             <label htmlFor="album-date">Date</label>
-            <input id="album-date" value={form.date} onChange={(e) => setForm((p) => ({ ...p, date: e.target.value }))} placeholder="March 8, 2025" />
+            <input id="album-date" value={form.date} onChange={(e) => setForm((p) => ({ ...p, date: e.target.value }))} placeholder="DD/MM/YYYY (e.g. 31/08/2026)" />
           </div>
           <div className="admin-field" style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
             <button className="admin-btn admin-btn--primary" disabled={saving} onClick={addOne}>
@@ -647,7 +647,7 @@ export default function GalleryAdmin() {
                   : <div className="admin-image-card__empty">No image</div>}
                 <div className="admin-image-card__info">
                   <strong>{a.title}</strong>
-                  {a.date && <span className="admin-badge admin-badge--sm admin-badge--gray" style={{ marginTop: 2, alignSelf: 'flex-start' }}>{a.date}</span>}
+                  {a.date && <span className="admin-badge admin-badge--sm admin-badge--gray" style={{ marginTop: 2, alignSelf: 'flex-start' }}>{formatAlbumDate(a.date)}</span>}
                   {a.link
                     ? <a href={a.link} target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.8rem', marginTop: 4 }}>Open Google Photos ↗</a>
                     : <span style={{ fontSize: '0.8rem', color: '#b45', marginTop: 4 }}>No VIEW link</span>}

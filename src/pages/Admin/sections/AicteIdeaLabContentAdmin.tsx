@@ -1,21 +1,80 @@
 import { useEffect, useState } from 'react';
-import { doc, serverTimestamp } from 'firebase/firestore';
-import { setDoc } from '../../../lib/auditLog';
+import { collection, doc, serverTimestamp } from 'firebase/firestore';
+import { setDoc, addDoc, updateDoc, deleteDoc } from '../../../lib/auditLog';
 import { db } from '../../../lib/firebase';
 import { useDocument } from '../../../hooks/useDocument';
+import { useOrderedCollection, type WithId } from '../../../hooks/useCollection';
+import { useImageCropModal } from '../../../components/ImageUploader/useImageCropModal';
+import { deleteFile, type UploadResult } from '../../../lib/storage';
 import {
   aicteIdeaLab,
   type IdeaLabProcessStep,
   type IdeaLabPillar,
   type IdeaLabEquipmentItem,
 } from '../../Differentiators/aicteIdeaLab.data';
+import {
+  Award,
+  Lightbulb,
+  Workflow,
+  Compass,
+  Users,
+  GraduationCap,
+  Building2,
+  FileCheck,
+  Plus,
+  Trash2,
+  Edit2,
+  Save,
+  RotateCcw,
+  Sparkles,
+  Layers,
+  X,
+  CheckCircle,
+  Image as ImageIcon,
+} from 'lucide-react';
 
-export interface CustomIdeaLabSection {
-  id: string;
-  title: string;
+import CustomSectionEditor from './CustomSectionEditor';
+import { replaceAtPath, getAtPath, type CustomSection } from '../../../lib/customSections';
+
+export interface CustomIdeaLabSection extends CustomSection {
+  title?: string;
   badge?: string;
   paragraphs?: string[];
   bulletPoints?: string[];
+}
+
+function normalizeCustomSection(sec: any): CustomIdeaLabSection {
+  const label = sec.label || sec.title || 'Navigation Section';
+  const title = sec.title || label;
+  const badge = sec.badge || sec.subtitle || '';
+  const textContent = sec.textContent !== undefined ? sec.textContent : (Array.isArray(sec.paragraphs) ? sec.paragraphs.join('\n') : '');
+  const listText = sec.listText !== undefined ? sec.listText : (Array.isArray(sec.bulletPoints) ? sec.bulletPoints.join('\n') : '');
+  const paragraphs = sec.paragraphs || (textContent ? textContent.split('\n').filter(Boolean) : []);
+  const bulletPoints = sec.bulletPoints || (listText ? listText.split('\n').filter(Boolean) : []);
+  const contentType = sec.contentType || (listText.trim() ? 'list' : 'text');
+  return {
+    id: sec.id || `section-${Date.now()}`,
+    label,
+    title,
+    badge,
+    subtitle: badge,
+    contentType,
+    textContent,
+    listText,
+    paragraphs,
+    bulletPoints,
+    tableText: sec.tableText || '',
+    linksText: sec.linksText || '',
+    files: sec.files || [],
+    subSections: Array.isArray(sec.subSections) ? sec.subSections.map(normalizeCustomSection) : [],
+    subSectionsDisplay: sec.subSectionsDisplay,
+    placement: sec.placement,
+    boldHeading: sec.boldHeading,
+    photo: sec.photo,
+    galleryPhotos: sec.galleryPhotos,
+    imageCards: sec.imageCards,
+    contacts: sec.contacts,
+  };
 }
 
 export interface AicteIdeaLabDoc {
@@ -69,8 +128,31 @@ export interface AicteIdeaLabDoc {
   additionalSections?: CustomIdeaLabSection[];
 }
 
+export interface AicteIdeaLabTeamMemberDoc extends WithId {
+  name: string;
+  designation: string;
+  role: string;
+  order: number;
+}
+
+export interface AicteIdeaLabAmbassadorDoc extends WithId {
+  regNumber: string;
+  name: string;
+  year: string;
+  branch: string;
+  email: string;
+  order: number;
+}
+
+export interface AicteIdeaLabFacilityPhotoDoc extends WithId {
+  imageUrl: string;
+  storagePath: string;
+  caption: string;
+  category?: string;
+  order: number;
+}
+
 const DEFAULT_STATE: AicteIdeaLabDoc = {
-  hero: { ...aicteIdeaLab.hero },
   telemetry: aicteIdeaLab.telemetry.map((t) => ({ ...t })),
   overview: {
     title: aicteIdeaLab.overview.title,
@@ -97,33 +179,170 @@ const DEFAULT_STATE: AicteIdeaLabDoc = {
     facultyCoordinators: [...aicteIdeaLab.officialInfo.facultyCoordinators],
     email: aicteIdeaLab.officialInfo.email,
   },
-  cta: { ...aicteIdeaLab.cta },
   additionalSections: [],
 };
 
-type ActiveSubSection =
-  | 'telemetry'
-  | 'overview'
-  | 'vision'
-  | 'team-copy'
-  | 'ambassadors-copy'
-  | 'facilities-copy'
-  | 'official-info'
-  | 'custom-sections'
-  | 'hero-cta';
+const DEFAULT_TEAM = [
+  { name: 'Dr. G. Srinivasa Rao', designation: 'Principal, SVECW', role: 'Chief Mentor', order: 1 },
+  { name: 'Dr. P. Srinivasa Raju', designation: 'Vice Principal, SVECW', role: 'Coordinator', order: 2 },
+  { name: 'Dr. S. Hanumantha Rao', designation: 'Professor, Dept. of ECE', role: 'Co-Coordinator', order: 3 },
+  { name: 'Dr. T. Sudheer Kumar', designation: 'Professor, Dept. of ECE', role: 'Tech GURU', order: 4 },
+  { name: 'Mr. B. Satya Krishna', designation: 'Asst. Professor, Dept. of ME', role: 'Tech GURU', order: 5 },
+  { name: 'Mr. N. Kalyan Chakravarthy', designation: 'Technician', role: 'Lab GURU', order: 6 },
+];
+
+const DEFAULT_AMBASSADORS = [
+  { regNumber: '21B01A54A6', name: 'T. Hanuma Priya', year: 'II', branch: 'AIDS', email: '21B01A54A6@svecw.edu.in', order: 1 },
+  { regNumber: '21B01A6110', name: 'B. Haritha Priya Lakshmi Bala', year: 'II', branch: 'AIML', email: '21B01A6110@svecw.edu.in', order: 2 },
+  { regNumber: '21B01A0125', name: 'K. Renu Priyanka', year: 'II', branch: 'CIVIL', email: '21B01A0125@svecw.edu.in', order: 3 },
+  { regNumber: '21B01A0525', name: 'B. Naga Sai Eswari Sathvika', year: 'II', branch: 'CSE', email: '21B01A0525@svecw.edu.in', order: 4 },
+  { regNumber: '21B01A0437', name: 'J. Tejaswini Sai Sindhu', year: 'II', branch: 'ECE', email: '21B01A0437@svecw.edu.in', order: 5 },
+  { regNumber: '21B01A0488', name: 'R. Jahnavi', year: 'II', branch: 'ECE', email: '21B01A04A1@svecw.edu.in', order: 6 },
+  { regNumber: '21B01A0211', name: 'G. T. S. Padmavathi', year: 'II', branch: 'EEE', email: '21B01A0211@svecw.edu.in', order: 7 },
+  { regNumber: '21B01A0221', name: 'K. Pujitha', year: 'II', branch: 'EEE', email: '21B01A0221@svecw.edu.in', order: 8 },
+  { regNumber: '21B01A0313', name: 'D. Yasaswini Naga Sai Sirisha', year: 'II', branch: 'ME', email: '21B01A0313@svecw.edu.in', order: 9 },
+  { regNumber: '21B01A0314', name: 'D. H Pravallika Devi', year: 'II', branch: 'ME', email: '21B01A0314@svecw.edu.in', order: 10 },
+];
+
+function FacilityPhotoCardItem({
+  photo,
+  onReplacePhoto,
+  onRemovePhoto,
+}: {
+  photo: AicteIdeaLabFacilityPhotoDoc;
+  onReplacePhoto: (photo: AicteIdeaLabFacilityPhotoDoc, file: File) => void;
+  onRemovePhoto: (photo: AicteIdeaLabFacilityPhotoDoc) => void;
+}) {
+  const [caption, setCaption] = useState(photo.caption || '');
+  const [category, setCategory] = useState(photo.category || '');
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    setCaption(photo.caption || '');
+    setCategory(photo.category || '');
+  }, [photo.caption, photo.category]);
+
+  const saveDetails = async () => {
+    setSaving(true);
+    try {
+      await updateDoc(doc(db, 'aicteIdeaLabFacilityPhotos', photo.id), {
+        caption,
+        category,
+      });
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch (e) {
+      alert(`Couldn't update details: ${(e as Error).message}`);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div style={{ background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '8px', overflow: 'hidden', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+      <div style={{ position: 'relative' }}>
+        <img loading="lazy" src={photo.imageUrl} alt={caption} style={{ width: '100%', height: '145px', objectFit: 'cover', display: 'block' }} />
+        <label style={{ position: 'absolute', top: '0.35rem', right: '0.35rem', background: 'rgba(15, 23, 42, 0.85)', color: '#ffffff', padding: '0.25rem 0.5rem', borderRadius: '5px', fontSize: '0.72rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.3rem', fontWeight: 600, backdropFilter: 'blur(4px)', boxShadow: '0 2px 4px rgba(0,0,0,0.2)' }}>
+          <Edit2 size={13} /> Edit Image
+          <input
+            type="file"
+            accept="image/*"
+            hidden
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) onReplacePhoto(photo, file);
+              e.target.value = '';
+            }}
+          />
+        </label>
+      </div>
+
+      <div style={{ padding: '0.65rem', display: 'flex', flexDirection: 'column', gap: '0.45rem', background: '#f8fafc', flex: 1 }}>
+        <div>
+          <label style={{ fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.04em', color: '#64748b', fontWeight: 700, display: 'block', marginBottom: '0.2rem' }}>
+            Category Badge (e.g. DIGITAL FABRICATION)
+          </label>
+          <input
+            type="text"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            onBlur={saveDetails}
+            placeholder="e.g. DIGITAL FABRICATION"
+            className="admin-input"
+            style={{ fontSize: '0.78rem', padding: '0.3rem 0.45rem' }}
+          />
+        </div>
+
+        <div>
+          <label style={{ fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.04em', color: '#64748b', fontWeight: 700, display: 'block', marginBottom: '0.2rem' }}>
+            Equipment Name / Title
+          </label>
+          <input
+            type="text"
+            value={caption}
+            onChange={(e) => setCaption(e.target.value)}
+            onBlur={saveDetails}
+            placeholder="e.g. 3D Printers & Additive Manufacturing"
+            className="admin-input"
+            style={{ fontSize: '0.8rem', fontWeight: 600, padding: '0.3rem 0.45rem' }}
+          />
+        </div>
+
+        <div style={{ display: 'flex', gap: '0.4rem', marginTop: '0.2rem', paddingTop: '0.35rem', borderTop: '1px solid #e2e8f0' }}>
+          <button
+            type="button"
+            onClick={saveDetails}
+            disabled={saving}
+            className="admin-btn admin-btn--sm admin-btn--primary"
+            style={{ flex: 1, padding: '0.25rem 0.4rem', fontSize: '0.72rem', justifyContent: 'center' }}
+          >
+            <Save size={12} /> {saving ? 'Saving...' : saved ? 'Saved!' : 'Save Text'}
+          </button>
+          <button
+            type="button"
+            onClick={() => onRemovePhoto(photo)}
+            className="admin-btn admin-btn--sm admin-btn--ghost"
+            style={{ color: '#dc2626', padding: '0.25rem 0.4rem', fontSize: '0.72rem' }}
+            title="Remove Photo"
+          >
+            <Trash2 size={13} />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function AicteIdeaLabContentAdmin() {
   const { data, loading } = useDocument<AicteIdeaLabDoc>('settings', 'aicteIdeaLab');
   const [form, setForm] = useState<AicteIdeaLabDoc>(DEFAULT_STATE);
   const [hasInitialized, setHasInitialized] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState<ActiveSubSection>('overview');
+  const [savedSuccess, setSavedSuccess] = useState(false);
+
+  // Collections for inline team, ambassadors & photo gallery
+  const { docs: teamMembers } = useOrderedCollection<AicteIdeaLabTeamMemberDoc>('aicteIdeaLabTeam', 'order');
+  const { docs: ambassadorMembers } = useOrderedCollection<AicteIdeaLabAmbassadorDoc>('aicteIdeaLabAmbassadors', 'order');
+  const { docs: facilityPhotos } = useOrderedCollection<AicteIdeaLabFacilityPhotoDoc>('aicteIdeaLabFacilityPhotos', 'order');
+
+  // Image Cropper for Facility Photos
+  const { openCrop, cropModal } = useImageCropModal(4 / 3);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+
+  // Inline forms state
+  const [teamForm, setTeamForm] = useState({ name: '', designation: '', role: '', order: 0 });
+  const [editingTeamId, setEditingTeamId] = useState<string | null>(null);
+  const [isAddingTeam, setIsAddingTeam] = useState(false);
+
+  const [ambassadorForm, setAmbassadorForm] = useState({ regNumber: '', name: '', year: '', branch: '', email: '', order: 0 });
+  const [editingAmbassadorId, setEditingAmbassadorId] = useState<string | null>(null);
+  const [isAddingAmbassador, setIsAddingAmbassador] = useState(false);
 
   useEffect(() => {
     if (!loading && !hasInitialized) {
       if (data) {
         setForm({
-          hero: { ...DEFAULT_STATE.hero, ...data.hero },
           telemetry: data.telemetry && data.telemetry.length > 0 ? data.telemetry : DEFAULT_STATE.telemetry,
           overview: {
             title: data.overview?.title || DEFAULT_STATE.overview?.title || '',
@@ -158,22 +377,31 @@ export default function AicteIdeaLabContentAdmin() {
             facultyCoordinators: data.officialInfo?.facultyCoordinators || DEFAULT_STATE.officialInfo?.facultyCoordinators || [],
             email: data.officialInfo?.email || DEFAULT_STATE.officialInfo?.email || '',
           },
-          cta: { ...DEFAULT_STATE.cta, ...data.cta },
-          additionalSections: data.additionalSections || [],
+          additionalSections: (data.additionalSections || []).map(normalizeCustomSection),
         });
       }
       setHasInitialized(true);
     }
   }, [data, loading, hasInitialized]);
 
-  const save = async () => {
+  const saveMainDoc = async () => {
     setSaving(true);
     try {
+      const formattedSections = (form.additionalSections || []).map((sec) => ({
+        ...sec,
+        title: sec.label || sec.title || 'Navigation Section',
+        badge: sec.subtitle || sec.badge || '',
+        paragraphs: sec.textContent ? sec.textContent.split('\n').filter(Boolean) : (sec.paragraphs || []),
+        bulletPoints: sec.listText ? sec.listText.split('\n').filter(Boolean) : (sec.bulletPoints || []),
+      }));
+
       await setDoc(doc(db, 'settings', 'aicteIdeaLab'), {
         ...form,
+        additionalSections: formattedSections,
         updatedAt: serverTimestamp(),
       }, { merge: true });
-      alert('AICTE IDEA Lab content updated successfully! All changes are live on the website.');
+      setSavedSuccess(true);
+      setTimeout(() => setSavedSuccess(false), 3000);
     } catch (e) {
       alert(`Couldn't save: ${(e as Error).message}`);
     } finally {
@@ -182,12 +410,12 @@ export default function AicteIdeaLabContentAdmin() {
   };
 
   const resetToDefaults = () => {
-    if (confirm('Reset all IDEA Lab text to the default starting values? You can still edit them before saving.')) {
+    if (confirm('Reset all AICTE IDEA Lab copy to starting defaults?')) {
       setForm(DEFAULT_STATE);
     }
   };
 
-  // Helper setters
+  // --- 1. TELEMETRY STATS HELPERS ---
   const updateTelemetry = (idx: number, field: 'value' | 'label', val: string) => {
     const list = [...(form.telemetry || [])];
     if (list[idx]) {
@@ -199,7 +427,7 @@ export default function AicteIdeaLabContentAdmin() {
   const addTelemetryItem = () => {
     setForm((p) => ({
       ...p,
-      telemetry: [...(p.telemetry || []), { value: '', label: '' }],
+      telemetry: [...(p.telemetry || []), { value: 'New Stat', label: 'Stat Description' }],
     }));
   };
 
@@ -210,7 +438,7 @@ export default function AicteIdeaLabContentAdmin() {
     }));
   };
 
-  // Process Step Helpers
+  // --- 2. PROCESS STEP HELPERS ---
   const updateProcessStep = (idx: number, field: keyof IdeaLabProcessStep, val: string) => {
     const steps = [...(form.process?.steps || [])];
     if (steps[idx]) {
@@ -244,7 +472,7 @@ export default function AicteIdeaLabContentAdmin() {
     }));
   };
 
-  // Pillars Helpers
+  // --- 3. PILLARS HELPERS ---
   const updatePillar = (idx: number, field: keyof IdeaLabPillar, val: string) => {
     const pillars = [...(form.pillars || [])];
     if (pillars[idx]) {
@@ -272,648 +500,994 @@ export default function AicteIdeaLabContentAdmin() {
     }));
   };
 
-  // Additional Custom Sections Helpers
-  const addCustomSection = () => {
-    const newId = `section-${Date.now()}`;
-    setForm((p) => ({
-      ...p,
-      additionalSections: [
-        ...(p.additionalSections || []),
-        {
-          id: newId,
-          title: 'New Section',
-          badge: 'IDEA Lab Section',
-          paragraphs: ['Write section content here...'],
-          bulletPoints: [],
-        },
-      ],
-    }));
-  };
-
-  const updateCustomSection = (idx: number, field: keyof CustomIdeaLabSection, val: unknown) => {
-    const list = [...(form.additionalSections || [])];
-    if (list[idx]) {
-      list[idx] = { ...list[idx], [field]: val };
-      setForm((p) => ({ ...p, additionalSections: list }));
+  // --- 4. TEAM MEMBERS CRUD ---
+  const handleSaveTeam = async () => {
+    if (!teamForm.name || !teamForm.designation || !teamForm.role) return alert('Name, designation, and role are required.');
+    try {
+      if (editingTeamId) {
+        await updateDoc(doc(db, 'aicteIdeaLabTeam', editingTeamId), { ...teamForm });
+      } else {
+        await addDoc(collection(db, 'aicteIdeaLabTeam'), {
+          ...teamForm,
+          order: teamForm.order || teamMembers.length + 1,
+          createdAt: serverTimestamp(),
+        });
+      }
+      setTeamForm({ name: '', designation: '', role: '', order: 0 });
+      setEditingTeamId(null);
+      setIsAddingTeam(false);
+    } catch (e) {
+      alert(`Couldn't save member: ${(e as Error).message}`);
     }
   };
 
-  const removeCustomSection = (idx: number) => {
-    if (!confirm('Delete this section?')) return;
+  const handleDeleteTeam = async (id: string) => {
+    if (!confirm('Delete this team member?')) return;
+    try {
+      await deleteDoc(doc(db, 'aicteIdeaLabTeam', id));
+    } catch (e) {
+      alert(`Couldn't delete: ${(e as Error).message}`);
+    }
+  };
+
+  const seedTeam = async () => {
+    if (!confirm('Add starter SVECW AICTE IDEA LAB team members?')) return;
+    try {
+      for (const m of DEFAULT_TEAM) {
+        await addDoc(collection(db, 'aicteIdeaLabTeam'), { ...m, createdAt: serverTimestamp() });
+      }
+    } catch (e) {
+      alert(`Couldn't add starter team: ${(e as Error).message}`);
+    }
+  };
+
+  // --- 5. AMBASSADORS CRUD ---
+  const handleSaveAmbassador = async () => {
+    if (!ambassadorForm.regNumber || !ambassadorForm.name) return alert('Reg. number and name are required.');
+    try {
+      if (editingAmbassadorId) {
+        await updateDoc(doc(db, 'aicteIdeaLabAmbassadors', editingAmbassadorId), { ...ambassadorForm });
+      } else {
+        await addDoc(collection(db, 'aicteIdeaLabAmbassadors'), {
+          ...ambassadorForm,
+          order: ambassadorForm.order || ambassadorMembers.length + 1,
+          createdAt: serverTimestamp(),
+        });
+      }
+      setAmbassadorForm({ regNumber: '', name: '', year: '', branch: '', email: '', order: 0 });
+      setEditingAmbassadorId(null);
+      setIsAddingAmbassador(false);
+    } catch (e) {
+      alert(`Couldn't save ambassador: ${(e as Error).message}`);
+    }
+  };
+
+  const handleDeleteAmbassador = async (id: string) => {
+    if (!confirm('Delete this student ambassador?')) return;
+    try {
+      await deleteDoc(doc(db, 'aicteIdeaLabAmbassadors', id));
+    } catch (e) {
+      alert(`Couldn't delete: ${(e as Error).message}`);
+    }
+  };
+
+  const seedAmbassadors = async () => {
+    if (!confirm('Add starter set of student ambassadors?')) return;
+    try {
+      for (const a of DEFAULT_AMBASSADORS) {
+        await addDoc(collection(db, 'aicteIdeaLabAmbassadors'), { ...a, createdAt: serverTimestamp() });
+      }
+    } catch (e) {
+      alert(`Couldn't add starter ambassadors: ${(e as Error).message}`);
+    }
+  };
+
+  // --- 6. FACILITY PHOTOS CRUD ---
+  const addFacilityPhoto = (file: File) => {
+    setUploadingPhoto(true);
+    openCrop(file, 'vwu/aicte-idea-lab-facilities', async (result: UploadResult) => {
+      try {
+        await addDoc(collection(db, 'aicteIdeaLabFacilityPhotos'), {
+          imageUrl: result.url,
+          storagePath: result.path,
+          caption: '3D Printers & Additive Manufacturing',
+          category: 'DIGITAL FABRICATION',
+          order: facilityPhotos.length + 1,
+          createdAt: serverTimestamp(),
+        });
+      } catch (e) {
+        alert(`Couldn't upload photo: ${(e as Error).message}`);
+      } finally {
+        setUploadingPhoto(false);
+      }
+    });
+  };
+
+  const replaceFacilityPhoto = (photo: AicteIdeaLabFacilityPhotoDoc, file: File) => {
+    setUploadingPhoto(true);
+    openCrop(file, 'vwu/aicte-idea-lab-facilities', async (result: UploadResult) => {
+      try {
+        if (photo.storagePath) {
+          try { await deleteFile(photo.storagePath); } catch {}
+        }
+        await updateDoc(doc(db, 'aicteIdeaLabFacilityPhotos', photo.id), {
+          imageUrl: result.url,
+          storagePath: result.path,
+        });
+      } catch (e) {
+        alert(`Couldn't update photo image: ${(e as Error).message}`);
+      } finally {
+        setUploadingPhoto(false);
+      }
+    });
+  };
+
+  const removeFacilityPhoto = async (photo: AicteIdeaLabFacilityPhotoDoc) => {
+    if (!confirm('Remove this photo?')) return;
+    try {
+      await deleteDoc(doc(db, 'aicteIdeaLabFacilityPhotos', photo.id));
+      if (photo.storagePath) await deleteFile(photo.storagePath);
+    } catch (e) {
+      alert(`Couldn't remove photo: ${(e as Error).message}`);
+    }
+  };
+
+  // --- 8. CUSTOM ADDITIONAL SECTIONS HELPERS ---
+  const handleCustomSectionFileUploaded = (sectionPath: number[], fileIndex: number, r: UploadResult) => {
     setForm((p) => ({
       ...p,
-      additionalSections: (p.additionalSections || []).filter((_, i) => i !== idx),
+      additionalSections: replaceAtPath(p.additionalSections || [], sectionPath, (s) => ({
+        ...s,
+        files: (s.files || []).map((f, i) => (i === fileIndex ? { ...f, fileUrl: r.url, storagePath: r.path } : f)),
+      })),
+    }));
+  };
+
+  const handleCustomSectionFileRemoved = async (sectionPath: number[], fileIndex: number) => {
+    const file = getAtPath(form.additionalSections || [], sectionPath)?.files?.[fileIndex];
+    if (!file?.fileUrl) return;
+    if (!confirm('Remove this file? This cannot be undone.')) return;
+    try {
+      if (file.storagePath) await deleteFile(file.storagePath);
+    } catch (e) {
+      alert(`Couldn't delete the file from storage: ${(e as Error).message}`);
+      return;
+    }
+    setForm((p) => ({
+      ...p,
+      additionalSections: replaceAtPath(p.additionalSections || [], sectionPath, (s) => ({
+        ...s,
+        files: (s.files || []).filter((_, i) => i !== fileIndex),
+      })),
+    }));
+  };
+
+  const handleCustomSectionPhotoUploaded = (sectionPath: number[], r: UploadResult) => {
+    setForm((p) => ({
+      ...p,
+      additionalSections: replaceAtPath(p.additionalSections || [], sectionPath, (s) => ({
+        ...s,
+        photo: { imageUrl: r.url, storagePath: r.path },
+      })),
+    }));
+  };
+
+  const handleCustomSectionPhotoRemoved = async (sectionPath: number[]) => {
+    const photo = getAtPath(form.additionalSections || [], sectionPath)?.photo;
+    if (!photo?.imageUrl) return;
+    if (!confirm('Remove this photo? This cannot be undone.')) return;
+    try {
+      if (photo.storagePath) await deleteFile(photo.storagePath);
+    } catch (e) {
+      alert(`Couldn't delete the photo from storage: ${(e as Error).message}`);
+      return;
+    }
+    setForm((p) => ({
+      ...p,
+      additionalSections: replaceAtPath(p.additionalSections || [], sectionPath, (s) => {
+        const next = { ...s };
+        delete next.photo;
+        return next;
+      }),
+    }));
+  };
+
+  const handleCustomSectionGalleryPhotoUploaded = (sectionPath: number[], photoIndex: number, r: UploadResult) => {
+    setForm((p) => ({
+      ...p,
+      additionalSections: replaceAtPath(p.additionalSections || [], sectionPath, (s) => ({
+        ...s,
+        galleryPhotos: (s.galleryPhotos || []).map((ph, i) => (i === photoIndex ? { imageUrl: r.url, storagePath: r.path } : ph)),
+      })),
+    }));
+  };
+
+  const handleCustomSectionGalleryPhotoRemoved = async (sectionPath: number[], photoIndex: number) => {
+    const photo = getAtPath(form.additionalSections || [], sectionPath)?.galleryPhotos?.[photoIndex];
+    if (!photo) return;
+    if (photo.imageUrl && !confirm('Remove this photo? This cannot be undone.')) return;
+    try {
+      if (photo.storagePath) await deleteFile(photo.storagePath);
+    } catch (e) {
+      alert(`Couldn't delete the photo from storage: ${(e as Error).message}`);
+      return;
+    }
+    setForm((p) => ({
+      ...p,
+      additionalSections: replaceAtPath(p.additionalSections || [], sectionPath, (s) => ({
+        ...s,
+        galleryPhotos: (s.galleryPhotos || []).filter((_, i) => i !== photoIndex),
+      })),
     }));
   };
 
   if (loading && !hasInitialized) {
-    return <p className="admin-loading">Loading AICTE IDEA Lab content…</p>;
+    return <p className="admin-loading">Loading AICTE IDEA Lab Page Editor…</p>;
   }
 
   return (
     <div className="admin-section">
       <div className="admin-card">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '1rem' }}>
+        {/* Header */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '1.25rem', borderBottom: '1px solid #e5e7eb', paddingBottom: '1rem' }}>
           <div>
-            <h2 className="admin-card__title" style={{ margin: 0 }}>AICTE IDEA Lab — Dynamic Page Content</h2>
-            <p className="admin-field__hint" style={{ margin: '0.25rem 0 0' }}>
-              Edit and manage every section, paragraph, telemetry stat, vision pillar, and official record on the live page.
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Lightbulb size={22} color="#c8a03c" />
+              <h2 className="admin-card__title" style={{ margin: 0, padding: 0, border: 'none' }}>
+                AICTE IDEA Lab Page Management
+              </h2>
+            </div>
+            <p className="admin-field__hint" style={{ margin: '0.35rem 0 0', fontSize: '0.85rem' }}>
+              Manage all content, team rosters, student ambassadors, and facility equipment photos in the <strong>exact top-to-bottom order</strong> as displayed on the live public website.
             </p>
           </div>
           <div style={{ display: 'flex', gap: '0.5rem' }}>
-            <button type="button" className="admin-btn admin-btn--sm admin-btn--ghost" onClick={resetToDefaults}>
-              Reset to Defaults
+            <button type="button" onClick={resetToDefaults} className="admin-btn admin-btn--sm admin-btn--ghost">
+              <RotateCcw size={14} /> Reset Defaults
             </button>
-            <button type="button" className="admin-btn admin-btn--sm admin-btn--primary" onClick={save} disabled={saving}>
-              {saving ? 'Saving…' : 'Save All Changes'}
+            <button type="button" onClick={saveMainDoc} disabled={saving} className="admin-btn admin-btn--sm admin-btn--primary">
+              <Save size={14} /> {saving ? 'Saving...' : 'Save All Changes'}
             </button>
           </div>
         </div>
 
-        {/* Inner Subtabs */}
-        <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.75rem', marginBottom: '1.5rem' }}>
-          <button
-            type="button"
-            className={`admin-btn admin-btn--sm ${activeTab === 'telemetry' ? 'admin-btn--primary' : 'admin-btn--ghost'}`}
-            onClick={() => setActiveTab('telemetry')}
-          >
-            Telemetry Badges ({form.telemetry?.length || 0})
-          </button>
-          <button
-            type="button"
-            className={`admin-btn admin-btn--sm ${activeTab === 'overview' ? 'admin-btn--primary' : 'admin-btn--ghost'}`}
-            onClick={() => setActiveTab('overview')}
-          >
-            From Idea to Prototype
-          </button>
-          <button
-            type="button"
-            className={`admin-btn admin-btn--sm ${activeTab === 'vision' ? 'admin-btn--primary' : 'admin-btn--ghost'}`}
-            onClick={() => setActiveTab('vision')}
-          >
-            Vision & Pillars ({form.pillars?.length || 0})
-          </button>
-          <button
-            type="button"
-            className={`admin-btn admin-btn--sm ${activeTab === 'team-copy' ? 'admin-btn--primary' : 'admin-btn--ghost'}`}
-            onClick={() => setActiveTab('team-copy')}
-          >
-            Team Info & Intro
-          </button>
-          <button
-            type="button"
-            className={`admin-btn admin-btn--sm ${activeTab === 'ambassadors-copy' ? 'admin-btn--primary' : 'admin-btn--ghost'}`}
-            onClick={() => setActiveTab('ambassadors-copy')}
-          >
-            Ambassadors Info & Intro
-          </button>
-          <button
-            type="button"
-            className={`admin-btn admin-btn--sm ${activeTab === 'facilities-copy' ? 'admin-btn--primary' : 'admin-btn--ghost'}`}
-            onClick={() => setActiveTab('facilities-copy')}
-          >
-            Facilities Copy
-          </button>
-          <button
-            type="button"
-            className={`admin-btn admin-btn--sm ${activeTab === 'official-info' ? 'admin-btn--primary' : 'admin-btn--ghost'}`}
-            onClick={() => setActiveTab('official-info')}
-          >
-            Official Info & Registry
-          </button>
-          <button
-            type="button"
-            className={`admin-btn admin-btn--sm ${activeTab === 'custom-sections' ? 'admin-btn--primary' : 'admin-btn--ghost'}`}
-            onClick={() => setActiveTab('custom-sections')}
-          >
-            + Add More Sections ({form.additionalSections?.length || 0})
-          </button>
-          <button
-            type="button"
-            className={`admin-btn admin-btn--sm ${activeTab === 'hero-cta' ? 'admin-btn--primary' : 'admin-btn--ghost'}`}
-            onClick={() => setActiveTab('hero-cta')}
-          >
-            Hero & CTA Buttons
-          </button>
-        </div>
-
-        {/* TAB 1: Telemetry Stats */}
-        {activeTab === 'telemetry' && (
-          <div className="admin-form-grid" style={{ gridTemplateColumns: '1fr' }}>
-            <h3 style={{ fontSize: '1.1rem', fontWeight: 600, margin: '0 0 0.5rem' }}>Top Stat Cards (Telemetry Strip)</h3>
-            <p className="admin-field__hint">
-              Shown in the 4 prominent stat cards directly beneath the hero header.
-            </p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem', marginTop: '0.5rem' }}>
-              {(form.telemetry || []).map((t, idx) => (
-                <div key={idx} style={{ background: '#f8fafc', padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                    <strong>Card #{idx + 1}</strong>
-                    <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeTelemetryItem(idx)}>
-                      Remove
-                    </button>
-                  </div>
-                  <div className="admin-field" style={{ marginBottom: '0.5rem' }}>
-                    <label>Main Value / Text</label>
-                    <input
-                      value={t.value}
-                      onChange={(e) => updateTelemetry(idx, 'value', e.target.value)}
-                      placeholder="e.g. IDEA202000128"
-                    />
-                  </div>
-                  <div className="admin-field">
-                    <label>Subtitle / Label</label>
-                    <input
-                      value={t.label}
-                      onChange={(e) => updateTelemetry(idx, 'label', e.target.value)}
-                      placeholder="e.g. AQIS APPLICATION ID"
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div style={{ marginTop: '0.75rem' }}>
-              <button type="button" className="admin-btn admin-btn--sm admin-btn--secondary" onClick={addTelemetryItem}>
-                + Add Stat Card
-              </button>
-            </div>
+        {savedSuccess && (
+          <div style={{ background: '#ecfdf5', border: '1px solid #a7f3d0', padding: '0.75rem 1rem', borderRadius: '8px', color: '#065f46', fontSize: '0.85rem', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <CheckCircle size={16} /> Saved and published live to AICTE IDEA Lab page!
           </div>
         )}
 
-        {/* TAB 2: Overview & Process */}
-        {activeTab === 'overview' && (
-          <div>
-            <div className="admin-field admin-field--full">
-              <label>Overview Tab Title</label>
+        {/* Top Jump Bar (Exact Public Page Top-to-Bottom Order) */}
+        <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '0.65rem 1rem', marginBottom: '1.75rem', display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap', fontSize: '0.82rem' }}>
+          <strong style={{ color: '#475569', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+            <Layers size={14} /> Jump to Section (Public Page Order):
+          </strong>
+          <a href="#sec-telemetry" style={{ color: '#0284c7', textDecoration: 'none', fontWeight: 600 }}>1. Telemetry Stats Banner</a> •
+          <a href="#sec-overview" style={{ color: '#0284c7', textDecoration: 'none', fontWeight: 600 }}>2. From Idea to Prototype</a> •
+          <a href="#sec-vision" style={{ color: '#0284c7', textDecoration: 'none', fontWeight: 600 }}>3. Vision &amp; Academic Pillars</a> •
+          <a href="#sec-team" style={{ color: '#0284c7', textDecoration: 'none', fontWeight: 600 }}>4. Leadership &amp; Mentorship Roster</a> •
+          <a href="#sec-ambassadors" style={{ color: '#0284c7', textDecoration: 'none', fontWeight: 600 }}>5. Student Ambassadors</a> •
+          <a href="#sec-facilities" style={{ color: '#0284c7', textDecoration: 'none', fontWeight: 600 }}>6. Facilities &amp; Equipment Photos</a> •
+          <a href="#sec-official" style={{ color: '#0284c7', textDecoration: 'none', fontWeight: 600 }}>7. Official Roster &amp; Registry</a> •
+          <a href="#sec-custom" style={{ color: '#0284c7', textDecoration: 'none', fontWeight: 600 }}>8. Additional Navigation Sections</a>
+        </div>
+
+        {/* SECTION 1: TELEMETRY BADGES BANNER */}
+        <div id="sec-telemetry" style={{ background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '10px', padding: '1.25rem', marginBottom: '1.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', marginBottom: '0.75rem', borderBottom: '2px solid #e2e8f0', paddingBottom: '0.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Award size={18} color="#0284c7" />
+              <h3 style={{ margin: 0, fontSize: '1.05rem', color: '#0f172a' }}>1. Telemetry Badges Banner ({form.telemetry?.length || 0})</h3>
+            </div>
+            <button type="button" onClick={addTelemetryItem} className="admin-btn admin-btn--sm admin-btn--primary">
+              <Plus size={14} /> Add Stat Badge
+            </button>
+          </div>
+          <p className="admin-field__hint" style={{ marginBottom: '1rem' }}>
+            These 4 key metrics display prominently at the top of the AICTE IDEA Lab page.
+          </p>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '0.75rem' }}>
+            {(form.telemetry || []).map((stat, idx) => (
+              <div key={idx} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '0.75rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
+                  <strong style={{ fontSize: '0.82rem', color: '#0369a1' }}>Stat #{idx + 1}</strong>
+                  <button type="button" onClick={() => removeTelemetryItem(idx)} style={{ background: 'none', border: 'none', color: '#dc2626', cursor: 'pointer', padding: '0.2rem' }}>
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+                <div className="admin-field" style={{ marginBottom: '0.4rem' }}>
+                  <label style={{ fontSize: '0.75rem' }}>Stat Value (e.g. ₹1.13 Cr)</label>
+                  <input
+                    type="text"
+                    value={stat.value}
+                    onChange={(e) => updateTelemetry(idx, 'value', e.target.value)}
+                    className="admin-input"
+                    style={{ fontWeight: 700 }}
+                  />
+                </div>
+                <div className="admin-field">
+                  <label style={{ fontSize: '0.75rem' }}>Stat Label (e.g. Total Project Outlay)</label>
+                  <input
+                    type="text"
+                    value={stat.label}
+                    onChange={(e) => updateTelemetry(idx, 'label', e.target.value)}
+                    className="admin-input"
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* SECTION 2: FROM IDEA TO PROTOTYPE & INNOVATION PROCESS */}
+        <div id="sec-overview" style={{ background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '10px', padding: '1.25rem', marginBottom: '1.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem', borderBottom: '2px solid #e2e8f0', paddingBottom: '0.5rem' }}>
+            <Workflow size={18} color="#0284c7" />
+            <h3 style={{ margin: 0, fontSize: '1.05rem', color: '#0f172a' }}>2. From Idea to Prototype &amp; Innovation Process (Tab 1)</h3>
+          </div>
+
+          <div className="admin-form-grid" style={{ marginBottom: '1.25rem' }}>
+            <div className="admin-field" style={{ gridColumn: '1 / -1' }}>
+              <label style={{ fontWeight: 600 }}>Tab Title</label>
               <input
+                type="text"
                 value={form.overview?.title || ''}
                 onChange={(e) => setForm((p) => ({ ...p, overview: { ...p.overview, title: e.target.value } }))}
+                className="admin-input"
                 placeholder="From Idea to Prototype"
               />
             </div>
-
-            <div className="admin-field admin-field--full" style={{ marginTop: '1rem' }}>
-              <label>Overview Paragraphs</label>
-              <p className="admin-field__hint">Separate each paragraph with a blank line.</p>
+            <div className="admin-field" style={{ gridColumn: '1 / -1' }}>
+              <label style={{ fontWeight: 600 }}>Overview Paragraphs (One per line; use **text** for bold)</label>
               <textarea
-                rows={6}
-                value={(form.overview?.paragraphs || []).join('\n\n')}
-                onChange={(e) => {
-                  const paras = e.target.value.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
-                  setForm((p) => ({ ...p, overview: { ...p.overview, paragraphs: paras } }));
-                }}
-                placeholder="Write the lead overview paragraphs..."
+                value={(form.overview?.paragraphs || []).join('\n')}
+                onChange={(e) => setForm((p) => ({ ...p, overview: { ...p.overview, paragraphs: e.target.value.split('\n') } }))}
+                className="admin-input"
+                rows={4}
+                style={{ width: '100%', fontFamily: 'inherit' }}
               />
             </div>
+          </div>
 
-            <hr style={{ margin: '1.5rem 0', borderColor: '#e2e8f0' }} />
+          {/* Process Section Sub-Card */}
+          <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '1rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
+              <div style={{ fontWeight: 700, fontSize: '0.92rem', color: '#0369a1', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                <Sparkles size={16} /> Innovation Process Cards ({form.process?.steps?.length || 0})
+              </div>
+              <button type="button" onClick={addProcessStep} className="admin-btn admin-btn--sm admin-btn--ghost">
+                <Plus size={13} /> Add Process Step
+              </button>
+            </div>
 
-            <h3 style={{ fontSize: '1.1rem', fontWeight: 600, margin: '0 0 0.5rem' }}>Innovation Process Section</h3>
             <div className="admin-form-grid" style={{ marginBottom: '1rem' }}>
               <div className="admin-field">
-                <label>Process Subheading / Title</label>
+                <label style={{ fontSize: '0.78rem', fontWeight: 600 }}>Process Subtitle / Title</label>
                 <input
+                  type="text"
                   value={form.process?.title || ''}
                   onChange={(e) => setForm((p) => ({ ...p, process: { ...p.process, title: e.target.value } }))}
+                  className="admin-input"
                   placeholder="Learn. Build. Test. Improve."
                 />
               </div>
-              <div className="admin-field admin-field--full">
-                <label>Process Intro Text</label>
-                <textarea
-                  rows={2}
+              <div className="admin-field">
+                <label style={{ fontSize: '0.78rem', fontWeight: 600 }}>Process Intro Text</label>
+                <input
+                  type="text"
                   value={form.process?.intro || ''}
                   onChange={(e) => setForm((p) => ({ ...p, process: { ...p.process, intro: e.target.value } }))}
-                  placeholder="The IDEA Lab encourages students to move beyond theoretical understanding..."
+                  className="admin-input"
                 />
               </div>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-              <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>Process Steps ({form.process?.steps?.length || 0})</h4>
-              <button type="button" className="admin-btn admin-btn--sm admin-btn--secondary" onClick={addProcessStep}>
-                + Add Step
-              </button>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '0.75rem' }}>
               {(form.process?.steps || []).map((step, idx) => (
-                <div key={idx} style={{ background: '#f8fafc', padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                    <input
-                      style={{ maxWidth: 60, fontWeight: 700 }}
-                      value={step.number}
-                      onChange={(e) => updateProcessStep(idx, 'number', e.target.value)}
-                      placeholder="01"
-                    />
-                    <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeProcessStep(idx)}>
-                      Delete
+                <div key={idx} style={{ background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '6px', padding: '0.65rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                    <span style={{ fontSize: '0.72rem', fontWeight: 800, background: '#fef3c7', color: '#b45309', padding: '0.1rem 0.35rem', borderRadius: '4px' }}>
+                      Step #{step.number}
+                    </span>
+                    <button type="button" onClick={() => removeProcessStep(idx)} style={{ background: 'none', border: 'none', color: '#dc2626', cursor: 'pointer', padding: '0.15rem' }}>
+                      <Trash2 size={13} />
                     </button>
                   </div>
-                  <div className="admin-field" style={{ marginBottom: '0.5rem' }}>
-                    <label>Step Title</label>
-                    <input
-                      value={step.title}
-                      onChange={(e) => updateProcessStep(idx, 'title', e.target.value)}
-                      placeholder="e.g. Explore an Idea"
-                    />
-                  </div>
-                  <div className="admin-field">
-                    <label>Step Description</label>
-                    <textarea
-                      rows={3}
-                      value={step.description}
-                      onChange={(e) => updateProcessStep(idx, 'description', e.target.value)}
-                      placeholder="Step description..."
-                    />
-                  </div>
+                  <input
+                    type="text"
+                    value={step.title}
+                    onChange={(e) => updateProcessStep(idx, 'title', e.target.value)}
+                    className="admin-input"
+                    style={{ fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.35rem' }}
+                    placeholder="Step Title"
+                  />
+                  <textarea
+                    value={step.description}
+                    onChange={(e) => updateProcessStep(idx, 'description', e.target.value)}
+                    className="admin-input"
+                    rows={2}
+                    style={{ fontSize: '0.78rem', fontFamily: 'inherit' }}
+                    placeholder="Step description..."
+                  />
                 </div>
               ))}
             </div>
           </div>
-        )}
+        </div>
 
-        {/* TAB 3: Vision & Academic Pillars */}
-        {activeTab === 'vision' && (
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-              <div>
-                <h3 style={{ fontSize: '1.1rem', fontWeight: 600, margin: 0 }}>Vision & Academic Pillars</h3>
-                <p className="admin-field__hint" style={{ margin: '0.25rem 0 0' }}>
-                  Cards displayed in the "Vision & Academic Pillars" tab.
-                </p>
+        {/* SECTION 3: VISION & ACADEMIC PILLARS */}
+        <div id="sec-vision" style={{ background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '10px', padding: '1.25rem', marginBottom: '1.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', marginBottom: '0.75rem', borderBottom: '2px solid #e2e8f0', paddingBottom: '0.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Compass size={18} color="#0284c7" />
+              <h3 style={{ margin: 0, fontSize: '1.05rem', color: '#0f172a' }}>3. Vision &amp; Academic Pillars (Tab 2)</h3>
+            </div>
+            <button type="button" onClick={addPillar} className="admin-btn admin-btn--sm admin-btn--primary">
+              <Plus size={14} /> Add Academic Pillar
+            </button>
+          </div>
+          <p className="admin-field__hint" style={{ marginBottom: '1rem' }}>
+            These pillar cards form the Vision &amp; Philosophy framework.
+          </p>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '0.75rem' }}>
+            {(form.pillars || []).map((pillar, idx) => (
+              <div key={idx} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '0.75rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                  <span style={{ fontSize: '0.72rem', fontWeight: 800, background: '#e0f2fe', color: '#0369a1', padding: '0.1rem 0.35rem', borderRadius: '4px' }}>
+                    Pillar #{pillar.number}
+                  </span>
+                  <button type="button" onClick={() => removePillar(idx)} style={{ background: 'none', border: 'none', color: '#dc2626', cursor: 'pointer', padding: '0.15rem' }}>
+                    <Trash2 size={13} />
+                  </button>
+                </div>
+                <input
+                  type="text"
+                  value={pillar.title}
+                  onChange={(e) => updatePillar(idx, 'title', e.target.value)}
+                  className="admin-input"
+                  style={{ fontSize: '0.85rem', fontWeight: 700, marginBottom: '0.35rem' }}
+                  placeholder="Pillar Title"
+                />
+                <textarea
+                  value={pillar.description}
+                  onChange={(e) => updatePillar(idx, 'description', e.target.value)}
+                  className="admin-input"
+                  rows={3}
+                  style={{ fontSize: '0.78rem', fontFamily: 'inherit' }}
+                  placeholder="Pillar description..."
+                />
               </div>
-              <button type="button" className="admin-btn admin-btn--sm admin-btn--secondary" onClick={addPillar}>
-                + Add Academic Pillar
+            ))}
+          </div>
+        </div>
+
+        {/* SECTION 4: LEADERSHIP & MENTORSHIP (TEAM ROSTER) */}
+        <div id="sec-team" style={{ background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '10px', padding: '1.25rem', marginBottom: '1.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', marginBottom: '0.75rem', borderBottom: '2px solid #e2e8f0', paddingBottom: '0.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Users size={18} color="#0284c7" />
+              <h3 style={{ margin: 0, fontSize: '1.05rem', color: '#0f172a' }}>4. Leadership &amp; Mentorship — Faculty Team (Tab 3)</h3>
+            </div>
+            <div style={{ display: 'flex', gap: '0.4rem' }}>
+              {teamMembers.length === 0 && (
+                <button type="button" onClick={seedTeam} className="admin-btn admin-btn--sm admin-btn--ghost">
+                  Seed Starter Team
+                </button>
+              )}
+              <button type="button" onClick={() => setIsAddingTeam(true)} className="admin-btn admin-btn--sm admin-btn--primary">
+                <Plus size={14} /> Add Faculty Member
               </button>
             </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
-              {(form.pillars || []).map((pillar, idx) => (
-                <div key={idx} style={{ background: '#f8fafc', padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                    <input
-                      style={{ maxWidth: 60, fontWeight: 700 }}
-                      value={pillar.number}
-                      onChange={(e) => updatePillar(idx, 'number', e.target.value)}
-                      placeholder="01"
-                    />
-                    <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removePillar(idx)}>
-                      Delete
-                    </button>
-                  </div>
-                  <div className="admin-field" style={{ marginBottom: '0.5rem' }}>
-                    <label>Pillar Title</label>
-                    <input
-                      value={pillar.title}
-                      onChange={(e) => updatePillar(idx, 'title', e.target.value)}
-                      placeholder="e.g. Student Innovation"
-                    />
-                  </div>
-                  <div className="admin-field">
-                    <label>Pillar Description</label>
-                    <textarea
-                      rows={3}
-                      value={pillar.description}
-                      onChange={(e) => updatePillar(idx, 'description', e.target.value)}
-                      placeholder="Pillar description..."
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
-        )}
 
-        {/* TAB 4: Team Copy */}
-        {activeTab === 'team-copy' && (
-          <div className="admin-form-grid" style={{ gridTemplateColumns: '1fr' }}>
-            <h3 style={{ fontSize: '1.1rem', fontWeight: 600, margin: '0 0 0.5rem' }}>People Behind IDEA Lab — Header & Copy</h3>
-            <p className="admin-field__hint">
-              Note: You can add and edit the individual faculty team members in the "Team Members Roster" subtab.
-            </p>
-
-            <div className="admin-field admin-field--full">
-              <label>Section Title</label>
+          <div className="admin-form-grid" style={{ marginBottom: '1.25rem' }}>
+            <div className="admin-field">
+              <label style={{ fontWeight: 600 }}>Section Title</label>
               <input
+                type="text"
                 value={form.team?.title || ''}
                 onChange={(e) => setForm((p) => ({ ...p, team: { ...p.team, title: e.target.value } }))}
+                className="admin-input"
                 placeholder="People Behind the IDEA Lab"
               />
             </div>
-
-            <div className="admin-field admin-field--full">
-              <label>Intro Paragraph</label>
+            <div className="admin-field" style={{ gridColumn: '1 / -1' }}>
+              <label style={{ fontWeight: 600 }}>Introductory Text</label>
               <textarea
-                rows={3}
                 value={form.team?.intro || ''}
                 onChange={(e) => setForm((p) => ({ ...p, team: { ...p.team, intro: e.target.value } }))}
-                placeholder="The IDEA Lab is supported by academic leadership, faculty coordinators and technical mentors..."
-              />
-            </div>
-
-            <div className="admin-field admin-field--full">
-              <label>Official Coordinator Contact Email</label>
-              <input
-                value={form.officialInfo?.email || ''}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  setForm((p) => ({
-                    ...p,
-                    officialInfo: { ...p.officialInfo, email: val },
-                  }));
-                }}
-                placeholder="idealab@svecw.edu.in"
+                className="admin-input"
+                rows={2}
+                style={{ width: '100%', fontFamily: 'inherit' }}
               />
             </div>
           </div>
-        )}
 
-        {/* TAB 5: Ambassadors Copy */}
-        {activeTab === 'ambassadors-copy' && (
-          <div className="admin-form-grid" style={{ gridTemplateColumns: '1fr' }}>
-            <h3 style={{ fontSize: '1.1rem', fontWeight: 600, margin: '0 0 0.5rem' }}>Student Ambassadors — Header & Copy</h3>
-            <p className="admin-field__hint">
-              Note: You can add and edit individual student ambassadors in the "Student Ambassadors Roster" subtab.
-            </p>
+          {/* Add / Edit Team Member Form Modal */}
+          {(isAddingTeam || editingTeamId) && (
+            <div style={{ background: '#f0f9ff', border: '1px solid #bae6fd', borderRadius: '8px', padding: '0.75rem', marginBottom: '1rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                <strong style={{ fontSize: '0.85rem', color: '#0369a1' }}>
+                  {editingTeamId ? 'Edit Team Member' : 'New Faculty Team Member'}
+                </strong>
+                <button type="button" onClick={() => { setIsAddingTeam(false); setEditingTeamId(null); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}>
+                  <X size={16} />
+                </button>
+              </div>
+              <div className="admin-form-grid">
+                <div className="admin-field">
+                  <label>Faculty Name *</label>
+                  <input
+                    type="text"
+                    value={teamForm.name}
+                    onChange={(e) => setTeamForm((p) => ({ ...p, name: e.target.value }))}
+                    placeholder="Dr. G. Srinivasa Rao"
+                    className="admin-input"
+                  />
+                </div>
+                <div className="admin-field">
+                  <label>Designation *</label>
+                  <input
+                    type="text"
+                    value={teamForm.designation}
+                    onChange={(e) => setTeamForm((p) => ({ ...p, designation: e.target.value }))}
+                    placeholder="Principal, SVECW"
+                    className="admin-input"
+                  />
+                </div>
+                <div className="admin-field">
+                  <label>Role * (e.g. Chief Mentor, Tech GURU)</label>
+                  <input
+                    type="text"
+                    value={teamForm.role}
+                    onChange={(e) => setTeamForm((p) => ({ ...p, role: e.target.value }))}
+                    placeholder="Chief Mentor"
+                    className="admin-input"
+                  />
+                </div>
+                <div className="admin-field">
+                  <label>Display Order</label>
+                  <input
+                    type="number"
+                    value={teamForm.order}
+                    onChange={(e) => setTeamForm((p) => ({ ...p, order: +e.target.value }))}
+                    className="admin-input"
+                  />
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
+                <button type="button" onClick={() => { setIsAddingTeam(false); setEditingTeamId(null); }} className="admin-btn admin-btn--sm admin-btn--ghost">Cancel</button>
+                <button type="button" onClick={handleSaveTeam} className="admin-btn admin-btn--sm admin-btn--primary">
+                  <Save size={13} /> {editingTeamId ? 'Update Member' : 'Add Member'}
+                </button>
+              </div>
+            </div>
+          )}
 
-            <div className="admin-field admin-field--full">
-              <label>Section Title</label>
+          {/* Team Roster Table */}
+          <div className="admin-table-wrap" style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '0.5rem' }}>
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Order</th>
+                  <th>Faculty Name</th>
+                  <th>Designation</th>
+                  <th>Role</th>
+                  <th style={{ textAlign: 'right' }}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {teamMembers.map((m) => (
+                  <tr key={m.id}>
+                    <td>#{m.order}</td>
+                    <td style={{ fontWeight: 600 }}>{m.name}</td>
+                    <td>{m.designation}</td>
+                    <td>
+                      <span style={{ fontSize: '0.72rem', background: '#fef3c7', color: '#b45309', fontWeight: 700, padding: '0.1rem 0.4rem', borderRadius: '4px' }}>
+                        {m.role}
+                      </span>
+                    </td>
+                    <td style={{ textAlign: 'right' }}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingTeamId(m.id);
+                          setTeamForm({ name: m.name, designation: m.designation, role: m.role, order: m.order });
+                        }}
+                        className="admin-btn admin-btn--sm admin-btn--ghost"
+                        style={{ padding: '0.2rem 0.35rem' }}
+                      >
+                        <Edit2 size={13} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteTeam(m.id)}
+                        className="admin-btn admin-btn--sm admin-btn--ghost"
+                        style={{ padding: '0.2rem 0.35rem', color: '#dc2626' }}
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+                {teamMembers.length === 0 && (
+                  <tr>
+                    <td colSpan={5} style={{ fontStyle: 'italic', color: '#64748b', textAlign: 'center', padding: '1rem' }}>
+                      No team members listed yet. Click "Add Faculty Member" above.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* SECTION 5: STUDENT AMBASSADORS */}
+        <div id="sec-ambassadors" style={{ background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '10px', padding: '1.25rem', marginBottom: '1.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', marginBottom: '0.75rem', borderBottom: '2px solid #e2e8f0', paddingBottom: '0.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <GraduationCap size={18} color="#0284c7" />
+              <h3 style={{ margin: 0, fontSize: '1.05rem', color: '#0f172a' }}>5. Student Leadership &amp; Ambassadors (Tab 4)</h3>
+            </div>
+            <div style={{ display: 'flex', gap: '0.4rem' }}>
+              {ambassadorMembers.length === 0 && (
+                <button type="button" onClick={seedAmbassadors} className="admin-btn admin-btn--sm admin-btn--ghost">
+                  Seed Starter Ambassadors
+                </button>
+              )}
+              <button type="button" onClick={() => setIsAddingAmbassador(true)} className="admin-btn admin-btn--sm admin-btn--primary">
+                <Plus size={14} /> Add Ambassador
+              </button>
+            </div>
+          </div>
+
+          <div className="admin-form-grid" style={{ marginBottom: '1.25rem' }}>
+            <div className="admin-field">
+              <label style={{ fontWeight: 600 }}>Section Title</label>
               <input
+                type="text"
                 value={form.ambassadors?.title || ''}
                 onChange={(e) => setForm((p) => ({ ...p, ambassadors: { ...p.ambassadors, title: e.target.value } }))}
+                className="admin-input"
                 placeholder="Student Ambassadors"
               />
             </div>
-
-            <div className="admin-field admin-field--full">
-              <label>Intro Paragraph</label>
-              <textarea
-                rows={3}
-                value={form.ambassadors?.intro || ''}
-                onChange={(e) => setForm((p) => ({ ...p, ambassadors: { ...p.ambassadors, intro: e.target.value } }))}
-                placeholder="Student Ambassadors help strengthen student participation in IDEA Lab activities..."
-              />
-            </div>
-
-            <div className="admin-field admin-field--full">
-              <label>Contact Notice Card Text</label>
-              <textarea
-                rows={2}
+            <div className="admin-field">
+              <label style={{ fontWeight: 600 }}>Notice / Contact Note</label>
+              <input
+                type="text"
                 value={form.ambassadors?.contactNotice || ''}
                 onChange={(e) => setForm((p) => ({ ...p, ambassadors: { ...p.ambassadors, contactNotice: e.target.value } }))}
-                placeholder="For student ambassador inquiries or to connect with lab representatives..."
+                className="admin-input"
+              />
+            </div>
+            <div className="admin-field" style={{ gridColumn: '1 / -1' }}>
+              <label style={{ fontWeight: 600 }}>Introductory Text</label>
+              <textarea
+                value={form.ambassadors?.intro || ''}
+                onChange={(e) => setForm((p) => ({ ...p, ambassadors: { ...p.ambassadors, intro: e.target.value } }))}
+                className="admin-input"
+                rows={2}
+                style={{ width: '100%', fontFamily: 'inherit' }}
               />
             </div>
           </div>
-        )}
 
-        {/* TAB 6: Facilities Copy */}
-        {activeTab === 'facilities-copy' && (
-          <div>
-            <h3 style={{ fontSize: '1.1rem', fontWeight: 600, margin: '0 0 0.5rem' }}>Facilities for Making & Prototyping</h3>
-            <p className="admin-field__hint" style={{ marginBottom: '1rem' }}>
-              Note: Upload real photos in the "Facility Photos" subtab. The list below acts as default equipment cards when photos are not yet uploaded.
-            </p>
+          {/* Add / Edit Ambassador Form Modal */}
+          {(isAddingAmbassador || editingAmbassadorId) && (
+            <div style={{ background: '#f0f9ff', border: '1px solid #bae6fd', borderRadius: '8px', padding: '0.75rem', marginBottom: '1rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                <strong style={{ fontSize: '0.85rem', color: '#0369a1' }}>
+                  {editingAmbassadorId ? 'Edit Student Ambassador' : 'New Student Ambassador'}
+                </strong>
+                <button type="button" onClick={() => { setIsAddingAmbassador(false); setEditingAmbassadorId(null); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}>
+                  <X size={16} />
+                </button>
+              </div>
+              <div className="admin-form-grid">
+                <div className="admin-field">
+                  <label>Reg. Number *</label>
+                  <input
+                    type="text"
+                    value={ambassadorForm.regNumber}
+                    onChange={(e) => setAmbassadorForm((p) => ({ ...p, regNumber: e.target.value.toUpperCase() }))}
+                    placeholder="21B01A54A6"
+                    className="admin-input"
+                  />
+                </div>
+                <div className="admin-field">
+                  <label>Student Name *</label>
+                  <input
+                    type="text"
+                    value={ambassadorForm.name}
+                    onChange={(e) => setAmbassadorForm((p) => ({ ...p, name: e.target.value }))}
+                    placeholder="T. Hanuma Priya"
+                    className="admin-input"
+                  />
+                </div>
+                <div className="admin-field">
+                  <label>Year (e.g. II)</label>
+                  <input
+                    type="text"
+                    value={ambassadorForm.year}
+                    onChange={(e) => setAmbassadorForm((p) => ({ ...p, year: e.target.value }))}
+                    placeholder="II"
+                    className="admin-input"
+                  />
+                </div>
+                <div className="admin-field">
+                  <label>Branch (e.g. AIDS, ECE)</label>
+                  <input
+                    type="text"
+                    value={ambassadorForm.branch}
+                    onChange={(e) => setAmbassadorForm((p) => ({ ...p, branch: e.target.value.toUpperCase() }))}
+                    placeholder="AIDS"
+                    className="admin-input"
+                  />
+                </div>
+                <div className="admin-field">
+                  <label>Student Email</label>
+                  <input
+                    type="text"
+                    value={ambassadorForm.email}
+                    onChange={(e) => setAmbassadorForm((p) => ({ ...p, email: e.target.value }))}
+                    placeholder="21B01A54A6@svecw.edu.in"
+                    className="admin-input"
+                  />
+                </div>
+                <div className="admin-field">
+                  <label>Display Order</label>
+                  <input
+                    type="number"
+                    value={ambassadorForm.order}
+                    onChange={(e) => setAmbassadorForm((p) => ({ ...p, order: +e.target.value }))}
+                    className="admin-input"
+                  />
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
+                <button type="button" onClick={() => { setIsAddingAmbassador(false); setEditingAmbassadorId(null); }} className="admin-btn admin-btn--sm admin-btn--ghost">Cancel</button>
+                <button type="button" onClick={handleSaveAmbassador} className="admin-btn admin-btn--sm admin-btn--primary">
+                  <Save size={13} /> {editingAmbassadorId ? 'Update Ambassador' : 'Add Ambassador'}
+                </button>
+              </div>
+            </div>
+          )}
 
-            <div className="admin-field admin-field--full">
-              <label>Section Title</label>
+          {/* Ambassadors Table */}
+          <div className="admin-table-wrap" style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '0.5rem' }}>
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Order</th>
+                  <th>Reg. Number</th>
+                  <th>Student Name</th>
+                  <th>Year &amp; Branch</th>
+                  <th style={{ textAlign: 'right' }}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {ambassadorMembers.map((a) => (
+                  <tr key={a.id}>
+                    <td>#{a.order}</td>
+                    <td style={{ fontFamily: 'monospace', fontWeight: 700, color: '#0369a1' }}>{a.regNumber}</td>
+                    <td style={{ fontWeight: 600 }}>{a.name}</td>
+                    <td>{a.year} - {a.branch}</td>
+                    <td style={{ textAlign: 'right' }}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingAmbassadorId(a.id);
+                          setAmbassadorForm({ regNumber: a.regNumber, name: a.name, year: a.year, branch: a.branch, email: a.email, order: a.order });
+                        }}
+                        className="admin-btn admin-btn--sm admin-btn--ghost"
+                        style={{ padding: '0.2rem 0.35rem' }}
+                      >
+                        <Edit2 size={13} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteAmbassador(a.id)}
+                        className="admin-btn admin-btn--sm admin-btn--ghost"
+                        style={{ padding: '0.2rem 0.35rem', color: '#dc2626' }}
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+                {ambassadorMembers.length === 0 && (
+                  <tr>
+                    <td colSpan={5} style={{ fontStyle: 'italic', color: '#64748b', textAlign: 'center', padding: '1rem' }}>
+                      No student ambassadors listed yet. Click "Add Ambassador" above.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* SECTION 6: INFRASTRUCTURE & FACILITIES */}
+        <div id="sec-facilities" style={{ background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '10px', padding: '1.25rem', marginBottom: '1.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', marginBottom: '0.75rem', borderBottom: '2px solid #e2e8f0', paddingBottom: '0.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Building2 size={18} color="#0284c7" />
+              <h3 style={{ margin: 0, fontSize: '1.05rem', color: '#0f172a' }}>6. Facilities &amp; Workstation Photos (Tab 5)</h3>
+            </div>
+            <label className="admin-btn admin-btn--sm admin-btn--primary" style={{ cursor: 'pointer', opacity: uploadingPhoto ? 0.6 : 1 }}>
+              <ImageIcon size={14} /> {uploadingPhoto ? 'Uploading...' : 'Add Facility Photo'}
               <input
+                type="file"
+                accept="image/*"
+                hidden
+                disabled={uploadingPhoto}
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) addFacilityPhoto(file);
+                  e.target.value = '';
+                }}
+              />
+            </label>
+          </div>
+
+          <div className="admin-form-grid" style={{ marginBottom: '1.25rem' }}>
+            <div className="admin-field" style={{ gridColumn: '1 / -1' }}>
+              <label style={{ fontWeight: 600 }}>Section Title</label>
+              <input
+                type="text"
                 value={form.facilities?.title || ''}
                 onChange={(e) => setForm((p) => ({ ...p, facilities: { ...p.facilities, title: e.target.value } }))}
+                className="admin-input"
                 placeholder="Facilities for Making & Prototyping"
               />
             </div>
-
-            <div className="admin-field admin-field--full" style={{ marginTop: '1rem' }}>
-              <label>Facilities Intro Paragraphs</label>
-              <p className="admin-field__hint">Separate each paragraph with a blank line.</p>
+            <div className="admin-field" style={{ gridColumn: '1 / -1' }}>
+              <label style={{ fontWeight: 600 }}>Facilities Lead Paragraphs (One per line)</label>
               <textarea
-                rows={4}
-                value={(form.facilities?.paragraphs || []).join('\n\n')}
-                onChange={(e) => {
-                  const paras = e.target.value.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
-                  setForm((p) => ({ ...p, facilities: { ...p.facilities, paragraphs: paras } }));
-                }}
-                placeholder="Write facilities lead paragraphs..."
+                value={(form.facilities?.paragraphs || []).join('\n')}
+                onChange={(e) => setForm((p) => ({ ...p, facilities: { ...p.facilities, paragraphs: e.target.value.split('\n') } }))}
+                className="admin-input"
+                rows={3}
+                style={{ width: '100%', fontFamily: 'inherit' }}
               />
             </div>
           </div>
-        )}
 
-        {/* TAB 7: Official Information */}
-        {activeTab === 'official-info' && (
+          {/* Facility Photos Gallery */}
+          <h4 style={{ fontSize: '0.88rem', color: '#334155', marginBottom: '0.5rem' }}>
+            Equipment &amp; Workstation Photos Gallery ({facilityPhotos.length})
+          </h4>
+          <p className="admin-field__hint" style={{ marginBottom: '0.75rem' }}>
+            Photos uploaded here display in the Facilities grid on the live page.
+          </p>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '1rem' }}>
+            {facilityPhotos.map((p) => (
+              <FacilityPhotoCardItem
+                key={p.id}
+                photo={p}
+                onReplacePhoto={replaceFacilityPhoto}
+                onRemovePhoto={removeFacilityPhoto}
+              />
+            ))}
+            {facilityPhotos.length === 0 && (
+              <p style={{ fontStyle: 'italic', color: '#64748b', fontSize: '0.85rem', gridColumn: '1 / -1' }}>
+                No custom facility photos uploaded yet. Public page displays standard workstation slots. Click "Add Facility Photo" above to upload images.
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* SECTION 7: OFFICIAL ROSTER & REGISTRY */}
+        <div id="sec-official" style={{ background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '10px', padding: '1.25rem', marginBottom: '1.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem', borderBottom: '2px solid #e2e8f0', paddingBottom: '0.5rem' }}>
+            <FileCheck size={18} color="#0284c7" />
+            <h3 style={{ margin: 0, fontSize: '1.05rem', color: '#0f172a' }}>7. Official Roster &amp; Registry (Tab 6)</h3>
+          </div>
+
           <div className="admin-form-grid">
-            <div className="admin-field admin-field--full">
-              <label>Section Title</label>
+            <div className="admin-field" style={{ gridColumn: '1 / -1' }}>
+              <label style={{ fontWeight: 600 }}>Section Title</label>
               <input
+                type="text"
                 value={form.officialInfo?.title || ''}
                 onChange={(e) => setForm((p) => ({ ...p, officialInfo: { ...p.officialInfo, title: e.target.value } }))}
+                className="admin-input"
                 placeholder="Official IDEA Lab Information"
               />
             </div>
-
             <div className="admin-field">
-              <label>AQIS Application ID</label>
+              <label style={{ fontWeight: 600 }}>AQIS Application ID</label>
               <input
+                type="text"
                 value={form.officialInfo?.aqisId || ''}
                 onChange={(e) => setForm((p) => ({ ...p, officialInfo: { ...p.officialInfo, aqisId: e.target.value } }))}
-                placeholder="IDEA202000128"
+                className="admin-input"
+                placeholder="1-10972304911"
               />
             </div>
-
             <div className="admin-field">
-              <label>Head of Institution</label>
+              <label style={{ fontWeight: 600 }}>Head of Institution</label>
               <input
+                type="text"
                 value={form.officialInfo?.headOfInstitution || ''}
                 onChange={(e) => setForm((p) => ({ ...p, officialInfo: { ...p.officialInfo, headOfInstitution: e.target.value } }))}
-                placeholder="Dr. G. Srinivasa Rao"
+                className="admin-input"
+                placeholder="Dr. G. Srinivasa Rao, Principal"
               />
             </div>
-
-            <div className="admin-field admin-field--full">
-              <label>Institution Name & Address</label>
+            <div className="admin-field" style={{ gridColumn: '1 / -1' }}>
+              <label style={{ fontWeight: 600 }}>Institution Name</label>
               <input
+                type="text"
                 value={form.officialInfo?.institution || ''}
                 onChange={(e) => setForm((p) => ({ ...p, officialInfo: { ...p.officialInfo, institution: e.target.value } }))}
-                placeholder="Shri Vishnu Engineering College for Women, Bhimavaram, West Godavari District, Andhra Pradesh"
+                className="admin-input"
+                placeholder="Shri Vishnu Engineering College for Women (Autonomous)"
               />
             </div>
-
-            <div className="admin-field admin-field--full">
-              <label>Faculty Coordinators (one per line)</label>
+            <div className="admin-field" style={{ gridColumn: '1 / -1' }}>
+              <label style={{ fontWeight: 600 }}>Faculty Coordinators List (One per line)</label>
               <textarea
-                rows={3}
                 value={(form.officialInfo?.facultyCoordinators || []).join('\n')}
-                onChange={(e) => {
-                  const list = e.target.value.split('\n').map((s) => s.trim()).filter(Boolean);
-                  setForm((p) => ({ ...p, officialInfo: { ...p.officialInfo, facultyCoordinators: list } }));
-                }}
-                placeholder="Dr. P. Srinivasa Raju&#10;Dr. S. Hanumantha Rao"
+                onChange={(e) => setForm((p) => ({ ...p, officialInfo: { ...p.officialInfo, facultyCoordinators: e.target.value.split('\n') } }))}
+                className="admin-input"
+                rows={3}
+                style={{ width: '100%', fontFamily: 'inherit' }}
               />
             </div>
-
-            <div className="admin-field admin-field--full">
-              <label>Official Contact Email</label>
+            <div className="admin-field" style={{ gridColumn: '1 / -1' }}>
+              <label style={{ fontWeight: 600 }}>Official Contact Email</label>
               <input
+                type="text"
                 value={form.officialInfo?.email || ''}
                 onChange={(e) => setForm((p) => ({ ...p, officialInfo: { ...p.officialInfo, email: e.target.value } }))}
+                className="admin-input"
                 placeholder="idealab@svecw.edu.in"
               />
             </div>
           </div>
-        )}
+        </div>
 
-        {/* TAB 8: Additional Custom Sections */}
-        {activeTab === 'custom-sections' && (
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-              <div>
-                <h3 style={{ fontSize: '1.1rem', fontWeight: 600, margin: 0 }}>Additional Custom Sections</h3>
-                <p className="admin-field__hint" style={{ margin: '0.25rem 0 0' }}>
-                  Create additional sections anytime in the future. They will appear in the Quick Navigation menu and content pane automatically.
-                </p>
-              </div>
-              <button type="button" className="admin-btn admin-btn--sm admin-btn--secondary" onClick={addCustomSection}>
-                + Add New Section
-              </button>
-            </div>
-
-            {(!form.additionalSections || form.additionalSections.length === 0) ? (
-              <div style={{ padding: '2rem', textAlign: 'center', background: '#f8fafc', borderRadius: 8, border: '1px dashed #cbd5e1' }}>
-                <p style={{ color: '#64748b', margin: '0 0 0.75rem' }}>No additional custom sections added yet.</p>
-                <button type="button" className="admin-btn admin-btn--sm admin-btn--primary" onClick={addCustomSection}>
-                  + Add First Custom Section
-                </button>
-              </div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                {form.additionalSections.map((sec, idx) => (
-                  <div key={sec.id || idx} style={{ background: '#f8fafc', padding: '1.25rem', borderRadius: 8, border: '1px solid #e2e8f0' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.5rem' }}>
-                      <strong style={{ fontSize: '1.05rem', color: '#0B1E42' }}>Section #{idx + 1}: {sec.title || 'Untitled'}</strong>
-                      <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeCustomSection(idx)}>
-                        Delete Section
-                      </button>
-                    </div>
-
-                    <div className="admin-form-grid" style={{ marginBottom: '0.75rem' }}>
-                      <div className="admin-field">
-                        <label>Section Title * (Shown in Quick Navigation & Heading)</label>
-                        <input
-                          value={sec.title}
-                          onChange={(e) => updateCustomSection(idx, 'title', e.target.value)}
-                          placeholder="e.g. Events & Hackathons"
-                        />
-                      </div>
-                      <div className="admin-field">
-                        <label>Badge / Eyebrow Text (Optional)</label>
-                        <input
-                          value={sec.badge || ''}
-                          onChange={(e) => updateCustomSection(idx, 'badge', e.target.value)}
-                          placeholder="e.g. Upcoming Activities"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="admin-field admin-field--full" style={{ marginBottom: '0.75rem' }}>
-                      <label>Paragraphs</label>
-                      <p className="admin-field__hint">Separate each paragraph with a blank line.</p>
-                      <textarea
-                        rows={4}
-                        value={(sec.paragraphs || []).join('\n\n')}
-                        onChange={(e) => {
-                          const paras = e.target.value.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
-                          updateCustomSection(idx, 'paragraphs', paras);
-                        }}
-                        placeholder="Write detailed information for this section..."
-                      />
-                    </div>
-
-                    <div className="admin-field admin-field--full">
-                      <label>Key Highlights / Bullet Points (Optional)</label>
-                      <p className="admin-field__hint">One bullet point per line.</p>
-                      <textarea
-                        rows={3}
-                        value={(sec.bulletPoints || []).join('\n')}
-                        onChange={(e) => {
-                          const points = e.target.value.split('\n').map((p) => p.trim()).filter(Boolean);
-                          updateCustomSection(idx, 'bulletPoints', points);
-                        }}
-                        placeholder="• Annual Prototyping Challenge&#10;• Industry Mentorship Programs&#10;• Inter-college Hackathons"
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* TAB 9: Hero & CTA Buttons */}
-        {activeTab === 'hero-cta' && (
-          <div className="admin-form-grid">
-            <h3 style={{ fontSize: '1.1rem', fontWeight: 600, margin: '0 0 0.5rem', gridColumn: '1 / -1' }}>Hero Tagline & CTA Buttons</h3>
-
-            <div className="admin-field admin-field--full">
-              <label>Hero Tagline / Subtitle</label>
-              <textarea
-                rows={2}
-                value={form.hero?.tagline || ''}
-                onChange={(e) => setForm((p) => ({ ...p, hero: { ...p.hero, tagline: e.target.value } }))}
-                placeholder="Turn ideas into working prototypes through hands-on experimentation..."
-              />
-            </div>
-
-            <div className="admin-field">
-              <label>Primary Hero Button Text</label>
-              <input
-                value={form.hero?.ctaPrimary || ''}
-                onChange={(e) => setForm((p) => ({ ...p, hero: { ...p.hero, ctaPrimary: e.target.value } }))}
-                placeholder="Explore the IDEA Lab →"
-              />
-            </div>
-
-            <div className="admin-field">
-              <label>Secondary Hero Button Text</label>
-              <input
-                value={form.hero?.ctaSecondary || ''}
-                onChange={(e) => setForm((p) => ({ ...p, hero: { ...p.hero, ctaSecondary: e.target.value } }))}
-                placeholder="View Facilities →"
-              />
-            </div>
-
-            <hr style={{ gridColumn: '1 / -1', margin: '1rem 0', borderColor: '#e2e8f0' }} />
-
-            <h3 style={{ fontSize: '1.1rem', fontWeight: 600, margin: '0 0 0.5rem', gridColumn: '1 / -1' }}>Bottom CTA Banner</h3>
-
-            <div className="admin-field admin-field--full">
-              <label>CTA Section Title</label>
-              <input
-                value={form.cta?.title || ''}
-                onChange={(e) => setForm((p) => ({ ...p, cta: { ...p.cta, title: e.target.value } }))}
-                placeholder="Explore Innovation at VWU"
-              />
-            </div>
-
-            <div className="admin-field admin-field--full">
-              <label>CTA Section Description</label>
-              <textarea
-                rows={2}
-                value={form.cta?.description || ''}
-                onChange={(e) => setForm((p) => ({ ...p, cta: { ...p.cta, description: e.target.value } }))}
-                placeholder="Discover the labs, centres and initiatives that extend learning beyond the classroom..."
-              />
+        {/* SECTION 8: ADDITIONAL CUSTOM NAVIGATION SECTIONS */}
+        <div id="sec-custom" style={{ background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '10px', padding: '1.25rem', marginBottom: '1rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', marginBottom: '0.75rem', borderBottom: '2px solid #e2e8f0', paddingBottom: '0.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Sparkles size={18} color="#0284c7" />
+              <h3 style={{ margin: 0, fontSize: '1.05rem', color: '#0f172a' }}>
+                8. Additional Navigation Sections ({form.additionalSections?.length || 0})
+              </h3>
             </div>
           </div>
-        )}
+          <p className="admin-field__hint" style={{ marginBottom: '1rem' }}>
+            Add any additional sections or sub-sections needed — key highlights, equipment tables, checklists, lists of links, files, contacts, or photo galleries. Any top-level section created here automatically appears as a tab under Quick Navigation on the live public page.
+          </p>
 
-        <div className="admin-form-actions" style={{ marginTop: '1.5rem', borderTop: '1px solid #e2e8f0', paddingTop: '1rem' }}>
-          <button type="button" className="admin-btn admin-btn--primary" onClick={save} disabled={saving}>
-            {saving ? 'Saving…' : 'Save All IDEA Lab Changes'}
+          <CustomSectionEditor
+            sections={form.additionalSections || []}
+            onChange={(next) => setForm((p) => ({ ...p, additionalSections: next }))}
+            rootSections={form.additionalSections || []}
+            parentPath={[]}
+            onFileUploaded={handleCustomSectionFileUploaded}
+            onFileRemoved={handleCustomSectionFileRemoved}
+            onPhotoUploaded={handleCustomSectionPhotoUploaded}
+            onPhotoRemoved={handleCustomSectionPhotoRemoved}
+            onGalleryPhotoUploaded={handleCustomSectionGalleryPhotoUploaded}
+            onGalleryPhotoRemoved={handleCustomSectionGalleryPhotoRemoved}
+          />
+        </div>
+
+        {/* Save Footer */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', marginTop: '1.5rem', borderTop: '1px solid #e5e7eb', paddingTop: '1rem' }}>
+          <button type="button" onClick={saveMainDoc} disabled={saving} className="admin-btn admin-btn--primary">
+            <Save size={14} /> {saving ? 'Saving...' : 'Save All AICTE IDEA Lab Changes'}
           </button>
         </div>
       </div>
+      {cropModal}
     </div>
   );
 }

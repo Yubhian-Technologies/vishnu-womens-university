@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import {
   Sparkles,
   Lightbulb,
@@ -6,23 +5,18 @@ import {
   ArrowRight,
   CheckCircle2,
   Cpu,
-  ChevronDown,
   FileText,
   Boxes,
   Target,
-  Award,
   Star,
   Building2,
-  Handshake,
-  FolderKanban,
   Coins,
   ShieldCheck,
   Wrench,
 } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
-import { CustomSectionsGalleries, SectionSubtree } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
-import SmoothCollapse from '../../components/SmoothCollapse/SmoothCollapse';
-import { hasCustomSectionContent, type CustomSection } from '../../lib/customSections';
+import { CustomSectionsGalleries } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
+import { type CustomSection } from '../../lib/customSections';
 import { smoothScrollTo } from '../../lib/smoothScroll';
 import { useDocument } from '../../hooks/useDocument';
 import type { ChipsToStartupDoc } from '../Admin/sections/ChipsToStartupContentAdmin';
@@ -30,17 +24,6 @@ import type { DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdm
 import { chipsToStartup } from './chipsToStartup.data';
 import { renderBold } from '../../lib/boldText';
 import './ChipsToStartupPage.css';
-
-const MODULE_ICONS: Record<string, typeof FileText> = {
-  'project-outlay': FileText,
-  resources: Boxes,
-  'eda-tools': Cpu,
-  'broad-objectives-of-project': Target,
-  patent: Award,
-  highlights: Star,
-  facilities: Building2,
-  partners: Handshake,
-};
 
 export default function ChipsToStartupPage({
   item,
@@ -59,30 +42,33 @@ export default function ChipsToStartupPage({
   const aboutParagraphs = remoteData?.aboutParagraphs && remoteData.aboutParagraphs.length > 0 ? remoteData.aboutParagraphs : chipsToStartup.aboutParagraphs;
   const statCards = remoteData?.statCards && remoteData.statCards.length > 0 ? remoteData.statCards : chipsToStartup.statCards;
   const objectives = remoteData?.objectives && remoteData.objectives.length > 0 ? remoteData.objectives : chipsToStartup.objectives;
-  const galleryCaption = chipsToStartup.galleryCaption;
+  const galleryCaption = remoteData?.galleryCaption || chipsToStartup.galleryCaption;
   const projectOutlay = remoteData?.projectOutlay || chipsToStartup.projectOutlay;
   const resources = remoteData?.resources || chipsToStartup.resources;
   const edaTools = remoteData?.edaTools || chipsToStartup.edaTools;
-  const projectObjectives = chipsToStartup.projectObjectives;
+  const projectObjectives = remoteData?.projectObjectives || chipsToStartup.projectObjectives;
   const facilities = remoteData?.facilities || chipsToStartup.facilities;
-  const keyHighlights = chipsToStartup.keyHighlights;
+  const keyHighlights = remoteData?.keyHighlights && remoteData.keyHighlights.length > 0 ? remoteData.keyHighlights : chipsToStartup.keyHighlights;
 
-  const dynamicTitle = item?.title || heroTitle;
-  const dynamicSubtitle = item?.summary || item?.desc || heroSubtitle;
-  const dynamicAbout = (item?.description && hasCustomSectionContent(item.description) && item.description.textContent)
-    ? [item.description.textContent]
-    : item?.desc
-    ? [item.desc]
-    : aboutParagraphs;
+  const dynamicTitle = heroTitle;
+  const dynamicSubtitle = heroSubtitle;
+  const dynamicAbout = aboutParagraphs;
+  const dynamicObjectives = objectives;
 
-  const dynamicObjectives = (item?.objectives && hasCustomSectionContent(item.objectives))
-    ? (item.objectives.listText ? item.objectives.listText.split('\n').filter(Boolean) : [item.objectives.textContent || ''])
-    : objectives;
-
-  const modules = customSections.filter(
-    (s) => s.placement !== 'intro' && s.contentType !== 'gallery' && hasCustomSectionContent(s)
-  );
-  const [openModuleId, setOpenModuleId] = useState<string | null>(null);
+  const allCustomSections = [
+    ...customSections,
+    ...(remoteData?.additionalSections || []).map((s: any) => ({
+      id: s.id || `sec-${Math.random()}`,
+      label: s.title || s.label || 'Custom Section',
+      contentType: (s.bulletPoints && s.bulletPoints.length > 0) ? ('list' as const) : ('text' as const),
+      textContent: Array.isArray(s.paragraphs) ? s.paragraphs.join('\n\n') : (s.textContent || ''),
+      listText: Array.isArray(s.bulletPoints) ? s.bulletPoints.join('\n') : (s.listText || ''),
+      files: s.files,
+      photo: s.photo,
+      galleryPhotos: s.galleryPhotos,
+      placement: s.placement || 'accordion',
+    })),
+  ];
 
   return (
     <div className="cts-page">
@@ -328,7 +314,7 @@ export default function ChipsToStartupPage({
         </span>
         <h2 className="cts-card-title">{projectObjectives.title}</h2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', marginTop: '0.75rem' }}>
-          {projectObjectives.items.map((itemStr, idx) => (
+          {(projectObjectives?.items || []).map((itemStr, idx) => (
             <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', background: '#F8FAFC', padding: '1rem 1.1rem', borderRadius: '10px', border: '1px solid #E2E8F0' }}>
               <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#0F2547', color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.8rem', flexShrink: 0 }}>
                 0{idx + 1}
@@ -413,45 +399,8 @@ export default function ChipsToStartupPage({
             {renderBold(galleryCaption)}
           </p>
         </div>
-        <CustomSectionsGalleries sections={customSections} />
+        <CustomSectionsGalleries sections={allCustomSections} />
       </section>
-
-      {/* 11. DYNAMIC MODULES (IF ANY CUSTOM SECTIONS REMAIN) */}
-      {modules.length > 0 && (
-        <section className="cts-card cts-modules" id="cts-modules">
-          <span className="cts-card-icon">
-            <FolderKanban size={18} strokeWidth={2} />
-          </span>
-          <h2 className="cts-card-title">Additional Modules</h2>
-          <div className="cts-modules-grid">
-            {modules.map((m) => {
-              const Icon = MODULE_ICONS[m.id] || FileText;
-              const isOpen = openModuleId === m.id;
-              return (
-                <div key={m.id} className={`cts-module-row${isOpen ? ' is-open' : ''}`}>
-                  <button
-                    type="button"
-                    className="cts-module-trigger"
-                    onClick={() => setOpenModuleId(isOpen ? null : m.id)}
-                    aria-expanded={isOpen}
-                  >
-                    <span className="cts-module-icon">
-                      <Icon size={16} strokeWidth={2} />
-                    </span>
-                    <span className="cts-module-label">{m.label}</span>
-                    <ChevronDown size={16} strokeWidth={2.25} className="cts-module-arrow" aria-hidden="true" />
-                  </button>
-                  <SmoothCollapse open={isOpen}>
-                    <div className="cts-module-body">
-                      <SectionSubtree section={m} />
-                    </div>
-                  </SmoothCollapse>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      )}
     </div>
   );
 }

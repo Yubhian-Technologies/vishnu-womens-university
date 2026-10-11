@@ -282,6 +282,13 @@ function ForeignLanguagesPage({ data: fallbackData }: { data: typeof foreignLang
           ))}
         </div>
       </div>
+
+      {/* 6. Custom Sections */}
+      {(data.customSections || []).length > 0 && (
+        <div style={{ marginTop: '2.5rem' }}>
+          <CustomSectionsAccordion sections={data.customSections || []} />
+        </div>
+      )}
     </div>
   );
 }
