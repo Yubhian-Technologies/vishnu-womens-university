@@ -17,7 +17,6 @@ import {
   Handshake,
 } from 'lucide-react';
 import { CustomSectionsIntro, CustomSectionsGalleries, CustomSectionsAccordion } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
-import { hasCustomSectionContent } from '../../lib/customSections';
 import { useDocument } from '../../hooks/useDocument';
 import type { MedaPlmCoeDoc } from '../Admin/sections/MedaPlmCoeContentAdmin';
 import { medaPlmCoe } from './medaPlmCoe.data';
@@ -27,11 +26,11 @@ import { renderBold } from '../../lib/boldText';
 import './MedaPlmCoePage.css';
 
 interface MedaPlmCoePageProps {
-  item: DifferentiatorItemDoc;
+  item?: DifferentiatorItemDoc;
   sections: CustomSection[];
 }
 
-export default function MedaPlmCoePage({ item, sections }: MedaPlmCoePageProps) {
+export default function MedaPlmCoePage({ sections }: MedaPlmCoePageProps) {
   const { data: remoteData } = useDocument<MedaPlmCoeDoc>('settings', 'medaPlmCoe');
   const [lightboxImg, setLightboxImg] = useState<string | null>(null);
 
@@ -107,10 +106,54 @@ export default function MedaPlmCoePage({ item, sections }: MedaPlmCoePageProps) 
     return [];
   };
 
-  const highlights = parseList(highlightsSection);
-  const facilities = parseList(facilitiesSection);
-  const outcomes = parseList(outcomesSection);
-  const partners = parseList(partnersSection);
+  const DEFAULT_HIGHLIGHTS = [
+    'MoU partnership with Capgemini',
+    'MEDA: 3D modelling, parametric design, FEA, GD&T, design for manufacturing',
+    'PLM: product structure, BOM, CAD-PLM integration, Siemens Teamcenter',
+    'Training tools: CATIA, Siemens NX CAD, ANSYS, Siemens Teamcenter',
+    'Graduates eligible for Capgemini internships and placements',
+    'Industry-ready credentials upon completion',
+  ];
+
+  const DEFAULT_ACHIEVEMENTS = [
+    'Students receive industry-ready credentials upon completion',
+    'Mentorship from Capgemini industry experts',
+    'Internship and placement opportunities with Capgemini',
+  ];
+
+  const DEFAULT_FACILITIES = [
+    'CATIA',
+    'Siemens NX CAD',
+    'ANSYS',
+    'Siemens Teamcenter',
+  ];
+
+  const DEFAULT_PARTNERS = [
+    'Capgemini',
+  ];
+
+  const filterValid = (arr?: string[]) => (arr || []).filter((s) => s && s.trim());
+
+  const highlights = filterValid(remoteData?.highlights).length > 0
+    ? filterValid(remoteData?.highlights)
+    : (parseList(highlightsSection).length > 0 ? parseList(highlightsSection) : DEFAULT_HIGHLIGHTS);
+
+  const outcomes = filterValid(remoteData?.achievements).length > 0
+    ? filterValid(remoteData?.achievements)
+    : (parseList(outcomesSection).length > 0 ? parseList(outcomesSection) : DEFAULT_ACHIEVEMENTS);
+
+  const facilities = filterValid(remoteData?.facilities).length > 0
+    ? filterValid(remoteData?.facilities)
+    : (parseList(facilitiesSection).length > 0 ? parseList(facilitiesSection) : DEFAULT_FACILITIES);
+
+  const partners = filterValid(remoteData?.partners).length > 0
+    ? filterValid(remoteData?.partners)
+    : (parseList(partnersSection).length > 0 ? parseList(partnersSection) : DEFAULT_PARTNERS);
+
+  const allCustomSections = [
+    ...sections,
+    ...(remoteData?.additionalSections || []),
+  ];
 
   // Helper component to render a section's photo frame safely using modulo index
   const RenderPhotoFrame = ({ index }: { index: number }) => {
@@ -180,21 +223,15 @@ export default function MedaPlmCoePage({ item, sections }: MedaPlmCoePageProps) 
       <section className={`meda-hero-banner ${hasPhotos ? 'has-photo' : 'no-photo'}`}>
         <div>
           <div className="meda-hero-badge">
-            <Sparkles size={14} /> {item?.title || 'Capgemini Collaboration MoU'}
+            <Sparkles size={14} /> Capgemini Collaboration MoU
           </div>
           <h2 className="meda-hero-title">
-            {item?.title ? `Industry Collaboration & Excellence — ${item.title}` : data.collaboration.title}
+            {data.collaboration.title}
           </h2>
           <div className="meda-hero-paragraphs">
-            {(item?.description && hasCustomSectionContent(item.description) && item.description.textContent) ? (
-              <p className="meda-hero-text">{renderBold(item.description.textContent)}</p>
-            ) : item?.desc ? (
-              <p className="meda-hero-text">{renderBold(item.desc)}</p>
-            ) : (
-              data.collaboration.paragraphs.map((p, idx) => (
-                <p key={idx} className="meda-hero-text">{renderBold(p)}</p>
-              ))
-            )}
+            {data.collaboration.paragraphs.map((p, idx) => (
+              <p key={idx} className="meda-hero-text">{renderBold(p)}</p>
+            ))}
           </div>
         </div>
         {hasPhotos && <RenderPhotoFrame index={0} />}
@@ -433,14 +470,14 @@ export default function MedaPlmCoePage({ item, sections }: MedaPlmCoePageProps) 
       )}
 
       {/* DYNAMIC CUSTOM SECTIONS */}
-      {sections.some((s) => s.placement === 'intro') && (
+      {allCustomSections.some((s) => s.placement === 'intro') && (
         <div style={{ marginTop: '2rem' }}>
-          <CustomSectionsIntro sections={sections} />
+          <CustomSectionsIntro sections={allCustomSections} />
         </div>
       )}
       <div style={{ marginTop: '2.5rem' }}>
-        <CustomSectionsGalleries sections={sections} />
-        <CustomSectionsAccordion sections={sections.filter((s) => s.placement !== 'intro' && s.contentType !== 'gallery' && s.id !== 'highlights' && s.id !== 'facilities' && s.id !== 'outcomes' && s.id !== 'partners')} />
+        <CustomSectionsGalleries sections={allCustomSections} />
+        <CustomSectionsAccordion sections={allCustomSections.filter((s) => s.placement !== 'intro' && s.contentType !== 'gallery' && s.id !== 'highlights' && s.id !== 'facilities' && s.id !== 'outcomes' && s.id !== 'partners')} />
       </div>
 
       {/* Lightbox for Photos */}

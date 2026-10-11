@@ -1,3 +1,5 @@
+import type { CustomSection } from '../../lib/customSections';
+
 // Rich hardcoded content for the Assistive Technology Lab (ATL)
 // differentiator page (slug: assistive-tech-lab) — overrides that item's
 // generic Firestore intro/about text in DifferentiatorDetail.tsx.
@@ -46,6 +48,52 @@ export interface AtlBatchGroup {
   mentors?: string;
   selectedProject?: string;
   members: AtlBatchRow[];
+}
+
+export interface AtlStudentRosterYear {
+  id: string;
+  yearLabel: string;
+  type: 'batches' | 'table';
+  batches?: AtlBatchGroup[];
+  table?: AtlSimpleTable;
+}
+
+export interface AtlExhibitionYear {
+  id: string;
+  yearLabel: string;
+  title: string;
+  blocks: AtlBlock[];
+}
+
+export interface AtlExhibitionShowcase {
+  id: string;
+  tabLabel: string;
+  title: string;
+  type: 'batches' | 'table';
+  batches?: AtlBatchGroup[];
+  table?: AtlSimpleTable;
+}
+
+export interface AtlProjectOutcome {
+  id: string;
+  tabLabel: string;
+  title: string;
+  blocks: AtlBlock[];
+}
+
+export interface AtlClientVisitYear {
+  id: string;
+  tabLabel?: string;
+  yearLabel?: string;
+  title: string;
+  blocks: AtlBlock[];
+}
+
+export interface AtlInnovationFair {
+  id: string;
+  tabLabel: string;
+  title: string;
+  blocks: AtlBlock[];
 }
 
 export interface AtlTestimonial {
@@ -931,4 +979,413 @@ export const assistiveTechLab = {
     ],
   } as { title: string; headers: string[]; rows: AtlTableRow[] },
   atlInNewsCaption: 'Students at Telangana Assistive Technology Summit 4.0 at T-Hub, telecasted in ETV YUVA programme on 4th Jan 2024.',
+  exhibitionReports: [
+    {
+      id: '2023-24',
+      yearLabel: '2023-24',
+      title: 'International Day of Persons with Disabilities — Assistive Technology Project Exhibition Day (2023-24)',
+      blocks: [
+        { type: 'meta', items: [
+          { label: 'Date', value: '03-12-2023' },
+          { label: 'Location', value: 'B-Block Seminar Hall, ECE Department, SVECW' },
+          { label: 'Chief Guest', value: 'Dr. U.V. Ramana Raju, Managing Trustee, Centre for Visually Challenged, Bhimavaram' },
+          { label: 'Participants', value: 'ATL Dean, Vice Principal, ATL 50 students, 13 ATL Mentors and 2 supporting staff from ATL' },
+        ] },
+        { type: 'paragraph', text: 'On December 3, 2023, the B-Block Seminar Hall hosted the following program: The event commenced with a prayer, followed by the ceremonial lighting of the lamp. A welcoming address was delivered to all attendees, setting the stage for the proceedings. ATL Dean Dr. K. Padma Vasavi shared her insights on the Assistive Technology Lab (ATL), emphasizing its significance and impact. The Vice Principal extended felicitations to Chief Guest Dr. U.V. Ramana Raju, acknowledging his distinguished presence. Dr. U.V. Ramana Raju then delivered an enlightening address, sharing valuable perspectives with the audience. ATL products were distributed among beneficiaries, showcasing the tangible outcomes of the lab\'s initiatives. The program concluded with a vote of thanks, expressing gratitude to all participants and supporters for their contributions.' },
+        { type: 'table', title: 'ATL Day Distribution Projects', table: {
+          headers: ['S.No', 'Name of the Project', 'Qty', 'Beneficiary'],
+          rows: [
+            { cells: ['1', 'Talking Box', '2', 'Sri Venkateswara Deaf & Dumb School'] },
+            { cells: ['2', 'Blind Stick', '5', 'U.V. Ramana Raju Blind School'] },
+            { cells: ['3', 'Braille Tutor', '2', 'U.V. Ramana Raju Blind School'] },
+            { cells: ['4', 'India Map', '2', 'U.V. Ramana Raju Blind School'] },
+            { cells: ['5', 'Medicine Reminder', '1', 'U.V. Ramana Raju Blind School'] },
+            { cells: ['6', 'Currency Note Identifier', '1', 'U.V. Ramana Raju Blind School'] },
+          ],
+        } },
+      ],
+    },
+    {
+      id: '2024-25',
+      yearLabel: '2024-25',
+      title: 'International Day of Persons with Disabilities — Assistive Technology Project Exhibition Day (2024-25)',
+      blocks: [
+        { type: 'meta', items: [
+          { label: 'Date', value: '3rd December 2024' },
+          { label: 'Venue', value: 'B-Block Seminar Hall, Department of ECE, SVECW' },
+          { label: 'Organized by', value: 'Assistive Technology Lab (ATL), SVECW' },
+          { label: 'Chief Guest', value: 'Dr. U.V. Ramana Raju, Managing Trustee, Centre for Visually Challenged, Bhimavaram' },
+          { label: 'Participants', value: 'Dr. G. Srinivasa Rao (Principal, SVECW), Prof. P. Venkata Rama Raju (Vice-Principal), ATL Dean, 40 ATL Students, 12 ATL Mentors, and 2 Supporting Staff' },
+        ] },
+        { type: 'heading', text: 'Event Overview' },
+        { type: 'paragraph', text: 'Shri Vishnu Engineering College for Women (SVECW) proudly hosted the Assistive Technology Project Exhibition Day on 3rd December 2024 in observance of the International Day of Persons with Disabilities. Organized by the Assistive Technology Lab (ATL) of the ECE Department, the event showcased student innovations aimed at empowering individuals with disabilities through affordable and user-friendly technological solutions.' },
+        { type: 'heading', text: 'Inaugural Session' },
+        { type: 'paragraph', text: "The event opened with a prayer and ceremonial lamp lighting. Dr. K. Padmavasavi, ATL Dean, welcomed the dignitaries and highlighted ATL's impact. Prof. P. Venkata Rama Raju, Vice-Principal, congratulated the teams for socially relevant innovations. Dr. G. Srinivasa Rao, Principal, SVECW, emphasized ATL's role in integrating technology with empathy." },
+        { type: 'heading', text: 'Keynote Address' },
+        { type: 'paragraph', text: 'Dr. U.V. Ramana Raju, Chief Guest and Managing Trustee, Centre for Visually Challenged, delivered a powerful keynote emphasizing the importance of technology in improving the quality of life for persons with disabilities. He appreciated the tangible efforts made by the ATL students.' },
+        { type: 'table', title: 'ATL Product Distribution', table: {
+          headers: ['S.No', 'Project Name', 'Remarks'],
+          rows: [
+            { cells: ['1', 'Trike (Scooter)', 'Directly Distributed to an Individual Client'] },
+            { cells: ['2', 'Datura Flower (Tactile Botany Model)', 'Distributed to U.V. Ramana Raju Blind School'] },
+            { cells: ['3', 'E-Sticks (Smart Walking Sticks)', 'Distributed to U.V. Ramana Raju Blind School'] },
+            { cells: ['4', 'Human Heart (3D Printed Model)', 'Distributed to U.V. Ramana Raju Blind School'] },
+          ],
+        } },
+        { type: 'paragraph', text: 'The program ended with a vote of thanks from the ATL Coordinator, appreciating the involvement of 40 students, 12 mentors, and the support from college management. The event exemplified how engineering education can be transformed into a socially impactful journey, creating a strong foundation for empathetic and inclusive innovations.' },
+      ],
+    },
+    {
+      id: '2025-26',
+      yearLabel: '2025-26',
+      title: 'International Day of Persons with Disabilities Day – Event Report (2025-26)',
+      blocks: [
+        { type: 'meta', items: [
+          { label: 'Date', value: '03-12-2025' },
+          { label: 'Venue', value: 'Smt. B. Seetha Indoor Auditorium, SVECW, Bhimavaram' },
+          { label: 'Participants', value: 'ATL student teams, ATL mentors, faculty members, supporting staff, beneficiaries, and invited guests' },
+        ] },
+        { type: 'heading', text: 'Purpose of the Event' },
+        { type: 'paragraph', text: 'The event was organized on the occasion of the International Day of Persons with Disabilities to showcase and distribute assistive technology solutions developed by ATL students. The programme aimed to promote inclusion, accessibility, and social responsibility through technology-driven solutions addressing real-life challenges faced by persons with disabilities.' },
+        { type: 'heading', text: 'Objectives' },
+        { type: 'bullets', items: [
+          'To create awareness about assistive technologies and their societal impact.',
+          'To provide practical, user-centric assistive solutions to beneficiaries.',
+          'To encourage students to design empathy-driven and inclusive engineering solutions.',
+          'To facilitate interaction between beneficiaries, experts, and student innovators.',
+        ] },
+        { type: 'heading', text: 'Programme Schedule' },
+        { type: 'bullets', items: [
+          'Prayer',
+          'Lighting of the Lamp',
+          'Welcome Address',
+          'Felicitation to the Chief Guest',
+          'Address by the Chief Guest',
+          'Felicitation to the Guest of Honor',
+          'Address by the Guest of Honor',
+          'Cultural Programmes by beneficiary school students',
+          'Distribution of ATL Assistive Products to beneficiaries',
+          'Vote of Thanks',
+        ] },
+        { type: 'heading', text: 'Chief Guest and Dignitaries' },
+        { type: 'boldBullets', items: [
+          { lead: 'Chief Guest:', text: ' Dr. K. Madhu Murthy, Chairman, AP State Council for Higher Education' },
+          { lead: 'Guest of Honor:', text: ' Dr. U. V. Ramana Raju, Managing Trustee, Centre for Visually Challenged, Bhimavaram' },
+          { lead: 'Presided by:', text: ' Sri. K. V. Vishnu Raju, Chairman, Sri Vishnu Educational Society, Bhimavaram' },
+        ] },
+        { type: 'heading', text: 'Event Proceedings' },
+        { type: 'paragraph', text: 'The programme commenced with a prayer followed by the ceremonial lighting of the lamp by the dignitaries. The welcome address highlighted the role of the Centre for Assistive Technology in developing inclusive solutions. The Chief Guest and Guest of Honor addressed the gathering, emphasizing the importance of empathy-driven innovation and the responsibility of engineers toward society.' },
+        { type: 'paragraph', text: 'Cultural programmes performed by beneficiary school students added vibrancy to the event and reflected the spirit of inclusion. The key highlight of the programme was the distribution of assistive technology products designed and developed by ATL student teams.' },
+        { type: 'heading', text: 'Assistive Technology Projects Distributed' },
+        { type: 'numbered', items: [
+          'E-Sticks – 10',
+          'India Map – 2',
+          'World Map – 2',
+          'State Map – 2',
+          'AP Districts Map – 2',
+          'Medical Dispenser',
+          'Object Detection System (for visually impaired)',
+          'Assistive Bike',
+        ] },
+        { type: 'paragraph', text: 'These projects were developed by ATL students with continuous guidance from ATL mentors, focusing on usability, safety, and real-world application.' },
+        { type: 'heading', text: 'Media Coverage' },
+        { type: 'paragraph', text: "The event received media attention and was covered by a leading regional newspaper (Eenadu — ఈనాడు), highlighting the distribution of assistive devices and the institution's commitment toward empowering persons with disabilities. (Edition: Andhra Pradesh – West Godavari, published 04/12/2025)" },
+        { type: 'heading', text: 'Outcome of the Event' },
+        { type: 'bullets', items: [
+          'Beneficiaries received functional assistive devices addressing mobility, learning, and daily living challenges.',
+          'Students gained hands-on experience in designing solutions with social impact.',
+          'The event strengthened collaboration between the institution, community organizations, and beneficiaries.',
+          'Awareness on inclusive technology and accessibility was enhanced among participants.',
+        ] },
+        { type: 'paragraph', text: "The Assistive Technology Day event organized on 03-12-2025 was a meaningful and impactful initiative. It successfully combined technical innovation with social responsibility, reinforcing the institution's commitment to inclusive education and community engagement. The event inspired students to continue developing assistive solutions that improve quality of life for persons with disabilities." },
+      ],
+    },
+  ] as AtlExhibitionYear[],
+  exhibitionShowcases: [
+    {
+      id: 'kl-university-2024',
+      tabLabel: 'KL University Vijayawada (06-01-2024)',
+      title: 'Projects Exhibiting at Regional Meet KL University Vijayawada on 06-01-2024',
+      type: 'batches',
+      batches: [
+        { batchNo: 1, selectedProject: 'Vibro Tactile Alert', members: [
+          { regdNo: '21B01A0419', name: 'Gangireddy Loshmi', department: 'ECE' },
+          { regdNo: '21B01A0411', name: 'Ch. Lehsrike Sri', department: 'ECE' },
+          { regdNo: '22B01A04C0', name: 'V. Akshaya', department: 'ECE' },
+        ] },
+        { batchNo: 2, selectedProject: 'Autoclave Hiss Indicator (AHI)', members: [
+          { regdNo: '21B01A0425', name: 'G. Pujitha Devi', department: 'ECE' },
+          { regdNo: '21B01A0452', name: 'Koluru Sri Harshithe', department: 'ECE' },
+          { regdNo: '21B01A0403', name: 'V. Deepthi', department: 'ECE' },
+        ] },
+        { batchNo: 3, selectedProject: 'Sequel Aegis Latch (SAL)', members: [
+          { regdNo: '21B01A0478', name: 'Palipe Joswitha', department: 'ECE' },
+          { regdNo: '21B01A04A8', name: 'V. Susmitha', department: 'ECE' },
+          { regdNo: '21B01A0425', name: 'G. Dhatri Gayatri', department: 'ECE' },
+        ] },
+        { batchNo: 4, selectedProject: 'Buzzing Bend', members: [
+          { regdNo: '21B01A0431', name: 'G. Tripura TejaSri Gowri', department: 'ECE' },
+          { regdNo: '21B01A0432', name: 'G. Gnese AruSaisthi', department: 'ECE' },
+          { regdNo: '21B01A0433', name: 'G. Lavanya', department: 'ECE' },
+        ] },
+        { batchNo: 5, selectedProject: 'Auto Braille', members: [
+          { regdNo: '21B01A0494', name: 'R. Naga Kavya', department: 'ECE' },
+          { regdNo: '21B01A0491', name: 'Rokkam Baveena Sri Santhoshi', department: 'ECE' },
+          { regdNo: '22B05A0461', name: 'M. Mouya Sri', department: 'ECE' },
+        ] },
+      ],
+    },
+    {
+      id: 'iit-madras-2024',
+      tabLabel: 'IIT Madras Makeathon (07-01-2024)',
+      title: 'Projects Exhibiting at IIT Madras for AT MAKEATHON event on 07-01-2024',
+      type: 'batches',
+      batches: [
+        { batchNo: 1, selectedProject: 'A Blind-Friendly Interactive Ball Game', members: [
+          { regdNo: '21B01A0434', name: 'Gurugu Sai Girija', department: 'ECE' },
+          { regdNo: '22B05A0413', name: 'Simhadri Likitha Sai Durga', department: 'ECE' },
+          { regdNo: '21B01A0403', name: 'Aluri Durga Sri Nanditha', department: 'ECE' },
+        ] },
+        { batchNo: 2, selectedProject: 'Prosthetic Fore Arm For People with Limited Hand Dexterity', members: [
+          { regdNo: '21B01A0401', name: 'Adapa Hari Priya', department: 'ECE' },
+          { regdNo: '21B01A0426', name: 'G. Jyothi Sri Priya', department: 'ECE' },
+          { regdNo: '21B01A0451', name: 'Kesanakurthi Sri Subhanjili', department: 'ECE' },
+        ] },
+      ],
+    },
+    {
+      id: 'telangana-summit-2024',
+      tabLabel: 'Telangana AT Summit 4.0 (04-01-2024)',
+      title: 'Projects Exhibiting at Telangana Assistive Technology Summit 4.0 at T-Hub on 4th Jan 2024',
+      type: 'table',
+      table: {
+        headers: ['S.No', 'Regd. No.', 'Student Name', 'Branch', 'Project', 'YouTube Video Link'],
+        rows: [
+          { cells: ['1', '21B01A0457', 'Megapu Siva Renjani', 'ECE-A', 'SHE SHIELD', ''] },
+          { cells: ['2', '22B05A0406', 'K Sai Vardhini', 'ECE-A', '', ''] },
+          { cells: ['3', '21B05A0484', 'Vennemsetty Vaili Suvarna', 'ECE-B', '', ''] },
+          { cells: ['4', '22B05A0413', 'Simhadri Likitha Sai Durga', 'ECE-B', '', ''] },
+          { cells: ['5', '22B05A0204', 'Nandem Sravani', 'EEE', '', ''] },
+          { cells: ['6', '22B05A0302', 'Kekarie Charitha', 'Mechanical', '', ''] },
+        ],
+      },
+    },
+  ] as AtlExhibitionShowcase[],
+  atlOutcomes: [
+    {
+      id: 'trance-2k25',
+      tabLabel: 'TRANCE-2K25 (2024-25)',
+      title: 'ATL 2024-25 Outcomes — TRANCE-2K25',
+      blocks: [
+        { type: 'paragraph', text: 'The Department of ECE at S.R.K.R. Engineering College hosted its flagship tech fest, TRANCE-2K25, on February 15, 2025. The event featured a dynamic blend of technical innovation and creative expression through segments like T-Techathon, Art Spark, NexGen, Caliber Clash, and more. Students showcased exceptional skills in coding, gaming, quizzes, art, and IoT. Among the highlights, Jhansi Nainavarapu (22B01A0475) earned First Prize in the T-Techathon, demonstrating the project FLEX-TALK for her outstanding problem-solving and programming abilities.' },
+      ],
+    },
+    {
+      id: 'iic-regional-meet-2025',
+      tabLabel: 'IIC Regional Meet 2025 Vijayawada (2025-26)',
+      title: 'ATL Outcomes (2025-26) — IIC Regional Meet 2025 Vijayawada',
+      blocks: [
+        { type: 'paragraph', text: 'VoxDot is an assistive technology project developed to improve accessibility and independence for visually impaired individuals. Many visually impaired students rely on Braille for learning, but existing Braille printers are expensive, bulky, and not easily available in schools or rural areas. Because of this, users often depend on teachers, friends, or volunteers to convert information into Braille, which delays access to study materials and limits independent learning. To address this problem, VoxDot is designed as an affordable voice-controlled Braille printing device that converts spoken words directly into printed Braille. The system captures voice input through a Bluetooth-enabled Android application, converts it into text, and then translates it into Braille. An Arduino-based microcontroller system controls a solenoid-based mechanism and motor driver to generate Braille dot patterns on paper. This allows users to instantly convert voice into Braille and print notes independently. The device is portable, easy to operate, and cost-effective, enabling visually impaired users to access information without relying on others. It supports inclusive education by helping students receive learning materials quickly and independently. The primary users include visually impaired individuals, blind schools, special education institutions, NGOs, libraries, and caregivers. The estimated production cost per unit is around ₹15,853, with additional recurring costs of about ₹1,660, while the device can be sold for approximately ₹20,750, making it more affordable than many existing Braille printers. The project also has potential partnerships with blind schools, NGOs, and government initiatives such as AICTE and CSR programs to expand its reach.' },
+      ],
+    },
+  ] as AtlProjectOutcome[],
+  clientVisits: [
+    {
+      id: '2023-24',
+      tabLabel: 'Zion School Visit (2023-24)',
+      yearLabel: 'Zion School Visit (2023-24)',
+      title: 'ZION School Visit for ATL Students (2023-24)',
+      blocks: [
+        { type: 'meta', items: [
+          { label: 'Date', value: '26-08-2023' },
+          { label: 'Location', value: 'Zion School, Rajahmundry' },
+          { label: 'Participants', value: 'ATL 48 students, 13 ATL Mentors and 2 supporting staff from ATL' },
+        ] },
+        { type: 'paragraph', text: 'The purpose of this visit was to gain a deeper understanding of the challenges faced by individuals with disabilities and make a real time project.' },
+        { type: 'heading', text: 'Objectives' },
+        { type: 'paragraph', text: 'The primary objectives of our visit were as follows:' },
+        { type: 'bullets', items: [
+          'To interact with the students and staff of the disabled school.',
+          'To understand the challenges and obstacles faced by disabled individuals.',
+          'To learn about the various disabilities and the support systems in place to assist individuals with disabilities.',
+        ] },
+        { type: 'heading', text: 'Itinerary' },
+        { type: 'paragraph', text: 'The visit took place on 26-08-2023 and lasted for approximately 6 hours. The itinerary for the day was as follows:' },
+        { type: 'bullets', items: [
+          '9:00 AM: Students assembled at C Block parking and departed for the Zion disabled school.',
+          '12:30 PM: Arrived at the disabled school and received a warm welcome by the school staff.',
+          '01:00 PM: Interactive sessions with differently-abled children.',
+          '2:00 PM: Farewell and departure.',
+          '5:30 PM: Reached college.',
+        ] },
+        { type: 'heading', text: 'Interaction Activities' },
+        { type: 'paragraph', text: 'Upon arrival, we were warmly welcomed by the school staff and students. We had the opportunity to interact with the disabled students, who showed us around the school and shared their experiences with us. We were deeply moved by their resilience and determination to overcome challenges. We visited various classrooms and observed the teaching methods and activities tailored to suit the needs of the disabled students. The teachers and support staff demonstrated immense dedication and patience in providing education and care to these students.' },
+        { type: 'paragraph', text: 'It reminded us of the importance of inclusivity and the need to create a society where everyone, regardless of their abilities, can thrive. We would like to express our gratitude to the school staff and students for their warm hospitality and for allowing us to be a part of their community for a day.' },
+      ],
+    },
+    {
+      id: '2025-26',
+      tabLabel: 'Zion School Visit (2025-26)',
+      yearLabel: 'Zion School Visit (2025-26)',
+      title: 'Client Visit Report — Zion School, Rajahmundry (2025-26)',
+      blocks: [
+        { type: 'meta', items: [
+          { label: 'Date', value: '23-08-2025' },
+          { label: 'Location', value: 'Zion School, Rajahmundry, A.P' },
+          { label: 'Participants', value: 'ATL 43 students, 5 ATL Mentors and 2 supporting staff from ATL' },
+        ] },
+        { type: 'paragraph', text: 'The purpose of this visit was to provide students with real-time exposure to community-based learning and to identify potential assistive technology needs in educational and healthcare environments. The visit helped students understand real-world challenges and develop empathy-driven design thinking skills.' },
+        { type: 'heading', text: 'Objectives' },
+        { type: 'paragraph', text: 'The primary objectives of our visit were as follows:' },
+        { type: 'numbered', items: [
+          'To understand the challenges and needs faced by individuals in real-life learning and rehabilitation settings.',
+          'To explore opportunities for developing assistive projects to improve accessibility and learning outcomes.',
+        ] },
+        { type: 'heading', text: 'Itinerary' },
+        { type: 'paragraph', text: 'The visit took place on 23-08-2025 and lasted for approximately 6 hours. The itinerary for the day was as follows:' },
+        { type: 'bullets', items: [
+          '9:00 AM: Students assembled at C Block parking area and departed for Rajahmundry.',
+          '12:30 PM: Arrival at the destination and warm welcome by the host institution.',
+          '1:00 PM: Interaction sessions with faculty, staff, and students.',
+          '2:30 PM: Group discussion on assistive technology project opportunities.',
+          '5:30 PM: Departure and return to college.',
+        ] },
+        { type: 'heading', text: 'Interaction Activities' },
+        { type: 'paragraph', text: "Upon arrival, the team was greeted warmly by the staff and students. The participants had the opportunity to interact with the students, observe their learning environment, and understand the kind of challenges they face in daily life. The mentors guided the students in identifying project themes that align with the Assistive Technology Lab's objectives." },
+        { type: 'paragraph', text: 'The visit was highly insightful, fostering awareness and compassion among students while encouraging them to apply their engineering knowledge to real-world social impact.' },
+      ],
+    },
+  ] as AtlClientVisitYear[],
+  innovationFairs: [
+    {
+      id: 'jntu-kakinada',
+      tabLabel: 'Innovation Project Fair at JNTU Kakinada',
+      title: 'Innovation Project Fair at JNTU Kakinada',
+      blocks: [
+        { type: 'paragraph', text: 'An Innovation Project Fair was organized at Jawaharlal Nehru Technological University Kakinada to encourage students to showcase creative ideas and technological innovations. The event brought together students from various engineering colleges to present projects addressing real-world problems through technology and research. Our team participated in the fair by presenting the project "BrailleEase", a device designed to convert digital text into Braille characters to make digital content accessible for visually challenged individuals.' },
+        { type: 'paragraph', text: 'The chief guest of the event was Nara Lokesh, Minister for Information Technology, Electronics & Communications and Human Resource Development, Government of Andhra Pradesh. During the event, he interacted with students, observed the innovative projects, and appreciated the efforts of young engineers in developing solutions that can benefit society. His presence motivated students to focus on innovation, entrepreneurship, and technology-driven development.' },
+        { type: 'paragraph', text: 'The exhibition provided a valuable platform for students to demonstrate their technical skills, creativity, and problem-solving abilities. Our project BrailleEase received positive feedback from visitors and faculty members for its social impact and potential to improve accessibility for visually challenged people.' },
+        { type: 'paragraph', text: 'Overall, the Innovation Project Fair was an inspiring experience that encouraged students to pursue innovative ideas and contribute to technological advancement for societal benefit.' },
+      ],
+    },
+    {
+      id: 'avishkandhra-rtih',
+      tabLabel: 'AVISHKANDHRA — RTIH, Rajamahendravaram',
+      title: 'AVISHKANDHRA — RTIH, Rajamahendravaram',
+      blocks: [
+        { type: 'paragraph', text: 'ATL teams visited the Regional Technology and Innovation Hub (RTIH), Rajamahendravaram to present and demonstrate our innovative projects aimed at solving real-world societal problems using technology. The visit provided us with an opportunity to interact with experts, present our ideas, and receive valuable feedback that could help us improve our projects and explore their real-world applications. During the visit presented two projects developed by our team: DripTrack – Smart Saline Monitoring System and SheShield – Women Safety Wearable Device.' },
+        { type: 'paragraph', text: "DripTrack is a smart healthcare monitoring system designed to improve patient safety in hospitals. In hospital wards, nurses and medical staff often have to monitor the saline bottles of multiple patients simultaneously. Manually checking the saline level every few minutes can be difficult and time-consuming. If a saline bottle becomes empty and it is not noticed in time, air may enter the patient's bloodstream, which can lead to serious health complications. To overcome this issue, DripTrack continuously monitors the weight of the saline bottle using a load cell sensor. When the saline level reaches a critical low point, the system automatically activates an alert using a buzzer and LED indicator so that nurses can replace the bottle in time. This system helps prevent potential risks and reduces the workload of healthcare staff." },
+        { type: 'paragraph', text: "The second project, SheShield, is a women's safety wearable device specially designed to protect mentally challenged women. It acts as a personal safety device that provides an instant response when there is unwanted physical contact in sensitive areas associated with bad touch. The device immediately sends the live GPS location of the victim along with captured images of the situation, which can also serve as evidence. For immediate attention, the device activates a flash and buzzer sound to alert nearby people. The special feature of this device is that it can be triggered by a simple touch without requiring any manual interaction from the user. Although it is primarily designed for mentally challenged women, it can be useful for every woman in today's society." },
+        { type: 'paragraph', text: 'The experts and mentors at RTIH appreciated the practical applications and social relevance of both projects. They also provided valuable suggestions regarding improvements and future implementation. The visit was a highly informative and motivating experience that encouraged us to further develop our ideas and work towards creating innovative solutions for society.' },
+      ],
+    },
+    {
+      id: 'iic-inauguration-expo',
+      tabLabel: 'Innovation & Incubation Center Inauguration — Project Expo at Rajahmundry',
+      title: 'Innovation & Incubation Center Inauguration — Project Expo at Rajahmundry',
+      blocks: [
+        { type: 'paragraph', text: 'Our team had the valuable opportunity to present our innovative student projects during an interaction with Nara Lokesh Sir in Rajamahendravaram. The meeting provided us with a platform to showcase our ideas and explain how technology can be used to solve real-world societal problems. It was an inspiring experience that allowed us to receive encouragement and recognition for our innovative work. During the interaction, we presented two of our projects: DripTrack – Smart Saline Monitoring System and SheShield – Women Safety Wearable Device.' },
+        { type: 'paragraph', text: "DripTrack is designed to enhance patient safety in hospitals by continuously monitoring the saline bottle level. In hospital wards, nurses often need to monitor multiple patients at the same time, which makes it difficult to manually check every saline bottle regularly. If a saline bottle becomes empty and it is not noticed in time, air may enter the patient's bloodstream and lead to serious health complications. DripTrack addresses this issue by using a load cell sensor to measure the weight of the saline bottle and continuously monitor the fluid level. When the saline reaches a critical low level, the system automatically activates a buzzer and LED alert so that medical staff can replace the bottle immediately, thereby preventing possible risks." },
+        { type: 'paragraph', text: "The second project, SheShield, is a women's safety wearable device specially designed to protect mentally challenged women. It acts as a personal safety device that provides an instant response when there is unwanted physical contact in sensitive areas associated with bad touch. The device immediately sends the live GPS location of the victim along with captured images of the situation, which can serve as evidence. To attract immediate attention, the system also generates a flash and buzzer sound. The special feature of this device is that it can be triggered by a simple touch without requiring any manual interaction from the user. Although it is primarily designed for mentally challenged women, it can also serve as a protective device for women in general." },
+        { type: 'paragraph', text: 'During the interaction, Nara Lokesh Sir appreciated the innovative ideas and the social relevance of our projects. He encouraged students to focus on developing practical technological solutions that address real societal challenges. The meeting was highly motivating and inspired us to continue working on innovative projects that can contribute positively to society.' },
+      ],
+    },
+  ] as AtlInnovationFair[],
+  customSections: [] as CustomSection[],
 };
+
+export const defaultAtlCustomSections: CustomSection[] = [
+  {
+    id: 'collaborations',
+    label: 'Collaborations',
+    contentType: 'text',
+    textContent: 'Established in 2009, the Assistive Technology Lab collaborates with the University of Massachusetts (UMass), Lowell, USA. It focuses on empowering SVECW students to design projects benefiting the differently-abled, aiming to integrate them into mainstream society.',
+  },
+  {
+    id: 'clients',
+    label: 'Clients',
+    contentType: 'list',
+    listText: [
+      'Center for Visually Challenged, Bhimavaram',
+      'Sri Venkateswara Deaf and Dumb School, Bhimavaram',
+      'Arunodaya Manovikasa Kendram, Bhimavaram',
+      'Anjali School for Physically and Mentally Challenged, Palakollu',
+      'Andhra Blind School, Narsapuram',
+      'Zion School for Visually and Physically Challenged, Rajahmundry',
+    ].join('\n'),
+  },
+  {
+    id: 'testimonials',
+    label: 'Testimonials',
+    contentType: 'list',
+    listText: [
+      '"I simply got surprised to see so many projects which are distributed for social cause. It benefits to the most needy people (blind dumb hearing impaired mentally handicapped). I particularly wish all the students involved in these projects. I heartily wish them all the best." — Anupam Datta, Carnegie Mellon University',
+      '"Impressed by the enthusiasm of the students. Look forward to a team converting this to beauty. Very nice projects. Good luck." — M. Sandeep, CII Vice President',
+      '"Incredible machine with lovely presentation." — Francis Fage, INRIA',
+      '"An outstanding effort by students and faculty. Keep it up." — Dr. U. Chandra Sekhar, Director ESCI, Hyderabad',
+      '"Applications of technology for the social cause are something that you have innovated in this lab with passion for society welfare." — Prof. P. Thrimurthy, past president, CSI',
+      '"Thrilled to see the development and progress by undergraduate students is marvelous. Suggest to work with DRDO." — Dr. K. Trinath, Associate Director, NSTL Vizag',
+      '"This lab is totally dedicated for the society. It is a unique lab which works for social cause. This should be encouraged and spread its message all over India." — Dr. Ranjan Kumar Beshra, Asst. Prof, IIT Patna',
+      '"This lab has excelled in developing very humane and generally useful instruments — students have tremendous passion in learning needful things and helping the society in general. Keep the good work going and reach new heights. That\'s my wish to this great lab." — Datla Ravi Prasad Raju, Sr. Scientist, Texas Instruments USA',
+      '"I am delighted by looking at the great application of technical knowledge useful to the needs of the differently challenged people by the participation of the students — that is really great of this institution." — Dr. G. Tulasi Ram Das, VC, JNTUK',
+      '"Excellent. Hope the tools can be put to use and popularized. Best Wishes." — B. Gopala Krishna, TCS, Hyderabad',
+      '"Already highly ignited young minds. Highly appreciable work, R&D and performance." — J.P. Shivhare, prof ITMU, Sector-23A, Gurgaon, Ex-Scientist-ISRO/DOS/GOI',
+      '"Great concept and will go a long way in improving the conditions of people with disability in our country." — Harish, Mysore, Director India DPS, IEEE',
+      '"Excellent examples of technology for humanity. Thanks and congratulations." — Peter Stacker, 2012 IEEE Pres Elect',
+    ].join('\n'),
+  },
+  {
+    id: 'seminars',
+    label: 'Seminars',
+    contentType: 'list',
+    listText: [
+      '[2014] A faculty development programme was conducted from 12-17th of May, 2014 for the benefit of ATL mentors.',
+      '[2014] A bridge course is offered to the ATL students by the ATL mentors from 11-30th of Sep, 2014.',
+      '[2013] A bridge course is offered to the ATL students by the ATL mentors two weeks before the commencement of ATL workshop by Prof. Alan Rux from 15-30th July, 2013.',
+      '[2012] Systems Perspective of Open Innovation: Open Source Hardware and Applications : A Case Study, 3rd Feb, 2012, Mr. Maruthi Pathapati, CEO and Founder Director, Vidcentum R&D Pvt Ltd, Hyderabad.',
+      '[2012] Patent Based Projects And Patenting Process, 4th Feb, 2012, Dr. Ch. Kameswara Rao, Dean R&D, TKR Engineering College, Hyderabad.',
+      '[2011] Workshop on Microcontrollers, 14th July, 2010 to 20th July, 2010, Dr. K. Pushpa, K. Padma Vasavi, SVECW, Bhimavaram.',
+      '[2011] Workshop on Assistive Technology, 20th July 2011 to 27th July, 2011, Prof. Alan Rux, UMASS Lowell, USA.',
+      '[2011] Workshop on Microcontroller for Faculty involved in ATL, K. Padma Vasavi, M. V. Ganeswara Rao, SVECW, Bhimavaram.',
+    ].join('\n'),
+  },
+  {
+    id: 'people',
+    label: 'People / Institutions Involved',
+    contentType: 'text',
+    textContent: 'Every year around seventy students from various disciplines of different institutions are selected to the ATL. The students are of different institutions selected within the campus, which are listed below:\n\n• Shri Vishnu Engineering College for Women\n• Vishnu Institute of Technology\n• Padmasri B. V. Raju Institute of Computer Education\n• Smt. B. Seetha Polytechnic\n\nSimilarly, around fifteen faculty members from these institutions are selected to guide the students to make the projects. Apart from the faculty guides and student members involved in making the projects, around ten faculty members are selected as faculty coordinators to monitor that the students and faculty guides interact actively with the team of Prof. Alan Rux (ATP Coordinator, UMASS Lowell, USA) from U.S.A.\n\nThe team of students, faculty guides and co-ordinators, under the guidance of Prof. Alan Rux, work with commitment and dedication towards making projects that assist the physically and mentally challenged people.',
+  },
+  {
+    id: 'publications',
+    label: 'Publications',
+    contentType: 'list',
+    listText: [
+      'K. Padma Vasavi et al, "An RFID and E-Compass Based Navigation System for the Blind", BEATS 2010 (International Conference on Assistive Technology), NIT Jalandhar, Punjab.',
+      'K. Padma Vasavi et al, "A helping Aid for Visually Challenged by RFID Technology", Book Chapter in "Projects using MSP430 Microcontrollers" by Texas Instruments India, 2011.',
+      'K. Padma Vasavi, R. Susmitha, "Pattern Identification Training System for Students with Autism", International Journal in Engineering Research and Technology, vol1 Issue 3, July 2012.',
+      'R. Susmitha, "An Artificial Hand Gripper using Different Technologies", National Conference on Assistive Technology, 2011, BVRIT, Hyderabad.',
+      'M. V. Ganeswara Rao, "A Microcontroller Based Intelligent Stick", National Conference on Assistive Technology, 2011, BVRIT, Hyderabad.',
+      'P. Ravikumar, "Talking Box for Speech Challenged", National Conference on Assistive Technology, 2011, BVRIT, Hyderabad.',
+      'D. Murali Krishna, A. Krishna Chaitanya, "Speech Training System", National Conference on Assistive Technology, 2011, BVRIT, Hyderabad.',
+      'P.V.V. Rama Rao, M. Pradeep, "Voice Activated Wheel Chair", National Conference on Assistive Technology, 2011, BVRIT, Hyderabad.',
+      'G.R.L.V.N. Srinivasa Raju, "An RFID Based Door Opening and Closing System for Physically Challenged", National Conference on Assistive Technology, 2011, BVRIT, Hyderabad.',
+      'V. Srinivasa Rao, "Voice Activated Dental Chair equipment for Physically Challenged Doctors", National Conference on Assistive Technology, 2011, BVRIT, Hyderabad.',
+      'B. Surya Prasada Rao, "Gait Training System for Mentally Challenged", National Conference on Assistive Technology, 2011, BVRIT, Hyderabad.',
+      'K. Padma Vasavi, "An Overview of Brain Computer Interface Systems for Communication and Control", International Journal of Engineering Technology and Research, ISSN:2321-0869, volume-1, Issue-1, April 2014.',
+    ].join('\n'),
+  },
+  {
+    id: 'outcomes',
+    label: 'Outcomes & Achievements',
+    contentType: 'text',
+    textContent: '• Projects Exhibiting at Regional Meet KL University Vijayawada on 06-01-2024\n• Projects Exhibiting at IIT Madras for AT MAKEATHON event on 07-01-2024\n• Projects Exhibiting at Telangana Assistive Technology Summit 4.0 at T-Hub on 4th Jan 2024 (Telecasted in ETV YUVA programme)',
+  },
+  {
+    id: 'partners',
+    label: 'Partners',
+    contentType: 'text',
+    textContent: 'Established in 2009, the Assistive Technology Lab collaborates with the University of Massachusetts (UMass), Lowell, USA. It focuses on empowering SVECW students to design projects benefiting the differently-abled, aiming to integrate them into mainstream society.',
+  },
+];
+
+assistiveTechLab.customSections = defaultAtlCustomSections;

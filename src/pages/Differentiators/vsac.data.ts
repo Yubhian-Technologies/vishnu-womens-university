@@ -23,7 +23,9 @@ export interface SimpleTable {
 export interface TrainingResearchItem {
   title: string;
   paragraphs: string[];
+  tableTitle?: string;
   table?: SimpleTable;
+  images?: string[];
   secondParagraph?: string;
   secondTable?: SimpleTable;
 }
@@ -145,6 +147,35 @@ export const vsac = {
   },
 
   trainingResearch: [
+    {
+      title: 'Space Hackathon Challenge 2026',
+      paragraphs: [
+        'The Space Hackathon Challenge 2026, a 24-hour innovation challenge, was successfully organized by the Vishnu Space Applications Center (VSAC) in association with the Department of Electronics and Communication Engineering, Vishnu Women\'s University, from 19 August 2026, 10:00 AM to 20 August 2026, 10:00 AM. The hackathon was organized with the objective of encouraging students to develop AI- and machine-learning-based solutions for real-world problems in space technology, satellite imagery, geospatial analytics, and CubeSat systems. The event provided an interdisciplinary platform for students to transform technical knowledge into working solutions within a challenging 24-hour timeframe.',
+        'The event received enthusiastic participation from students across different branches of the University. A total of 105 students, forming approximately 35 teams of three members each, participated in the challenge.',
+      ],
+      images: [
+        '/images/hackathon/poster.png',
+        '/images/hackathon/collage.png',
+        '/images/hackathon/stage.png',
+        '/images/hackathon/lab.png',
+      ],
+      tableTitle: 'Students Benefited',
+      table: {
+        headers: ['S.NO', 'ROLL NUMBER', 'NAME', 'BRANCH'],
+        rows: [
+          { cells: ['1', '24B01A0434', 'G.L.S.VAISHNAVI', 'ECE'] },
+          { cells: ['2', '24B01A0425', 'D RADHA SIRISHA', 'ECE'] },
+          { cells: ['3', '24B01A0446', 'KAMASANI AKHILA', 'ECE'] },
+          { cells: ['4', '25B01A0437', 'G SRAVANTHI', 'ECE'] },
+          { cells: ['5', '25B01A0450', 'KOKA PADMINI', 'ECE'] },
+          { cells: ['6', '24B01A0407', 'A KEERTHI NANDINI', 'ECE'] },
+          { cells: ['7', '24B01A0472', 'M. AKSHAYA', 'ECE'] },
+          { cells: ['8', '25B01A0490', 'PERUGU NEELIMA', 'ECE'] },
+          { cells: ['9', '25B01A0468', 'M.SARVAGNA', 'ECE'] },
+          { cells: ['10', '25B01A0466', 'M. AKSHAYA', 'ECE'] },
+        ],
+      },
+    },
     {
       title: 'One-Week Training Programme on HAM Radio and Morse Code',
       paragraphs: [
