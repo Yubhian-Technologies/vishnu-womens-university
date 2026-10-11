@@ -16,7 +16,7 @@ import { doc } from 'firebase/firestore';
 import { setDoc } from '../../../lib/auditLog';
 import { db } from '../../../lib/firebase';
 import { useDocument } from '../../../hooks/useDocument';
-import { ruralWomenTechPark, type RwtpIntervention, type RwtpActivity } from '../../Differentiators/ruralWomenTechPark.data';
+import { ruralWomenTechPark } from '../../Differentiators/ruralWomenTechPark.data';
 import CustomSectionEditor from './CustomSectionEditor';
 import { replaceAtPath, getAtPath, type CustomSection } from '../../../lib/customSections';
 import { deleteFile, type UploadResult } from '../../../lib/storage';

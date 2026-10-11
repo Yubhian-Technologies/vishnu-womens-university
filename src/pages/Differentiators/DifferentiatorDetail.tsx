@@ -18,6 +18,7 @@ import type { AicteIdeaLabDoc } from '../Admin/sections/AicteIdeaLabContentAdmin
 import type { FacultyDoc } from '../Academics/Faculty';
 import { talentSprintWise } from './talentSprintWise.data';
 import { foreignLanguages } from './foreignLanguages.data';
+import type { ForeignLanguagesDoc } from '../Admin/sections/ForeignLanguagesContentAdmin';
 import { medaPlmCoe } from './medaPlmCoe.data';
 import { microchipEmbedded } from './microchipEmbedded.data';
 import { aicteIdeaLab } from './aicteIdeaLab.data';
@@ -126,7 +127,7 @@ function LanguageModuleAccordion({ lang, index }: { lang: typeof foreignLanguage
 }
 
 function ForeignLanguagesPage({ data: fallbackData }: { data: typeof foreignLanguages }) {
-  const { data: remoteData } = useDocument<typeof foreignLanguages>('settings', 'foreignLanguages');
+  const { data: remoteData } = useDocument<ForeignLanguagesDoc>('settings', 'foreignLanguages');
   const data = { ...fallbackData, ...(remoteData || {}) };
   const quote = data.quote || fallbackData.quote;
   const coordinator = data.coordinator || fallbackData.coordinator;
