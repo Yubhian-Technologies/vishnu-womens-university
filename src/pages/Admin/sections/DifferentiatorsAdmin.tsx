@@ -11,9 +11,6 @@ import { replaceAtPath, getAtPath, hasCustomSectionContent, type CustomSection }
 import { type CustomTab } from '../../../lib/customTabs';
 import { diffChangedFields } from '../../../lib/formDiff';
 import AicteIdeaLabContentAdmin from './AicteIdeaLabContentAdmin';
-import AicteIdeaLabTeamAdmin from './AicteIdeaLabTeamAdmin';
-import AicteIdeaLabAmbassadorsAdmin from './AicteIdeaLabAmbassadorsAdmin';
-import AicteIdeaLabFacilityPhotosAdmin from './AicteIdeaLabFacilityPhotosAdmin';
 import TiDspContentAdmin from './TiDspContentAdmin';
 import MicrochipContentAdmin from './MicrochipContentAdmin';
 import MedaPlmCoeContentAdmin from './MedaPlmCoeContentAdmin';
@@ -33,8 +30,6 @@ import RuralWomenTechParkContentAdmin from './RuralWomenTechParkContentAdmin';
 import IicContentAdmin from './IicContentAdmin';
 import IicCouncilMembersAdmin from './IicCouncilMembersAdmin';
 import IicDocumentsAdmin from './IicDocumentsAdmin';
-import VdlAchievementsAdmin from './VdlAchievementsAdmin';
-import VdlTeamAdmin from './VdlTeamAdmin';
 import RwtpReportsAdmin from './RwtpReportsAdmin';
 import { useAdminSession } from '../AdminSessionContext';
 import { allowedDifferentiatorItems } from '../../../lib/rbac';
@@ -43,10 +38,7 @@ import { allowedDifferentiatorItems } from '../../../lib/rbac';
 // (matching AICTE IDEA Lab pattern), plus any legacy roster/report sub-panels:
 const ITEM_SUB_SECTIONS: Record<string, { key: string; label: string; Component: ComponentType }[]> = {
   'aicte-idea-lab': [
-    { key: 'page-content', label: 'All Page Content & Sections', Component: AicteIdeaLabContentAdmin },
-    { key: 'team', label: 'Team Members Roster', Component: AicteIdeaLabTeamAdmin },
-    { key: 'ambassadors', label: 'Student Ambassadors Roster', Component: AicteIdeaLabAmbassadorsAdmin },
-    { key: 'facility-photos', label: 'Facility Photos', Component: AicteIdeaLabFacilityPhotosAdmin },
+    { key: 'page-content', label: 'All Page Content & Sections (Public Order)', Component: AicteIdeaLabContentAdmin },
   ],
   'ti-dsp-coe': [
     { key: 'page-content', label: 'All Page Content & Sections', Component: TiDspContentAdmin },
@@ -74,8 +66,6 @@ const ITEM_SUB_SECTIONS: Record<string, { key: string; label: string; Component:
   ],
   'vehicle-design-lab': [
     { key: 'page-content', label: 'All Page Content & Sections', Component: VehicleDesignLabContentAdmin },
-    { key: 'team', label: 'Team', Component: VdlTeamAdmin },
-    { key: 'achievement-reports', label: 'Achievement Reports', Component: VdlAchievementsAdmin },
   ],
   'ar-vr-studio': [
     { key: 'page-content', label: 'All Page Content & Sections', Component: ArVrStudioContentAdmin },
@@ -248,7 +238,7 @@ export const DIFFERENTIATOR_CATEGORIES = [
 // Description/Vision/Mission/Objectives/Custom Sections Overview section
 // every other item has. Only gates the Tabs editor below; every other field
 // applies to these 4 exactly like any other item.
-const TABS_SLUGS = new Set(['talentsprint-wise', 'institution-innovation-cell', 'vehicle-design-lab', 'aicte-idea-lab']);
+const TABS_SLUGS = new Set(['talentsprint-wise', 'institution-innovation-cell']);
 
 // The single source of truth for "what does this item look like under the
 // new structure" — used both when opening one item for edit (startEdit) and
@@ -795,7 +785,7 @@ export default function DifferentiatorsAdmin() {
             <label htmlFor="field-hero-subtitle">Hero Subtitle (shown under the title on the detail page's hero banner, only when not an external link)</label>
             <textarea id="field-hero-subtitle" rows={2} value={form.summary || ''} onChange={(e) => set('summary', e.target.value)} />
           </div>
-          {form.slug !== 'aicte-idea-lab' && (
+          {!ITEM_SUB_SECTIONS[form.slug] && (
             <>
               <BlockEditor
                 blockKey="description"
@@ -893,9 +883,9 @@ export default function DifferentiatorsAdmin() {
         const ActiveComponent = active.Component;
         return (
           <div className="admin-card">
-            <h2 className="admin-card__title">Extra Content — {form.title}</h2>
+            <h2 className="admin-card__title">Content — {form.title}</h2>
             <p className="admin-field__hint" style={{ marginBottom: '1rem' }}>
-              This item has its own extra editable content, shown here while you're editing it.
+              This item has its own editable content, shown here while you're editing it.
             </p>
             {subs.length > 1 && (
               <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1.25rem' }}>

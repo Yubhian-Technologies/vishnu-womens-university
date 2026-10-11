@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Image as ImageIcon, ExternalLink } from 'lucide-react';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import type { GalleryAlbumDoc } from '../Admin/sections/GalleryAdmin';
-import { sortAlbumsLatestFirst } from '../../lib/galleryAlbums';
+import { formatAlbumDate, sortAlbumsLatestFirst } from '../../lib/galleryAlbums';
 import { useHashScroll } from '../../hooks/useHashScroll';
 import PageHero from '../../components/PageHero/PageHero';
 import './Gallery.css';
@@ -234,7 +234,7 @@ export default function Gallery() {
                         <span style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                           {album.year}
                         </span>
-                        {album.date && <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)' }}>{album.date}</span>}
+                        {album.date && <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)' }}>{formatAlbumDate(album.date)}</span>}
                       </div>
                       <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: '0.95rem', fontWeight: 600, color: 'var(--color-primary)', lineHeight: 1.45, flex: 1, margin: 0 }}>
                         {album.title}

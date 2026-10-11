@@ -14,9 +14,11 @@ import {
   Maximize2,
   Award,
   CheckCircle2,
+  ZoomIn,
+  ZoomOut,
+  RotateCcw,
 } from 'lucide-react';
 import { CustomSectionsIntro, CustomSectionsGalleries, CustomSectionsAccordion } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
-import { hasCustomSectionContent } from '../../lib/customSections';
 import { useDocument } from '../../hooks/useDocument';
 import type { VsacDoc } from '../Admin/sections/VsacContentAdmin';
 import { vsac, type VsacMember, type SimpleTable } from './vsac.data';
@@ -34,6 +36,12 @@ export default function VsacPage({ item, sections }: VsacPageProps) {
   const { data: remoteData } = useDocument<VsacDoc>('settings', 'vsac');
   const [activeTab, setActiveTab] = useState<number>(0);
   const [lightboxImg, setLightboxImg] = useState<string | null>(null);
+  const [zoomLevel, setZoomLevel] = useState<number>(1);
+
+  const openLightbox = (url: string) => {
+    setLightboxImg(url);
+    setZoomLevel(1);
+  };
 
   const rawParagraphs = remoteData?.paragraphs && remoteData.paragraphs.length > 0 ? remoteData.paragraphs : vsac.paragraphs;
   const rawVision = remoteData?.vision || vsac.vision;
@@ -42,18 +50,19 @@ export default function VsacPage({ item, sections }: VsacPageProps) {
   const trainingResearch = remoteData?.trainingResearch && remoteData.trainingResearch.length > 0 ? remoteData.trainingResearch : vsac.trainingResearch;
   const industryCollaboration = remoteData?.industryCollaboration || vsac.industryCollaboration;
   const additionalSections = remoteData?.additionalSections || [];
+  const team = remoteData?.team || vsac.team;
+  const socialImpacts = remoteData?.socialImpacts || vsac.socialImpacts;
+  const learningOutcomes = remoteData?.learningOutcomes || vsac.learningOutcomes;
+  const galleryTitle = remoteData?.galleryTitle || vsac.galleryTitle;
+  const galleryCaption = remoteData?.galleryCaption || vsac.galleryCaption;
+  const visionTitle = remoteData?.visionTitle || vsac.visionTitle;
+  const missionTitle = remoteData?.missionTitle || vsac.missionTitle;
+  const objectivesTitle = remoteData?.objectivesTitle || vsac.objectivesTitle;
 
-  const aboutParagraphs = (item?.description && hasCustomSectionContent(item.description) && item.description.textContent)
-    ? [item.description.textContent]
-    : item?.desc
-    ? [item.desc]
-    : rawParagraphs;
-
-  const visionText = (item?.vision && hasCustomSectionContent(item.vision) && (item.vision.textContent || item.vision.listText)) || rawVision;
-
-  const missionList = (item?.mission && hasCustomSectionContent(item.mission) && (item.mission.listText?.split('\n').filter(Boolean) || [item.mission.textContent || ''])) || rawMission;
-
-  const objectivesList = (item?.objectives && hasCustomSectionContent(item.objectives) && (item.objectives.listText?.split('\n').filter(Boolean) || [item.objectives.textContent || ''])) || rawObjectives;
+  const aboutParagraphs = rawParagraphs;
+  const visionText = rawVision;
+  const missionList = rawMission;
+  const objectivesList = rawObjectives;
 
   // Extract existing photos safely
   const gallerySection = sections.find(
@@ -93,14 +102,19 @@ export default function VsacPage({ item, sections }: VsacPageProps) {
 
   const hasPhotos = galleryItems.length > 0;
 
-  const RenderTable = ({ table }: { table: SimpleTable }) => {
+  const RenderTable = ({ table, title }: { table: SimpleTable; title?: string }) => {
     const [isExpanded, setIsExpanded] = useState(false);
-    const PREVIEW_COUNT = 5;
+    const PREVIEW_COUNT = 10;
     const isExpandable = table.rows.length > PREVIEW_COUNT;
     const visibleRows = isExpandable && !isExpanded ? table.rows.slice(0, PREVIEW_COUNT) : table.rows;
 
     return (
-      <div>
+      <div style={{ marginTop: '1rem' }}>
+        {title && (
+          <h4 style={{ fontSize: '0.95rem', fontWeight: 800, color: '#070F26', marginBottom: '0.5rem' }}>
+            {title}
+          </h4>
+        )}
         <div className="vsac-table-container">
           <table className="vsac-table">
             <thead>
@@ -182,14 +196,14 @@ export default function VsacPage({ item, sections }: VsacPageProps) {
               {/* Vision & Mission */}
               <div className="vsac-orbit-card">
                 <div className="vsac-orbit-title">
-                  <Compass size={16} style={{ color: '#00E5FF' }} /> {vsac.visionTitle}
+                  <Compass size={16} style={{ color: '#00E5FF' }} /> {visionTitle}
                 </div>
                 <p className="vsac-orbit-item" style={{ fontStyle: 'italic', fontWeight: 500, lineHeight: 1.6, color: '#334155' }}>
                   &ldquo;{renderBold(visionText)}&rdquo;
                 </p>
 
                 <div className="vsac-orbit-title" style={{ marginTop: '1.25rem' }}>
-                  <Sparkles size={16} style={{ color: '#FFB300' }} /> {vsac.missionTitle}
+                  <Sparkles size={16} style={{ color: '#FFB300' }} /> {missionTitle}
                 </div>
                 <ul className="vsac-orbit-list">
                   {missionList.map((m, idx) => (
@@ -204,7 +218,7 @@ export default function VsacPage({ item, sections }: VsacPageProps) {
               {/* Objectives */}
               <div className="vsac-orbit-card" style={{ borderLeftColor: '#FFB300' }}>
                 <div className="vsac-orbit-title">
-                  <Target size={16} style={{ color: '#FFB300' }} /> {vsac.objectivesTitle}
+                  <Target size={16} style={{ color: '#FFB300' }} /> {objectivesTitle}
                 </div>
                 <ul className="vsac-orbit-list">
                   {objectivesList.map((obj, idx) => (
@@ -229,7 +243,7 @@ export default function VsacPage({ item, sections }: VsacPageProps) {
       <div className="vsac-block">
         <div className="vsac-block-header">
           <h2 className="vsac-block-title">
-            <Users size={18} style={{ color: '#00E5FF' }} /> Flight Operations Team & HAM Radio Operators
+            <Users size={18} style={{ color: '#00E5FF' }} /> Flight Operations Team &amp; HAM Radio Operators
           </h2>
         </div>
         <div className="vsac-block-body">
@@ -237,7 +251,7 @@ export default function VsacPage({ item, sections }: VsacPageProps) {
             Faculty In-Charge
           </h3>
           <div className="vsac-team-grid" style={{ marginBottom: 'var(--space-3)' }}>
-            {vsac.team.inCharge.map((member: VsacMember, idx: number) => (
+            {(team?.inCharge || []).map((member: VsacMember, idx: number) => (
               <div key={idx} className="vsac-team-card" style={{ borderLeft: '3px solid #00E5FF' }}>
                 <div className="vsac-team-top">
                   <div>
@@ -259,7 +273,7 @@ export default function VsacPage({ item, sections }: VsacPageProps) {
             Faculty Team Members
           </h3>
           <div className="vsac-team-grid">
-            {vsac.team.facultyMembers.map((member: VsacMember, idx: number) => (
+            {(team?.facultyMembers || []).map((member: VsacMember, idx: number) => (
               <div key={idx} className="vsac-team-card">
                 <div className="vsac-team-top">
                   <div>
@@ -283,7 +297,7 @@ export default function VsacPage({ item, sections }: VsacPageProps) {
       <div className="vsac-block">
         <div className="vsac-block-header">
           <h2 className="vsac-block-title">
-            <BookOpen size={18} style={{ color: '#00E5FF' }} /> Space Research & Training Operations
+            <BookOpen size={18} style={{ color: '#00E5FF' }} /> Space Research &amp; Training Operations
           </h2>
         </div>
         <div className="vsac-block-body">
@@ -317,8 +331,40 @@ export default function VsacPage({ item, sections }: VsacPageProps) {
                     </p>
                   ))}
 
+                  {/* Training Item Image Gallery */}
+                  {trainingResearch[activeTab].images && trainingResearch[activeTab].images!.length > 0 && (
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.75rem', margin: '1rem 0' }}>
+                      {trainingResearch[activeTab].images!.map((imgUrl, imgIdx) => (
+                        <div
+                          key={imgIdx}
+                          style={{ position: 'relative', borderRadius: '8px', overflow: 'hidden', border: '1px solid #E2E8F0', cursor: 'pointer', height: '110px' }}
+                          className="vsac-img-zoom-card"
+                          onClick={() => openLightbox(imgUrl)}
+                        >
+                          <img loading="lazy" src={imgUrl} alt={`Gallery Photo ${imgIdx + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', transition: 'transform 0.3s ease' }} />
+                          <div
+                            className="vsac-img-zoom-overlay"
+                            style={{
+                              position: 'absolute',
+                              inset: 0,
+                              background: 'rgba(7, 15, 38, 0.4)',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              color: '#FFFFFF',
+                              opacity: 0,
+                              transition: 'opacity 0.2s ease',
+                            }}
+                          >
+                            <ZoomIn size={22} />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
                   {trainingResearch[activeTab].table && (
-                    <RenderTable table={trainingResearch[activeTab].table!} />
+                    <RenderTable table={trainingResearch[activeTab].table!} title={trainingResearch[activeTab].tableTitle} />
                   )}
 
                   {trainingResearch[activeTab].secondParagraph && (
@@ -346,8 +392,8 @@ export default function VsacPage({ item, sections }: VsacPageProps) {
         </div>
         <div className="vsac-block-body">
           <div className="vsac-orbit-card" style={{ borderLeftColor: '#00E5FF', background: '#FFFFFF' }}>
-            {industryCollaboration.paragraphs.map((p, idx) => (
-              <p key={idx} className="vsac-orbit-item" style={{ color: '#334155', lineHeight: 1.65, marginBottom: idx < industryCollaboration.paragraphs.length - 1 ? '0.75rem' : 0 }}>
+            {(industryCollaboration?.paragraphs || []).map((p, idx, arr) => (
+              <p key={idx} className="vsac-orbit-item" style={{ color: '#334155', lineHeight: 1.65, marginBottom: idx < arr.length - 1 ? '0.75rem' : 0 }}>
                 {renderBold(p)}
               </p>
             ))}
@@ -359,12 +405,12 @@ export default function VsacPage({ item, sections }: VsacPageProps) {
       <div className="vsac-block">
         <div className="vsac-block-header">
           <h2 className="vsac-block-title">
-            <Globe2 size={18} style={{ color: '#00E5FF' }} /> {vsac.socialImpacts.title}
+            <Globe2 size={18} style={{ color: '#00E5FF' }} /> {socialImpacts.title}
           </h2>
         </div>
         <div className="vsac-block-body">
           <div className="vsac-bullets-grid">
-            {vsac.socialImpacts.bullets.map((b, bIdx) => (
+            {(socialImpacts?.bullets || []).map((b, bIdx) => (
               <div key={bIdx} className="vsac-bullet-card">
                 <span className="vsac-bullet-lead">{b.lead}</span>
                 <span className="vsac-bullet-text">{renderBold(b.text)}</span>
@@ -378,12 +424,12 @@ export default function VsacPage({ item, sections }: VsacPageProps) {
       <div className="vsac-block">
         <div className="vsac-block-header">
           <h2 className="vsac-block-title">
-            <Award size={18} style={{ color: '#FFB300' }} /> {vsac.learningOutcomes.title}
+            <Award size={18} style={{ color: '#FFB300' }} /> {learningOutcomes.title}
           </h2>
         </div>
         <div className="vsac-block-body">
           <div className="vsac-bullets-grid">
-            {vsac.learningOutcomes.bullets.map((b, bIdx) => (
+            {(learningOutcomes?.bullets || []).map((b, bIdx) => (
               <div key={bIdx} className="vsac-bullet-card" style={{ borderLeft: '3px solid #FFB300' }}>
                 <span className="vsac-bullet-lead">{b.lead}</span>
                 <span className="vsac-bullet-text">{renderBold(b.text)}</span>
@@ -399,10 +445,10 @@ export default function VsacPage({ item, sections }: VsacPageProps) {
           <div className="vsac-block-header">
             <div>
               <h2 className="vsac-block-title">
-                <ImageIcon size={18} style={{ color: '#00E5FF' }} /> {vsac.galleryTitle}
+                <ImageIcon size={18} style={{ color: '#00E5FF' }} /> {galleryTitle}
               </h2>
               <p style={{ color: '#94A3B8', fontSize: '0.85rem', margin: '0.2rem 0 0', fontWeight: 500 }}>
-                {renderBold(vsac.galleryCaption)}
+                {renderBold(galleryCaption)}
               </p>
             </div>
           </div>
@@ -429,7 +475,37 @@ export default function VsacPage({ item, sections }: VsacPageProps) {
       )}
       <div style={{ marginTop: '2rem' }}>
         <CustomSectionsGalleries sections={sections} />
-        <CustomSectionsAccordion sections={sections.filter((s) => s.placement !== 'intro' && s.contentType !== 'gallery' && s.id !== 'gallery')} />
+        <CustomSectionsAccordion
+          sections={sections.filter((s) => {
+            if (s.placement === 'intro' || s.contentType === 'gallery' || s.id === 'gallery') {
+              return false;
+            }
+            const id = (s.id || '').toLowerCase().trim();
+            const label = ((s as any).label || (s as any).title || '').toLowerCase().trim();
+            if (
+              id === 'team' ||
+              id === 'collaborations' ||
+              id === 'industry-collaborations' ||
+              id === 'outcomes' ||
+              id === 'achievements' ||
+              id.includes('outcome') ||
+              id.includes('achievement') ||
+              label === 'team' ||
+              label === 'industry collaborations' ||
+              label === 'collaborations' ||
+              label === 'industry collaboration' ||
+              label === 'outcomes & achievements' ||
+              label === 'outcomes and achievements' ||
+              label === 'outcomes' ||
+              label === 'achievements' ||
+              label.includes('outcome') ||
+              label.includes('achievement')
+            ) {
+              return false;
+            }
+            return true;
+          })}
+        />
       </div>
 
       {/* Dynamic Additional Sections from Admin */}
@@ -465,14 +541,62 @@ export default function VsacPage({ item, sections }: VsacPageProps) {
         </div>
       )}
 
-      {/* Lightbox Modal */}
+      {/* Lightbox Modal with Zoom Controls */}
       {lightboxImg && (
         <div className="meda-lightbox-backdrop" onClick={() => setLightboxImg(null)}>
-          <div className="meda-lightbox-content" onClick={(e) => e.stopPropagation()}>
-            <button className="meda-lightbox-close" onClick={() => setLightboxImg(null)}>
-              <X size={28} />
-            </button>
-            <img loading="lazy" src={lightboxImg} alt="Enlarged photo" className="meda-lightbox-img" />
+          <div className="meda-lightbox-content" onClick={(e) => e.stopPropagation()} style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div style={{ position: 'absolute', top: '-45px', right: '0', zIndex: 10, display: 'flex', gap: '0.5rem', background: 'rgba(7, 15, 38, 0.85)', padding: '6px 14px', borderRadius: '30px', border: '1px solid rgba(0, 229, 255, 0.3)', backdropFilter: 'blur(4px)' }}>
+              <button
+                type="button"
+                style={{ background: 'none', border: 'none', color: '#FFFFFF', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', fontWeight: 600 }}
+                onClick={() => setZoomLevel((prev) => Math.min(prev + 0.5, 3))}
+                title="Zoom In"
+              >
+                <ZoomIn size={16} /> Zoom In
+              </button>
+              <button
+                type="button"
+                style={{ background: 'none', border: 'none', color: '#FFFFFF', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', fontWeight: 600 }}
+                onClick={() => setZoomLevel((prev) => Math.max(prev - 0.5, 1))}
+                title="Zoom Out"
+              >
+                <ZoomOut size={16} /> Zoom Out
+              </button>
+              <button
+                type="button"
+                style={{ background: 'none', border: 'none', color: '#FFFFFF', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', fontWeight: 600 }}
+                onClick={() => setZoomLevel(1)}
+                title="Reset Zoom"
+              >
+                <RotateCcw size={14} /> Reset ({Math.round(zoomLevel * 100)}%)
+              </button>
+              <button
+                type="button"
+                style={{ background: 'none', border: 'none', color: '#FFFFFF', cursor: 'pointer', marginLeft: '6px' }}
+                onClick={() => setLightboxImg(null)}
+                title="Close"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <div style={{ overflow: 'auto', maxHeight: '80vh', maxWidth: '90vw', borderRadius: '8px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <img
+                loading="lazy"
+                src={lightboxImg}
+                alt="Enlarged photo"
+                className="meda-lightbox-img"
+                onClick={() => setZoomLevel((prev) => (prev >= 2.5 ? 1 : prev + 0.5))}
+                style={{
+                  transform: `scale(${zoomLevel})`,
+                  transformOrigin: 'center center',
+                  transition: 'transform 0.25s ease',
+                  cursor: zoomLevel >= 2.5 ? 'zoom-out' : 'zoom-in',
+                  maxWidth: '100%',
+                  maxHeight: '100%',
+                  display: 'block',
+                }}
+              />
+            </div>
           </div>
         </div>
       )}

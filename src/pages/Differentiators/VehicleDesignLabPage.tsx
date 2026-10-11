@@ -44,20 +44,34 @@ export default function VehicleDesignLabPage({ item, sections }: VehicleDesignLa
   const { data: remoteData } = useDocument<VehicleDesignLabDoc>('settings', 'vehicleDesignLab');
   const vdl = { ...vehicleDesignLab, ...(remoteData || {}) };
 
-  const aboutParagraphs = (item?.description && hasCustomSectionContent(item.description) && item.description.textContent)
+  const aboutParagraphs = (vdl.paragraphs && vdl.paragraphs.length > 0)
+    ? vdl.paragraphs
+    : (item?.description && hasCustomSectionContent(item.description) && item.description.textContent)
     ? [item.description.textContent]
     : item?.desc
     ? [item.desc]
-    : vdl.paragraphs;
+    : vehicleDesignLab.paragraphs;
 
-  const visionText = (item?.vision && hasCustomSectionContent(item.vision) && (item.vision.textContent || item.vision.listText)) || vdl.vision;
+  const visionText = vdl.vision || (item?.vision && hasCustomSectionContent(item.vision) && (item.vision.textContent || item.vision.listText)) || vehicleDesignLab.vision;
 
-  const missionText = (item?.mission && hasCustomSectionContent(item.mission) && (item.mission.textContent || item.mission.listText)) || vdl.mission;
+  const missionText = vdl.mission || (item?.mission && hasCustomSectionContent(item.mission) && (item.mission.textContent || item.mission.listText)) || vehicleDesignLab.mission;
 
   const objectivesList = (item?.objectives && hasCustomSectionContent(item.objectives) && (item.objectives.listText?.split('\n').filter(Boolean) || [item.objectives.textContent || ''])) || null;
 
   // Admin-managed achievement cards (Admin -> Vehicle Design Lab Achievements)
   const { docs: achievementCards } = useOrderedCollection<VdlAchievementReportDoc>('vdlAchievementReports', 'order');
+  const defaultAchievementCards: Partial<VdlAchievementReportDoc>[] = [
+    { id: 'vdl-2024-25', label: 'ME-VDL Achievements 2024-25', order: 1 },
+    { id: 'vdl-2023-24', label: 'ME-VDL Achievements 2023-24', order: 2 },
+    { id: 'vdl-2022-23', label: 'ME-VDL Achievements 2022-23', order: 3 },
+    { id: 'vdl-2021-22', label: 'ME-VDL Achievements 2021-22', order: 4 },
+    { id: 'vdl-2020-21', label: 'ME-VDL Achievements 2020-21', order: 5 },
+    { id: 'vdl-2019-20', label: 'ME-VDL Achievements 2019-20', order: 6 },
+    { id: 'vdl-2018-19', label: 'ME-VDL Achievements 2018-19', order: 7 },
+    { id: 'vdl-2017-18', label: 'ME-VDL Achievements 2017-18', order: 8 },
+    { id: 'vdl-2016-17', label: 'ME-VDL Achievements 2016-17', order: 9 },
+  ];
+  const effectiveAchievementCards = achievementCards.length > 0 ? achievementCards : defaultAchievementCards;
 
   // Admin-managed Head of Lab + Faculty Team Members (Admin -> Vehicle Design Lab -> Team)
   const { docs: teamMembers } = useOrderedCollection<VdlTeamMemberDoc>('vdlTeamMembers', 'order');
@@ -448,10 +462,10 @@ export default function VehicleDesignLabPage({ item, sections }: VehicleDesignLa
           </p>
 
           {/* Admin-managed achievement cards (photo + description, optional PDF report) */}
-          {achievementCards.length > 0 && (
+          {effectiveAchievementCards.length > 0 && (
             <div className="vdl-competitions-grid" style={{ marginBottom: 'var(--space-4)' }}>
-              {achievementCards.map((card) => (
-                <div key={card.id} className="vdl-comp-card">
+              {effectiveAchievementCards.map((card) => (
+                <div key={card.id || card.label} className="vdl-comp-card">
                   {card.imageUrl && (
                     <img loading="lazy"
                       src={card.imageUrl}
@@ -463,10 +477,14 @@ export default function VehicleDesignLabPage({ item, sections }: VehicleDesignLa
                     <Award size={16} style={{ color: '#FF5722' }} /> {card.label}
                   </div>
                   {card.description && <p className="vdl-comp-text">{renderBold(card.description)}</p>}
-                  {card.fileUrl && (
+                  {card.fileUrl ? (
                     <a href={card.fileUrl} target="_blank" rel="noopener noreferrer" className="vdl-report-link">
                       View Report
                     </a>
+                  ) : (
+                    <span className="vdl-report-link" style={{ opacity: 0.7, cursor: 'default' }}>
+                      View Report
+                    </span>
                   )}
                 </div>
               ))}
@@ -478,7 +496,7 @@ export default function VehicleDesignLabPage({ item, sections }: VehicleDesignLa
             <h3 className="vdl-section-subtitle">
               <Briefcase size={16} style={{ color: '#FF5722' }} /> Career Placements & Recruiter Ecosystem
             </h3>
-            {vehicleDesignLab.studentsAchievements.placementsParagraphs.map((para, idx) => (
+            {((vdl as any).studentsAchievements?.placementsParagraphs || vehicleDesignLab.studentsAchievements.placementsParagraphs).map((para: string, idx: number) => (
               <p key={idx} className="vdl-overview-text" style={{ color: '#2D3748', marginBottom: 'var(--space-2)' }}>
                 {renderBold(para)}
               </p>
@@ -498,7 +516,7 @@ export default function VehicleDesignLabPage({ item, sections }: VehicleDesignLa
         <div className="vdl-block-body">
           <div className={`vdl-split ${hasPhotos ? 'has-photo' : 'no-photo'}`}>
             <div className="vdl-outcomes-grid">
-              {vehicleDesignLab.outcomes.map((out: VdlOutcomeItem, idx: number) => (
+              {(vdl.outcomes || vehicleDesignLab.outcomes).map((out: VdlOutcomeItem, idx: number) => (
                 <div key={idx} className="vdl-outcome-card">
                   <div className="vdl-outcome-title">{out.title}</div>
                   <p className="vdl-outcome-text">{renderBold(out.text)}</p>
@@ -536,17 +554,24 @@ export default function VehicleDesignLabPage({ item, sections }: VehicleDesignLa
       )}
 
       {/* DYNAMIC CUSTOM SECTIONS */}
-      {sections.some((s) => s.placement === 'intro') && (
-        <div style={{ marginTop: '2rem' }}>
-          <CustomSectionsIntro sections={sections} />
-        </div>
-      )}
-      {sections.length > 0 && (
-        <div style={{ marginTop: '2.5rem' }}>
-          <CustomSectionsGalleries sections={sections} />
-          <CustomSectionsAccordion sections={sections.filter((s) => s.placement !== 'intro' && s.contentType !== 'gallery')} />
-        </div>
-      )}
+      {(() => {
+        const effectiveSections = (vdl.customSections && vdl.customSections.length > 0) ? vdl.customSections : sections;
+        return (
+          <>
+            {effectiveSections.some((s) => s.placement === 'intro') && (
+              <div style={{ marginTop: '2rem' }}>
+                <CustomSectionsIntro sections={effectiveSections} />
+              </div>
+            )}
+            {effectiveSections.length > 0 && (
+              <div style={{ marginTop: '2.5rem' }}>
+                <CustomSectionsGalleries sections={effectiveSections} />
+                <CustomSectionsAccordion sections={effectiveSections.filter((s) => s.placement !== 'intro' && s.contentType !== 'gallery')} />
+              </div>
+            )}
+          </>
+        );
+      })()}
 
       {/* LIGHTBOX MODAL */}
       {lightboxImg && (

@@ -75,20 +75,23 @@ export default function UltraTechPage({
   } = source;
 
   const overviewText =
-    item?.description?.textContent ||
-    descriptionSection?.textContent ||
-    item?.desc ||
-    overview;
+    (Array.isArray(overview) && overview.length > 0)
+      ? overview
+      : (item?.description?.textContent || descriptionSection?.textContent || item?.desc || ultraTechCoe.overview);
 
   const visionText =
-    (item?.vision && hasCustomSectionContent(item.vision) && (item.vision.textContent || item.vision.listText)) ||
-    introBlocks.find((s) => s.id === 'vision')?.textContent?.trim() ||
-    (typeof vision === 'string' ? vision : '');
+    (typeof vision === 'string' && vision.trim().length > 0)
+      ? vision
+      : ((item?.vision && (item.vision.textContent || item.vision.listText)) ||
+         introBlocks.find((s) => s.id === 'vision')?.textContent?.trim() ||
+         ultraTechCoe.vision);
 
   const missionList =
-    (item?.mission && hasCustomSectionContent(item.mission) && (item.mission.listText?.split('\n').filter(Boolean) || [item.mission.textContent || ''])) ||
-    introBlocks.find((s) => s.id === 'mission')?.listText?.split('\n').map((s) => s.trim()).filter(Boolean) ||
-    mission;
+    (Array.isArray(mission) && mission.length > 0)
+      ? mission
+      : ((item?.mission && (item.mission.listText?.split('\n').filter(Boolean) || [item.mission.textContent || ''])) ||
+         introBlocks.find((s) => s.id === 'mission')?.listText?.split('\n').map((s) => s.trim()).filter(Boolean) ||
+         ultraTechCoe.mission);
 
   const objectivesText =
     (item?.objectives && hasCustomSectionContent(item.objectives) && (item.objectives.textContent || item.objectives.listText)) ||
@@ -115,8 +118,13 @@ export default function UltraTechPage({
     );
   };
 
+  const allCustomSections = [
+    ...customSections,
+    ...(remoteData?.additionalSections || []),
+  ];
+
   // Filter out any custom sections that duplicate our hardcoded blocks or are removed
-  const accordionSections = customSections.filter(
+  const accordionSections = allCustomSections.filter(
     (s) => !isExcluded(s.id, s.label)
   );
 
@@ -693,8 +701,8 @@ export default function UltraTechPage({
               Student Technical Learning Activity
             </h3>
           </div>
-          {customSections.length > 0 && (
-            <CustomSectionsGalleries sections={customSections} />
+          {allCustomSections.length > 0 && (
+            <CustomSectionsGalleries sections={allCustomSections} />
           )}
         </section>
       </div>

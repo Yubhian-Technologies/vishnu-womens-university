@@ -32,13 +32,95 @@ import { fetchPriorityAttr } from '../../lib/domAttrs';
 import { CustomSectionsIntro, CustomSectionsGalleries, CustomSectionsAccordion } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import { hasCustomSectionContent, type CustomSectionPhoto } from '../../lib/customSections';
 import { DIFFERENTIATOR_CATEGORIES, type DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
-import { assistiveTechLab } from './assistiveTechLab.data';
+import { assistiveTechLab, type AtlStudentRosterYear, type AtlBlock, type AtlExhibitionYear, type AtlExhibitionShowcase, type AtlProjectOutcome, type AtlClientVisitYear, type AtlInnovationFair } from './assistiveTechLab.data';
 import { useDocument } from '../../hooks/useDocument';
 import type { AssistiveTechLabDoc } from '../Admin/sections/AssistiveTechContentAdmin';
 import { renderBold } from '../../lib/boldText';
 import './AssistiveTechLab.css';
 
 const SLUG = 'assistive-tech-lab';
+
+// Helper to render activity/exhibition blocks
+function renderAtlBlock(block: AtlBlock, bIdx: number) {
+  switch (block.type) {
+    case 'meta':
+      return (
+        <div key={bIdx} className="atl-block-meta">
+          {block.items.map((item, i) => (
+            <div key={i} className="atl-meta-item">
+              <strong>{item.label}:</strong> {item.value}
+            </div>
+          ))}
+        </div>
+      );
+    case 'paragraph':
+      return (
+        <p key={bIdx} className="atl-block-paragraph">
+          {renderBold(block.text)}
+        </p>
+      );
+    case 'heading':
+      return (
+        <h4 key={bIdx} className="atl-block-heading">
+          {block.text}
+        </h4>
+      );
+    case 'bullets':
+      return (
+        <ul key={bIdx} className="atl-block-bullets">
+          {block.items.map((item, i) => (
+            <li key={i}>{renderBold(item)}</li>
+          ))}
+        </ul>
+      );
+    case 'boldBullets':
+      return (
+        <ul key={bIdx} className="atl-block-bullets">
+          {block.items.map((item, i) => (
+            <li key={i}>
+              <strong>{item.lead}</strong> {renderBold(item.text)}
+            </li>
+          ))}
+        </ul>
+      );
+    case 'numbered':
+      return (
+        <ol key={bIdx} className="atl-block-numbered">
+          {block.items.map((item, i) => (
+            <li key={i}>{renderBold(item)}</li>
+          ))}
+        </ol>
+      );
+    case 'table':
+      return (
+        <div key={bIdx} className="atl-block-table-wrap">
+          {block.title && <h5 className="atl-table-subheading">{block.title}</h5>}
+          <div className="atl-table-container">
+            <table className="atl-table atl-table--sm">
+              <thead>
+                <tr>
+                  {block.table.headers.map((h, i) => (
+                    <th key={i}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {block.table.rows.map((row, rIdx) => (
+                  <tr key={rIdx}>
+                    {row.cells.map((cell, cIdx) => (
+                      <td key={cIdx}>{cell}</td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      );
+    default:
+      return null;
+  }
+}
 
 // Resolves an AtlDevice's `icon` key (plain data — see assistiveTechLab.data.ts)
 // to its lucide component. An unrecognized key (e.g. an older admin-saved
@@ -60,8 +142,42 @@ export default function AssistiveTechLab() {
   const [lightbox, setLightbox] = useState<{ photos: { imageUrl: string; caption?: string }[]; index: number } | null>(null);
   const [activeNav, setActiveNav] = useState('overview');
   const [selectedYearIdx, setSelectedYearIdx] = useState(0);
+  const [activeStudentTabIdx, setActiveStudentTabIdx] = useState<number | null>(null);
+  const [activeExhibitionTabIdx, setActiveExhibitionTabIdx] = useState<number | null>(null);
+  const [activeShowcaseTabIdx, setActiveShowcaseTabIdx] = useState<number | null>(null);
+  const [activeOutcomeTabIdx, setActiveOutcomeTabIdx] = useState<number | null>(null);
+  const [activeClientVisitTabIdx, setActiveClientVisitTabIdx] = useState<number | null>(null);
+  const [activeInnovationTabIdx, setActiveInnovationTabIdx] = useState<number | null>(null);
   const { data: remoteData } = useDocument<AssistiveTechLabDoc>('settings', 'assistiveTechLab');
   const atl = { ...assistiveTechLab, ...(remoteData || {}) };
+
+  const exhibitionReports: AtlExhibitionYear[] = (remoteData?.exhibitionReports && remoteData.exhibitionReports.length > 0)
+    ? remoteData.exhibitionReports
+    : (atl.exhibitionReports || []);
+
+  const exhibitionShowcases: AtlExhibitionShowcase[] = (remoteData?.exhibitionShowcases && remoteData.exhibitionShowcases.length > 0)
+    ? remoteData.exhibitionShowcases
+    : (atl.exhibitionShowcases || []);
+
+  const atlOutcomes: AtlProjectOutcome[] = (remoteData?.atlOutcomes && remoteData.atlOutcomes.length > 0)
+    ? remoteData.atlOutcomes
+    : (atl.atlOutcomes || []);
+
+  const clientVisits: AtlClientVisitYear[] = (remoteData?.clientVisits && remoteData.clientVisits.length > 0)
+    ? remoteData.clientVisits
+    : (atl.clientVisits || []);
+
+  const innovationFairs: AtlInnovationFair[] = (remoteData?.innovationFairs && remoteData.innovationFairs.length > 0)
+    ? remoteData.innovationFairs
+    : (atl.innovationFairs || []);
+
+  const studentRosters: AtlStudentRosterYear[] = (remoteData?.studentRosters && remoteData.studentRosters.length > 0)
+    ? remoteData.studentRosters
+    : [
+        { id: '2023-24', yearLabel: atl.studentsBenefitted?.yearLabel || 'Students Benefitted: Academic Year 2023-24', type: 'batches', batches: atl.studentsBenefitted?.batches || [] },
+        { id: '2024-25', yearLabel: atl.studentsBenefitted2024?.yearLabel || 'Students Benefitted: Academic Year 2024-25', type: 'batches', batches: atl.studentsBenefitted2024?.batches || [] },
+        { id: '2025-26', yearLabel: 'ATL Selected Students (2025-26)', type: 'table', table: atl.selectedStudents2025 || { headers: [], rows: [] } },
+      ];
 
   const dynamicTitle = item?.title || 'Assistive Technology Lab (ATL)';
   const dynamicSubtitle = item?.summary || item?.desc || 'A visionary center established in collaboration with University of Massachusetts (UMass), Lowell, USA — applying multidisciplinary engineering to design life-changing devices for the differently-abled.';
@@ -117,7 +233,9 @@ export default function AssistiveTechLab() {
     heroSlides[0]?.imageUrl;
 
   // Extract dynamic photos from Firestore custom sections
-  const customSections = item?.customSections || [];
+  const customSections = (remoteData?.customSections && remoteData.customSections.length > 0)
+    ? remoteData.customSections
+    : (item?.customSections || []);
   const gallerySections = customSections.filter((s) => s.contentType === 'gallery' && hasCustomSectionContent(s));
   const dynamicPhotos: CustomSectionPhoto[] = gallerySections.flatMap((s) => s.galleryPhotos || []).filter((p) => p.imageUrl);
 
@@ -499,6 +617,322 @@ export default function AssistiveTechLab() {
         </div>
       </section>
 
+      {/* 5.1 International Day of Persons with Disabilities — Exhibition Days & Event Reports */}
+      {exhibitionReports.length > 0 && (
+        <section id="exhibitions" className="atl-section atl-section--compact atl-section--alt">
+          <div className="container">
+            <div className="atl-section-header atl-section-header--sm">
+              <span className="atl-section-label">
+                <Sparkles size={14} /> Annual Flagship Showcases
+              </span>
+              <h2 className="atl-section-title">International Day of Persons with Disabilities — Exhibition Days & Event Reports</h2>
+              <p className="atl-section-lead">
+                Comprehensive annual exhibition reports, beneficiary product distributions, keynote addresses, and event proceedings.
+              </p>
+            </div>
+
+            <div className="atl-students-unified-card">
+              {/* Horizontal Pill Track for Academic Years */}
+              <div className="atl-students-pill-track">
+                {exhibitionReports.map((report, idx) => {
+                  const isActive = activeExhibitionTabIdx === idx;
+                  return (
+                    <button
+                      key={report.id || idx}
+                      type="button"
+                      onClick={() => setActiveExhibitionTabIdx(isActive ? null : idx)}
+                      className={`atl-student-pill-btn ${isActive ? 'is-active' : ''}`}
+                    >
+                      <span className="atl-pill-num">{String(idx + 1).padStart(2, '0')}</span>
+                      <span className="atl-pill-title">{report.yearLabel}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Active Exhibition Year Content */}
+              {activeExhibitionTabIdx !== null && exhibitionReports[activeExhibitionTabIdx] && (
+                <div className="atl-students-content-pane" style={{ padding: '0.5rem 0.25rem' }}>
+                  <h3 className="atl-exhibition-pane-title">
+                    {exhibitionReports[activeExhibitionTabIdx].title}
+                  </h3>
+                  <div className="atl-exhibition-blocks">
+                    {(exhibitionReports[activeExhibitionTabIdx].blocks || []).map((b, bIdx) => renderAtlBlock(b, bIdx))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* 5.2 National & Regional Project Exhibitions & Summits */}
+      {exhibitionShowcases.length > 0 && (
+        <section id="showcases" className="atl-section atl-section--compact">
+          <div className="container">
+            <div className="atl-section-header atl-section-header--sm">
+              <span className="atl-section-label">
+                <Globe2 size={14} /> Fairs & Summits
+              </span>
+              <h2 className="atl-section-title">National & Regional Project Exhibitions & Summits</h2>
+              <p className="atl-section-lead">
+                Student team presentations, prototypes, and awards at prestigious summits and regional meets across India.
+              </p>
+            </div>
+
+            <div className="atl-students-unified-card">
+              {/* Horizontal Pill Track for Exhibition Showcase Events */}
+              <div className="atl-students-pill-track">
+                {exhibitionShowcases.map((showcase, idx) => {
+                  const isActive = activeShowcaseTabIdx === idx;
+                  return (
+                    <button
+                      key={showcase.id || idx}
+                      type="button"
+                      onClick={() => setActiveShowcaseTabIdx(isActive ? null : idx)}
+                      className={`atl-student-pill-btn ${isActive ? 'is-active' : ''}`}
+                    >
+                      <span className="atl-pill-num">{String(idx + 1).padStart(2, '0')}</span>
+                      <span className="atl-pill-title">{showcase.tabLabel || showcase.title}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Active Showcase Content */}
+              {activeShowcaseTabIdx !== null && exhibitionShowcases[activeShowcaseTabIdx] && (
+                <div className="atl-students-content-pane">
+                  <h3 className="atl-exhibition-pane-title" style={{ marginBottom: '1rem' }}>
+                    {exhibitionShowcases[activeShowcaseTabIdx].title}
+                  </h3>
+
+                  {exhibitionShowcases[activeShowcaseTabIdx].type === 'batches' &&
+                    (exhibitionShowcases[activeShowcaseTabIdx].batches || []).length > 0 && (
+                      <div className="atl-batches-grid">
+                        {(exhibitionShowcases[activeShowcaseTabIdx].batches || []).map((batch, bIdx) => (
+                          <div key={bIdx} className="atl-batch-compact-card">
+                            <div className="atl-batch-mini-header" style={{ marginTop: 0 }}>
+                              <div className="atl-batch-header-left">
+                                <span className="atl-batch-badge">Batch {batch.batchNo}</span>
+                                {batch.batchName && (
+                                  <span className="atl-batch-name-tag">{batch.batchName}</span>
+                                )}
+                                {batch.selectedProject && (
+                                  <span className="atl-batch-project-title">
+                                    Project: {batch.selectedProject}
+                                  </span>
+                                )}
+                              </div>
+                              {batch.mentors && (
+                                <span className="atl-batch-mentors-tag">Mentors: {batch.mentors}</span>
+                              )}
+                            </div>
+
+                            <div className="atl-table-container" style={{ marginTop: '0.5rem' }}>
+                              <table className="atl-table atl-table--sm">
+                                <thead>
+                                  <tr>
+                                    <th>Regd. No</th>
+                                    <th>Student Name</th>
+                                    <th>Department</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {(batch.members || []).map((m, mIdx) => (
+                                    <tr key={mIdx}>
+                                      <td className="atl-cell-mono">{m.regdNo}</td>
+                                      <td className="atl-cell-bold">{m.name}</td>
+                                      <td>{m.department}</td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                  {exhibitionShowcases[activeShowcaseTabIdx].type === 'table' &&
+                    exhibitionShowcases[activeShowcaseTabIdx].table && (
+                      <div className="atl-table-container">
+                        <table className="atl-table atl-table--sm">
+                          <thead>
+                            <tr>
+                              {(exhibitionShowcases[activeShowcaseTabIdx].table?.headers || []).map((h, i) => (
+                                <th key={i}>{h}</th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {(exhibitionShowcases[activeShowcaseTabIdx].table?.rows || []).map((row, rIdx) => (
+                              <tr key={rIdx}>
+                                {(row.cells || []).map((cell, cIdx) => (
+                                  <td key={cIdx} className={cIdx === 2 || cIdx === 4 ? 'atl-cell-bold' : ''}>
+                                    {cell}
+                                  </td>
+                                ))}
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* 5.3 ATL Project Outcomes & Tech Fests */}
+      {atlOutcomes.length > 0 && (
+        <section id="outcomes" className="atl-section atl-section--compact atl-section--alt">
+          <div className="container">
+            <div className="atl-section-header atl-section-header--sm">
+              <span className="atl-section-label">
+                <Sparkles size={14} /> Innovations & Competition Results
+              </span>
+              <h2 className="atl-section-title">ATL Project Outcomes & Tech Fests</h2>
+              <p className="atl-section-lead">
+                Specialized project outcomes, award-winning innovations, and competition results achieved by Assistive Technology Lab teams.
+              </p>
+            </div>
+
+            <div className="atl-students-unified-card">
+              {/* Horizontal Pill Track for Project Outcomes */}
+              <div className="atl-students-pill-track">
+                {atlOutcomes.map((outcome, idx) => {
+                  const isActive = activeOutcomeTabIdx === idx;
+                  return (
+                    <button
+                      key={outcome.id || idx}
+                      type="button"
+                      onClick={() => setActiveOutcomeTabIdx(isActive ? null : idx)}
+                      className={`atl-student-pill-btn ${isActive ? 'is-active' : ''}`}
+                    >
+                      <span className="atl-pill-num">{String(idx + 1).padStart(2, '0')}</span>
+                      <span className="atl-pill-title">{outcome.tabLabel || outcome.title}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Active Outcome Content */}
+              {activeOutcomeTabIdx !== null && atlOutcomes[activeOutcomeTabIdx] && (
+                <div className="atl-students-content-pane" style={{ padding: '0.5rem 0.25rem' }}>
+                  <h3 className="atl-exhibition-pane-title">
+                    {atlOutcomes[activeOutcomeTabIdx].title}
+                  </h3>
+                  <div className="atl-exhibition-blocks">
+                    {(atlOutcomes[activeOutcomeTabIdx].blocks || []).map((b, bIdx) => renderAtlBlock(b, bIdx))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* 5.4 Zion School & Client Field Visits */}
+      {clientVisits.length > 0 && (
+        <section id="client-visits" className="atl-section atl-section--compact">
+          <div className="container">
+            <div className="atl-section-header atl-section-header--sm">
+              <span className="atl-section-label">
+                <Globe2 size={14} /> School & Client Visits
+              </span>
+              <h2 className="atl-section-title">Zion School & Client Field Visits</h2>
+              <p className="atl-section-lead">
+                Outreach initiatives, school student visits, and assistive technology client consultation reports.
+              </p>
+            </div>
+
+            <div className="atl-students-unified-card">
+              {/* Horizontal Pill Track for Client Visits */}
+              <div className="atl-students-pill-track">
+                {clientVisits.map((visit, idx) => {
+                  const isActive = activeClientVisitTabIdx === idx;
+                  return (
+                    <button
+                      key={visit.id || idx}
+                      type="button"
+                      onClick={() => setActiveClientVisitTabIdx(isActive ? null : idx)}
+                      className={`atl-student-pill-btn ${isActive ? 'is-active' : ''}`}
+                    >
+                      <span className="atl-pill-num">{String(idx + 1).padStart(2, '0')}</span>
+                      <span className="atl-pill-title">{visit.tabLabel || visit.title}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Active Client Visit Content */}
+              {activeClientVisitTabIdx !== null && clientVisits[activeClientVisitTabIdx] && (
+                <div className="atl-students-content-pane" style={{ padding: '0.5rem 0.25rem' }}>
+                  <h3 className="atl-exhibition-pane-title">
+                    {clientVisits[activeClientVisitTabIdx].title}
+                  </h3>
+                  <div className="atl-exhibition-blocks">
+                    {(clientVisits[activeClientVisitTabIdx].blocks || []).map((b, bIdx) => renderAtlBlock(b, bIdx))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* 5.5 Innovation Fairs & Regional Expos */}
+      {innovationFairs.length > 0 && (
+        <section id="innovation-fairs" className="atl-section atl-section--compact atl-section--alt">
+          <div className="container">
+            <div className="atl-section-header atl-section-header--sm">
+              <span className="atl-section-label">
+                <Sparkles size={14} /> Project Fairs & Expos
+              </span>
+              <h2 className="atl-section-title">Innovation Project Fairs & Regional Expos</h2>
+              <p className="atl-section-lead">
+                State-level project exhibitions, innovation hub showcases, and incubation center inauguration expos.
+              </p>
+            </div>
+
+            <div className="atl-students-unified-card">
+              {/* Horizontal Pill Track for Innovation Fairs */}
+              <div className="atl-students-pill-track">
+                {innovationFairs.map((fair, idx) => {
+                  const isActive = activeInnovationTabIdx === idx;
+                  return (
+                    <button
+                      key={fair.id || idx}
+                      type="button"
+                      onClick={() => setActiveInnovationTabIdx(isActive ? null : idx)}
+                      className={`atl-student-pill-btn ${isActive ? 'is-active' : ''}`}
+                    >
+                      <span className="atl-pill-num">{String(idx + 1).padStart(2, '0')}</span>
+                      <span className="atl-pill-title">{fair.tabLabel || fair.title}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Active Innovation Fair Content */}
+              {activeInnovationTabIdx !== null && innovationFairs[activeInnovationTabIdx] && (
+                <div className="atl-students-content-pane" style={{ padding: '0.5rem 0.25rem' }}>
+                  <h3 className="atl-exhibition-pane-title">
+                    {innovationFairs[activeInnovationTabIdx].title}
+                  </h3>
+                  <div className="atl-exhibition-blocks">
+                    {(innovationFairs[activeInnovationTabIdx].blocks || []).map((b, bIdx) => renderAtlBlock(b, bIdx))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* 6. Leadership & Faculty Mentors Roster */}
       <section id="faculty" className="atl-section atl-section--alt">
         <div className="container">
@@ -659,6 +1093,121 @@ export default function AssistiveTechLab() {
         </section>
       )}
 
+      {/* 9. Unified Students Benefitted & Selected Students Roster (Compact Horizontal Tab Bar) */}
+      <section id="students" className="atl-section atl-section--compact">
+        <div className="container">
+          <div className="atl-section-header atl-section-header--sm">
+            <span className="atl-section-label">
+              <Users size={14} /> Student Roster & Beneficiaries
+            </span>
+            <h2 className="atl-section-title">Students Benefitted & Selected Students Roster</h2>
+            <p className="atl-section-lead">
+              Comprehensive rosters of students trained, project batches mentored, and selected innovators in the Assistive Technology Lab.
+            </p>
+          </div>
+
+          <div className="atl-students-unified-card">
+            {/* Horizontal Pill Track for Academic Years */}
+            <div className="atl-students-pill-track">
+              {studentRosters.map((roster, idx) => {
+                const isActive = activeStudentTabIdx === idx;
+                return (
+                  <button
+                    key={roster.id || idx}
+                    type="button"
+                    onClick={() => setActiveStudentTabIdx(isActive ? null : idx)}
+                    className={`atl-student-pill-btn ${isActive ? 'is-active' : ''}`}
+                  >
+                    <span className="atl-pill-num">{String(idx + 1).padStart(2, '0')}</span>
+                    <span className="atl-pill-title">{roster.yearLabel}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Active Academic Year Content */}
+            {activeStudentTabIdx !== null && studentRosters[activeStudentTabIdx] && (
+              <div className="atl-students-content-pane">
+                {studentRosters[activeStudentTabIdx].type === 'batches' &&
+                  (studentRosters[activeStudentTabIdx].batches || []).length > 0 && (
+                    <div className="atl-batches-grid">
+                      {(studentRosters[activeStudentTabIdx].batches || []).map((batch, bIdx) => (
+                        <div key={bIdx} className="atl-batch-compact-card">
+                          <div className="atl-batch-mini-header" style={{ marginTop: 0 }}>
+                            <div className="atl-batch-header-left">
+                              <span className="atl-batch-badge">Batch {batch.batchNo}</span>
+                              {batch.batchName && (
+                                <span className="atl-batch-name-tag">
+                                  {batch.batchName}
+                                </span>
+                              )}
+                              {batch.selectedProject && (
+                                <span className="atl-batch-project-title">
+                                  Project: {batch.selectedProject}
+                                </span>
+                              )}
+                            </div>
+                            {batch.mentors && (
+                              <span className="atl-batch-mentors-tag">
+                                Mentors: {batch.mentors}
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="atl-table-container" style={{ marginTop: '0.5rem' }}>
+                            <table className="atl-table atl-table--sm">
+                              <thead>
+                                <tr>
+                                  <th>Regd. No</th>
+                                  <th>Student Name</th>
+                                  <th>Department</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {(batch.members || []).map((m, mIdx) => (
+                                  <tr key={mIdx}>
+                                    <td className="atl-cell-mono">{m.regdNo}</td>
+                                    <td className="atl-cell-bold">{m.name}</td>
+                                    <td>{m.department}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                {studentRosters[activeStudentTabIdx].type === 'table' &&
+                  studentRosters[activeStudentTabIdx].table && (
+                    <div className="atl-table-container">
+                      <table className="atl-table atl-table--sm">
+                        <thead>
+                          <tr>
+                            {(studentRosters[activeStudentTabIdx].table?.headers || []).map((h, i) => (
+                              <th key={i}>{h}</th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {(studentRosters[activeStudentTabIdx].table?.rows || []).map((row, rIdx) => (
+                            <tr key={rIdx}>
+                              {(row.cells || []).map((cell, cIdx) => (
+                                <td key={cIdx} className={cIdx === 3 ? 'atl-cell-bold' : ''}>{cell}</td>
+                              ))}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
       {/* DYNAMIC CUSTOM SECTIONS */}
       {customSections.some((s) => s.placement === 'intro') && (
         <section className="atl-section">
@@ -667,11 +1216,69 @@ export default function AssistiveTechLab() {
           </div>
         </section>
       )}
-      {customSections.length > 0 && (
+      {customSections.some((s) => {
+        const title = (s.label || '').trim().toLowerCase();
+        const isExcluded =
+          title === 'team' ||
+          title.startsWith('atl activities') ||
+          title === 'key highlights' ||
+          title === 'highlights' ||
+          s.id === 'highlights' ||
+          title.startsWith('students benefitted') ||
+          title.startsWith('atl selected students') ||
+          title.includes('selected students') ||
+          title.includes('international day of persons with disabilities') ||
+          title.includes('exhibition day') ||
+          title.includes('kl university') ||
+          title.includes('iit madras') ||
+          title.includes('telangana') ||
+          title.includes('projects exhibiting') ||
+          title.includes('trance') ||
+          title.includes('iic regional') ||
+          title.includes('zion') ||
+          title.includes('client visit') ||
+          title.includes('jntu kakinada') ||
+          title.includes('avishkandhra') ||
+          title.includes('rtih') ||
+          title.includes('incubation center inauguration') ||
+          title.includes('project expo at rajahmundry') ||
+          title.includes('innovation project fair');
+        return s.placement !== 'intro' && s.contentType !== 'gallery' && !isExcluded;
+      }) && (
         <section className="atl-section">
           <div className="container">
             <CustomSectionsGalleries sections={customSections} />
-            <CustomSectionsAccordion sections={customSections.filter((s) => s.placement !== 'intro' && s.contentType !== 'gallery')} />
+            <CustomSectionsAccordion
+              sections={customSections.filter((s) => {
+                const title = (s.label || '').trim().toLowerCase();
+                const isExcluded =
+                  title === 'team' ||
+                  title.startsWith('atl activities') ||
+                  title === 'key highlights' ||
+                  title === 'highlights' ||
+                  s.id === 'highlights' ||
+                  title.startsWith('students benefitted') ||
+                  title.startsWith('atl selected students') ||
+                  title.includes('selected students') ||
+                  title.includes('international day of persons with disabilities') ||
+                  title.includes('exhibition day') ||
+                  title.includes('kl university') ||
+                  title.includes('iit madras') ||
+                  title.includes('telangana') ||
+                  title.includes('projects exhibiting') ||
+                  title.includes('trance') ||
+                  title.includes('iic regional') ||
+                  title.includes('zion') ||
+                  title.includes('client visit') ||
+                  title.includes('jntu kakinada') ||
+                  title.includes('avishkandhra') ||
+                  title.includes('rtih') ||
+                  title.includes('incubation center inauguration') ||
+                  title.includes('project expo at rajahmundry') ||
+                  title.includes('innovation project fair');
+                return s.placement !== 'intro' && s.contentType !== 'gallery' && !isExcluded;
+              })}
+            />
           </div>
         </section>
       )}
