@@ -124,13 +124,30 @@ export default function IdeaLabPage({ item, sections = [] }: IdeaLabPageProps) {
     email: ideaDoc?.officialInfo?.email || aicteIdeaLab.officialInfo.email,
   };
 
-  const additionalSections = ideaDoc?.additionalSections || [];
-  const adminTabs = item?.tabs || [];
+  const isAboutIdeaLabTab = (id?: string, labelOrTitle?: string) => {
+    const normId = (id || '').trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+    const normLabel = (labelOrTitle || '').trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+    return (
+      normId === 'aboutaicteidealab' ||
+      normLabel === 'aboutaicteidealab' ||
+      normId === 'aboutidealab' ||
+      normLabel === 'aboutidealab' ||
+      (normLabel.includes('about') && normLabel.includes('idealab')) ||
+      (normId.includes('about') && normId.includes('idealab'))
+    );
+  };
+
+  const additionalSections = (ideaDoc?.additionalSections || []).filter(
+    (sec) => !isAboutIdeaLabTab(sec.id, sec.title)
+  );
+  const adminTabs = (item?.tabs || []).filter(
+    (tab) => !isAboutIdeaLabTab(tab.id, tab.label)
+  );
 
   const [activeTabId, setActiveTabId] = useState<string>(() => {
     if (typeof window !== 'undefined') {
       const hash = window.location.hash.replace('#', '');
-      if (hash) {
+      if (hash && !isAboutIdeaLabTab(hash, hash)) {
         return hash;
       }
     }
@@ -138,10 +155,21 @@ export default function IdeaLabPage({ item, sections = [] }: IdeaLabPageProps) {
   });
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash.replace('#', '');
+      if (isAboutIdeaLabTab(hash, hash)) {
+        window.history.replaceState(null, '', window.location.pathname + window.location.search);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '');
-      if (hash) {
+      if (hash && !isAboutIdeaLabTab(hash, hash)) {
         setActiveTabId(hash);
+      } else if (isAboutIdeaLabTab(hash, hash)) {
+        setActiveTabId('overview');
       }
     };
     window.addEventListener('hashchange', handleHashChange);
