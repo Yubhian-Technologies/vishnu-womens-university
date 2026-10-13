@@ -97,6 +97,27 @@
   margin-bottom: var(--space-3, 0.75rem);
 }
 
+.vsac-overview-text p {
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 0.925rem;
+  line-height: 1.65;
+  margin-bottom: 0.75rem;
+}
+
+.vsac-overview-text p:last-child {
+  margin-bottom: 0;
+}
+
+.vsac-overview-text ul {
+  margin: 0.5rem 0;
+  padding-left: 1.25rem;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.vsac-overview-text li {
+  margin-bottom: 0.25rem;
+}
+
 .vsac-overview-text:last-child {
   margin-bottom: 0;
 }

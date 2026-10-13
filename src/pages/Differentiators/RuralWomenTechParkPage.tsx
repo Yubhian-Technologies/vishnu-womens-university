@@ -20,6 +20,7 @@ import { useDocument } from '../../hooks/useDocument';
 import { ruralWomenTechPark } from './ruralWomenTechPark.data';
 import type { RuralWomenTechParkDoc } from '../Admin/sections/RuralWomenTechParkContentAdmin';
 import { renderBold } from '../../lib/boldText';
+import BodyBlocks, { parseBodyContent } from '../../components/BodyBlocks/BodyBlocks';
 import './rural-women-tech-park.css';
 
 interface RwtpReportLink {
@@ -217,9 +218,13 @@ export default function RuralWomenTechParkPage({
             <div className="rwtp-about-tag-badge">
               <Leaf size={16} /> ABOUT WTP
             </div>
-            <p className="rwtp-about-text">
-              {renderBold(dynamicAbout)}
-            </p>
+            <div className="rwtp-about-text">
+              <BodyBlocks
+                blocks={parseBodyContent(dynamicAbout)}
+                paragraphStyle={{ color: '#2d4236', lineHeight: 1.7, fontSize: '0.95rem' }}
+                strongStyle={{ fontWeight: 700, color: '#163327' }}
+              />
+            </div>
             <svg
               className="rwtp-about-leaf-bg"
               width="120"
@@ -355,7 +360,13 @@ export default function RuralWomenTechParkPage({
                         <div key={idx} className="rwtp-intervention-block">
                           <h4 className="rwtp-intervention-title">{interv.title}</h4>
                           {interv.paragraphs.map((p, pIdx) => (
-                            <p key={pIdx} className="rwtp-intervention-desc">{renderBold(p)}</p>
+                            <div key={pIdx} className="rwtp-intervention-desc">
+                              <BodyBlocks
+                                blocks={parseBodyContent(p)}
+                                paragraphStyle={{ color: '#3b5244', fontSize: '0.875rem', lineHeight: 1.65 }}
+                                strongStyle={{ fontWeight: 700, color: '#163327' }}
+                              />
+                            </div>
                           ))}
                         </div>
                       ))}
@@ -367,7 +378,13 @@ export default function RuralWomenTechParkPage({
                         <div key={idx} className="rwtp-intervention-block">
                           <h4 className="rwtp-intervention-title">{interv.title}</h4>
                           {interv.paragraphs.map((p, pIdx) => (
-                            <p key={pIdx} className="rwtp-intervention-desc">{renderBold(p)}</p>
+                            <div key={pIdx} className="rwtp-intervention-desc">
+                              <BodyBlocks
+                                blocks={parseBodyContent(p)}
+                                paragraphStyle={{ color: '#3b5244', fontSize: '0.875rem', lineHeight: 1.65 }}
+                                strongStyle={{ fontWeight: 700, color: '#163327' }}
+                              />
+                            </div>
                           ))}
                         </div>
                       ))}
@@ -375,9 +392,17 @@ export default function RuralWomenTechParkPage({
                   </div>
 
                   {(rwtp.paragraphs || []).length > 0 && (
-                    <p className="rwtp-step-summary-paragraph">
-                      {renderBold(rwtp.paragraphs[rwtp.paragraphs.length - 1])}
-                    </p>
+                    <div className="rwtp-step-summary-paragraph">
+                      {(rwtp.paragraphs || []).map((p, pIdx) => (
+                        <div key={pIdx} style={{ marginBottom: pIdx < (rwtp.paragraphs || []).length - 1 ? '0.75rem' : 0 }}>
+                          <BodyBlocks
+                            blocks={parseBodyContent(p)}
+                            paragraphStyle={{ color: '#3b5244', fontSize: '0.875rem', lineHeight: 1.65 }}
+                            strongStyle={{ fontWeight: 700, color: '#163327' }}
+                          />
+                        </div>
+                      ))}
+                    </div>
                   )}
                 </div>
               )}
@@ -504,7 +529,13 @@ export default function RuralWomenTechParkPage({
                       (rwtp as any).facilities.map((fac: { title: string; description: string }, idx: number) => (
                         <div key={idx}>
                           <h4 className="rwtp-intervention-title">{fac.title}</h4>
-                          <p className="rwtp-intervention-desc">{renderBold(fac.description)}</p>
+                          <div className="rwtp-intervention-desc">
+                            <BodyBlocks
+                              blocks={parseBodyContent(fac.description)}
+                              paragraphStyle={{ color: '#3b5244', fontSize: '0.875rem', lineHeight: 1.65 }}
+                              strongStyle={{ fontWeight: 700, color: '#163327' }}
+                            />
+                          </div>
                         </div>
                       ))
                     ) : (
@@ -547,9 +578,13 @@ export default function RuralWomenTechParkPage({
 
               {openItems['05'] && (
                 <div className="rwtp-step-content">
-                  <p className="rwtp-intervention-desc">
-                    {renderBold((rwtp as any).outcomes || `Over 1400+ rural women and self-help group members have gained sustainable livelihoods, technical independence, and financial inclusion through the technology park initiatives.`)}
-                  </p>
+                  <div className="rwtp-intervention-desc">
+                    <BodyBlocks
+                      blocks={parseBodyContent((rwtp as any).outcomes || `Over 1400+ rural women and self-help group members have gained sustainable livelihoods, technical independence, and financial inclusion through the technology park initiatives.`)}
+                      paragraphStyle={{ color: '#3b5244', fontSize: '0.875rem', lineHeight: 1.65 }}
+                      strongStyle={{ fontWeight: 700, color: '#163327' }}
+                    />
+                  </div>
                 </div>
               )}
             </div>

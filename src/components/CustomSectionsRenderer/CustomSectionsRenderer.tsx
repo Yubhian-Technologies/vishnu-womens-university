@@ -5,6 +5,7 @@ import { parseFlexibleTable, parseLinkList } from '../../lib/structuredTable';
 import FlexibleTable from '../FlexibleTable/FlexibleTable';
 import SmoothCollapse from '../SmoothCollapse/SmoothCollapse';
 import { linkify } from '../../lib/linkify';
+import BodyBlocks, { parseBodyContent } from '../BodyBlocks/BodyBlocks';
 import './CustomSectionsRenderer.css';
 
 // Renders admin-defined custom sections (see lib/customSections.ts).
@@ -207,7 +208,9 @@ function PersonPanelList({ people }: { people: CustomSection[] }) {
                       style={{ width: 70, height: 70, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '1px solid var(--color-light-gray)' }}
                     />
                   )}
-                  <p style={{ flex: '1 1 240px', color: 'var(--color-text)', lineHeight: 1.8, whiteSpace: 'pre-line', margin: 0 }}>{linkify(person.textContent || '')}</p>
+                  <div style={{ flex: '1 1 240px', color: 'var(--color-text)', lineHeight: 1.8 }}>
+                    <BodyBlocks blocks={parseBodyContent(person.textContent || '')} paragraphStyle={{ margin: 0 }} />
+                  </div>
                 </div>
               </SmoothCollapse>
             )}
@@ -612,9 +615,10 @@ function CustomSectionBodyContent({ section, departmentSlug, categorySlug }: { s
   if (section.contentType === 'text') {
     if (!section.textContent?.trim()) return null;
     return (
-      <p style={{ color: 'var(--color-text)', lineHeight: 1.8, whiteSpace: 'pre-line' }}>
-        {linkify(section.textContent)}
-      </p>
+      <BodyBlocks
+        blocks={parseBodyContent(section.textContent)}
+        paragraphStyle={{ color: 'var(--color-text)', lineHeight: 1.8 }}
+      />
     );
   }
   if (section.contentType === 'person') {
@@ -627,9 +631,10 @@ function CustomSectionBodyContent({ section, departmentSlug, categorySlug }: { s
           </p>
         )}
         {section.textContent?.trim() && (
-          <p style={{ color: 'var(--color-text)', lineHeight: 1.8, whiteSpace: 'pre-line' }}>
-            {linkify(section.textContent)}
-          </p>
+          <BodyBlocks
+            blocks={parseBodyContent(section.textContent)}
+            paragraphStyle={{ color: 'var(--color-text)', lineHeight: 1.8 }}
+          />
         )}
       </>
     );
@@ -667,14 +672,17 @@ function CustomSectionBodyContent({ section, departmentSlug, categorySlug }: { s
     const items = (section.listText || '').split('\n').map((s) => s.trim()).filter(Boolean);
     return (
       <ul style={{ listStyle: 'none', margin: '0 0 var(--space-5)', padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-        {items.map((point, i) => (
-          <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-3)' }}>
-            <span style={{ width: 18, height: 18, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
-              <svg width="9" height="9" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-            </span>
-            <span style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.6 }}>{linkify(point)}</span>
-          </li>
-        ))}
+        {items.map((point, i) => {
+          const cleanPoint = point.replace(/^([•]\s*|[-*–—]\s+|\d+[.)]\s+)/, '');
+          return (
+            <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-3)' }}>
+              <span style={{ width: 18, height: 18, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
+                <svg width="9" height="9" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+              </span>
+              <span style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.6 }}>{linkify(cleanPoint)}</span>
+            </li>
+          );
+        })}
       </ul>
     );
   }
@@ -703,7 +711,9 @@ function CustomSectionBodyContent({ section, departmentSlug, categorySlug }: { s
                 </h4>
               )}
               {card.description && (
-                <p style={{ color: 'var(--color-text)', lineHeight: 1.6, margin: 0, whiteSpace: 'pre-line' }}>{renderBold(card.description)}</p>
+                <div style={{ color: 'var(--color-text)', lineHeight: 1.6, margin: 0 }}>
+                  <BodyBlocks blocks={parseBodyContent(card.description)} paragraphStyle={{ margin: 0 }} />
+                </div>
               )}
             </div>
           </div>

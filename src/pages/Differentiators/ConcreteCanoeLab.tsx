@@ -35,6 +35,7 @@ import { concreteCanoeLab } from './concreteCanoeLab.data';
 import { useDocument } from '../../hooks/useDocument';
 import type { ConcreteCanoeDoc } from '../Admin/sections/ConcreteCanoeContentAdmin';
 import { renderBold } from '../../lib/boldText';
+import BodyBlocks, { parseBodyContent } from '../../components/BodyBlocks/BodyBlocks';
 import './ConcreteCanoeLab.css';
 
 const SLUG = 'concrete-canoe-lab';
@@ -249,7 +250,7 @@ export default function ConcreteCanoeLab() {
             <Anchor size={120} className="canoe-overview-quote-mark" aria-hidden="true" />
             <div className="canoe-prose">
               {aboutParagraphs.map((p, i) => (
-                <p key={i}>{renderBold(p)}</p>
+                <BodyBlocks key={i} blocks={parseBodyContent(p)} paragraphStyle={{}} />
               ))}
             </div>
           </div>
@@ -264,9 +265,7 @@ export default function ConcreteCanoeLab() {
                 </div>
                 <h3 className="canoe-vm-title">Our Vision</h3>
               </div>
-              <p style={{ fontSize: 'var(--text-base)', lineHeight: 1.7, color: 'var(--color-text)', margin: 0 }}>
-                {canoe.vision}
-              </p>
+              <BodyBlocks blocks={parseBodyContent(canoe.vision)} paragraphStyle={{ fontSize: 'var(--text-base)', lineHeight: 1.7, color: 'var(--color-text)', margin: 0 }} />
             </div>
 
             {/* Mission */}

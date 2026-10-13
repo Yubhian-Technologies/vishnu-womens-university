@@ -17,6 +17,7 @@ import { arVrStudio } from './arVrStudio.data';
 import { useDocument } from '../../hooks/useDocument';
 import type { ArVrStudioDoc } from '../Admin/sections/ArVrStudioContentAdmin';
 import { renderBold } from '../../lib/boldText';
+import BodyBlocks, { parseBodyContent } from '../../components/BodyBlocks/BodyBlocks';
 import './ArVrStudio.css';
 
 const SLUG = 'ar-vr-studio';
@@ -120,9 +121,7 @@ export default function ArVrStudio() {
             <Quote size={28} strokeWidth={2} className="arvr-overview__mark" aria-hidden="true" />
             <div className="arvr-prose">
               {aboutParagraphs.map((para, i) => (
-                <p key={i} style={{ marginBottom: i < aboutParagraphs.length - 1 ? '1rem' : 0 }}>
-                  {renderBold(para)}
-                </p>
+                <BodyBlocks key={i} blocks={parseBodyContent(para)} paragraphStyle={{ marginBottom: i < aboutParagraphs.length - 1 ? '1rem' : 0 }} />
               ))}
             </div>
           </div>
@@ -137,7 +136,7 @@ export default function ArVrStudio() {
               <Target size={14} strokeWidth={2.4} /> {studio.visionTitle}
             </span>
             <div className="arvr-prose">
-              <p>{renderBold(visionText)}</p>
+              <BodyBlocks blocks={parseBodyContent(visionText)} paragraphStyle={{}} />
             </div>
           </div>
           <div className="arvr-glass arvr-vm-card">

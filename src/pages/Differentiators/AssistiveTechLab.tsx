@@ -36,6 +36,7 @@ import { assistiveTechLab, type AtlStudentRosterYear, type AtlBlock, type AtlExh
 import { useDocument } from '../../hooks/useDocument';
 import type { AssistiveTechLabDoc } from '../Admin/sections/AssistiveTechContentAdmin';
 import { renderBold } from '../../lib/boldText';
+import BodyBlocks, { parseBodyContent } from '../../components/BodyBlocks/BodyBlocks';
 import './AssistiveTechLab.css';
 
 const SLUG = 'assistive-tech-lab';
@@ -55,9 +56,9 @@ function renderAtlBlock(block: AtlBlock, bIdx: number) {
       );
     case 'paragraph':
       return (
-        <p key={bIdx} className="atl-block-paragraph">
-          {renderBold(block.text)}
-        </p>
+        <div key={bIdx} className="atl-block-paragraph">
+          <BodyBlocks blocks={parseBodyContent(block.text)} paragraphStyle={{}} />
+        </div>
       );
     case 'heading':
       return (
@@ -371,7 +372,7 @@ export default function AssistiveTechLab() {
             <HeartHandshake size={140} className="atl-overview-watermark" aria-hidden="true" />
             <div className="atl-prose">
               {aboutParagraphs.map((p, i) => (
-                <p key={i}>{renderBold(p)}</p>
+                <BodyBlocks key={i} blocks={parseBodyContent(p)} paragraphStyle={{}} />
               ))}
             </div>
           </div>

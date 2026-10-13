@@ -27,6 +27,7 @@ import type { AicteIdeaLabAmbassadorDoc } from '../Admin/sections/AicteIdeaLabAm
 import { CustomSectionsPlain, CustomSectionsPills, CustomSectionsGalleries, CustomSectionsAccordion } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import { renderBold } from '../../lib/boldText';
+import BodyBlocks, { parseBodyContent } from '../../components/BodyBlocks/BodyBlocks';
 import './IdeaLabPage.css';
 
 interface IdeaLabPageProps {
@@ -217,7 +218,9 @@ export default function IdeaLabPage({ item, sections = [] }: IdeaLabPageProps) {
                 <h2 className="idealab-card-title">{overview.title}</h2>
                 <div className="idealab-paragraphs">
                   {overview.paragraphs.map((p, idx) => (
-                    <p key={idx} className="idealab-lead-text">{renderBold(p)}</p>
+                    <div key={idx} className="idealab-lead-text">
+                      <BodyBlocks blocks={parseBodyContent(p)} paragraphStyle={{}} />
+                    </div>
                   ))}
                 </div>
 
@@ -471,7 +474,9 @@ export default function IdeaLabPage({ item, sections = [] }: IdeaLabPageProps) {
                   {sec.paragraphs && sec.paragraphs.length > 0 && (
                     <div className="idealab-paragraphs">
                       {sec.paragraphs.map((p, idx) => (
-                        <p key={idx} className="idealab-lead-text">{renderBold(p)}</p>
+                        <div key={idx} className="idealab-lead-text">
+                          <BodyBlocks blocks={parseBodyContent(p)} paragraphStyle={{ margin: 0 }} />
+                        </div>
                       ))}
                     </div>
                   )}

@@ -395,6 +395,9 @@ export default function CustomSectionEditor({
                   onChange={(e) => updateSection(si, { textContent: e.target.value })}
                   placeholder="Section content…"
                 />
+                <p className="admin-field__hint" style={{ margin: '0.4rem 0 0', fontSize: '0.8rem', color: '#64748b' }}>
+                  Supports multiple paragraphs (separate with blank lines), bullet lists (start lines with <code>- </code>, <code>• </code>, or <code>* </code>), and bold text (wrap in <code>**text**</code>).
+                </p>
               </div>
             )}
 
@@ -414,6 +417,9 @@ export default function CustomSectionEditor({
                     onChange={(e) => updateSection(si, { textContent: e.target.value })}
                     placeholder="Bio / details — shown when this person's card is hovered (or tapped on mobile)…"
                   />
+                  <p className="admin-field__hint" style={{ margin: '0.4rem 0 0', fontSize: '0.8rem', color: '#64748b' }}>
+                    Supports multiple paragraphs (separate with blank lines), bullet lists (start lines with <code>- </code>, <code>• </code>, or <code>* </code>), and bold text (wrap in <code>**text**</code>).
+                  </p>
                 </div>
                 <p className="admin-field__hint">
                   The section name above is this person's name. Group several people together and they'll show as a click-to-expand panel list on the public page.

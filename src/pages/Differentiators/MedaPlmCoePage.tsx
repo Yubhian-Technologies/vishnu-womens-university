@@ -23,6 +23,7 @@ import { medaPlmCoe } from './medaPlmCoe.data';
 import type { DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
 import type { CustomSection } from '../../lib/customSections';
 import { renderBold } from '../../lib/boldText';
+import BodyBlocks, { parseBodyContent } from '../../components/BodyBlocks/BodyBlocks';
 import './MedaPlmCoePage.css';
 
 interface MedaPlmCoePageProps {
@@ -230,7 +231,7 @@ export default function MedaPlmCoePage({ sections }: MedaPlmCoePageProps) {
           </h2>
           <div className="meda-hero-paragraphs">
             {data.collaboration.paragraphs.map((p, idx) => (
-              <p key={idx} className="meda-hero-text">{renderBold(p)}</p>
+              <BodyBlocks key={idx} blocks={parseBodyContent(p)} paragraphStyle={{ margin: '0 0 0.85rem 0' }} />
             ))}
           </div>
         </div>
@@ -249,9 +250,9 @@ export default function MedaPlmCoePage({ sections }: MedaPlmCoePageProps) {
         <div className="meda-glass-card">
           <div className={`meda-glass-split ${hasPhotos ? 'has-photo' : 'no-photo'}`}>
             <div>
-              <p className="meda-closing-note" style={{ marginTop: 0, paddingTop: 0, borderTop: 'none', fontStyle: 'normal', color: '#475569', fontSize: '0.975rem' }}>
-                {renderBold(data.meda.intro)}
-              </p>
+              <div className="meda-closing-note" style={{ marginTop: 0, paddingTop: 0, borderTop: 'none', fontStyle: 'normal', color: '#475569', fontSize: '0.975rem' }}>
+                <BodyBlocks blocks={parseBodyContent(data.meda.intro)} />
+              </div>
 
               {/* Software Platforms */}
               <div style={{ margin: '0.75rem 0 0.5rem 0', fontWeight: 800, fontSize: '0.85rem', color: '#0B1E42', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
@@ -311,9 +312,9 @@ export default function MedaPlmCoePage({ sections }: MedaPlmCoePageProps) {
             {hasPhotos && <RenderPhotoFrame index={2} />}
 
             <div>
-              <p className="meda-closing-note" style={{ marginTop: 0, paddingTop: 0, borderTop: 'none', fontStyle: 'normal', color: '#475569', fontSize: '0.975rem' }}>
-                {renderBold(data.plm.intro)}
-              </p>
+              <div className="meda-closing-note" style={{ marginTop: 0, paddingTop: 0, borderTop: 'none', fontStyle: 'normal', color: '#475569', fontSize: '0.975rem' }}>
+                <BodyBlocks blocks={parseBodyContent(data.plm.intro)} />
+              </div>
 
               {/* Training Modules */}
               <div className="meda-concepts-panel" style={{ background: '#F8FAFC', marginBottom: '0.75rem' }}>
@@ -361,9 +362,9 @@ export default function MedaPlmCoePage({ sections }: MedaPlmCoePageProps) {
         <div className="meda-glass-card">
           <div className={`meda-glass-split ${hasPhotos ? 'has-photo' : 'no-photo'}`}>
             <div>
-              <p className="meda-closing-note" style={{ marginTop: 0, paddingTop: 0, borderTop: 'none', fontStyle: 'normal', color: '#475569', fontSize: '0.975rem' }}>
-                {renderBold(data.outcomes.intro)}
-              </p>
+              <div className="meda-closing-note" style={{ marginTop: 0, paddingTop: 0, borderTop: 'none', fontStyle: 'normal', color: '#475569', fontSize: '0.975rem' }}>
+                <BodyBlocks blocks={parseBodyContent(data.outcomes.intro)} />
+              </div>
 
               <div style={{ margin: '0.75rem 0 0.5rem 0', fontWeight: 800, fontSize: '0.85rem', color: '#0B1E42', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                 {data.outcomes.opportunitiesHeading}
