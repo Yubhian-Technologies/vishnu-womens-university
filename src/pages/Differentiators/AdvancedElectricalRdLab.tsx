@@ -32,6 +32,7 @@ import { hasCustomSectionContent, type CustomSectionPhoto } from '../../lib/cust
 import { DIFFERENTIATOR_CATEGORIES, type DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
 import { defaultAdvancedElectrical, type AdvancedElectricalDoc } from '../Admin/sections/AdvancedElectricalContentAdmin';
 import { renderBold } from '../../lib/boldText';
+import BodyBlocks, { parseBodyContent } from '../../components/BodyBlocks/BodyBlocks';
 import './AdvancedElectricalRdLab.css';
 
 const SLUG = 'advanced-electrical-rd-lab';
@@ -238,17 +239,15 @@ export default function AdvancedElectricalRdLab() {
               <Compass size={14} /> {overviewBadge}
             </span>
             <h2 className="elec-section-title">{overviewTitle}</h2>
-            <p className="elec-section-lead">
-              {overviewLead}
-            </p>
+            <div className="elec-section-lead">
+              <BodyBlocks blocks={parseBodyContent(overviewLead)} paragraphStyle={{ margin: 0 }} />
+            </div>
           </div>
 
           <div className="elec-overview-card">
             <Zap size={140} className="elec-overview-watermark" aria-hidden="true" />
             <div className="elec-prose">
-              <p>
-                {renderBold(aboutText)}
-              </p>
+              <BodyBlocks blocks={parseBodyContent(aboutText)} paragraphStyle={{}} />
             </div>
           </div>
 

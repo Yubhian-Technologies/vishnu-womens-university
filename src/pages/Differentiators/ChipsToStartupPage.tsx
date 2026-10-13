@@ -23,6 +23,7 @@ import type { ChipsToStartupDoc } from '../Admin/sections/ChipsToStartupContentA
 import type { DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
 import { chipsToStartup } from './chipsToStartup.data';
 import { renderBold } from '../../lib/boldText';
+import BodyBlocks, { parseBodyContent } from '../../components/BodyBlocks/BodyBlocks';
 import './ChipsToStartupPage.css';
 
 export default function ChipsToStartupPage({
@@ -127,7 +128,7 @@ export default function ChipsToStartupPage({
           <h2 className="cts-card-title">{aboutTitle}</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
             {dynamicAbout.map((p, i) => (
-              <p key={i}>{renderBold(p)}</p>
+              <BodyBlocks key={i} blocks={parseBodyContent(p)} paragraphStyle={{}} />
             ))}
           </div>
         </div>

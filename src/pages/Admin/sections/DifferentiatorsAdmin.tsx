@@ -313,12 +313,17 @@ function BlockEditor({ blockKey, label, hint, value, onChange, onPhotoUploaded, 
           placeholder="One point per line…"
         />
       ) : (
-        <textarea
-          rows={4}
-          value={value.textContent || ''}
-          onChange={(e) => onChange({ ...value, textContent: e.target.value })}
-          placeholder={`${label}…`}
-        />
+        <>
+          <textarea
+            rows={4}
+            value={value.textContent || ''}
+            onChange={(e) => onChange({ ...value, textContent: e.target.value })}
+            placeholder={`${label}…`}
+          />
+          <p className="admin-field__hint" style={{ margin: '0.4rem 0 0', fontSize: '0.8rem', color: '#64748b' }}>
+            Supports multiple paragraphs (separate with blank lines), bullet lists (start lines with <code>- </code>, <code>• </code>, or <code>* </code>), and bold text (wrap in <code>**text**</code>).
+          </p>
+        </>
       )}
       <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', marginTop: '0.5rem' }}>
         <div style={{ width: 140 }}>

@@ -30,6 +30,7 @@ import { useOrderedCollection } from '../../hooks/useCollection';
 import { useDocument } from '../../hooks/useDocument';
 import type { VehicleDesignLabDoc } from '../Admin/sections/VehicleDesignLabContentAdmin';
 import { renderBold } from '../../lib/boldText';
+import BodyBlocks, { parseBodyContent } from '../../components/BodyBlocks/BodyBlocks';
 import './VehicleDesignLabPage.css';
 
 interface VehicleDesignLabPageProps {
@@ -163,9 +164,7 @@ export default function VehicleDesignLabPage({ item, sections }: VehicleDesignLa
 
           <div className="vdl-hero-text-block">
             {aboutParagraphs.map((para, idx) => (
-              <p key={idx} className="vdl-overview-text">
-                {renderBold(para)}
-              </p>
+              <BodyBlocks key={idx} blocks={parseBodyContent(para)} paragraphStyle={{ margin: '0 0 1rem 0' }} />
             ))}
           </div>
 
@@ -199,9 +198,9 @@ export default function VehicleDesignLabPage({ item, sections }: VehicleDesignLa
                 <div className="vdl-card-title">
                   <Compass size={16} style={{ color: '#FF5722' }} /> Vision
                 </div>
-                <p className="vdl-card-text" style={{ fontStyle: 'italic', fontWeight: 600 }}>
-                  {renderBold(visionText)}
-                </p>
+                <div className="vdl-card-text" style={{ fontStyle: 'italic', fontWeight: 600 }}>
+                  <BodyBlocks blocks={parseBodyContent(visionText)} />
+                </div>
               </div>
 
               {/* Mission */}
@@ -209,9 +208,9 @@ export default function VehicleDesignLabPage({ item, sections }: VehicleDesignLa
                 <div className="vdl-card-title">
                   <Flame size={16} style={{ color: '#FF9800' }} /> Mission
                 </div>
-                <p className="vdl-card-text">
-                  {renderBold(missionText)}
-                </p>
+                <div className="vdl-card-text">
+                  <BodyBlocks blocks={parseBodyContent(missionText)} />
+                </div>
               </div>
             </div>
 

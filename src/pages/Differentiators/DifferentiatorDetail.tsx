@@ -36,6 +36,7 @@ import IicPage from './IicPage';
 import RuralWomenTechParkPage from './RuralWomenTechParkPage';
 import SmartInterviewsPage from './SmartInterviewsPage';
 import { renderBold } from '../../lib/boldText';
+import BodyBlocks, { parseBodyContent } from '../../components/BodyBlocks/BodyBlocks';
 import { DEFAULT_GSAC_HERO_CONTENT, GSAC_HERO_CONTENT_COLLECTION, GSAC_HERO_CONTENT_DOC_ID, type GsacHeroContentDoc } from '../Admin/sections/GsacHeroContentAdmin';
 import '../detail-layout.css';
 import '../gsac-shared.css';
@@ -100,7 +101,9 @@ function LanguageModuleAccordion({ lang, index }: { lang: typeof foreignLanguage
         <div className="fl-module-body animate-fade-in">
           <p className="fl-module-quote">&quot;{renderBold(lang.quote)}&quot;</p>
           <div className="fl-module-paragraphs">
-            {lang.paragraphs.map((p, i) => <p key={i}>{renderBold(p)}</p>)}
+            {lang.paragraphs.map((p, i) => (
+              <BodyBlocks key={i} blocks={parseBodyContent(p)} />
+            ))}
           </div>
 
           {lang.table && lang.table.length > 0 && (
@@ -161,9 +164,7 @@ function ForeignLanguagesPage({ data: fallbackData }: { data: typeof foreignLang
       {/* 2. Intro Paragraph */}
       <div className="fl-body-intro-text">
         {(data.paragraphs || fallbackData.paragraphs).map((p, idx) => (
-          <p key={idx} style={{ marginBottom: idx < (data.paragraphs || []).length - 1 ? '0.75rem' : 0 }}>
-            {renderBold(p)}
-          </p>
+          <BodyBlocks key={idx} blocks={parseBodyContent(p)} paragraphStyle={{ marginBottom: idx < (data.paragraphs || []).length - 1 ? '0.75rem' : 0 }} />
         ))}
       </div>
 
@@ -182,9 +183,9 @@ function ForeignLanguagesPage({ data: fallbackData }: { data: typeof foreignLang
             </div>
             <h3 className="fl-info-card-title">VISION</h3>
           </div>
-          <p className="fl-info-card-body">
-            {renderBold(data.vision || fallbackData.vision)}
-          </p>
+          <div className="fl-info-card-body">
+            <BodyBlocks blocks={parseBodyContent(data.vision || fallbackData.vision)} />
+          </div>
         </div>
 
         {/* Card 2: Objectives */}

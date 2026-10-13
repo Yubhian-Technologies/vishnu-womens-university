@@ -168,6 +168,31 @@
   max-width: 540px;
 }
 
+.si-hero-desc p {
+  margin: 0 0 0.75rem 0;
+}
+
+.si-hero-desc p:last-child {
+  margin-bottom: 0;
+}
+
+.si-hero-desc ul {
+  margin: 0.5rem 0;
+  padding-left: 1.25rem;
+}
+
+.si-hero-desc li {
+  margin-bottom: 0.25rem;
+}
+
+.si-top-hero-desc p {
+  margin: 0 0 0.5rem 0;
+}
+
+.si-top-hero-desc p:last-child {
+  margin-bottom: 0;
+}
+
 .si-hero-keywords {
   font-size: 0.725rem;
   font-weight: 800;

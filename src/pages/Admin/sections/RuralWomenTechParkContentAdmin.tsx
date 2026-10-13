@@ -297,11 +297,15 @@ export default function RuralWomenTechParkContentAdmin() {
         <div className="admin-field">
           <label className="admin-label">About WTP Description Text</label>
           <textarea
-            rows={4}
+            rows={8}
             value={data.aboutText || ''}
             onChange={(e) => setData({ ...data, aboutText: e.target.value })}
             className="admin-textarea"
+            placeholder="Enter About WTP description paragraphs and bullet points..."
           />
+          <p className="admin-field__hint" style={{ margin: '0.4rem 0 0', fontSize: '0.8rem', color: '#64748b' }}>
+            Supports multiple paragraphs (separate with blank lines), bullet lists (start lines with <code>- </code>, <code>• </code>, or <code>* </code>), and bold text (wrap in <code>**text**</code>).
+          </p>
         </div>
       </div>
 

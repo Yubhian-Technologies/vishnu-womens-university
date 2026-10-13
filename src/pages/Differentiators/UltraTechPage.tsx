@@ -27,6 +27,7 @@ import {
   Handshake
 } from 'lucide-react';
 import { renderBold } from '../../lib/boldText';
+import BodyBlocks, { parseBodyContent } from '../../components/BodyBlocks/BodyBlocks';
 import './UltraTechPage.css';
 
 import type { DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
@@ -281,15 +282,15 @@ export default function UltraTechPage({
             </div>
 
             <h2 className="utec-about-title">{aboutTitle}</h2>
-            {Array.isArray(overviewText) ? (
-              overviewText.map((p, i) => (
-                <p key={i} className="utec-about-desc" style={{ marginBottom: i < overviewText.length - 1 ? '1rem' : 0 }}>
-                  {renderBold(p)}
-                </p>
-              ))
-            ) : (
-              <p className="utec-about-desc">{renderBold(overviewText)}</p>
-            )}
+            <div className="utec-about-desc">
+              {Array.isArray(overviewText) ? (
+                overviewText.map((p, i) => (
+                  <BodyBlocks key={i} blocks={parseBodyContent(p)} paragraphStyle={{ marginBottom: i < overviewText.length - 1 ? '1rem' : 0 }} />
+                ))
+              ) : (
+                <BodyBlocks blocks={parseBodyContent(overviewText)} />
+              )}
+            </div>
 
             {/* 4 FEATURE PILLARS INTEGRATED */}
             <div className="utec-pillars-wrapper">
@@ -345,7 +346,9 @@ export default function UltraTechPage({
 
                 <div className="utec-vision-quote-card">
                   <span className="utec-quote-mark">“</span>
-                  <p className="utec-vision-quote-text">{renderBold(visionText)}</p>
+                  <div className="utec-vision-quote-text">
+                    <BodyBlocks blocks={parseBodyContent(visionText)} />
+                  </div>
                 </div>
               </div>
             )}

@@ -34,6 +34,7 @@ import { useDocument } from '../../hooks/useDocument';
 import { CustomSectionsPlain, CustomSectionsPills, CustomSectionsGalleries, CustomSectionsAccordion } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import { renderBold } from '../../lib/boldText';
+import BodyBlocks, { parseBodyContent } from '../../components/BodyBlocks/BodyBlocks';
 import './IicPage.css';
 
 interface IicDocEntryDoc extends WithId {
@@ -281,9 +282,9 @@ export default function IicPage({ item, sections = [] }: IicPageProps) {
                   : item?.desc
                   ? [item.desc]
                   : iic.about).map((paragraph, i) => (
-                  <p key={i} className="iic-lead-text" style={{ marginBottom: i < iic.about.length - 1 ? '1rem' : 0 }}>
-                    {renderBold(paragraph)}
-                  </p>
+                  <div key={i} className="iic-lead-text" style={{ marginBottom: i < iic.about.length - 1 ? '1rem' : 0 }}>
+                    <BodyBlocks blocks={parseBodyContent(paragraph)} paragraphStyle={{}} />
+                  </div>
                 ))}
               </div>
 
@@ -294,9 +295,9 @@ export default function IicPage({ item, sections = [] }: IicPageProps) {
                 </div>
                 <h3 className="iic-subcard-title">{iic.journeyTitle}</h3>
                 {iic.journey.map((p, i) => (
-                  <p key={i} className="iic-lead-text" style={{ marginBottom: i < iic.journey.length - 1 ? '1rem' : 0 }}>
-                    {renderBold(p)}
-                  </p>
+                  <div key={i} className="iic-lead-text" style={{ marginBottom: i < iic.journey.length - 1 ? '1rem' : 0 }}>
+                    <BodyBlocks blocks={parseBodyContent(p)} paragraphStyle={{}} />
+                  </div>
                 ))}
               </div>
 

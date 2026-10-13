@@ -24,6 +24,7 @@ import type { HpcLabDoc } from '../Admin/sections/HpcLabContentAdmin';
 import type { DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
 import { highPerformanceComputingLab, parseHpcObjective } from './highPerformanceComputingLab.data';
 import { renderBold } from '../../lib/boldText';
+import BodyBlocks, { parseBodyContent } from '../../components/BodyBlocks/BodyBlocks';
 import './HpcLabPage.css';
 
 interface HpcLabPageProps {
@@ -280,9 +281,9 @@ export default function HpcLabPage({ item, sections = [] }: HpcLabPageProps) {
             <h2 className="hpc-section-heading">{overviewTitle}</h2>
             <div className="hpc-paragraphs">
               {aboutParagraphs.map((para: string, idx: number) => (
-                <p key={idx} className="hpc-lead-paragraph">
-                  {renderBold(para)}
-                </p>
+                <div key={idx} className="hpc-lead-paragraph">
+                  <BodyBlocks blocks={parseBodyContent(para)} paragraphStyle={{}} />
+                </div>
               ))}
             </div>
           </div>
@@ -294,7 +295,9 @@ export default function HpcLabPage({ item, sections = [] }: HpcLabPageProps) {
                 <Compass size={14} /> {visionBadge}
               </div>
               <h3 className="hpc-subcard-title">{visionTitle}</h3>
-              <p className="hpc-vision-text">{renderBold(visionText)}</p>
+              <div className="hpc-vision-text">
+                <BodyBlocks blocks={parseBodyContent(visionText)} paragraphStyle={{}} />
+              </div>
             </div>
 
             <div className="hpc-cyber-card hpc-mission-card">

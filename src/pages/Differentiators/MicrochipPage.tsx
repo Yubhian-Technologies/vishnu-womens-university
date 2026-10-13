@@ -21,6 +21,7 @@ import { hasCustomSectionContent, type CustomSection } from '../../lib/customSec
 import { CustomSectionsAccordion, CustomSectionsIntro } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import type { DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
 import { renderBold } from '../../lib/boldText';
+import BodyBlocks, { parseBodyContent } from '../../components/BodyBlocks/BodyBlocks';
 import './MicrochipPage.css';
 
 interface MicrochipPageProps {
@@ -153,7 +154,7 @@ export default function MicrochipPage({
           </div>
           <div className="mc-about-body">
             {aboutParagraphs.map((para, idx) => (
-              <p key={idx} className="mc-about-text">{renderBold(para)}</p>
+              <BodyBlocks key={idx} blocks={parseBodyContent(para)} paragraphStyle={{ fontSize: '1rem', lineHeight: 1.8, color: '#334155', margin: '0 0 1rem 0' }} />
             ))}
           </div>
 
@@ -184,7 +185,7 @@ export default function MicrochipPage({
             </span>
             <h3 className="mc-vm-title">{data.vision.title}</h3>
             <div className="mc-vision-content">
-              <p>{renderBold(visionText)}</p>
+              <BodyBlocks blocks={parseBodyContent(visionText)} />
             </div>
           </div>
 
@@ -194,7 +195,9 @@ export default function MicrochipPage({
               <Target size={14} /> Institutional Mission
             </span>
             <h3 className="mc-vm-title">{data.mission.title}</h3>
-            <p className="mc-mission-intro">{renderBold(data.mission.intro)}</p>
+            <div className="mc-mission-intro">
+              <BodyBlocks blocks={parseBodyContent(data.mission.intro)} />
+            </div>
             <ul className="mc-mission-list">
               {missionList.map((point: string, idx: number) => (
                 <li key={idx} className="mc-mission-item">

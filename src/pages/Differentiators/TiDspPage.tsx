@@ -23,6 +23,7 @@ import {
   X,
 } from 'lucide-react';
 import { renderBold } from '../../lib/boldText';
+import BodyBlocks, { parseBodyContent } from '../../components/BodyBlocks/BodyBlocks';
 import './TiDspPage.css';
 
 interface TiDspPageProps {
@@ -170,11 +171,11 @@ export default function TiDspPage({
             <Sparkles size={14} /> Centre of Excellence
           </div>
           <h2 className="iic-card-title">{item?.title || aboutTitle}</h2>
-          {overviewParagraphs.map((p, i) => (
-            <p key={i} className="iic-lead-text" style={{ marginBottom: i < overviewParagraphs.length - 1 ? '1rem' : 0 }}>
-              {renderBold(p)}
-            </p>
-          ))}
+          <div className="iic-lead-text">
+            {overviewParagraphs.map((p, i) => (
+              <BodyBlocks key={i} blocks={parseBodyContent(p)} paragraphStyle={{ marginBottom: i < overviewParagraphs.length - 1 ? '1rem' : 0 }} />
+            ))}
+          </div>
         </div>
 
         {/* STATS STRIP */}
@@ -220,7 +221,7 @@ export default function TiDspPage({
             </span>
             <h3 className="ti-vm-title">Our Vision</h3>
             <div className="ti-vision-text">
-              &quot;{renderBold(visionText)}&quot;
+              <BodyBlocks blocks={parseBodyContent(visionText)} />
             </div>
           </div>
 

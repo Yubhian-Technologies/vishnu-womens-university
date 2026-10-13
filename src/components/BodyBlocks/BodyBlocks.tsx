@@ -1,19 +1,17 @@
 import type { CSSProperties } from 'react';
+import { linkify } from '../../lib/linkify';
 
 export type BodyBlock =
   | { type: 'paragraph'; text: string }
   | { type: 'list'; items: string[] };
 
-// Every plain line is its own paragraph — no blank-line-between-paragraphs
-// rule to get right (that convention proved too easy to get wrong in
-// practice: admins kept typing one point per line with no blank line,
-// expecting each to render separately, and instead got everything joined
-// into one block). A "- " prefix still groups consecutive lines into a
-// bullet list; blank lines are optional visual spacing only, no longer
-// required to separate paragraphs.
+// Matches lines starting with bullet symbols (- , * , • , – , — ) or numbered points (1. , 1) )
+const BULLET_PATTERN = /^([•]\s*|[-*–—]\s+|\d+[.)]\s+)(.+)$/;
+
 export function parseBodyContent(text: string): BodyBlock[] {
   const blocks: BodyBlock[] = [];
   let listItems: string[] = [];
+  let paragraphLines: string[] = [];
 
   const flushList = () => {
     if (listItems.length > 0) {
@@ -22,21 +20,32 @@ export function parseBodyContent(text: string): BodyBlock[] {
     }
   };
 
+  const flushParagraph = () => {
+    if (paragraphLines.length > 0) {
+      blocks.push({ type: 'paragraph', text: paragraphLines.join('\n') });
+      paragraphLines = [];
+    }
+  };
+
   for (const rawLine of (text || '').split('\n')) {
-    const line = rawLine.trim();
-    if (!line) {
+    const trimmed = rawLine.trim();
+    if (!trimmed) {
       flushList();
+      flushParagraph();
       continue;
     }
-    if (line.startsWith('- ')) {
-      listItems.push(line.slice(2).trim());
+    const bulletMatch = trimmed.match(BULLET_PATTERN);
+    if (bulletMatch) {
+      flushParagraph();
+      listItems.push(bulletMatch[2].trim());
       continue;
     }
     flushList();
-    blocks.push({ type: 'paragraph', text: line });
+    paragraphLines.push(trimmed);
   }
 
   flushList();
+  flushParagraph();
   return blocks;
 }
 
@@ -45,16 +54,15 @@ const LINK_PATTERN = /^\[([^\]]+)\]\(([^)]+)\)$/;
 // to the visitor's device instead of opening in a new tab.
 const DOWNLOADABLE_FILE_PATTERN = /\.(pdf|docx?|xlsx?|pptx?|zip)$/i;
 
-function renderInlineText(text: string) {
+function renderInlineText(text: string, strongStyle?: CSSProperties) {
   return text.split(/(\*\*[^*]+\*\*|\[[^\]]+\]\([^)]+\))/g).map((part, index) => {
     if (part.startsWith('**') && part.endsWith('**')) {
-      // Matches .section-title (the real <h2> heading style) exactly — these
-      // ** markers are used throughout Intro/About text as informal
-      // sub-headings ("Objectives:", "Placement & Industry Relations Team:"),
-      // so they should read as real headings, not just bolded body text.
       return (
-        <strong key={index} style={{ fontFamily: 'var(--font-serif)', color: 'var(--color-primary)', fontWeight: 700 }}>
-          {part.slice(2, -2)}
+        <strong
+          key={index}
+          style={strongStyle ?? { fontWeight: 700 }}
+        >
+          {linkify(part.slice(2, -2))}
         </strong>
       );
     }
@@ -73,33 +81,60 @@ function renderInlineText(text: string) {
         </a>
       );
     }
-    return <span key={index}>{part}</span>;
+    return <span key={index}>{linkify(part)}</span>;
   });
 }
 
 // Renders parseBodyContent's blocks — shared by every admin-editable
 // Intro/About/Overview-style text field on the site, so all of them support
-// the same blank-line-separated paragraphs / "- " bullet lists / **bold** /
+// the same blank-line-separated paragraphs / bullet lists / **bold** /
 // [link](url) syntax instead of being dumped into one unbroken <p>.
-export default function BodyBlocks({ blocks, paragraphStyle }: { blocks: BodyBlock[]; paragraphStyle: CSSProperties }) {
+export default function BodyBlocks({
+  blocks,
+  paragraphStyle,
+  strongStyle,
+  listStyle,
+}: {
+  blocks: BodyBlock[];
+  paragraphStyle?: CSSProperties;
+  strongStyle?: CSSProperties;
+  listStyle?: CSSProperties;
+}) {
   return (
     <>
       {blocks.map((block, index) => {
+        const isLast = index === blocks.length - 1;
         if (block.type === 'list') {
           return (
-            <ul key={index} style={{ listStyle: 'none', padding: 0, margin: '0 0 1rem' }}>
+            <ul key={index} style={{ listStyle: 'none', padding: 0, margin: isLast ? 0 : '0 0 1rem', ...listStyle }}>
               {block.items.map((entry, itemIndex) => (
-                <li key={itemIndex} style={{ display: 'flex', gap: '0.6rem', marginBottom: '0.7rem' }}>
-                  <span aria-hidden="true" style={{ fontSize: '1.4em', lineHeight: 1, flexShrink: 0 }}>•</span>
-                  <span style={paragraphStyle}>{renderInlineText(entry)}</span>
+                <li
+                  key={itemIndex}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: '0.6rem',
+                    marginBottom: itemIndex === block.items.length - 1 ? 0 : '0.6rem',
+                  }}
+                >
+                  <span aria-hidden="true" style={{ fontSize: '1.2em', lineHeight: 1.4, flexShrink: 0, color: 'currentColor' }}>•</span>
+                  <span style={{ ...paragraphStyle, whiteSpace: 'pre-line' }}>{renderInlineText(entry, strongStyle)}</span>
                 </li>
               ))}
             </ul>
           );
         }
         return (
-          <p key={index} style={{ ...paragraphStyle, margin: '0 0 1rem' }}>
-            {renderInlineText(block.text)}
+          <p
+            key={index}
+            style={{
+              lineHeight: 1.8,
+              ...paragraphStyle,
+              whiteSpace: 'pre-line',
+              margin: isLast ? 0 : (paragraphStyle?.margin ?? '0 0 1rem'),
+            }}
+          >
+            {renderInlineText(block.text, strongStyle)}
           </p>
         );
       })}

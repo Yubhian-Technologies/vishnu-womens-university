@@ -12,6 +12,7 @@ import { smartInterviews } from './smartInterviews.data';
 import { useDocument } from '../../hooks/useDocument';
 import type { SmartInterviewsDoc } from '../Admin/sections/SmartInterviewsContentAdmin';
 import { renderBold } from '../../lib/boldText';
+import BodyBlocks, { parseBodyContent } from '../../components/BodyBlocks/BodyBlocks';
 import './smart-interviews.css';
 
 interface SmartInterviewsPageProps {
@@ -67,7 +68,9 @@ export default function SmartInterviewsPage({
             <span>{siData.heroBadge || 'STUDENT EMPLOYMENT & PLACEMENT'}</span>
           </div>
           <h1 className="si-top-hero-title">{pageTitle}</h1>
-          <p className="si-top-hero-desc">{renderBold(dynamicSubtitle)}</p>
+          <div className="si-top-hero-desc">
+            <BodyBlocks blocks={parseBodyContent(dynamicSubtitle)} />
+          </div>
         </div>
       </section>
 
@@ -82,7 +85,9 @@ export default function SmartInterviewsPage({
                 {siData.aboutTitle || 'Smart'}<br />
                 <span className="si-hero-title-blue">{siData.aboutTitleBlue || 'Interviews'}</span>
               </h1>
-              <p className="si-hero-desc">{renderBold(dynamicAbout)}</p>
+              <div className="si-hero-desc">
+                <BodyBlocks blocks={parseBodyContent(dynamicAbout)} />
+              </div>
               <div className="si-hero-keywords">
                 {siData.aboutKeywords || 'PRACTICE / PROBLEM SOLVE / GET PLACED'}
               </div>
@@ -168,7 +173,9 @@ export default function SmartInterviewsPage({
               <div className={`si-phase-badge-box ${idx === 0 ? 'active' : 'inactive'}`}>0{idx + 1}</div>
               <div>
                 <h3 className="si-phase-name">{phase.label}</h3>
-                <p className="si-phase-content-text">{renderBold(phase.content)}</p>
+                <div className="si-phase-content-text">
+                  <BodyBlocks blocks={parseBodyContent(phase.content)} />
+                </div>
               </div>
             </div>
           ))}
@@ -193,9 +200,7 @@ export default function SmartInterviewsPage({
               {activeSectionId === '02' && (
                 <div className="si-accordion-detail-card">
                   {siData.moreParagraphs.map((p, i) => (
-                    <p key={i} style={{ margin: i === siData.moreParagraphs.length - 1 ? 0 : '0 0 0.9rem' }}>
-                      {renderBold(p)}
-                    </p>
+                    <BodyBlocks key={i} blocks={parseBodyContent(p)} paragraphStyle={{ margin: i === siData.moreParagraphs.length - 1 ? 0 : '0 0 0.9rem' }} />
                   ))}
                 </div>
               )}
@@ -276,10 +281,12 @@ export default function SmartInterviewsPage({
               </div>
               {activeSectionId === '05' && (
                 <div className="si-accordion-detail-card">
-                  {renderBold(
-                    siData.facilitiesContent ||
-                      'High-speed computing labs, online contest platforms (HackerRank, CodeChef, Codeforces), automated leaderboard evaluation systems, and dedicated interactive training centers.'
-                  )}
+                  <BodyBlocks
+                    blocks={parseBodyContent(
+                      siData.facilitiesContent ||
+                        'High-speed computing labs, online contest platforms (HackerRank, CodeChef, Codeforces), automated leaderboard evaluation systems, and dedicated interactive training centers.'
+                    )}
+                  />
                 </div>
               )}
 
@@ -293,10 +300,12 @@ export default function SmartInterviewsPage({
               </div>
               {activeSectionId === '06' && (
                 <div className="si-accordion-detail-card">
-                  {renderBold(
-                    siData.outcomesContent ||
-                      'Over 970+ students placed in top MNCs over the past 7 years with salary packages ranging from 10 LPA up to 50 LPA.'
-                  )}
+                  <BodyBlocks
+                    blocks={parseBodyContent(
+                      siData.outcomesContent ||
+                        'Over 970+ students placed in top MNCs over the past 7 years with salary packages ranging from 10 LPA up to 50 LPA.'
+                    )}
+                  />
                 </div>
               )}
 
@@ -310,10 +319,12 @@ export default function SmartInterviewsPage({
               </div>
               {activeSectionId === '07' && (
                 <div className="si-accordion-detail-card">
-                  {renderBold(
-                    siData.partnersContent ||
-                      'Smart Interviews, HackerRank, TCS (CodeVita), Infosys (HackWithInfy), CodeChef, and Codeforces.'
-                  )}
+                  <BodyBlocks
+                    blocks={parseBodyContent(
+                      siData.partnersContent ||
+                        'Smart Interviews, HackerRank, TCS (CodeVita), Infosys (HackWithInfy), CodeChef, and Codeforces.'
+                    )}
+                  />
                 </div>
               )}
             </div>

@@ -137,15 +137,22 @@
   margin-bottom: 1rem;
 }
 
-.mc-vision-content p {
-  font-size: 1.025rem;
-  line-height: 1.8;
-  color: #334155;
-  margin: 0;
+.mc-vision-content {
   background: #f8fafc;
   padding: 1.5rem;
   border-radius: 12px;
   border-left: 3px solid #c9973a;
+}
+
+.mc-vision-content p {
+  font-size: 1.025rem;
+  line-height: 1.8;
+  color: #334155;
+  margin: 0 0 0.75rem 0;
+}
+
+.mc-vision-content p:last-child {
+  margin-bottom: 0;
 }
 
 .mc-mission-intro {

@@ -25,6 +25,7 @@ import { vsac, type VsacMember, type SimpleTable } from './vsac.data';
 import type { DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
 import type { CustomSection } from '../../lib/customSections';
 import { renderBold } from '../../lib/boldText';
+import BodyBlocks, { parseBodyContent } from '../../components/BodyBlocks/BodyBlocks';
 import './VsacPage.css';
 
 interface VsacPageProps {
@@ -174,11 +175,11 @@ export default function VsacPage({ item, sections }: VsacPageProps) {
             {item?.title || vsac.aboutTitle}
           </h2>
 
-          {aboutParagraphs.map((para, idx) => (
-            <p key={idx} className="vsac-overview-text">
-              {renderBold(para)}
-            </p>
-          ))}
+          <div className="vsac-overview-text">
+            {aboutParagraphs.map((para, idx) => (
+              <BodyBlocks key={idx} blocks={parseBodyContent(para)} paragraphStyle={{ margin: '0 0 1rem 0' }} />
+            ))}
+          </div>
         </div>
         {hasPhotos && <RenderPhotoFrame index={0} />}
       </section>
@@ -198,9 +199,9 @@ export default function VsacPage({ item, sections }: VsacPageProps) {
                 <div className="vsac-orbit-title">
                   <Compass size={16} style={{ color: '#00E5FF' }} /> {visionTitle}
                 </div>
-                <p className="vsac-orbit-item" style={{ fontStyle: 'italic', fontWeight: 500, lineHeight: 1.6, color: '#334155' }}>
-                  &ldquo;{renderBold(visionText)}&rdquo;
-                </p>
+                <div className="vsac-orbit-item" style={{ fontStyle: 'italic', fontWeight: 500, lineHeight: 1.6, color: '#334155' }}>
+                  <BodyBlocks blocks={parseBodyContent(visionText)} />
+                </div>
 
                 <div className="vsac-orbit-title" style={{ marginTop: '1.25rem' }}>
                   <Sparkles size={16} style={{ color: '#FFB300' }} /> {missionTitle}

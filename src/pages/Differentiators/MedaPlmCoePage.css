@@ -144,6 +144,25 @@
   margin: 0;
 }
 
+.meda-hero-paragraphs p {
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.92);
+  font-weight: 400;
+  margin: 0 0 0.5rem 0;
+}
+
+.meda-hero-paragraphs ul {
+  margin: 0.5rem 0;
+  padding-left: 1.25rem;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.meda-hero-paragraphs li {
+  margin-bottom: 0.35rem;
+  line-height: 1.6;
+}
+
 /* Full-Width Section Header Banner */
 .meda-section-block {
   margin-bottom: var(--space-3, 0.75rem);

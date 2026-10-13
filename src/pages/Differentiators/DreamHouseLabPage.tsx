@@ -27,6 +27,7 @@ import type { CustomSection, CustomSectionPhoto } from '../../lib/customSections
 import { hasCustomSectionContent } from '../../lib/customSections';
 import { CustomSectionsGalleries, CustomSectionsAccordion, CustomSectionsIntro } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import { renderBold } from '../../lib/boldText';
+import BodyBlocks, { parseBodyContent } from '../../components/BodyBlocks/BodyBlocks';
 import { useDocument } from '../../hooks/useDocument';
 import type { DreamHouseLabDoc } from '../Admin/sections/DreamHouseLabContentAdmin';
 import './DreamHouseLabPage.css';
@@ -239,9 +240,9 @@ export default function DreamHouseLabPage({ item, sections }: DreamHouseLabPageP
             <h2 className="dhcl-section-heading">{overviewTitle}</h2>
             <div className="dhcl-paragraphs">
               {aboutParagraphs.map((p, idx) => (
-                <p key={idx} className="dhcl-lead-paragraph">
-                  {renderBold(p)}
-                </p>
+                <div key={idx} className="dhcl-lead-paragraph">
+                  <BodyBlocks blocks={parseBodyContent(p)} paragraphStyle={{}} />
+                </div>
               ))}
             </div>
 
@@ -316,7 +317,9 @@ export default function DreamHouseLabPage({ item, sections }: DreamHouseLabPageP
             <div className="dhcl-vision-content">
               <span className="dhcl-vm-subtitle">{visionSubtitle}</span>
               <h3 className="dhcl-vm-title">{visionTitle}</h3>
-              <p className="dhcl-vision-text">{visionText}</p>
+              <div className="dhcl-vision-text">
+                <BodyBlocks blocks={parseBodyContent(visionText)} paragraphStyle={{ margin: 0 }} />
+              </div>
             </div>
           </div>
 
