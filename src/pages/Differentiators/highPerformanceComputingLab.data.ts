@@ -10,6 +10,48 @@ export interface HpcMember {
   profileLink?: string;
 }
 
+export interface HpcObjectiveItem {
+  title?: string;
+  description: string;
+}
+
+export function parseHpcObjective(raw: string | HpcObjectiveItem | undefined | null): HpcObjectiveItem {
+  if (!raw) return { title: '', description: '' };
+  if (typeof raw === 'object' && raw !== null) {
+    return {
+      title: raw.title?.trim() || '',
+      description: raw.description?.trim() || '',
+    };
+  }
+  const str = String(raw).trim();
+  if (str.includes('\n')) {
+    const lines = str.split('\n').map((l) => l.trim()).filter(Boolean);
+    if (lines.length >= 2) {
+      return {
+        title: lines[0],
+        description: lines.slice(1).join('\n'),
+      };
+    } else if (lines.length === 1) {
+      return { title: '', description: lines[0] };
+    }
+  }
+  const boldMatch = str.match(/^\*\*(.+?)\*\*[:\s-]*(.*)$/s);
+  if (boldMatch) {
+    return {
+      title: boldMatch[1].trim(),
+      description: boldMatch[2].trim(),
+    };
+  }
+  const colonMatch = str.match(/^([A-Za-z0-9\s&,/-]{3,70}):\s+(.+)$/s);
+  if (colonMatch) {
+    return {
+      title: colonMatch[1].trim(),
+      description: colonMatch[2].trim(),
+    };
+  }
+  return { title: '', description: str };
+}
+
 export const highPerformanceComputingLab = {
   paragraphs: [
     'Centre of Excellence in High Performance Computing (HPC) Lab was established in 2021 at Department of Artificial Intelligence, with initial support from Shri Vishnu Engineering College for Women (SVECW). The use of High-Performance Computing (HPC) is significant to technological advancement and enhancing a nation’s economic competitiveness.',
@@ -24,10 +66,19 @@ export const highPerformanceComputingLab = {
     'To apply new advancements in high performance computing hardware and software.',
   ],
   objectives: [
-    'Explore and understand artificial intelligence, including machine learning, deep learning, computer vision and natural language processing to perform research on their applicability in various domains.',
-    'Providing cutting-edge GPU computing resources to the faculty and student for building machine learning, deep learning, and computer vision models specifically handling large real-world datasets.',
-    'To address the skill gap in computational science in the targeted domains by specialized trainings for increased adoption of advanced HPC in industry and academia.',
-  ],
+    {
+      title: 'Advance AI & Computational Research',
+      description: 'Explore and understand artificial intelligence, including machine learning, deep learning, computer vision and natural language processing to perform research on their applicability in various domains.',
+    },
+    {
+      title: 'Strengthen GPU-Based Research Capability',
+      description: 'Providing cutting-edge GPU computing resources to the faculty and student for building machine learning, deep learning, and computer vision models specifically handling large real-world datasets.',
+    },
+    {
+      title: 'Build High Performance Computing Skills',
+      description: 'To address the skill gap in computational science in the targeted domains by specialized trainings for increased adoption of advanced HPC in industry and academia.',
+    },
+  ] as (string | HpcObjectiveItem)[],
   team: {
     inCharge: [
       {

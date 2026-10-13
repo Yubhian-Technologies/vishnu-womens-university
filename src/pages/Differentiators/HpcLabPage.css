@@ -374,11 +374,29 @@
   flex-shrink: 0;
 }
 
+.hpc-objective-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.hpc-objective-heading {
+  font-size: 0.98rem;
+  font-weight: 800;
+  color: #0B1E42;
+  margin: 0;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+}
+
 .hpc-objective-text {
   font-size: 0.88rem;
   line-height: 1.55;
   color: #334155;
   margin: 0;
+  white-space: pre-line;
 }
 
 /* --------------------------------------------------------------------------

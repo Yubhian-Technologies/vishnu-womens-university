@@ -26,6 +26,8 @@ import { useDocument } from '../../../hooks/useDocument';
 import {
   highPerformanceComputingLab,
   type HpcMember,
+  type HpcObjectiveItem,
+  parseHpcObjective,
 } from '../../Differentiators/highPerformanceComputingLab.data';
 
 export type { HpcMember };
@@ -71,7 +73,7 @@ export interface HpcLabDoc {
   // 4. Strategic Objectives
   objectivesBadge?: string;
   objectivesTitle?: string;
-  objectives?: string[];
+  objectives?: (string | HpcObjectiveItem)[];
   // 5. Funded Research Projects
   fundedProjectsBadge?: string;
   fundedProjectsTitle?: string;
@@ -746,40 +748,64 @@ export default function HpcLabContentAdmin() {
           <div>
             <label className="admin-label">Strategic Objectives List</label>
             <p style={{ fontSize: '0.8rem', color: '#64748B', margin: '0 0 0.5rem 0' }}>
-              Displayed on the website as numbered objective cards (01, 02, 03...).
+              Displayed on the website as numbered objective cards (01, 02, 03...) with a bold highlight heading and description.
             </p>
-            {(form.objectives || []).map((obj, idx) => (
-              <div key={idx} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem', alignItems: 'flex-start' }}>
-                <span style={{ fontSize: '0.8rem', fontWeight: 800, color: '#008080', background: '#E6FFFA', padding: '0.35rem 0.6rem', borderRadius: '4px', minWidth: '36px', textAlign: 'center' }}>
-                  {String(idx + 1).padStart(2, '0')}
-                </span>
-                <textarea
-                  className="admin-textarea"
-                  rows={2}
-                  value={obj}
-                  onChange={(e) => {
-                    const list = [...(form.objectives || [])];
-                    list[idx] = e.target.value;
-                    setForm((p) => ({ ...p, objectives: list }));
-                  }}
-                />
-                <button
-                  type="button"
-                  onClick={() => {
-                    const list = (form.objectives || []).filter((_, i) => i !== idx);
-                    setForm((p) => ({ ...p, objectives: list }));
-                  }}
-                  className="admin-btn-danger"
-                  style={{ padding: '0.4rem 0.6rem', alignSelf: 'flex-start' }}
-                  title="Remove objective"
-                >
-                  <Trash2 size={14} />
-                </button>
-              </div>
-            ))}
+            {(form.objectives || []).map((rawObj, idx) => {
+              const item = parseHpcObjective(rawObj);
+              return (
+                <div key={idx} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.75rem', alignItems: 'flex-start' }}>
+                  <span style={{ fontSize: '0.8rem', fontWeight: 800, color: '#008080', background: '#E6FFFA', padding: '0.35rem 0.6rem', borderRadius: '4px', minWidth: '36px', textAlign: 'center', marginTop: '0.2rem' }}>
+                    {String(idx + 1).padStart(2, '0')}
+                  </span>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', flex: 1 }}>
+                    <input
+                      type="text"
+                      className="admin-input"
+                      placeholder="Highlight Heading (e.g. Advance AI & Computational Research)"
+                      style={{ fontWeight: 700 }}
+                      value={item.title || ''}
+                      onChange={(e) => {
+                        const list = [...(form.objectives || [])];
+                        list[idx] = {
+                          title: e.target.value,
+                          description: item.description,
+                        };
+                        setForm((p) => ({ ...p, objectives: list }));
+                      }}
+                    />
+                    <textarea
+                      className="admin-textarea"
+                      rows={2}
+                      placeholder="Objective description..."
+                      value={item.description}
+                      onChange={(e) => {
+                        const list = [...(form.objectives || [])];
+                        list[idx] = {
+                          title: item.title || '',
+                          description: e.target.value,
+                        };
+                        setForm((p) => ({ ...p, objectives: list }));
+                      }}
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const list = (form.objectives || []).filter((_, i) => i !== idx);
+                      setForm((p) => ({ ...p, objectives: list }));
+                    }}
+                    className="admin-btn-danger"
+                    style={{ padding: '0.4rem 0.6rem', alignSelf: 'flex-start', marginTop: '0.2rem' }}
+                    title="Remove objective"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              );
+            })}
             <button
               type="button"
-              onClick={() => setForm((p) => ({ ...p, objectives: [...(p.objectives || []), ''] }))}
+              onClick={() => setForm((p) => ({ ...p, objectives: [...(p.objectives || []), { title: '', description: '' }] }))}
               className="admin-btn-secondary"
               style={{ fontSize: '0.8rem', marginTop: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}
             >
