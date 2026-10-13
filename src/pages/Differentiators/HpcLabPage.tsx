@@ -22,7 +22,7 @@ import { type CustomSection } from '../../lib/customSections';
 import { useDocument } from '../../hooks/useDocument';
 import type { HpcLabDoc } from '../Admin/sections/HpcLabContentAdmin';
 import type { DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
-import { highPerformanceComputingLab } from './highPerformanceComputingLab.data';
+import { highPerformanceComputingLab, parseHpcObjective } from './highPerformanceComputingLab.data';
 import { renderBold } from '../../lib/boldText';
 import './HpcLabPage.css';
 
@@ -320,12 +320,22 @@ export default function HpcLabPage({ item, sections = [] }: HpcLabPageProps) {
             </div>
             <h3 className="hpc-subcard-title">{objectivesTitle}</h3>
             <div className="hpc-objectives-grid">
-              {objectivesList.map((obj: string, idx: number) => (
-                <div key={idx} className="hpc-objective-tile">
-                  <span className="hpc-objective-num">{String(idx + 1).padStart(2, '0')}</span>
-                  <p className="hpc-objective-text">{renderBold(obj)}</p>
-                </div>
-              ))}
+              {objectivesList.map((obj, idx) => {
+                const item = parseHpcObjective(obj);
+                return (
+                  <div key={idx} className="hpc-objective-tile">
+                    <span className="hpc-objective-num">{String(idx + 1).padStart(2, '0')}</span>
+                    <div className="hpc-objective-content">
+                      {item.title && (
+                        <h4 className="hpc-objective-heading">{renderBold(item.title)}</h4>
+                      )}
+                      {item.description && (
+                        <p className="hpc-objective-text">{renderBold(item.description)}</p>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </section>
