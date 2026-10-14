@@ -680,12 +680,13 @@ function SidebarImageCarousel({ images, alt }: { images: string[]; alt: string }
   );
 }
 
-// Round a value up to a "nice" axis maximum (1/2/5 × 10ⁿ).
+// Round a value up to a "nice" axis maximum (1/2/3/4/5/6/8/10 × 10ⁿ).
 function niceCeil(v: number): number {
   if (v <= 0) return 1;
   const mag = Math.pow(10, Math.floor(Math.log10(v)));
   const n = v / mag;
-  const step = n <= 1 ? 1 : n <= 2 ? 2 : n <= 5 ? 5 : 10;
+  const steps = [1, 2, 3, 4, 5, 6, 8, 10];
+  const step = steps.find((s) => n <= s) ?? 10;
   return step * mag;
 }
 
@@ -735,8 +736,12 @@ function BatchTrendChart({ data }: { data: PlacementYear[] }) {
   const cardStyle = { background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-5)' } as const;
   const titleStyle = { fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-text)', marginBottom: 'var(--space-3)' } as const;
 
-  // Offers axis: 0 → nice ceiling, 5 evenly-spaced ticks.
-  const offersMax = niceCeil(Math.max(...rows.map((r) => r.offers)) || 1);
+  // Offers axis: 0 → nice ceiling with extra headroom above the tallest bar.
+  // Keeping the zero baseline (so bar heights stay honestly proportional to
+  // value) but giving ~60% more room than the tightest fit means every bar
+  // sits lower and the gap between the shortest and tallest looks less
+  // dramatic, without distorting the underlying ratios.
+  const offersMax = niceCeil((Math.max(...rows.map((r) => r.offers)) || 1) * 1.6);
   const yOffers = (v: number) => m.top + ih - (v / offersMax) * ih;
   const OFFER_TICKS = 5;
   const barW = Math.min(42, (iw / rows.length) * 0.55);
