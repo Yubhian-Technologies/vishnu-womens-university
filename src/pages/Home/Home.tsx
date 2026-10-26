@@ -224,6 +224,15 @@ export default function Home() {
     return [...base, ...base];
   }, [activityItems]);
 
+  // Dynamically scale marquee duration with item count so events always glide by
+  // at a calm, readable pace (~10s per card, minimum 80s) rather than speeding up
+  // as more events are published.
+  const activityScrollDuration = useMemo(() => {
+    const baseCount = loopItems.length / 2;
+    if (baseCount <= 0) return '85s';
+    return `${Math.max(80, Math.round(baseCount * 10))}s`;
+  }, [loopItems]);
+
   useEffect(() => {
     document.title = homeContent.browserTabTitle;
   }, [homeContent.browserTabTitle]);
@@ -320,7 +329,10 @@ export default function Home() {
 
         <div className="activity-strip">
           <div className="activity-track-wrap">
-            <div className="activity-track">
+            <div
+              className="activity-track"
+              style={{ '--activity-scroll-duration': activityScrollDuration } as React.CSSProperties}
+            >
               {happeningsLoading ? (
                 Array.from({ length: 6 }).map((_, i) => (
                   <div key={i} className="activity-card activity-card--skeleton" aria-hidden="true" />

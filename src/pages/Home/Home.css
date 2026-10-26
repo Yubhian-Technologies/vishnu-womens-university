@@ -229,7 +229,7 @@
   gap: 18px;
   width: max-content;
   height: 100%;
-  animation: activity-scroll 38s linear infinite;
+  animation: activity-scroll var(--activity-scroll-duration, 85s) linear infinite;
   will-change: transform;
   padding: 12px 0;
 }
