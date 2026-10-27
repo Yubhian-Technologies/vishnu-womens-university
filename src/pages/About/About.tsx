@@ -205,7 +205,7 @@ export default function About() {
   }, []);
 
   return (
-    <main className="page-wrapper">
+    <main className="page-wrapper about-page">
       {/* Hero */}
       <PageHero
         page="about"
@@ -213,6 +213,7 @@ export default function About() {
         defaultSubtitle="Discover Vishnu Women's University — empowering women to learn, lead, and shape the future."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'About VWU' }]}
         hideCta={true}
+        className="about-hero"
       />
 
       {/* Quick Stats — M3 Tonal Surface Cards */}

@@ -96,7 +96,7 @@ import { renderBold } from '../../lib/boldText';
 import '../detail-layout.css';
 import '../Campus/tabbed-section.css';
 
-const NAV_OFFSET = 'calc(var(--topbar-height) + var(--header-height) + 1rem)';
+const NAV_OFFSET = 'calc(var(--topbar-height, 0px) + 195px)';
 
 const categoryLabel: Record<string, string> = {
   btech: 'B.Tech',

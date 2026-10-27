@@ -19,7 +19,7 @@ import { renderBold } from '../../lib/boldText';
 import { hodTitle } from '../../lib/hod';
 import '../detail-layout.css';
 
-const NAV_OFFSET = 'calc(var(--topbar-height) + var(--header-height) + 1rem)';
+const NAV_OFFSET = 'calc(var(--topbar-height, 0px) + 195px)';
 
 interface Props {
   dept: StandaloneDepartment;

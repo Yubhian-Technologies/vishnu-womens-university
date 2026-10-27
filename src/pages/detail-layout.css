@@ -4374,6 +4374,121 @@ td.pb-activities-num {
   gap: 1rem;
 }
 
+/* ---- Mobile Differentiator Detail Hero Banner matching About Page ---- */
+@media (max-width: 768px) {
+  .page-wrapper:has(.dept-hero-section),
+  .page-wrapper:has(.gsac-hero-section),
+  .page-wrapper:has(.fl-hero-section) {
+    padding-top: 0 !important;
+  }
+  .dept-hero-section {
+    min-height: unset !important;
+    height: auto !important;
+    display: block !important;
+    margin-top: 102px !important;
+    padding: 0 !important;
+  }
+  .dept-hero-section .container {
+    padding: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+  .dept-hero-card {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 1908 / 558 !important;
+    min-height: unset !important;
+    max-height: unset !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+  }
+  .dept-hero-bg-img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center !important;
+  }
+  .dept-hero-overlay {
+    display: none !important;
+  }
+  .dept-hero-content {
+    display: none !important;
+  }
+
+  /* GSAC Mobile Hero */
+  .gsac-hero-section {
+    min-height: unset !important;
+    height: auto !important;
+    display: block !important;
+    margin-top: 102px !important;
+    padding: 0 !important;
+  }
+  .gsac-hero-card {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 1908 / 558 !important;
+    min-height: unset !important;
+    max-height: unset !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+  }
+  .gsac-hero-bg {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center !important;
+  }
+  .gsac-hero-overlay,
+  .gsac-hero-doodle,
+  .gsac-hero-airplane,
+  .gsac-hero-content-wrapper {
+    display: none !important;
+  }
+
+  /* Foreign Languages Mobile Hero */
+  .fl-hero-section {
+    min-height: unset !important;
+    height: auto !important;
+    display: block !important;
+    margin-top: 102px !important;
+    padding: 0 !important;
+  }
+  .fl-hero-card {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 1908 / 558 !important;
+    min-height: unset !important;
+    max-height: unset !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+  }
+  .fl-hero-bg {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center !important;
+  }
+  .fl-hero-overlay,
+  .fl-hero-doodle,
+  .fl-hero-content-wrapper {
+    display: none !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .dept-hero-section,
+  .gsac-hero-section,
+  .fl-hero-section {
+    margin-top: 96px !important;
+  }
+}
+
 .btn-hero-gold,
 .btn-hero-outline {
   display: inline-flex;
@@ -5528,13 +5643,14 @@ td.pb-activities-num {
    ========================================================================== */
 .dept-horizontal-quicknav-section {
   position: sticky;
-  top: calc(var(--topbar-height, 0px) + 85px);
+  top: calc(var(--topbar-height, 0px) + env(safe-area-inset-top, 0px) + 128px);
   z-index: 40;
   margin: 0.35rem 0 1.25rem 0;
   padding: 0.25rem 0;
   pointer-events: auto;
   /* Prevent horizontal overflow bleed */
-  overflow: clip;
+  overflow-x: clip;
+  overflow-y: visible;
   max-width: 100%;
 }
 
@@ -5570,10 +5686,16 @@ td.pb-activities-num {
   }
 }
 
+@media (max-width: 1199px) {
+  .dept-horizontal-quicknav-section {
+    top: calc(var(--topbar-height, 0px) + env(safe-area-inset-top, 0px) + 120px);
+  }
+}
+
 /* Mobile: horizontally scrollable bar with auto-scroll active */
 @media (max-width: 768px) {
   .dept-horizontal-quicknav-section {
-    top: calc(var(--topbar-height, 0px) + 75px);
+    top: calc(var(--topbar-height, 0px) + env(safe-area-inset-top, 0px) + 118px);
     margin: 0.25rem 0 1rem 0;
     padding: 0.15rem 0;
     /* Allow pill to bleed to safe-area edges */
@@ -5610,6 +5732,12 @@ td.pb-activities-num {
     padding: 0.45rem 0.85rem;
     font-size: 0.82rem;
     white-space: nowrap;
+  }
+}
+
+@media (max-width: 640px) {
+  .dept-horizontal-quicknav-section {
+    top: calc(var(--topbar-height, 0px) + env(safe-area-inset-top, 0px) + 112px);
   }
 }
 
@@ -6563,39 +6691,39 @@ td.pb-activities-num {
 }
 
 @media (max-width: 768px) {
+  .page-wrapper:has(.placement-details-hero-card) {
+    padding-top: 0 !important;
+  }
+
   .placement-details-hero-card {
-    min-height: auto;
-    align-items: flex-end;
-  }
-  
-  .placement-details-glass-box {
-    max-width: 100%;
-    background: rgba(15, 23, 42, 0.55);
-    padding: 1.5rem;
-  }
-
-  .placement-details-hero-headline-main,
-  .placement-details-hero-headline-highlight {
-    white-space: normal;
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 1908 / 558 !important;
+    min-height: unset !important;
+    max-height: unset !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+    display: block !important;
+    position: relative !important;
   }
 
-  .placement-details-hero-stats {
-    flex-direction: column;
-    gap: 0.85rem;
+  .placement-details-hero-bg-media {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center !important;
+    display: block !important;
   }
 
-  .placement-details-stat-divider {
-    display: none;
-  }
-
-  .placement-details-stat-item {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    padding-bottom: 0.5rem;
-  }
-
-  .placement-details-stat-item:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
+  .placement-details-hero-overlay,
+  .placement-details-hero-content-wrap,
+  .placement-details-glass-box,
+  .placement-details-hero-bottom-accent {
+    display: none !important;
   }
 }
 

@@ -36,7 +36,7 @@ import { renderBold } from '../../lib/boldText';
 import '../detail-layout.css';
 import '../Campus/tabbed-section.css';
 
-const NAV_OFFSET = 'calc(var(--topbar-height, 0px) + 130px)';
+const NAV_OFFSET = 'calc(var(--topbar-height, 0px) + 195px)';
 
 // Every section id the quick-nav scroll-spy might need to observe — a
 // superset of whatever `quickLinks` ends up rendering for a given
