@@ -749,3 +749,62 @@
   .exec-detail-banner__fact { font-size: 0.9rem; }
   .exec-detail-banner__bio { font-size: 0.9rem; line-height: 1.55; }
 }
+
+/* ---- Mobile Hero Banner matching Home Page Hero Banner ---- */
+@media (max-width: 768px) {
+  .about-page {
+    padding-top: 0 !important;
+  }
+  .about-hero {
+    min-height: unset !important;
+    height: auto !important;
+    display: block !important;
+    margin-top: 102px !important;
+    padding: 0 !important;
+  }
+  .about-hero .container {
+    padding: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+  .about-hero .page-hero-card {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 1908 / 558 !important;
+    min-height: unset !important;
+    max-height: unset !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+  }
+  .about-hero .page-hero-image {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center !important;
+  }
+  .about-hero .page-hero-overlay {
+    display: none !important;
+  }
+  .about-hero .page-hero-content {
+    display: none !important;
+  }
+  .about-hero .page-hero__arrow {
+    display: none !important;
+  }
+  .about-hero .page-hero__counter {
+    display: none !important;
+  }
+  .about-hero .page-hero__dots {
+    bottom: 0.4rem !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .about-hero {
+    margin-top: 96px !important;
+  }
+}
+
+

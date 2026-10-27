@@ -375,7 +375,37 @@
   .arvr-hero { min-height: 460px; }
 }
 
+@media (max-width: 768px) {
+  .page-wrapper:has(.arvr-hero) {
+    padding-top: 0 !important;
+  }
+  .arvr-hero {
+    min-height: unset !important;
+    height: auto !important;
+    display: block !important;
+    margin-top: 102px !important;
+    padding: 0 !important;
+    width: 100% !important;
+    aspect-ratio: 1908 / 558 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+  }
+  .arvr-hero__bg {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center !important;
+  }
+  .arvr-hero__grid,
+  .arvr-hero__content {
+    display: none !important;
+  }
+}
+
 @media (max-width: 640px) {
+  .arvr-hero {
+    margin-top: 96px !important;
+  }
   .arvr-container { padding: 0 var(--space-5); }
-  .arvr-hero__content { padding: var(--space-10) var(--space-5) var(--space-8); }
 }

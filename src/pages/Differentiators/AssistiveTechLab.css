@@ -29,9 +29,47 @@
 }
 
 @media (max-width: 768px) {
+  .page-wrapper:has(.atl-hero-section) {
+    padding-top: 0 !important;
+  }
+  .atl-hero-section {
+    min-height: unset !important;
+    height: auto !important;
+    display: block !important;
+    margin-top: 102px !important;
+    padding: 0 !important;
+  }
+  .atl-hero-section .container {
+    padding: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+  }
   .atl-hero-card {
-    min-height: 380px;
-    padding: var(--space-6, 1.5rem) var(--space-5, 1.25rem);
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 1908 / 558 !important;
+    min-height: unset !important;
+    max-height: unset !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+  }
+  .atl-hero-bg {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center !important;
+  }
+  .atl-hero-content {
+    display: none !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .atl-hero-section {
+    margin-top: 96px !important;
   }
 }
 

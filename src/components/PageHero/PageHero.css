@@ -413,14 +413,25 @@
   }
   .page-hero__title {
     font-size: clamp(1.5rem, 3.8vw, 2.2rem);
+  }
+}
+
+/* ---- Mobile Hero Banner matching About Page / Home Page Hero Banner ---- */
 @media (max-width: 768px) {
+  .page-wrapper:has(.page-hero) {
+    padding-top: 0 !important;
+  }
   .page-hero {
+    min-height: unset !important;
+    height: auto !important;
+    display: block !important;
     margin-top: 102px !important;
     padding: 0 !important;
   }
   .page-hero .container {
-    padding-left: 0 !important;
-    padding-right: 0 !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
   }
   .page-hero-card,
   .page-hero--large .page-hero-card,
@@ -428,140 +439,40 @@
   .page-hero--small .page-hero-card {
     width: 100% !important;
     height: auto !important;
-    aspect-ratio: 16 / 9 !important;
+    aspect-ratio: 1908 / 558 !important;
     min-height: unset !important;
     max-height: unset !important;
     margin: 0 !important;
     border-radius: 0 !important;
-    box-shadow: none;
-    overflow: hidden;
+    box-shadow: none !important;
+    overflow: hidden !important;
+  }
+  .page-hero-image {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center !important;
   }
   .page-hero-overlay {
-    background: linear-gradient(
-      180deg,
-      rgba(11, 30, 66, 0.3) 0%,
-      rgba(11, 30, 66, 0.55) 50%,
-      rgba(11, 30, 66, 0.85) 100%
-    );
+    display: none !important;
   }
   .page-hero-content {
-    padding: 0.85rem 0.85rem 1.6rem 0.85rem !important;
-  }
-  .page-hero__title {
-    font-size: clamp(1.05rem, 4.5vw, 1.45rem) !important;
-    margin-top: 0.2rem !important;
-    margin-bottom: 0.25rem !important;
-    line-height: 1.2 !important;
-  }
-  .page-hero__subtitle {
-    font-size: 0.78rem !important;
-    line-height: 1.35 !important;
-    margin-bottom: 0.5rem !important;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-  .btn-hero-gold,
-  .btn-hero-outline {
-    padding: 0.45rem 0.95rem !important;
-    font-size: 0.75rem !important;
+    display: none !important;
   }
   .page-hero__arrow {
-    top: 0.5rem !important;
-    width: 30px !important;
-    height: 30px !important;
-    min-width: 30px !important;
-    min-height: 30px !important;
-    font-size: 0.85rem !important;
-    background: rgba(0, 0, 0, 0.35);
-    border-color: rgba(255, 255, 255, 0.4);
+    display: none !important;
   }
-  .page-hero__arrow::before {
-    content: '';
-    position: absolute;
-    inset: -6px;
-  }
-  .page-hero__arrow--prev {
-    right: 2.6rem !important;
-  }
-  .page-hero__arrow--next {
-    right: 0.5rem !important;
-  }
-  .breadcrumb {
-    max-width: calc(100% - 70px) !important;
-    padding: 0.15rem 0.55rem !important;
-    margin-bottom: 0.25rem !important;
-    border-radius: 4px;
-  }
-  .breadcrumb-item {
-    font-size: 0.72rem !important;
+  .page-hero__counter {
+    display: none !important;
   }
   .page-hero__dots {
     bottom: 0.4rem !important;
-  }
-  .page-hero__counter {
-    bottom: 0.4rem !important;
-    right: 0.5rem !important;
-    font-size: 0.7rem !important;
-    padding: 1px 6px !important;
   }
 }
 
 @media (max-width: 640px) {
   .page-hero {
     margin-top: 96px !important;
-    padding: 0 !important;
-  }
-  .page-hero .container {
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-  }
-  .page-hero-card,
-  .page-hero--large .page-hero-card,
-  .page-hero--medium .page-hero-card,
-  .page-hero--small .page-hero-card {
-    width: 100% !important;
-    height: auto !important;
-    aspect-ratio: 16 / 9 !important;
-    min-height: unset !important;
-    max-height: unset !important;
-    margin: 0 !important;
-    border-radius: 0 !important;
-    box-shadow: none;
-    overflow: hidden;
-  }
-  .page-hero-content {
-    padding: 0.85rem 0.85rem 1.6rem 0.85rem !important;
-  }
-  .page-hero__title {
-    font-size: clamp(1.05rem, 4.5vw, 1.45rem) !important;
-    margin-top: 0.2rem !important;
-    margin-bottom: 0.25rem !important;
-    line-height: 1.2 !important;
-  }
-  .page-hero__subtitle {
-    font-size: 0.78rem !important;
-    line-height: 1.35 !important;
-    margin-bottom: 0.5rem !important;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-  .btn-hero-gold,
-  .btn-hero-outline {
-    padding: 0.45rem 0.95rem !important;
-    font-size: 0.75rem !important;
-  }
-  .page-hero__dots {
-    bottom: 0.4rem !important;
-  }
-  .page-hero__counter {
-    bottom: 0.4rem !important;
-    right: 0.5rem !important;
-    font-size: 0.7rem !important;
-    padding: 1px 6px !important;
   }
 }
 
