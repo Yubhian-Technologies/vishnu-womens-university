@@ -75,7 +75,7 @@ export default function ProgrammeStructure({ semesters, loading }: Props) {
                   onClick={(e) => e.stopPropagation()}
                   style={{ flexShrink: 0, marginRight: 'var(--space-4)', fontSize: '0.72rem', fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-primary)', textDecoration: 'underline', textUnderlineOffset: 2, whiteSpace: 'nowrap' }}
                 >
-                  Core Structure & Syllabus
+                  Course Structure & Syllabus
                 </a>
               )}
             </div>
