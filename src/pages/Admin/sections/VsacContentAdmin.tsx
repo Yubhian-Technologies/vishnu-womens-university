@@ -72,7 +72,7 @@ export interface VsacDoc {
 }
 
 function cloneTable(table?: SimpleTable): SimpleTable | undefined {
-  if (!table) return undefined;
+  if (!table || !table.rows) return undefined;
   return {
     headers: [...(table.headers || [])],
     rows: (table.rows || []).map((r: { cells: string[] }) => ({ cells: [...(r.cells || [])] })),
@@ -80,15 +80,18 @@ function cloneTable(table?: SimpleTable): SimpleTable | undefined {
 }
 
 function cloneTrainingItem(t: TrainingResearchItem): TrainingResearchItem {
-  return {
+  const item: TrainingResearchItem = {
     title: t.title || '',
     paragraphs: [...(t.paragraphs || [])],
-    tableTitle: t.tableTitle || '',
-    table: cloneTable(t.table),
-    images: [...(t.images || [])],
-    secondParagraph: t.secondParagraph || '',
-    secondTable: cloneTable(t.secondTable),
   };
+  if (t.tableTitle) item.tableTitle = t.tableTitle;
+  const clonedTable = cloneTable(t.table);
+  if (clonedTable) item.table = clonedTable;
+  if (t.images && t.images.length > 0) item.images = [...t.images];
+  if (t.secondParagraph) item.secondParagraph = t.secondParagraph;
+  const clonedSecondTable = cloneTable(t.secondTable);
+  if (clonedSecondTable) item.secondTable = clonedSecondTable;
+  return item;
 }
 
 const DEFAULT_STATE: VsacDoc = {
@@ -136,7 +139,7 @@ function normalizeCustomSection(sec: any): CustomVsacSection {
   const paragraphs = sec.paragraphs || (textContent ? textContent.split('\n').filter(Boolean) : []);
   const bulletPoints = sec.bulletPoints || (listText ? listText.split('\n').filter(Boolean) : []);
   const contentType = sec.contentType || (listText.trim() ? 'list' : 'text');
-  return {
+  const res: CustomVsacSection = {
     id: sec.id || `section-${Date.now()}`,
     label,
     title,
@@ -148,11 +151,37 @@ function normalizeCustomSection(sec: any): CustomVsacSection {
     paragraphs,
     bulletPoints,
     files: sec.files || [],
-    photo: sec.photo,
     galleryPhotos: sec.galleryPhotos || [],
     subSections: sec.subSections || [],
     placement: sec.placement || 'accordion',
   };
+  if (sec.photo) res.photo = sec.photo;
+  return res;
+}
+
+/** Recursively removes any undefined keys or array entries so Firestore setDoc never rejects them */
+function cleanUndefined<T>(value: T): T {
+  if (value === undefined) {
+    return undefined as unknown as T;
+  }
+  if (value === null || typeof value !== 'object') {
+    return value;
+  }
+  if (value instanceof Date) {
+    return value;
+  }
+  if (Array.isArray(value)) {
+    return value
+      .filter((item) => item !== undefined)
+      .map((item) => cleanUndefined(item)) as unknown as T;
+  }
+  const result: Record<string, unknown> = {};
+  for (const [key, val] of Object.entries(value as Record<string, unknown>)) {
+    if (val !== undefined) {
+      result[key] = cleanUndefined(val);
+    }
+  }
+  return result as T;
 }
 
 function TableEditor({
@@ -369,9 +398,13 @@ export default function VsacContentAdmin() {
         bulletPoints: sec.listText ? sec.listText.split('\n').filter(Boolean) : sec.bulletPoints || [],
       }));
 
-      await setDoc(doc(db, 'settings', 'vsac'), {
+      const payload = cleanUndefined({
         ...form,
         additionalSections: formattedSections,
+      });
+
+      await setDoc(doc(db, 'settings', 'vsac'), {
+        ...payload,
         updatedAt: serverTimestamp(),
       }, { merge: true });
       alert('Vishnu Space Application Center (VSAC) content updated successfully!');
@@ -1069,7 +1102,9 @@ export default function VsacContentAdmin() {
                   item.table
                     ? () => {
                         const list = [...(form.trainingResearch || [])];
-                        list[idx] = { ...list[idx], table: undefined };
+                        const nextItem = { ...list[idx] };
+                        delete nextItem.table;
+                        list[idx] = nextItem;
                         setForm((p) => ({ ...p, trainingResearch: list }));
                       }
                     : undefined
@@ -1105,7 +1140,9 @@ export default function VsacContentAdmin() {
                   item.secondTable
                     ? () => {
                         const list = [...(form.trainingResearch || [])];
-                        list[idx] = { ...list[idx], secondTable: undefined };
+                        const nextItem = { ...list[idx] };
+                        delete nextItem.secondTable;
+                        list[idx] = nextItem;
                         setForm((p) => ({ ...p, trainingResearch: list }));
                       }
                     : undefined
