@@ -14,6 +14,9 @@ export interface CareerApplicationDoc {
   experience: string;
   message: string;
   resumeFileName?: string;
+  resumeUrl?: string;
+  dataFileName?: string;
+  dataFileUrl?: string;
   status: 'new' | 'read';
   createdAt?: { toDate: () => Date };
 }
@@ -111,7 +114,24 @@ export default function CareerApplicationsAdmin() {
           <div className="admin-detail-row"><strong>Experience:</strong> {selected.experience}</div>
           <div className="admin-detail-row"><strong>Applied:</strong> {formatTimestamp(selected.createdAt)}</div>
           {selected.resumeFileName && (
-            <div className="admin-detail-row"><strong>Resume:</strong> {selected.resumeFileName} (sent by email at submission time — not stored here)</div>
+            <div className="admin-detail-row">
+              <strong>Resume:</strong>{' '}
+              {selected.resumeUrl ? (
+                <a href={selected.resumeUrl} target="_blank" rel="noopener noreferrer">{selected.resumeFileName}</a>
+              ) : (
+                <>{selected.resumeFileName} (older application — file wasn't saved, only emailed at submission time)</>
+              )}
+            </div>
+          )}
+          {selected.dataFileName && (
+            <div className="admin-detail-row">
+              <strong>Data Format File:</strong>{' '}
+              {selected.dataFileUrl ? (
+                <a href={selected.dataFileUrl} target="_blank" rel="noopener noreferrer">{selected.dataFileName}</a>
+              ) : (
+                selected.dataFileName
+              )}
+            </div>
           )}
           {selected.message && <div className="admin-detail-message">{selected.message}</div>}
         </div>
